@@ -2041,9 +2041,9 @@ UI_Utils::item_Bind_HandleKey( itemDef_t *item, int key, int down )
 			id = controlUtils_->bindingIDFromName(item->cvar);
 			if (id != -1) 
 			{
-				controlUtils_->bindings_[id]->bind1_ = -1;
-				controlUtils_->bindings_[id]->bind2_ = -1;
-				controlUtils_->bindings_[id]->hold_ = -1;
+				controlUtils_->bindings_[id].bind1_ = -1;
+				controlUtils_->bindings_[id].bind2_ = -1;
+				controlUtils_->bindings_[id].hold_ = -1;
 			}
 			controlUtils_->setConfig(true);
 			waitingForKey_ = false;
@@ -2076,20 +2076,20 @@ UI_Utils::item_Bind_Assign( itemDef_t *item, int key, bool hold )
 		id = controlUtils_->bindingIDFromName(item->cvar);
 		if (id != -1)
 		{
-			for (auto* binding : controlUtils_->bindings_)
+			for (ControlUtils::Binding& other : controlUtils_->bindings_)
 			{
-				if (binding->hold_ == key) 
-					binding->hold_ = -1;
+				if (other.hold_ == key) 
+					other.hold_ = -1;
 			}
-			ControlUtils::Binding* binding = controlUtils_->bindings_[id];
-			if (binding->bind1_ == key)
+			ControlUtils::Binding& binding = controlUtils_->bindings_[id];
+			if (binding.bind1_ == key)
 			{
-				binding->bind1_ = binding->bind2_;
-				binding->bind2_ = -1;
+				binding.bind1_ = binding.bind2_;
+				binding.bind2_ = -1;
 			}
-			else if (binding->bind2_ == key) 
-				binding->bind2_ = -1;
-			binding->hold_ = key;
+			else if (binding.bind2_ == key) 
+				binding.bind2_ = -1;
+			binding.hold_ = key;
 		}
 		controlUtils_->setConfig(true);
 		waitingForKey_ = false;
@@ -2102,13 +2102,13 @@ UI_Utils::item_Bind_Assign( itemDef_t *item, int key, bool hold )
 		for (i=0; i < bindCount; i++)
 		{
 
-			if (controlUtils_->bindings_[i]->bind2_ == key) 
-				controlUtils_->bindings_[i]->bind2_ = -1;
+			if (controlUtils_->bindings_[i].bind2_ == key) 
+				controlUtils_->bindings_[i].bind2_ = -1;
 
-			if (controlUtils_->bindings_[i]->bind1_ == key)
+			if (controlUtils_->bindings_[i].bind1_ == key)
 			{
-				controlUtils_->bindings_[i]->bind1_ = controlUtils_->bindings_[i]->bind2_;
-				controlUtils_->bindings_[i]->bind2_ = -1;
+				controlUtils_->bindings_[i].bind1_ = controlUtils_->bindings_[i].bind2_;
+				controlUtils_->bindings_[i].bind2_ = -1;
 			}
 		}
 	}
@@ -2118,36 +2118,36 @@ UI_Utils::item_Bind_Assign( itemDef_t *item, int key, bool hold )
 
 	if (id != -1) 
 	{
-		if (controlUtils_->bindings_[id]->hold_ == key) 
-			controlUtils_->bindings_[id]->hold_ = -1;
+		if (controlUtils_->bindings_[id].hold_ == key) 
+			controlUtils_->bindings_[id].hold_ = -1;
 
 		if (key == -1) 
 		{
-			if( controlUtils_->bindings_[id]->bind1_ != -1 ) 
+			if( controlUtils_->bindings_[id].bind1_ != -1 ) 
 			{
-				dc_->setBinding( controlUtils_->bindings_[id]->bind1_, "" );
-				controlUtils_->bindings_[id]->bind1_ = -1;
+				dc_->setBinding( controlUtils_->bindings_[id].bind1_, "" );
+				controlUtils_->bindings_[id].bind1_ = -1;
 			}
-			if( controlUtils_->bindings_[id]->bind2_ != -1 ) 
+			if( controlUtils_->bindings_[id].bind2_ != -1 ) 
 			{
-				dc_->setBinding( controlUtils_->bindings_[id]->bind2_, "" );
-				controlUtils_->bindings_[id]->bind2_ = -1;
+				dc_->setBinding( controlUtils_->bindings_[id].bind2_, "" );
+				controlUtils_->bindings_[id].bind2_ = -1;
 			}
 		}
-		else if (controlUtils_->bindings_[id]->bind1_ == -1) 
+		else if (controlUtils_->bindings_[id].bind1_ == -1) 
 		{
-			controlUtils_->bindings_[id]->bind1_ = key;
+			controlUtils_->bindings_[id].bind1_ = key;
 		}
-		else if (controlUtils_->bindings_[id]->bind1_ != key && controlUtils_->bindings_[id]->bind2_ == -1) 
+		else if (controlUtils_->bindings_[id].bind1_ != key && controlUtils_->bindings_[id].bind2_ == -1) 
 		{
-			controlUtils_->bindings_[id]->bind2_ = key;
+			controlUtils_->bindings_[id].bind2_ = key;
 		}
 		else 
 		{
-			dc_->setBinding( controlUtils_->bindings_[id]->bind1_, "" );
-			dc_->setBinding( controlUtils_->bindings_[id]->bind2_, "" );
-			controlUtils_->bindings_[id]->bind1_ = key;
-			controlUtils_->bindings_[id]->bind2_ = -1;
+			dc_->setBinding( controlUtils_->bindings_[id].bind1_, "" );
+			dc_->setBinding( controlUtils_->bindings_[id].bind2_, "" );
+			controlUtils_->bindings_[id].bind1_ = key;
+			controlUtils_->bindings_[id].bind2_ = -1;
 		}						
 	}
 

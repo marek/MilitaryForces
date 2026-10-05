@@ -13,8 +13,6 @@ GameObjectInfo_Boat::GameObjectInfo_Boat() :
 
 GameObjectInfo_Boat::~GameObjectInfo_Boat()
 {
-	delete sonarInfo_;
-	sonarInfo_ = nullptr;
 }
 
 
@@ -45,13 +43,13 @@ GameObjectInfo_Boat::createAllBoats( GameObjectList& gameObjects )
 	Vector4Set( veh->shadowAdjusts_, 0, 0, 0, 0 );	
 	VectorSet( veh->gunoffset_, 5, 0, 8 );		
 	VectorSet( veh->cockpitview_, 0, 0, 6 );	
-	veh->airRadar_ = new VehicleRadarInfo(-1, 8000, CAT_PLANE|CAT_HELO);		
-	veh->groundRadar_ = new VehicleRadarInfo(0, 7000, CAT_GROUND|CAT_BOAT);			
+	veh->airRadar_ = std::make_unique<VehicleRadarInfo>(-1, 8000, CAT_PLANE|CAT_HELO);		
+	veh->groundRadar_ = std::make_unique<VehicleRadarInfo>(0, 7000, CAT_GROUND|CAT_BOAT);			
 	veh->minThrottle_ = -5;
 	veh->maxThrottle_ = 10;
 	veh->acceleration_ = 15;
 	veh->maxFuel_ = 150;
-	veh->sonarInfo_ = new VehicleRadarInfo(0, 3000, CAT_BOAT); 		
+	veh->sonarInfo_ = std::make_unique<VehicleRadarInfo>(0, 3000, CAT_BOAT); 		
     veh->maxSpeed_ = 50;		
 	gameObjects.push_back(veh);
 	//8,							// max angle to lean when turning <- gearheight

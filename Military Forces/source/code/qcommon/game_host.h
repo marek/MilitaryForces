@@ -1,6 +1,7 @@
 #ifndef GAME_HOST_H
 #define GAME_HOST_H
 
+#include <memory>
 #include <vector>
 #include "../game/q_shared.h"
 
@@ -33,7 +34,7 @@ public:
 	static void botUserCommand( int clientNum, usercmd_t *cmd );
 	static void adjustAreaPortalState( EntityBase* gameEnt, int open );
 	static void setBrushModel( EntityBase* gameEnt, const char *name );
-	static void locateGameData( std::vector<EntityBase*>* gameEntities, std::vector<ClientBase*>* gameClients );
+	static void locateGameData( std::vector<std::unique_ptr<EntityBase>>* gameEntities, std::vector<std::unique_ptr<ClientBase>>* gameClients );
 };
 
 #endif

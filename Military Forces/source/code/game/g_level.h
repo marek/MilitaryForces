@@ -4,6 +4,7 @@
 #include "q_shared.h"
 #include "g_client.h"
 #include "g_entity.h"
+#include <memory>
 #include <vector>
 
 
@@ -13,8 +14,8 @@ struct spawn_t;
 
 struct LevelLocals
 {
-	typedef std::vector<ClientBase*> ClientList;
-	typedef std::vector<EntityBase*> EntityList;
+	typedef std::vector<std::unique_ptr<ClientBase>> ClientList;
+	typedef std::vector<std::unique_ptr<EntityBase>> EntityList;
 
 	static const int k_MAX_SPAWN_VARS =	64;
 	static const int k_MAX_SPAWN_VARS_CHARS = 2048;

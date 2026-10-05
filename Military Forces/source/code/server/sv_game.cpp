@@ -279,8 +279,8 @@ GameHost::locateGameData
 
 ===============
 */
-void GameHost::locateGameData( std::vector<EntityBase*>* gameEntities, 
-					    std::vector<ClientBase*>* gameClients )
+void GameHost::locateGameData( std::vector<std::unique_ptr<EntityBase>>* gameEntities, 
+					    std::vector<std::unique_ptr<ClientBase>>* gameClients )
 //void GameHost::locateGameData( void* gEnts, int numGEntities, int sizeofGEntity_t,
 //					   playerState_t *clients, int sizeofGameClient ) 
 {

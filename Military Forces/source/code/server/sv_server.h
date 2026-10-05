@@ -4,6 +4,7 @@
 #include "../qcommon/qcommon.h"
 #include "../game/q_shared.h"
 #include "sv_entity.h"
+#include <memory>
 #include <vector>
 
 
@@ -13,8 +14,8 @@ struct cmodel_t;
 
 struct Server
 {
-	typedef std::vector<ClientBase*> ClientList;
-	typedef std::vector<EntityBase*> EntityList;
+	typedef std::vector<std::unique_ptr<ClientBase>> ClientList;
+	typedef std::vector<std::unique_ptr<EntityBase>> EntityList;
 
 	enum eServerState
 	{

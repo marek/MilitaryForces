@@ -29,10 +29,6 @@ GameObjectInfo_Vehicle::GameObjectInfo_Vehicle() :
 
 GameObjectInfo_Vehicle::~GameObjectInfo_Vehicle()
 {
-	delete airRadar_;
-	airRadar_ = nullptr;
-	delete groundRadar_;
-	groundRadar_ = nullptr;
 }
 
 bool

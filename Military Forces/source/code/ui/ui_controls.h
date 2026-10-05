@@ -82,7 +82,7 @@ struct ControlUtils
 	static void				setUtils( UI_Utils* utils );
 
 	// data
-	std::vector<Binding*>	bindings_;
+	std::vector<Binding>	bindings_;
 
 	static constexpr int	holdTime = 350;		// msec, same as the +hold command
 
@@ -103,7 +103,6 @@ struct ControlUtils::Binding
 							int bind1,
 							int bind2,
 							int defaulthold = -1 );
-					~Binding();
 
 	const char*     command_;
 	const char*		label_;	
@@ -114,11 +113,6 @@ struct ControlUtils::Binding
 	int				bind2_;
 	int				defaulthold_;	// key whose long press runs this command
 	int				hold_;
-
-private:
-	// disabled
-					Binding( Binding const& );
-	Binding&		operator=( Binding const& );
 };
 
 

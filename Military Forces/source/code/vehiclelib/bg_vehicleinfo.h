@@ -3,6 +3,7 @@
 #define __BG_VEHICLEINFO_H__
 
 
+#include <memory>
 #include "bg_vehicleextra.h"
 #include "bg_datamanager.h"
 #include <string>
@@ -92,8 +93,8 @@ struct GameObjectInfo_Vehicle : public GameObjectInfo
 	// general vehicle (non infantry)
 	vec3_t					gunoffset_;				// guntag
 	vec3_t					cockpitview_;			// to place the camera
-	VehicleRadarInfo*		airRadar_;				// air radar
-	VehicleRadarInfo*		groundRadar_;			// ground radar
+	std::unique_ptr<VehicleRadarInfo>		airRadar_;				// air radar
+	std::unique_ptr<VehicleRadarInfo>		groundRadar_;			// ground radar
 	int						minThrottle_;
 	int						maxThrottle_;
 	unsigned int			acceleration_;	
@@ -148,8 +149,8 @@ struct GameObjectInfo_Aircraft : public GameObjectInfo_Vehicle
 {
 	// all aircraft
 	int						engines_;				// how many engines does it actually have
-	VehiclePartAnimInfo*	bayAnim_;				// bay animation info (if it has weapons bay)
-	VehiclePartAnimInfo*	gearAnim_;				// gear animation info (if it has a retractable gear)
+	std::unique_ptr<VehiclePartAnimInfo>	bayAnim_;				// bay animation info (if it has weapons bay)
+	std::unique_ptr<VehiclePartAnimInfo>	gearAnim_;				// gear animation info (if it has a retractable gear)
 	float					tailAngle_;				// for taildraggers on ground (can be planes or helos)
 	float					gearHeight_;			// height of gear
 	unsigned int			abEffectModel_;			// num of afterburner model (for planes)
@@ -222,7 +223,7 @@ struct GameObjectInfo_Boat : public GameObjectInfo_Vehicle
 	static void				createAllBoats( GameObjectList& gameObjects );
 
 	// boats
-	VehicleRadarInfo*		sonarInfo_;				// in case it has sonar
+	std::unique_ptr<VehicleRadarInfo>		sonarInfo_;				// in case it has sonar
 
 private:
     // disable

@@ -78,26 +78,14 @@ LevelLocals::resetAll()
 void
 LevelLocals::resetClientsAndEntities()
 {
-	for(auto & client : clients_)
-	{
-		delete client;
-	}
 	clients_.clear();
 	clients_.resize(MAX_CLIENTS+1);	// first one is empty (world)
-	for( size_t i = 0; i <= MAX_CLIENTS; ++i )
-	{
-		clients_.at(i) = nullptr;
-	}
 
-	for(auto & gameEntitie : gameEntities_)
-	{
-		delete gameEntitie;
-	}
 	gameEntities_.clear();
 	gameEntities_.resize(MAX_CLIENTS+1);// 0 = world, after that the clients 1 -> MAX_CLIENTS + 1
 	for( size_t i = 0; i <= MAX_CLIENTS; ++i )
 	{
-		gameEntities_.at(i) = new GameEntity;// 0;
+		gameEntities_.at(i) = std::make_unique<GameEntity>();
 	}
 	num_entities_ = 0;
 }
@@ -112,8 +100,9 @@ LevelLocals::addEntity(GameEntity* newEnt)
 		{
 			if( !gameEntities_.at(i) )
 			{
-				gameEntities_.at(i) = newEnt;
-				clients_.at(i) = newEnt->client_;
+				gameEntities_.at(i).reset( newEnt );
+				if( clients_.at(i).get() != newEnt->client_ )
+					clients_.at(i).reset( newEnt->client_ );
 				break;
 			}
 		}
@@ -121,7 +110,7 @@ LevelLocals::addEntity(GameEntity* newEnt)
 	// normal entity, append
 	else
 	{
-		gameEntities_.push_back(newEnt);
+		gameEntities_.emplace_back(newEnt);
 		num_entities_ = gameEntities_.size();
 	}
 }
@@ -129,7 +118,7 @@ LevelLocals::addEntity(GameEntity* newEnt)
 void
 LevelLocals::addWorld(GameEntity* world)
 {
-	gameEntities_.at(0) = world;
+	gameEntities_.at(0).reset( world );
 }
 
 void
@@ -143,10 +132,7 @@ LevelLocals::removeEntity(GameEntity* entToRemove)
 	if( entToRemove->client_ )
 	{
 		int num = entToRemove->s.number;
-		delete gameEntities_.at(num);
-		gameEntities_.at(num) = nullptr;
-		//delete clients_.at(num);
-		//clients_.at(num) = 0;
+		gameEntities_.at(num).reset();
 	}
 	// others are removed
 	else
@@ -155,9 +141,8 @@ LevelLocals::removeEntity(GameEntity* entToRemove)
 		EntityList::iterator itEnd = gameEntities_.end();
 		for( ; it != itEnd; ++it )
 		{
-			if( *it == entToRemove )
+			if( it->get() == entToRemove )
 			{
-				delete (*it);
 				gameEntities_.erase(it);
 				num_entities_ = gameEntities_.size();
 				break;
@@ -169,25 +154,22 @@ LevelLocals::removeEntity(GameEntity* entToRemove)
 GameEntity*
 LevelLocals::getEntity(int entNum)
 {
-	return reinterpret_cast<GameEntity*>(gameEntities_.at(entNum));
+	return static_cast<GameEntity*>(gameEntities_.at(entNum).get());
 }
 
 GameClient*
 LevelLocals::getClient(int clientNum)
 {
-	return reinterpret_cast<GameClient*>(clients_.at(clientNum));
+	return static_cast<GameClient*>(clients_.at(clientNum).get());
 }
 
 GameClient*
 LevelLocals::createNewClient(int clientNum)
 {
-	GameClient* client = reinterpret_cast<GameClient*>(clients_.at(clientNum));
-	if( client )
-		delete client;
-	client = new GameClient;
+	GameClient* client = new GameClient;
 	client->ps_.clientNum = clientNum;
 
-	clients_.at(clientNum) = client;
+	clients_.at(clientNum).reset( client );
 
 	return client;
 }
@@ -195,13 +177,10 @@ LevelLocals::createNewClient(int clientNum)
 void
 LevelLocals::setPlayerEntity(GameEntity* playerEnt, int clientNum)
 {
-	GameEntity* ent = reinterpret_cast<GameEntity*>(gameEntities_.at(clientNum));
-	if( ent )
-		delete ent;
-
-	playerEnt->client_ = reinterpret_cast<GameClient*>(clients_.at(clientNum));
+	playerEnt->client_ = static_cast<GameClient*>(clients_.at(clientNum).get());
 	playerEnt->s.number = clientNum;
-	gameEntities_.at(clientNum) = playerEnt;
+	if( gameEntities_.at(clientNum).get() != playerEnt )
+		gameEntities_.at(clientNum).reset( playerEnt );
 }
 
 void		
@@ -299,7 +278,7 @@ LevelLocals::spawnEntity()
 
 	for( i = MAX_CLIENTS + 1 ; i < numEnts ; i++ )
 	{
-		GameEntity* ent = reinterpret_cast<GameEntity*>(gameEntities_.at(i));
+		GameEntity* ent = static_cast<GameEntity*>(gameEntities_.at(i).get());
 		if( !ent )
 		{
 			ent = new GameEntity;

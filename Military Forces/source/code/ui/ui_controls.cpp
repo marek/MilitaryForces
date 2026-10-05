@@ -8,140 +8,133 @@ UI_Utils* ControlUtils::utils_ = nullptr;
 
 ControlUtils::ControlUtils()
 {
-	bindings_.push_back( new Binding("+scores",			"Show Scoreboard",				ID_SHOWSCORES,		K_TAB,			-1,			-1, -1) );
-	bindings_.push_back( new Binding("weapprev",		"Previous Weapon",				ID_WEAPPREV,		'[',			-1,			-1, -1) );
-	bindings_.push_back( new Binding("weapnext", 		"Next Weapon",					ID_WEAPNEXT,		']',			-1,			-1, -1) );
-	bindings_.push_back( new Binding("messagemode", 	"Chat",							ID_CHAT,			't',			-1,			-1, -1) );
-	bindings_.push_back( new Binding("messagemode2", 	"Chat - Team",					ID_CHAT2,			'y',			-1,			-1, -1) );
-	bindings_.push_back( new Binding("messagemode3", 	"Chat - Target",				ID_CHAT3,			'u',			-1,			-1, -1) );
-	bindings_.push_back( new Binding("messagemode4", 	"Chat - Attacker",				ID_CHAT4,			'i',			-1,			-1, -1) );
-	bindings_.push_back( new Binding("cmessagemode", 	"MFQ3 Chat",					ID_CHAT,			't',			-1,			-1, -1) );
-	bindings_.push_back( new Binding("cmessagemode2", 	"MFQ3 Chat - Team",				ID_CHAT2,			-1,				-1,			-1, -1) );
-	bindings_.push_back( new Binding("cmessagemode3", 	"MFQ3 Chat - Target",			ID_CHAT3,			-1,				-1,			-1, -1) );
-	bindings_.push_back( new Binding("cmessagemode4", 	"MFQ3 Chat - Attacker",			ID_CHAT4,			-1,				-1,			-1, -1) );
-	bindings_.push_back( new Binding("weapon 0",		"Select MG",					ID_WEAPON_MG,		'0',			-1,			-1, -1) );
-	bindings_.push_back( new Binding("weapon 1",		"Select Weapon 1",				ID_WEAPON_1,		'1',			-1,			-1, -1) );
-	bindings_.push_back( new Binding("weapon 2",		"Select Weapon 2",				ID_WEAPON_2,		'2',			-1,			-1, -1) );
-	bindings_.push_back( new Binding("weapon 3",		"Select Weapon 3",				ID_WEAPON_3,		'3',			-1,			-1, -1) );
-	bindings_.push_back( new Binding("weapon 4",		"Select Weapon 4",				ID_WEAPON_4,		'4',			-1,			-1, -1) );
-	bindings_.push_back( new Binding("weapon 5",		"Select Weapon 5",				ID_WEAPON_5,		'5',			-1,			-1, -1) );
-	bindings_.push_back( new Binding("weapon 6",		"Select Weapon 6",				ID_WEAPON_6,		'6',			-1,			-1, -1) );
-	bindings_.push_back( new Binding("+button10",		"Fire Flare",					ID_WEAPON_FLARE,	K_SPACE,		-1,			-1, -1) );
-	bindings_.push_back( new Binding("encyclopedia",	"Encyclopedia",					ID_ENCYC,			-1,				-1,			-1, -1) );
-	bindings_.push_back( new Binding("teamselect",		"Team Selection",				ID_TEAMSEL,			-1,				-1,			-1, -1) );
-	bindings_.push_back( new Binding("vehicleselect",	"Vehicle Selection",			ID_VEHSEL,			'\\',			-1,			-1, -1) );
-	bindings_.push_back( new Binding("gps",				"GPS on/off",					ID_GPS,				'f',			-1,			-1, -1) );
-	bindings_.push_back( new Binding("toggleview",		"Toggle Camera",				ID_TOGGLEVIEW,		-1,				-1,			-1, -1) );
-	bindings_.push_back( new Binding("+cameraup",		"Camera Up",					ID_CAMERAUP,		-1,				-1,			-1, -1) );
-	bindings_.push_back( new Binding("+cameradown",		"Camera Down",					ID_CAMERADOWN,		-1,				-1,			-1, -1) );
-	bindings_.push_back( new Binding("+zoomin",			"Zoom In",						ID_ZOOMIN,			-1,				-1,			-1, -1) );
-	bindings_.push_back( new Binding("+zoomout",		"Zoom Out",						ID_ZOOMOUT,			-1,				-1,			-1, -1) );
-	bindings_.push_back( new Binding("contact_tower",	"Contact Tower",				ID_CONTACTTOWER,	K_BACKSPACE,	-1,			-1, -1) );
-	bindings_.push_back( new Binding("radar",			"RADAR on/off",					ID_RADAR,			-1,				-1,			-1, -1, 'r') );
-	bindings_.push_back( new Binding("extinfo",			"Ext.Info on/off",				ID_EXTINFO,			'-',			-1,			-1, -1) );
+	bindings_.emplace_back("+scores",			"Show Scoreboard",				ID_SHOWSCORES,		K_TAB,			-1,			-1, -1 );
+	bindings_.emplace_back("weapprev",		"Previous Weapon",				ID_WEAPPREV,		'[',			-1,			-1, -1 );
+	bindings_.emplace_back("weapnext", 		"Next Weapon",					ID_WEAPNEXT,		']',			-1,			-1, -1 );
+	bindings_.emplace_back("messagemode", 	"Chat",							ID_CHAT,			't',			-1,			-1, -1 );
+	bindings_.emplace_back("messagemode2", 	"Chat - Team",					ID_CHAT2,			'y',			-1,			-1, -1 );
+	bindings_.emplace_back("messagemode3", 	"Chat - Target",				ID_CHAT3,			'u',			-1,			-1, -1 );
+	bindings_.emplace_back("messagemode4", 	"Chat - Attacker",				ID_CHAT4,			'i',			-1,			-1, -1 );
+	bindings_.emplace_back("cmessagemode", 	"MFQ3 Chat",					ID_CHAT,			't',			-1,			-1, -1 );
+	bindings_.emplace_back("cmessagemode2", 	"MFQ3 Chat - Team",				ID_CHAT2,			-1,				-1,			-1, -1 );
+	bindings_.emplace_back("cmessagemode3", 	"MFQ3 Chat - Target",			ID_CHAT3,			-1,				-1,			-1, -1 );
+	bindings_.emplace_back("cmessagemode4", 	"MFQ3 Chat - Attacker",			ID_CHAT4,			-1,				-1,			-1, -1 );
+	bindings_.emplace_back("weapon 0",		"Select MG",					ID_WEAPON_MG,		'0',			-1,			-1, -1 );
+	bindings_.emplace_back("weapon 1",		"Select Weapon 1",				ID_WEAPON_1,		'1',			-1,			-1, -1 );
+	bindings_.emplace_back("weapon 2",		"Select Weapon 2",				ID_WEAPON_2,		'2',			-1,			-1, -1 );
+	bindings_.emplace_back("weapon 3",		"Select Weapon 3",				ID_WEAPON_3,		'3',			-1,			-1, -1 );
+	bindings_.emplace_back("weapon 4",		"Select Weapon 4",				ID_WEAPON_4,		'4',			-1,			-1, -1 );
+	bindings_.emplace_back("weapon 5",		"Select Weapon 5",				ID_WEAPON_5,		'5',			-1,			-1, -1 );
+	bindings_.emplace_back("weapon 6",		"Select Weapon 6",				ID_WEAPON_6,		'6',			-1,			-1, -1 );
+	bindings_.emplace_back("+button10",		"Fire Flare",					ID_WEAPON_FLARE,	K_SPACE,		-1,			-1, -1 );
+	bindings_.emplace_back("encyclopedia",	"Encyclopedia",					ID_ENCYC,			-1,				-1,			-1, -1 );
+	bindings_.emplace_back("teamselect",		"Team Selection",				ID_TEAMSEL,			-1,				-1,			-1, -1 );
+	bindings_.emplace_back("vehicleselect",	"Vehicle Selection",			ID_VEHSEL,			'\\',			-1,			-1, -1 );
+	bindings_.emplace_back("gps",				"GPS on/off",					ID_GPS,				'f',			-1,			-1, -1 );
+	bindings_.emplace_back("toggleview",		"Toggle Camera",				ID_TOGGLEVIEW,		-1,				-1,			-1, -1 );
+	bindings_.emplace_back("+cameraup",		"Camera Up",					ID_CAMERAUP,		-1,				-1,			-1, -1 );
+	bindings_.emplace_back("+cameradown",		"Camera Down",					ID_CAMERADOWN,		-1,				-1,			-1, -1 );
+	bindings_.emplace_back("+zoomin",			"Zoom In",						ID_ZOOMIN,			-1,				-1,			-1, -1 );
+	bindings_.emplace_back("+zoomout",		"Zoom Out",						ID_ZOOMOUT,			-1,				-1,			-1, -1 );
+	bindings_.emplace_back("contact_tower",	"Contact Tower",				ID_CONTACTTOWER,	K_BACKSPACE,	-1,			-1, -1 );
+	bindings_.emplace_back("radar",			"RADAR on/off",					ID_RADAR,			-1,				-1,			-1, -1, 'r' );
+	bindings_.emplace_back("extinfo",			"Ext.Info on/off",				ID_EXTINFO,			'-',			-1,			-1, -1 );
 	// one key for both radar jobs: a tap steps the range, holding it switches the radar
-	bindings_.push_back( new Binding("radarrange",		"RADAR range",					ID_RADARRANGE,		'r',			-1,			-1, -1) );
-	bindings_.push_back( new Binding("mfd1_mode",		"Cycle MFD1 Mode",				ID_CYCLEMFD1,		-1,				-1,			-1, -1) );
-	bindings_.push_back( new Binding("mfd2_mode",		"Cycle MFD2 Mode",				ID_CYCLEMFD2,		-1,				-1,			-1, -1) );
-	bindings_.push_back( new Binding("eject",			"Eject",						ID_EJECT,			-1,				'o',		-1,	-1) );
+	bindings_.emplace_back("radarrange",		"RADAR range",					ID_RADARRANGE,		'r',			-1,			-1, -1 );
+	bindings_.emplace_back("mfd1_mode",		"Cycle MFD1 Mode",				ID_CYCLEMFD1,		-1,				-1,			-1, -1 );
+	bindings_.emplace_back("mfd2_mode",		"Cycle MFD2 Mode",				ID_CYCLEMFD2,		-1,				-1,			-1, -1 );
+	bindings_.emplace_back("eject",			"Eject",						ID_EJECT,			-1,				'o',		-1,	-1 );
 
-	bindings_.push_back( new Binding("+forward", 		"Forward (Max)",				ID_FORWARD,			'w',			-1,			-1, -1) );
-	bindings_.push_back( new Binding("+back", 			"Back/Stop (Min)",				ID_BACKPEDAL,		's',			-1,			-1, -1) );
-	bindings_.push_back( new Binding("+moveleft", 		"Turn left (tank)",				ID_MOVELEFT,		'a',			-1,			-1, -1) );
-	bindings_.push_back( new Binding("+moveright", 		"Turn right (tank)",			ID_MOVERIGHT,		'd',			-1,			-1, -1) );
-	bindings_.push_back( new Binding("+moveup",			"up / jump",					ID_MOVEUP,			-1,				-1,			-1, -1) );
-	bindings_.push_back( new Binding("+movedown",		"down / crouch",				ID_MOVEDOWN,		-1,				-1,			-1, -1) );
-	bindings_.push_back( new Binding("+left", 			"Left (view)",					ID_LEFT,			K_LEFTARROW,	-1,			-1, -1) );
-	bindings_.push_back( new Binding("+right", 			"Right (view)", 				ID_RIGHT,			K_RIGHTARROW,	-1,			-1, -1) );
-	bindings_.push_back( new Binding("+lookup", 		"Up (view)",					ID_LOOKUP,			K_PGUP,			-1,			-1, -1) );
-	bindings_.push_back( new Binding("+lookdown", 		"Down (view)",					ID_LOOKDOWN,		K_PGDN,			-1,			-1, -1) );
-	bindings_.push_back( new Binding("+zoom", 			"Zoom View",					ID_ZOOMVIEW,		K_SHIFT,		-1,			-1, -1) );
-	bindings_.push_back( new Binding("+attack", 		"Fire MG",						ID_ATTACK,			K_CTRL,			-1,			-1, -1) );
-	bindings_.push_back( new Binding("+button2", 		"Fire Main Weapon",				ID_ATTACK2,			K_ENTER,		K_MOUSE4,	-1, -1) );
-	bindings_.push_back( new Binding("+button7",		"Landing Gear",					ID_GEAR,			'g',			-1,			-1, -1) );
-	bindings_.push_back( new Binding("+button8",	 	"(Speed)Brakes",				ID_BRAKE,			K_ALT,			-1,			-1, -1) );
-	bindings_.push_back( new Binding("+button9",	 	"Freelook Camera",				ID_FREECAM,			-1,				-1,			-1, -1) );
-	bindings_.push_back( new Binding("+button5", 		"Throttle Up",					ID_INCREASE,		'q',			-1,			-1, -1) );
-	bindings_.push_back( new Binding("+button6", 		"Throttle Down",				ID_DECREASE,		'e',			-1,			-1, -1) );
-	bindings_.push_back( new Binding("unlock",			"Unlock Target",				ID_UNLOCK,			K_CTRL,			-1,			-1, -1) );
-	bindings_.push_back( new Binding("+bombcam",		"Bomb Camera",					ID_BOMBCAMERA,		-1,				-1,			-1, -1) );
+	bindings_.emplace_back("+forward", 		"Forward (Max)",				ID_FORWARD,			'w',			-1,			-1, -1 );
+	bindings_.emplace_back("+back", 			"Back/Stop (Min)",				ID_BACKPEDAL,		's',			-1,			-1, -1 );
+	bindings_.emplace_back("+moveleft", 		"Turn left (tank)",				ID_MOVELEFT,		'a',			-1,			-1, -1 );
+	bindings_.emplace_back("+moveright", 		"Turn right (tank)",			ID_MOVERIGHT,		'd',			-1,			-1, -1 );
+	bindings_.emplace_back("+moveup",			"up / jump",					ID_MOVEUP,			-1,				-1,			-1, -1 );
+	bindings_.emplace_back("+movedown",		"down / crouch",				ID_MOVEDOWN,		-1,				-1,			-1, -1 );
+	bindings_.emplace_back("+left", 			"Left (view)",					ID_LEFT,			K_LEFTARROW,	-1,			-1, -1 );
+	bindings_.emplace_back("+right", 			"Right (view)", 				ID_RIGHT,			K_RIGHTARROW,	-1,			-1, -1 );
+	bindings_.emplace_back("+lookup", 		"Up (view)",					ID_LOOKUP,			K_PGUP,			-1,			-1, -1 );
+	bindings_.emplace_back("+lookdown", 		"Down (view)",					ID_LOOKDOWN,		K_PGDN,			-1,			-1, -1 );
+	bindings_.emplace_back("+zoom", 			"Zoom View",					ID_ZOOMVIEW,		K_SHIFT,		-1,			-1, -1 );
+	bindings_.emplace_back("+attack", 		"Fire MG",						ID_ATTACK,			K_CTRL,			-1,			-1, -1 );
+	bindings_.emplace_back("+button2", 		"Fire Main Weapon",				ID_ATTACK2,			K_ENTER,		K_MOUSE4,	-1, -1 );
+	bindings_.emplace_back("+button7",		"Landing Gear",					ID_GEAR,			'g',			-1,			-1, -1 );
+	bindings_.emplace_back("+button8",	 	"(Speed)Brakes",				ID_BRAKE,			K_ALT,			-1,			-1, -1 );
+	bindings_.emplace_back("+button9",	 	"Freelook Camera",				ID_FREECAM,			-1,				-1,			-1, -1 );
+	bindings_.emplace_back("+button5", 		"Throttle Up",					ID_INCREASE,		'q',			-1,			-1, -1 );
+	bindings_.emplace_back("+button6", 		"Throttle Down",				ID_DECREASE,		'e',			-1,			-1, -1 );
+	bindings_.emplace_back("unlock",			"Unlock Target",				ID_UNLOCK,			K_CTRL,			-1,			-1, -1 );
+	bindings_.emplace_back("+bombcam",		"Bomb Camera",					ID_BOMBCAMERA,		-1,				-1,			-1, -1 );
 	
 
 	// until this is finished and works it will be disabled
 /*
-	bindings_.push_back( new Binding("+AP_forward", 		"Forward (Max)",			ID_FORWARD,			'w',			-1,			-1, -1) );
-	bindings_.push_back( new Binding("+AP_back", 			"Back/Stop (Min)",			ID_BACKPEDAL,		's',			-1,			-1, -1) );
-	bindings_.push_back( new Binding("+AP_moveleft", 		"Turn left (tank)",			ID_MOVELEFT,		'a',			-1,			-1, -1) );
-	bindings_.push_back( new Binding("+AP_moveright", 		"Turn right (tank)",		ID_MOVERIGHT,		'd',			-1,			-1, -1) );
-	bindings_.push_back( new Binding("+AP_moveup",			"up / jump",				ID_MOVEUP,			-1,				-1,			-1, -1) );
-	bindings_.push_back( new Binding("+AP_movedown",		"down / crouch",			ID_MOVEDOWN,		-1,				-1,			-1, -1) );
-	bindings_.push_back( new Binding("+AP_left", 			"Left (view)",				ID_LEFT,			K_LEFTARROW,	-1,			-1, -1) );
-	bindings_.push_back( new Binding("+AP_right", 			"Right (view)", 			ID_RIGHT,			K_RIGHTARROW,	-1,			-1, -1) );
-	bindings_.push_back( new Binding("+AP_lookup", 			"Up (view)",				ID_LOOKUP,			K_PGUP,			-1,			-1, -1) );
-	bindings_.push_back( new Binding("+AP_lookdown", 		"Down (view)",				ID_LOOKDOWN,		K_PGDN,			-1,			-1, -1) );
-	bindings_.push_back( new Binding("+AP_zoom", 			"Zoom View",				ID_ZOOMVIEW,		K_SHIFT,		-1,			-1, -1) );
-	bindings_.push_back( new Binding("+AP_attack", 			"Fire MG",					ID_ATTACK,			K_CTRL,			-1,			-1, -1) );
-	bindings_.push_back( new Binding("+AP_button2", 		"Fire Main Weapon",			ID_ATTACK2,			K_ENTER,		K_MOUSE4,	-1, -1) );
-	bindings_.push_back( new Binding("+AP_button7",			"Landing Gear",				ID_GEAR,			'g',			-1,			-1, -1) );
-	bindings_.push_back( new Binding("+AP_button8",	 		"(Speed)Brakes",			ID_BRAKE,			K_ALT,			-1,			-1, -1) );
-	bindings_.push_back( new Binding("+AP_button9",			"Freelook Camera",			ID_FREECAM,			-1,				-1,			-1, -1) );
-	bindings_.push_back( new Binding("+AP_button5", 		"Throttle Up",				ID_INCREASE,		'q',			-1,			-1, -1) );
-	bindings_.push_back( new Binding("+AP_button6", 		"Throttle Down",			ID_DECREASE,		'e',			-1,			-1, -1) );
-	bindings_.push_back( new Binding("AP_unlock",			"Unlock Target",			ID_UNLOCK,			K_CTRL,			-1,			-1, -1) );
-	bindings_.push_back( new Binding("+AP_bombcam",			"Bomb Camera",				ID_BOMBCAMERA,		-1,				-1,			-1, -1) );
+	bindings_.emplace_back("+AP_forward", 		"Forward (Max)",			ID_FORWARD,			'w',			-1,			-1, -1 );
+	bindings_.emplace_back("+AP_back", 			"Back/Stop (Min)",			ID_BACKPEDAL,		's',			-1,			-1, -1 );
+	bindings_.emplace_back("+AP_moveleft", 		"Turn left (tank)",			ID_MOVELEFT,		'a',			-1,			-1, -1 );
+	bindings_.emplace_back("+AP_moveright", 		"Turn right (tank)",		ID_MOVERIGHT,		'd',			-1,			-1, -1 );
+	bindings_.emplace_back("+AP_moveup",			"up / jump",				ID_MOVEUP,			-1,				-1,			-1, -1 );
+	bindings_.emplace_back("+AP_movedown",		"down / crouch",			ID_MOVEDOWN,		-1,				-1,			-1, -1 );
+	bindings_.emplace_back("+AP_left", 			"Left (view)",				ID_LEFT,			K_LEFTARROW,	-1,			-1, -1 );
+	bindings_.emplace_back("+AP_right", 			"Right (view)", 			ID_RIGHT,			K_RIGHTARROW,	-1,			-1, -1 );
+	bindings_.emplace_back("+AP_lookup", 			"Up (view)",				ID_LOOKUP,			K_PGUP,			-1,			-1, -1 );
+	bindings_.emplace_back("+AP_lookdown", 		"Down (view)",				ID_LOOKDOWN,		K_PGDN,			-1,			-1, -1 );
+	bindings_.emplace_back("+AP_zoom", 			"Zoom View",				ID_ZOOMVIEW,		K_SHIFT,		-1,			-1, -1 );
+	bindings_.emplace_back("+AP_attack", 			"Fire MG",					ID_ATTACK,			K_CTRL,			-1,			-1, -1 );
+	bindings_.emplace_back("+AP_button2", 		"Fire Main Weapon",			ID_ATTACK2,			K_ENTER,		K_MOUSE4,	-1, -1 );
+	bindings_.emplace_back("+AP_button7",			"Landing Gear",				ID_GEAR,			'g',			-1,			-1, -1 );
+	bindings_.emplace_back("+AP_button8",	 		"(Speed)Brakes",			ID_BRAKE,			K_ALT,			-1,			-1, -1 );
+	bindings_.emplace_back("+AP_button9",			"Freelook Camera",			ID_FREECAM,			-1,				-1,			-1, -1 );
+	bindings_.emplace_back("+AP_button5", 		"Throttle Up",				ID_INCREASE,		'q',			-1,			-1, -1 );
+	bindings_.emplace_back("+AP_button6", 		"Throttle Down",			ID_DECREASE,		'e',			-1,			-1, -1 );
+	bindings_.emplace_back("AP_unlock",			"Unlock Target",			ID_UNLOCK,			K_CTRL,			-1,			-1, -1 );
+	bindings_.emplace_back("+AP_bombcam",			"Bomb Camera",				ID_BOMBCAMERA,		-1,				-1,			-1, -1 );
 	
-	bindings_.push_back( new Binding("+Heli_forward", 		"Forward (Max)",			ID_FORWARD,			'w',			-1,			-1, -1) );
-	bindings_.push_back( new Binding("+Heli_back", 			"Back/Stop (Min)",			ID_BACKPEDAL,		's',			-1,			-1, -1) );
-	bindings_.push_back( new Binding("+Heli_moveleft", 		"Turn left (tank)",			ID_MOVELEFT,		'a',			-1,			-1, -1) );
-	bindings_.push_back( new Binding("+Heli_moveright", 	"Turn right (tank)",		ID_MOVERIGHT,		'd',			-1,			-1, -1) );
-	bindings_.push_back( new Binding("+Heli_moveup",		"up / jump",				ID_MOVEUP,			-1,				-1,			-1, -1) );
-	bindings_.push_back( new Binding("+Heli_movedown",		"down / crouch",			ID_MOVEDOWN,		-1,				-1,			-1, -1) );
-	bindings_.push_back( new Binding("+Heli_left", 			"Left (view)",				ID_LEFT,			K_LEFTARROW,	-1,			-1, -1) );
-	bindings_.push_back( new Binding("+Heli_right", 		"Right (view)", 			ID_RIGHT,			K_RIGHTARROW,	-1,			-1, -1) );
-	bindings_.push_back( new Binding("+Heli_lookup", 		"Up (view)",				ID_LOOKUP,			K_PGUP,			-1,			-1, -1) );
-	bindings_.push_back( new Binding("+Heli_lookdown", 		"Down (view)",				ID_LOOKDOWN,		K_PGDN,			-1,			-1, -1) );
-	bindings_.push_back( new Binding("+Heli_zoom", 			"Zoom View",				ID_ZOOMVIEW,		K_SHIFT,		-1,			-1, -1) );
-	bindings_.push_back( new Binding("+Heli_attack", 		"Fire MG",					ID_ATTACK,			K_CTRL,			-1,			-1, -1) );
-	bindings_.push_back( new Binding("+Heli_button2", 		"Fire Main Weapon",			ID_ATTACK2,			K_ENTER,		K_MOUSE4,	-1, -1) );
-	bindings_.push_back( new Binding("+Heli_button7",		"Landing Gear",				ID_GEAR,			'g',			-1,			-1, -1) );
-	bindings_.push_back( new Binding("+Heli_button8",	 	"(Speed)Brakes",			ID_BRAKE,			K_ALT,			-1,			-1, -1) );
-	bindings_.push_back( new Binding("+Heli_button9",	 	"Freelook Camera",			ID_FREECAM,			-1,				-1,			-1, -1) );
-	bindings_.push_back( new Binding("+Heli_button5", 		"Throttle Up",				ID_INCREASE,		'q',			-1,			-1, -1) );
-	bindings_.push_back( new Binding("+Heli_button6", 		"Throttle Down",			ID_DECREASE,		'e',			-1,			-1, -1) );
-	bindings_.push_back( new Binding("Heli_unlock",			"Unlock Target",			ID_UNLOCK,			K_CTRL,			-1,			-1, -1) );
+	bindings_.emplace_back("+Heli_forward", 		"Forward (Max)",			ID_FORWARD,			'w',			-1,			-1, -1 );
+	bindings_.emplace_back("+Heli_back", 			"Back/Stop (Min)",			ID_BACKPEDAL,		's',			-1,			-1, -1 );
+	bindings_.emplace_back("+Heli_moveleft", 		"Turn left (tank)",			ID_MOVELEFT,		'a',			-1,			-1, -1 );
+	bindings_.emplace_back("+Heli_moveright", 	"Turn right (tank)",		ID_MOVERIGHT,		'd',			-1,			-1, -1 );
+	bindings_.emplace_back("+Heli_moveup",		"up / jump",				ID_MOVEUP,			-1,				-1,			-1, -1 );
+	bindings_.emplace_back("+Heli_movedown",		"down / crouch",			ID_MOVEDOWN,		-1,				-1,			-1, -1 );
+	bindings_.emplace_back("+Heli_left", 			"Left (view)",				ID_LEFT,			K_LEFTARROW,	-1,			-1, -1 );
+	bindings_.emplace_back("+Heli_right", 		"Right (view)", 			ID_RIGHT,			K_RIGHTARROW,	-1,			-1, -1 );
+	bindings_.emplace_back("+Heli_lookup", 		"Up (view)",				ID_LOOKUP,			K_PGUP,			-1,			-1, -1 );
+	bindings_.emplace_back("+Heli_lookdown", 		"Down (view)",				ID_LOOKDOWN,		K_PGDN,			-1,			-1, -1 );
+	bindings_.emplace_back("+Heli_zoom", 			"Zoom View",				ID_ZOOMVIEW,		K_SHIFT,		-1,			-1, -1 );
+	bindings_.emplace_back("+Heli_attack", 		"Fire MG",					ID_ATTACK,			K_CTRL,			-1,			-1, -1 );
+	bindings_.emplace_back("+Heli_button2", 		"Fire Main Weapon",			ID_ATTACK2,			K_ENTER,		K_MOUSE4,	-1, -1 );
+	bindings_.emplace_back("+Heli_button7",		"Landing Gear",				ID_GEAR,			'g',			-1,			-1, -1 );
+	bindings_.emplace_back("+Heli_button8",	 	"(Speed)Brakes",			ID_BRAKE,			K_ALT,			-1,			-1, -1 );
+	bindings_.emplace_back("+Heli_button9",	 	"Freelook Camera",			ID_FREECAM,			-1,				-1,			-1, -1 );
+	bindings_.emplace_back("+Heli_button5", 		"Throttle Up",				ID_INCREASE,		'q',			-1,			-1, -1 );
+	bindings_.emplace_back("+Heli_button6", 		"Throttle Down",			ID_DECREASE,		'e',			-1,			-1, -1 );
+	bindings_.emplace_back("Heli_unlock",			"Unlock Target",			ID_UNLOCK,			K_CTRL,			-1,			-1, -1 );
 
-	bindings_.push_back( new Binding("+GV_forward", 		"Forward (Max)",			ID_FORWARD,			'w',			-1,			-1, -1) );
-	bindings_.push_back( new Binding("+GV_back", 			"Back/Stop (Min)",			ID_BACKPEDAL,		's',			-1,			-1, -1) );
-	bindings_.push_back( new Binding("+GV_moveleft", 		"Turn left",				ID_MOVELEFT,		'a',			-1,			-1, -1) );
-	bindings_.push_back( new Binding("+GV_moveright", 		"Turn right",				ID_MOVERIGHT,		'd',			-1,			-1, -1) );
-	bindings_.push_back( new Binding("+GV_moveup",			"up",						ID_MOVEUP,			-1,				-1,			-1, -1) );
-	bindings_.push_back( new Binding("+GV_movedown",		"down / crouch",			ID_MOVEDOWN,		-1,				-1,			-1, -1) );
-	bindings_.push_back( new Binding("+GV_left", 			"Left (view)",				ID_LEFT,			K_LEFTARROW,	-1,			-1, -1) );
-	bindings_.push_back( new Binding("+GV_right", 			"Right (view)", 			ID_RIGHT,			K_RIGHTARROW,	-1,			-1, -1) );
-	bindings_.push_back( new Binding("+GV_lookup", 			"Up (view)",				ID_LOOKUP,			K_PGUP,			-1,			-1, -1) );
-	bindings_.push_back( new Binding("+GV_lookdown", 		"Down (view)",				ID_LOOKDOWN,		K_PGDN,			-1,			-1, -1) );
-	bindings_.push_back( new Binding("+GV_zoom", 			"Zoom View",				ID_ZOOMVIEW,		K_SHIFT,		-1,			-1, -1) );
-	bindings_.push_back( new Binding("+GV_attack", 			"Fire MG",					ID_ATTACK,			K_CTRL,			-1,			-1, -1) );
-	bindings_.push_back( new Binding("+GV_button2", 		"Fire Main Weapon",			ID_ATTACK2,			K_ENTER,		K_MOUSE4,	-1, -1) );
-	bindings_.push_back( new Binding("+GV_button8",	 		"Brakes",					ID_BRAKE,			K_ALT,			-1,			-1, -1) );
-	bindings_.push_back( new Binding("+GV_button9",	 		"Freelook Camera",			ID_FREECAM,			-1,				-1,			-1, -1) );
-	bindings_.push_back( new Binding("+GV_button5", 		"Throttle Up",				ID_INCREASE,		'q',			-1,			-1, -1) );
-	bindings_.push_back( new Binding("+GV_button6", 		"Throttle Down",			ID_DECREASE,		'e',			-1,			-1, -1) );
-	bindings_.push_back( new Binding("GV_unlock",			"Unlock Target",			ID_UNLOCK,			K_CTRL,			-1,			-1, -1) );
+	bindings_.emplace_back("+GV_forward", 		"Forward (Max)",			ID_FORWARD,			'w',			-1,			-1, -1 );
+	bindings_.emplace_back("+GV_back", 			"Back/Stop (Min)",			ID_BACKPEDAL,		's',			-1,			-1, -1 );
+	bindings_.emplace_back("+GV_moveleft", 		"Turn left",				ID_MOVELEFT,		'a',			-1,			-1, -1 );
+	bindings_.emplace_back("+GV_moveright", 		"Turn right",				ID_MOVERIGHT,		'd',			-1,			-1, -1 );
+	bindings_.emplace_back("+GV_moveup",			"up",						ID_MOVEUP,			-1,				-1,			-1, -1 );
+	bindings_.emplace_back("+GV_movedown",		"down / crouch",			ID_MOVEDOWN,		-1,				-1,			-1, -1 );
+	bindings_.emplace_back("+GV_left", 			"Left (view)",				ID_LEFT,			K_LEFTARROW,	-1,			-1, -1 );
+	bindings_.emplace_back("+GV_right", 			"Right (view)", 			ID_RIGHT,			K_RIGHTARROW,	-1,			-1, -1 );
+	bindings_.emplace_back("+GV_lookup", 			"Up (view)",				ID_LOOKUP,			K_PGUP,			-1,			-1, -1 );
+	bindings_.emplace_back("+GV_lookdown", 		"Down (view)",				ID_LOOKDOWN,		K_PGDN,			-1,			-1, -1 );
+	bindings_.emplace_back("+GV_zoom", 			"Zoom View",				ID_ZOOMVIEW,		K_SHIFT,		-1,			-1, -1 );
+	bindings_.emplace_back("+GV_attack", 			"Fire MG",					ID_ATTACK,			K_CTRL,			-1,			-1, -1 );
+	bindings_.emplace_back("+GV_button2", 		"Fire Main Weapon",			ID_ATTACK2,			K_ENTER,		K_MOUSE4,	-1, -1 );
+	bindings_.emplace_back("+GV_button8",	 		"Brakes",					ID_BRAKE,			K_ALT,			-1,			-1, -1 );
+	bindings_.emplace_back("+GV_button9",	 		"Freelook Camera",			ID_FREECAM,			-1,				-1,			-1, -1 );
+	bindings_.emplace_back("+GV_button5", 		"Throttle Up",				ID_INCREASE,		'q',			-1,			-1, -1 );
+	bindings_.emplace_back("+GV_button6", 		"Throttle Down",			ID_DECREASE,		'e',			-1,			-1, -1 );
+	bindings_.emplace_back("GV_unlock",			"Unlock Target",			ID_UNLOCK,			K_CTRL,			-1,			-1, -1 );
 */
 }
 
 
 
 ControlUtils::~ControlUtils()
-{
-	for(auto & binding : bindings_)
-	{	
-		delete binding;
-		binding = nullptr;
-	}
-	bindings_.clear();
-}
+= default;
 
 void
 ControlUtils::setUtils( UI_Utils* utils )
@@ -176,8 +169,8 @@ ControlUtils::getConfig()
 {
 	char	b[256], tap[256], hold[256];
 
-	for( Binding* binding : bindings_ )
-		binding->bind1_ = binding->bind2_ = binding->hold_ = -1;
+	for( Binding& binding : bindings_ )
+		binding.bind1_ = binding.bind2_ = binding.hold_ = -1;
 
 	for( int key = 0; key < K_LAST_KEY; key++ )
 	{
@@ -186,17 +179,17 @@ ControlUtils::getConfig()
 			continue;
 
 		const bool held = splitHold( b, tap, hold, 256 );
-		for( Binding* binding : bindings_ )
+		for( Binding& binding : bindings_ )
 		{
-			if( !Q_stricmp( held ? tap : b, binding->command_ ) )
+			if( !Q_stricmp( held ? tap : b, binding.command_ ) )
 			{
-				if( binding->bind1_ == -1 ) 
-					binding->bind1_ = key;
-				else if( binding->bind2_ == -1 ) 
-					binding->bind2_ = key;
+				if( binding.bind1_ == -1 ) 
+					binding.bind1_ = key;
+				else if( binding.bind2_ == -1 ) 
+					binding.bind2_ = key;
 			}
-			if( held && binding->hold_ == -1 && !Q_stricmp( hold, binding->command_ ) )
-				binding->hold_ = key;
+			if( held && binding.hold_ == -1 && !Q_stricmp( hold, binding.command_ ) )
+				binding.hold_ = key;
 		}
 	}
 }
@@ -210,12 +203,12 @@ ControlUtils::setConfig( bool restart )
 	{
 		const Binding* tapped = nullptr;
 		const Binding* held = nullptr;
-		for( const Binding* binding : bindings_ )
+		for( const Binding& binding : bindings_ )
 		{
-			if( !tapped && ( binding->bind1_ == key || binding->bind2_ == key ) ) 
-				tapped = binding;
-			if( !held && binding->hold_ == key ) 
-				held = binding;
+			if( !tapped && ( binding.bind1_ == key || binding.bind2_ == key ) ) 
+				tapped = &binding;
+			if( !held && binding.hold_ == key ) 
+				held = &binding;
 		}
 
 		if( held )
@@ -243,9 +236,9 @@ ControlUtils::setDefaults()
 	// iterate each command, set its default binding
 	for( i=0; i < bindCount; i++ )
 	{
-		bindings_[i]->bind1_ = bindings_[i]->defaultbind1_;
-		bindings_[i]->bind2_ = bindings_[i]->defaultbind2_;
-		bindings_[i]->hold_ = bindings_[i]->defaulthold_;
+		bindings_[i].bind1_ = bindings_[i].defaultbind1_;
+		bindings_[i].bind2_ = bindings_[i].defaultbind2_;
+		bindings_[i].hold_ = bindings_[i].defaulthold_;
 	}
 }
 
@@ -257,7 +250,7 @@ ControlUtils::bindingIDFromName( const char *name )
 
 	for (i=0; i < bindCount; i++)
 	{
-		if( Q_stricmp(name, bindings_[i]->command_) == 0 ) 
+		if( Q_stricmp(name, bindings_[i].command_) == 0 ) 
 		{
 			return i;
 		}
@@ -274,7 +267,7 @@ ControlUtils::bindingFromName( const char *cvar )
 	const int id = bindingIDFromName( cvar );
 	if( id != -1 )
 	{
-		const Binding& binding = *bindings_[id];
+		const Binding& binding = bindings_[id];
 		const struct { int key; const char* prefix; } keys[] = { { binding.bind1_, "" }, { binding.bind2_, "" }, { binding.hold_, "hold " } };
 		for( const auto& entry : keys )
 		{
@@ -313,6 +306,4 @@ ControlUtils::Binding::Binding( const char* command,
 {
 }
 
-ControlUtils::Binding::~Binding()
-= default;
 

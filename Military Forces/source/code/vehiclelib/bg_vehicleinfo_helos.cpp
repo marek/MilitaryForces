@@ -47,8 +47,8 @@ GameObjectInfo_Helicopter::createAllHelicopters( GameObjectList& gameObjects )
 	Vector4Set( veh->shadowAdjusts_, 0, 0, 0, 0 );	
 	VectorSet( veh->gunoffset_, 3, 1, 6 );		
 	VectorSet( veh->cockpitview_, 19, 0, 5 );	
-	veh->airRadar_ = new VehicleRadarInfo(0, 8000, CAT_PLANE|CAT_HELO);		
-	veh->groundRadar_ = new VehicleRadarInfo(-1, 5000, CAT_GROUND|CAT_BOAT);			
+	veh->airRadar_ = std::make_unique<VehicleRadarInfo>(0, 8000, CAT_PLANE|CAT_HELO);		
+	veh->groundRadar_ = std::make_unique<VehicleRadarInfo>(-1, 5000, CAT_GROUND|CAT_BOAT);			
 	veh->minThrottle_ = -5;
 	veh->maxThrottle_ = 10;
 	veh->acceleration_ = 100;

@@ -72,13 +72,13 @@ Server::setGameData( EntityList* ents, ClientList* clients )
 EntityBase*	
 Server::getEntityByNum( int num )
 {
-	return gameEntities_->at(num);
+	return gameEntities_->at(num).get();
 }
 
 ClientBase*		
 Server::getClientByNum( int num )
 {
-	return gameClients_->at(num);
+	return gameClients_->at(num).get();
 }
 
 SV_Entity*
