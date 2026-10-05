@@ -291,7 +291,7 @@ CL_AdjustAngles
 Moves the local angle positions
 ================
 */
-void CL_AdjustAngles( ) {
+static void CL_AdjustAngles( ) {
 	float	speed;
 	
 	if ( in_speed.active ) {
@@ -316,7 +316,7 @@ CL_KeyMove
 Sets the usercmd_t based on key states
 ================
 */
-void CL_KeyMove( usercmd_t *cmd ) {
+static void CL_KeyMove( usercmd_t *cmd ) {
 	int		movespeed;
 	int		forward, side, up;
 
@@ -391,7 +391,7 @@ void ClientLoop::joystickEvent( int axis, int value, int time ) {
 CL_JoystickMove
 =================
 */
-void CL_JoystickMove( usercmd_t *cmd ) {
+static void CL_JoystickMove( usercmd_t *cmd ) {
 	float	anglespeed;
 
 	float yaw     = j_yaw->value     * cl.joystickAxis[j_yaw_axis->integer];
@@ -435,7 +435,7 @@ CL_MouseMove
 =================
 */
 
-void CL_MouseMove(usercmd_t *cmd)
+static void CL_MouseMove(usercmd_t *cmd)
 {
 	float mx, my;
 
@@ -524,7 +524,7 @@ void CL_MouseMove(usercmd_t *cmd)
 CL_CmdButtons
 ==============
 */
-void CL_CmdButtons( usercmd_t *cmd ) {
+static void CL_CmdButtons( usercmd_t *cmd ) {
 	int		i;
 
 	//
@@ -556,7 +556,7 @@ void CL_CmdButtons( usercmd_t *cmd ) {
 CL_FinishMove
 ==============
 */
-void CL_FinishMove( usercmd_t *cmd ) {
+static void CL_FinishMove( usercmd_t *cmd ) {
 	int		i;
 
 	// copy the state that the cgame is currently sending
@@ -577,7 +577,7 @@ void CL_FinishMove( usercmd_t *cmd ) {
 CL_CreateCmd
 =================
 */
-usercmd_t CL_CreateCmd( ) {
+static usercmd_t CL_CreateCmd( ) {
 	usercmd_t	cmd;
 	vec3_t		oldAngles;
 
@@ -630,7 +630,7 @@ CL_CreateNewCommands
 Create a new usercmd_t structure for this frame
 =================
 */
-void CL_CreateNewCommands( ) {
+static void CL_CreateNewCommands( ) {
 	int			cmdNum;
 
 	// no need to create usercmds until we have a gamestate
@@ -671,7 +671,7 @@ delivered in the next packet, but saving a header and
 getting more delta compression will reduce total bandwidth.
 =================
 */
-bool CL_ReadyToSendPacket( ) {
+static bool CL_ReadyToSendPacket( ) {
 	int		oldPacketNum;
 	int		delta;
 

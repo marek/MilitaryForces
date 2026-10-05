@@ -92,7 +92,7 @@ int ClientHost::getCurrentCmdNumber()
 CL_GetParseEntityState
 ====================
 */
-bool	CL_GetParseEntityState( int parseEntityNumber, entityState_t *state ) {
+static bool	CL_GetParseEntityState( int parseEntityNumber, entityState_t *state ) {
 	// can't return anything that hasn't been parsed yet
 	if ( parseEntityNumber >= cl.parseEntitiesNum ) {
 		Common::error( ERR_DROP, "CL_GetParseEntityState: %i >= %i",
@@ -199,7 +199,7 @@ void ClientHost::addCgameCommand( const char *cmdName )
 CL_CgameError
 =====================
 */
-void CL_CgameError( const char *string ) {
+static void CL_CgameError( const char *string ) {
 	Common::error( ERR_DROP, "%s", string );
 }
 
@@ -209,7 +209,7 @@ void CL_CgameError( const char *string ) {
 CL_ConfigstringModified
 =====================
 */
-void CL_ConfigstringModified( ) {
+static void CL_ConfigstringModified( ) {
 	char		*old, *s;
 	int			i, index;
 	char		*dup;
@@ -518,7 +518,7 @@ or bursted delayed packets.
 
 constexpr int RESET_TIME = 500;
 
-void CL_AdjustTimeDelta( ) {
+static void CL_AdjustTimeDelta( ) {
 	int		newDelta;
 	int		deltaDelta;
 

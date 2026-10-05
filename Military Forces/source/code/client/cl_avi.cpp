@@ -169,7 +169,7 @@ ID_INLINE void Client::eND_CHUNK( )
 CL_WriteAVIHeader
 ===============
 */
-void CL_WriteAVIHeader( )
+static void CL_WriteAVIHeader( )
 {
   bufIndex = 0;
   afd.chunkStackTop = 0;

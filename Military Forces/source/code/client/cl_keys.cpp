@@ -1182,7 +1182,7 @@ CL_ParseBinding
 Execute the commands in the bind string
 ===================
 */
-void CL_ParseBinding( int key, bool down, unsigned time )
+static void CL_ParseBinding( int key, bool down, unsigned time )
 {
 	char buf[ MAX_STRING_CHARS ], *p = buf, *end;
 	bool allCommands, allowUpCmds;
@@ -1239,7 +1239,7 @@ CL_KeyDownEvent
 Called by ClientLoop::keyEvent to handle a keypress
 ===================
 */
-void CL_KeyDownEvent( int key, unsigned time )
+static void CL_KeyDownEvent( int key, unsigned time )
 {
 	keys[key].down = true;
 	keys[key].repeats++;
@@ -1336,7 +1336,7 @@ CL_KeyUpEvent
 Called by ClientLoop::keyEvent to handle a keyrelease
 ===================
 */
-void CL_KeyUpEvent( int key, unsigned time )
+static void CL_KeyUpEvent( int key, unsigned time )
 {
 	keys[key].repeats = 0;
 	keys[key].down = false;

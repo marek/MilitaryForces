@@ -63,7 +63,7 @@ Parses deltas from the given base and adds the resulting entity
 to the current frame
 ==================
 */
-void CL_DeltaEntity (Message *msg, clSnapshot_t *frame, int newnum, entityState_t *old, 
+static void CL_DeltaEntity (Message *msg, clSnapshot_t *frame, int newnum, entityState_t *old, 
 					 bool unchanged, bool discard = false) {
 	entityState_t	*state;
 
@@ -93,7 +93,7 @@ CL_ParsePacketEntities
 
 ==================
 */
-void CL_ParsePacketEntities( Message *msg, clSnapshot_t *oldframe, clSnapshot_t *newframe) {
+static void CL_ParsePacketEntities( Message *msg, clSnapshot_t *oldframe, clSnapshot_t *newframe) {
 	int			newnum;
 	entityState_t	*oldstate;
 	int			oldindex, oldnum;
@@ -208,7 +208,7 @@ cl.snap and saved in cl.snapshots[].  If the snapshot is invalid
 for any reason, no changes to the state will be made at all.
 ================
 */
-void CL_ParseSnapshot( Message *msg ) {
+static void CL_ParseSnapshot( Message *msg ) {
 	int			len;
 	clSnapshot_t	*old;
 	clSnapshot_t	newSnap;
@@ -585,7 +585,7 @@ CL_ParseDownload
 A download message has been received from the server
 =====================
 */
-void CL_ParseDownload ( Message *msg ) {
+static void CL_ParseDownload ( Message *msg ) {
 	int		size;
 	unsigned char data[MAX_MSGLEN];
 	uint16_t block;
@@ -852,7 +852,7 @@ Command strings are just saved off until cgame asks for them
 when it transitions a snapshot
 =====================
 */
-void CL_ParseCommandString( Message *msg ) {
+static void CL_ParseCommandString( Message *msg ) {
 	char	*s;
 	int		seq;
 	int		index;

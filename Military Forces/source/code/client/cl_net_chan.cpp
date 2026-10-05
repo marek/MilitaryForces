@@ -133,7 +133,7 @@ void Client::netchan_Decode( Message *msg ) {
 CL_Netchan_TransmitNextFragment
 =================
 */
-bool CL_Netchan_TransmitNextFragment(NetChannel *chan)
+static bool CL_Netchan_TransmitNextFragment(NetChannel *chan)
 {
 	if(chan->unsentFragments())
 	{

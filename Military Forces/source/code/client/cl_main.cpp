@@ -162,10 +162,10 @@ serverStatus_t cl_serverStatusList[MAX_SERVERSTATUSREQUESTS];
 static int noGameRestart = false;
 
 extern void SV_BotFrame( int time );
-void CL_CheckForResend( );
-void CL_ShowIP_f();
-void CL_ServerStatus_f();
-void CL_ServerStatusResponse( netadr_t from, Message *msg );
+static void CL_CheckForResend( );
+static void CL_ShowIP_f();
+static void CL_ServerStatus_f();
+static void CL_ServerStatusResponse( netadr_t from, Message *msg );
 
 /*
 ===============
@@ -320,7 +320,7 @@ Generally we don't want who's listening to change during a transmission,
 so this is only called when the key is first pressed
 ===============
 */
-void CL_VoipParseTargets()
+static void CL_VoipParseTargets()
 {
 	const char *target = cl_voipSendTarget->string;
 	char *end;
@@ -659,7 +659,7 @@ void Client::stopRecord_f( ) {
 CL_DemoFilename
 ================== 
 */  
-void CL_DemoFilename( int number, char *fileName, int fileNameSize ) {
+static void CL_DemoFilename( int number, char *fileName, int fileNameSize ) {
 	int		a,b,c,d;
 
 	if(number < 0 || number > 9999)
@@ -687,7 +687,7 @@ Begins recording a demo from the current position
 ====================
 */
 static char		demoName[MAX_QPATH];	// compiler bug workaround
-void CL_Record_f( ) {
+static void CL_Record_f( ) {
 	char		name[MAX_OSPATH];
 	byte		bufData[MAX_MSGLEN];
 	Message	buf;
@@ -870,7 +870,7 @@ float Client::demoFrameDurationSDev( )
 CL_DemoCompleted
 =================
 */
-void CL_DemoCompleted( )
+static void CL_DemoCompleted( )
 {
 	char buffer[ MAX_STRING_CHARS ];
 
@@ -1071,7 +1071,7 @@ demo <demoname>
 
 ====================
 */
-void CL_PlayDemo_f( ) {
+static void CL_PlayDemo_f( ) {
 	char		name[MAX_OSPATH];
 	char		arg[MAX_OSPATH];
 	char		*ext_test;
@@ -1240,7 +1240,7 @@ CL_ClearMemory
 Called by Common::gameRestart
 =================
 */
-void CL_ClearMemory(bool shutdownRef)
+static void CL_ClearMemory(bool shutdownRef)
 {
 	// shutdown all the client stuff
 	ClientLoop::shutdownAll(shutdownRef);
@@ -1520,7 +1520,7 @@ CL_RequestMotd
 
 ===================
 */
-void CL_RequestMotd( ) {
+static void CL_RequestMotd( ) {
 #ifdef UPDATE_SERVER_NAME
 	char		info[MAX_INFO_STRING];
 
@@ -1589,7 +1589,7 @@ in anyway.
 ===================
 */
 #ifndef STANDALONE
-void CL_RequestAuthorization( void ) {
+static void CL_RequestAuthorization( void ) {
 	char	nums[64];
 	int		i, j, l;
 	cvar_t	*fs;
@@ -1646,7 +1646,7 @@ CONSOLE COMMANDS
 CL_ForwardToServer_f
 ==================
 */
-void CL_ForwardToServer_f( ) {
+static void CL_ForwardToServer_f( ) {
 	if ( clc.state != CA_ACTIVE || clc.demoplaying ) {
 		Common::printf ("Not connected to a server.\n");
 		return;
@@ -1678,7 +1678,7 @@ CL_Reconnect_f
 
 ================
 */
-void CL_Reconnect_f( ) {
+static void CL_Reconnect_f( ) {
 	if ( !strlen( cl_reconnectArgs ) )
 		return;
 	CvarSystem::set("ui_singlePlayerActive", "0");
@@ -1691,7 +1691,7 @@ CL_Connect_f
 
 ================
 */
-void CL_Connect_f( ) {
+static void CL_Connect_f( ) {
 	char	server[MAX_OSPATH];
 	const char	*serverString;
 	int argc = CommandSystem::argc();
@@ -1851,7 +1851,7 @@ CL_Rcon_f
   an unconnected command.
 =====================
 */
-void CL_Rcon_f( ) {
+static void CL_Rcon_f( ) {
 	char	message[MAX_RCON_MESSAGE];
 	netadr_t	to;
 
@@ -1900,7 +1900,7 @@ void CL_Rcon_f( ) {
 CL_SendPureChecksums
 =================
 */
-void CL_SendPureChecksums( ) {
+static void CL_SendPureChecksums( ) {
 	char cMsg[MAX_INFO_VALUE];
 
 	// if we are pure we need to send back a command with our referenced pk3 checksums
@@ -1914,7 +1914,7 @@ void CL_SendPureChecksums( ) {
 CL_ResetPureClientAtServer
 =================
 */
-void CL_ResetPureClientAtServer( ) {
+static void CL_ResetPureClientAtServer( ) {
 	ClientHost::addReliableCommand("vdr", false);
 }
 
@@ -2027,7 +2027,7 @@ void Client::snd_Restart_f()
 CL_PK3List_f
 ==================
 */
-void CL_OpenedPK3List_f( ) {
+static void CL_OpenedPK3List_f( ) {
 	Common::printf("Opened PK3 Names: %s\n", FileSystem::loadedPakNames());
 }
 
@@ -2036,7 +2036,7 @@ void CL_OpenedPK3List_f( ) {
 CL_PureList_f
 ==================
 */
-void CL_ReferencedPK3List_f( ) {
+static void CL_ReferencedPK3List_f( ) {
 	Common::printf("Referenced PK3 Names: %s\n", FileSystem::referencedPakNames());
 }
 
@@ -2045,7 +2045,7 @@ void CL_ReferencedPK3List_f( ) {
 CL_Configstrings_f
 ==================
 */
-void CL_Configstrings_f( ) {
+static void CL_Configstrings_f( ) {
 	int		i;
 	int		ofs;
 
@@ -2068,7 +2068,7 @@ void CL_Configstrings_f( ) {
 CL_Clientinfo_f
 ==============
 */
-void CL_Clientinfo_f( ) {
+static void CL_Clientinfo_f( ) {
 	Common::printf( "--------- Client Information ---------\n" );
 	Common::printf( "state: %i\n", clc.state );
 	Common::printf( "Server: %s\n", clc.servername );
@@ -2087,7 +2087,7 @@ CL_DownloadsComplete
 Called when all downloading has been completed
 =================
 */
-void CL_DownloadsComplete( ) {
+static void CL_DownloadsComplete( ) {
 
 #ifdef USE_HTTP
 	// if we downloaded with HTTP
@@ -2371,7 +2371,7 @@ CL_CheckForResend
 Resend a connect message if the last one has timed out
 =================
 */
-void CL_CheckForResend( ) {
+static void CL_CheckForResend( ) {
 	int		port;
 	char	info[MAX_INFO_STRING];
 	char	data[MAX_INFO_STRING + 10];
@@ -2447,7 +2447,7 @@ CL_MotdPacket
 
 ===================
 */
-void CL_MotdPacket( netadr_t from ) {
+static void CL_MotdPacket( netadr_t from ) {
 #ifdef UPDATE_SERVER_NAME
 	char	*challenge;
 	char	*info;
@@ -2477,7 +2477,7 @@ void CL_MotdPacket( netadr_t from ) {
 CL_InitServerInfo
 ===================
 */
-void CL_InitServerInfo( serverInfo_t *server, netadr_t *address ) {
+static void CL_InitServerInfo( serverInfo_t *server, netadr_t *address ) {
 	server->adr = *address;
 	server->clients = 0;
 	server->hostName[0] = '\0';
@@ -2501,7 +2501,7 @@ void CL_InitServerInfo( serverInfo_t *server, netadr_t *address ) {
 CL_ServersResponsePacket
 ===================
 */
-void CL_ServersResponsePacket( const netadr_t* from, Message *msg, bool extended ) {
+static void CL_ServersResponsePacket( const netadr_t* from, Message *msg, bool extended ) {
 	int				i, j, count, total;
 	netadr_t addresses[MAX_SERVERSPERPACKET];
 	int				numservers;
@@ -2624,7 +2624,7 @@ CL_ConnectionlessPacket
 Responses to broadcasts, etc
 =================
 */
-void CL_ConnectionlessPacket( netadr_t from, Message *msg ) {
+static void CL_ConnectionlessPacket( netadr_t from, Message *msg ) {
 	char	*s;
 	char	*c;
 	int challenge = 0;
@@ -2898,7 +2898,7 @@ CL_CheckTimeout
 
 ==================
 */
-void CL_CheckTimeout( ) {
+static void CL_CheckTimeout( ) {
 	//
 	// check timeout
 	//
@@ -2940,7 +2940,7 @@ CL_CheckUserinfo
 
 ==================
 */
-void CL_CheckUserinfo( ) {
+static void CL_CheckUserinfo( ) {
 	// don't add reliable commands when not yet connected
 	if(clc.state < CA_CONNECTED)
 		return;
@@ -3169,7 +3169,7 @@ void Client::shutdownRef( ) {
 CL_InitRenderer
 ============
 */
-void CL_InitRenderer( ) {
+static void CL_InitRenderer( ) {
 	// this sets up the renderer and calls R_Init
 	refExport.BeginRegistration( &cls.glconfig );
 
@@ -3232,7 +3232,7 @@ void ClientLoop::startHunkUsers( bool rendererOnly ) {
 CL_RefMalloc
 ============
 */
-void *CL_RefMalloc( int size ) {
+static void *CL_RefMalloc( int size ) {
 	return Zone::tagMalloc( size, TAG_RENDERER );
 }
 
@@ -3354,7 +3354,7 @@ void ClientLoop::initRenderer( ) {
 //===========================================================================================
 
 
-void CL_SetModel_f( ) {
+static void CL_SetModel_f( ) {
 	char	*arg;
 	char	name[256];
 
@@ -3380,7 +3380,7 @@ video
 video [filename]
 ===============
 */
-void CL_Video_f( )
+static void CL_Video_f( )
 {
   char  filename[ MAX_OSPATH ];
   int   i, last;
@@ -3435,7 +3435,7 @@ void CL_Video_f( )
 CL_StopVideo_f
 ===============
 */
-void CL_StopVideo_f( )
+static void CL_StopVideo_f( )
 {
   Client::closeAVI( );
 }
@@ -3481,7 +3481,7 @@ static void CL_GenerateQKey()
 	}
 } 
 
-void CL_Sayto_f( ) {
+static void CL_Sayto_f( ) {
 	char		*rawname;
 	char		name[MAX_NAME_LENGTH];
 	char		cleanName[MAX_NAME_LENGTH];
@@ -3989,7 +3989,7 @@ void Client::serverInfoPacket( netadr_t from, Message *msg ) {
 CL_GetServerStatus
 ===================
 */
-serverStatus_t *CL_GetServerStatus( netadr_t from ) {
+static serverStatus_t *CL_GetServerStatus( netadr_t from ) {
 	int i, oldest, oldestTime;
 
 	for (i = 0; i < MAX_SERVERSTATUSREQUESTS; i++) {
@@ -4081,7 +4081,7 @@ int Client::serverStatus( const char *serverAddress, char *serverStatusString, i
 CL_ServerStatusResponse
 ===================
 */
-void CL_ServerStatusResponse( netadr_t from, Message *msg ) {
+static void CL_ServerStatusResponse( netadr_t from, Message *msg ) {
 	char	*s;
 	char	info[MAX_INFO_STRING];
 	int		i, l, score, ping;
@@ -4418,7 +4418,7 @@ int Client::getPingQueueCount( )
 CL_GetFreePing
 ==================
 */
-ping_t* CL_GetFreePing( )
+static ping_t* CL_GetFreePing( )
 {
 	ping_t*	pingptr;
 	ping_t*	best;	
@@ -4629,7 +4629,7 @@ bool Client::updateVisiblePings_f(int source) {
 CL_ServerStatus_f
 ==================
 */
-void CL_ServerStatus_f() {
+static void CL_ServerStatus_f() {
 	netadr_t	to, *toptr = nullptr;
 	char		*server;
 	serverStatus_t *serverStatus;
@@ -4686,7 +4686,7 @@ void CL_ServerStatus_f() {
 CL_ShowIP_f
 ==================
 */
-void CL_ShowIP_f() {
+static void CL_ShowIP_f() {
 	Sys_ShowIP();
 }
 
