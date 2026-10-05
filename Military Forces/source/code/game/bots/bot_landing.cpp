@@ -97,7 +97,7 @@ Status LandingSteps::survey( Bots::Mind& c )
 			Vec3 to, boxMins = { -60, -60, 0 }, boxMaxs = { 60, 60, 4 };
 			VectorMA( pad.center, -dir * (pad.halfLength - 150.0f + d), pad.axis, from );
 			from[2] = pad.z + 600;
-			VectorCopy( from, to );
+			to = from;
 			to[2] -= 4000;
 			GameHost::trace( &tr, from, boxMins, boxMaxs, to, ENTITYNUM_NONE, MASK_PLAYERSOLID|CONTENTS_BOTCLIP, false );
 			const float rise = tr.startsolid ? 600.0f : tr.endpos[2] - pad.z;

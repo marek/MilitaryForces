@@ -30,7 +30,7 @@ void GroundInstallation_Die::execute( GameEntity *inflictor, GameEntity *attacke
 		Vec3	pos;
 		int score;
 		VectorAdd( self_->r.absmin, self_->r.absmax, pos );
-		VectorScale( pos, 0.5f, pos );
+		pos = pos * ( 0.5f );
 		if( g_gametype.integer >= GT_TEAM && self_->s.generic1 == attacker->client_->ps_.persistant[PERS_TEAM] ) {
 			score = -self_->score_;
 		} else {
@@ -73,7 +73,7 @@ void Game::update_GI_Targets( GameEntity* ent )
 			if( theLevel.time_ > ent->gi_nextScanTime_ )
 			{
 				ent->gi_nextScanTime_ = theLevel.time_ + 1500;
-				VectorSet( rangevec, range, range, range );
+				rangevec = Vec3( range, range, range );
 				VectorSubtract( ent->r.currentOrigin, rangevec, mins );
 				VectorAdd( ent->r.currentOrigin, rangevec, maxs );
 				num = GameHost::areaEntities( mins, maxs, touch, MAX_GENTITIES );

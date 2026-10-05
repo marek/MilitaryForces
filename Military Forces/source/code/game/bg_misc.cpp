@@ -509,7 +509,7 @@ void GameShared::evaluateTrajectoryDelta( const trajectory_t *tr, int atTime, ve
 		{
 			VectorCopy(tr->trDelta,dir);
 			VectorNormalize (dir);
-			VectorScale (dir, tr->trDuration/10, dir);
+			dir = dir * ( tr->trDuration/10 );
 			VectorMA (tr->trDelta, deltaTime, dir, result);
 		} else
 			VectorCopy( tr->trDelta, result );

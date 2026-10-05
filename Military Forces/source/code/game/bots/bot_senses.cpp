@@ -320,7 +320,7 @@ void Bots::sense( GameEntity* ent, State& bot, Sense& out )
 		{
 			Vec3 behind;
 			AngleVectors( out.enemy->client_->ps_.vehicleAngles, behind, nullptr, nullptr );
-			VectorMA( target, -700.0f, behind, target );
+			target = target + behind * ( -700.0f );
 			target[2] -= 250.0f * character( bot ).cunning;
 		}
 		VectorSubtract( target, ent->r.currentOrigin, out.enemyDir );

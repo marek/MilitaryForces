@@ -27,7 +27,7 @@ struct SurfaceTasks
 		trace_t water;
 		VectorMA( c.ent->r.currentOrigin, reach, forward, ahead );
 		ahead[2] += 120;
-		VectorCopy( ahead, below );
+		below = ahead;
 		below[2] -= 500;
 		GameHost::trace( &water, ahead, nullptr, nullptr, below, c.ent->s.number, MASK_SOLID|MASK_WATER, false );
 		drop = water.fraction >= 1.0f || c.ent->r.currentOrigin[2] - water.endpos[2] > fabs( reach ) * 0.65f;

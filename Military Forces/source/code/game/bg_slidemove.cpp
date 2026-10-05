@@ -187,12 +187,12 @@ bool	PlayerMove::slideMove( bool gravity ) {
 				CrossProduct (planes[i], planes[j], dir);
 				VectorNormalize( dir );
 				d = DotProduct( dir, pm->ps->velocity );
-				VectorScale( dir, d, clipVelocity );
+				clipVelocity = dir * ( d );
 
 				CrossProduct (planes[i], planes[j], dir);
 				VectorNormalize( dir );
 				d = DotProduct( dir, endVelocity );
-				VectorScale( dir, d, endClipVelocity );
+				endClipVelocity = dir * ( d );
 
 				// see if there is a third plane the the New move enters
 				for ( k = 0 ; k < numplanes ; k++ ) {
@@ -211,7 +211,7 @@ bool	PlayerMove::slideMove( bool gravity ) {
 
 			// if we have fixed all interactions, try another move
 			VectorCopy( clipVelocity, pm->ps->velocity );
-			VectorCopy( endClipVelocity, endVelocity );
+			endVelocity = endClipVelocity;
 			break;
 		}
 	}

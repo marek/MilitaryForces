@@ -334,9 +334,9 @@ void ClientEntity::helo( clientInfo_t *ci )
 				CrossProduct( up, temp, right );
 				RotatePointAroundVector( forward, right, temp, this->lerpAngles2[PITCH] );
 				VectorMA( this->lerpOrigin, availableVehicles[ci->vehicle].gunoffset[0], forward, start );
-				VectorMA( start, availableVehicles[ci->vehicle].gunoffset[1], right, start );
-				VectorMA( start, availableVehicles[ci->vehicle].gunoffset[2], up, start );
-				VectorMA( start, 2000, forward, end );
+				start = start + right * ( availableVehicles[ci->vehicle].gunoffset[1] );
+				start = start + up * ( availableVehicles[ci->vehicle].gunoffset[2] );
+				end = start + forward * ( 2000 );
 				vectoangles( forward, ang );
 //				ang[2] = 0;
 				AnglesToAxis( ang, reticlelock.axis );
@@ -375,9 +375,9 @@ void ClientEntity::helo( clientInfo_t *ci )
 			CrossProduct( up, temp, right );
 			RotatePointAroundVector( forward, right, temp, this->lerpAngles2[PITCH] );
 			VectorMA( this->lerpOrigin, availableVehicles[ci->vehicle].gunoffset[0], forward, start );
-			VectorMA( start, availableVehicles[ci->vehicle].gunoffset[1], right, start );
-			VectorMA( start, availableVehicles[ci->vehicle].gunoffset[2], up, start );
-			VectorMA( start, 2000, forward, end );
+			start = start + right * ( availableVehicles[ci->vehicle].gunoffset[1] );
+			start = start + up * ( availableVehicles[ci->vehicle].gunoffset[2] );
+			end = start + forward * ( 2000 );
 			vectoangles( forward, ang );
 			ang[2] = 0;
 			AnglesToAxis( ang, reticle.axis );

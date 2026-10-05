@@ -17,11 +17,11 @@ Entity_Helicopter::checkForTakeoffOrLanding()
 	// get real throttle
 	throttle > maxthrottle ? -(throttle-maxthrottle) : throttle;	// real vert speed
 
-	VectorSet( startpos, s.pos.trBase[0], s.pos.trBase[1], s.pos.trBase[2] + r.mins[2]);
+	startpos = Vec3( s.pos.trBase[0], s.pos.trBase[1], s.pos.trBase[2] + r.mins[2] );
 	if( client_->ps_.ONOFF & OO_GEAR ) 
 		startpos[2] -= gearheight_;
 
-	VectorCopy( startpos, endpos );
+	endpos = startpos;
 	endpos[2] -= height;
 	Vec3	wheelMins = { -6, -6, 0 };
 	Vec3	wheelMaxs = { 6, 6, 0 };

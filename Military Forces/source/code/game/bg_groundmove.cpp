@@ -193,7 +193,7 @@ void PlayerMove::adjustToTerrain( )
 	if( tr.fraction < 1.0f ) {
 
 		// set up start and endpoints for full and close distance
-		VectorSet( dir, 0, pm->ps->vehicleAngles[1], 0 );
+		dir = Vec3( 0, pm->ps->vehicleAngles[1], 0 );
 		AngleVectors( dir, forward, right, nullptr );
 		VectorMA( pm->ps->origin, availableVehicles[pm->vehicle].maxs[0], forward, start[PFRONT] );
 		VectorMA( pm->ps->origin, availableVehicles[pm->vehicle].mins[0], forward, start[PBACK] );
@@ -340,7 +340,7 @@ void PlayerMove::stepSlideMove_GV()
 	mins[2] += 4;
 
 	// room above to lift the vehicle
-	VectorCopy( startOrigin, up );
+	up = startOrigin;
 	up[2] += stepSize;
 	pm->trace( &trace, startOrigin, mins, pm->maxs, up, pm->ps->clientNum, pm->tracemask, false );
 	if( trace.allsolid )
@@ -720,12 +720,12 @@ bool PlayerMove::slideMove_GV() {
 				CrossProduct (planes[i], planes[j], dir);
 				VectorNormalize( dir );
 				d = DotProduct( dir, pm->ps->velocity );
-				VectorScale( dir, d, clipVelocity );
+				clipVelocity = dir * ( d );
 
 				CrossProduct (planes[i], planes[j], dir);
 				VectorNormalize( dir );
 				d = DotProduct( dir, endVelocity );
-				VectorScale( dir, d, endClipVelocity );
+				endClipVelocity = dir * ( d );
 
 				// see if there is a third plane the the New move enters
 				for ( k = 0 ; k < numplanes ; k++ ) {
@@ -744,7 +744,7 @@ bool PlayerMove::slideMove_GV() {
 
 			// if we have fixed all interactions, try another move
 			VectorCopy( clipVelocity, pm->ps->velocity );
-			VectorCopy( endClipVelocity, endVelocity );
+			endVelocity = endClipVelocity;
 			break;
 		}
 	}

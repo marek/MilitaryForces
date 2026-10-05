@@ -33,10 +33,10 @@ void CGame::fFARTrail( ClientEntity * cent, const weaponInfo_t *wi )
 	VectorNormalize( velocity );
 
 	// calc adjusted position
-	VectorScale( velocity, -24.0f, velocity );		// -24.0f is just an arbitary distance which works OK with all current rocket models
-	VectorAdd( pos, velocity, pos );
+	velocity = velocity * ( -24.0f );		// -24.0f is just an arbitary distance which works OK with all current rocket models
+	pos = pos + velocity;
 
-	VectorCopy( pos, smoke_pos );
+	smoke_pos = pos;
 
 	smoke_pos[0] += + Q_random( &seed ) * 2;
 	smoke_pos[1] += + Q_random( &seed ) * 2;
@@ -77,8 +77,8 @@ void CGame::missileTrail( ClientEntity * cent, const weaponInfo_t *wi )
 	VectorNormalize( velocity );
 
 	// calc adjusted position
-	VectorScale( velocity, -24.0f, velocity );		// -24.0f is just an arbitary distance which works OK with all current rocket models
-	VectorAdd( pos, velocity, pos );
+	velocity = velocity * ( -24.0f );		// -24.0f is just an arbitary distance which works OK with all current rocket models
+	pos = pos + velocity;
 
 	// draw trail
 /*	smoke = CGame::smokePuff( pos, up, 
@@ -89,7 +89,7 @@ void CGame::missileTrail( ClientEntity * cent, const weaponInfo_t *wi )
 						  LEF_PUFF_DONT_SCALE, 
 						  cgs.media.smokePuffShader );	*/
 
-	VectorCopy( pos, smoke_pos );
+	smoke_pos = pos;
 	if(smoke_rot > 360)
 	{
 		smoke_rot = 0;
@@ -133,10 +133,10 @@ void CGame::flareTrail( ClientEntity * cent, const weaponInfo_t *wi )
 	VectorNormalize( velocity );
 
 	// calc adjusted position
-	VectorScale( velocity, -24.0f, velocity );		// -24.0f is just an arbitary distance which works OK with all current rocket models
-	VectorAdd( pos, velocity, pos );
+	velocity = velocity * ( -24.0f );		// -24.0f is just an arbitary distance which works OK with all current rocket models
+	pos = pos + velocity;
 
-	VectorCopy( pos, smoke_pos );
+	smoke_pos = pos;
 
 	smoke_pos[0] += Q_random( &seed ) * 5;
 	smoke_pos[1] += Q_random( &seed ) * 5;

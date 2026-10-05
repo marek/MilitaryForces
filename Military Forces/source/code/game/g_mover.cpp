@@ -142,9 +142,9 @@ static bool G_TryPushingEntity( GameEntity *check, GameEntity *pusher, vec3_t mo
 	{
 		VectorSubtract (check->s.pos.trBase, pusher->r.currentOrigin, org);
 	}
-	VectorCopy( org, org2 );
+	org2 = org;
 	G_RotatePoint( org2, matrix );
-	VectorSubtract (org2, org, move2);
+	move2 = org2 - org;
 	// add movement
 	VectorAdd (check->s.pos.trBase, move, check->s.pos.trBase);
 	VectorAdd (check->s.pos.trBase, move2, check->s.pos.trBase);

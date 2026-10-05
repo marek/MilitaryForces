@@ -382,7 +382,7 @@ GameEntity *Drop_Item( GameEntity *ent, gitem_t *item, float angle )
 	angles[PITCH] = 0;	// always forward
 
 	AngleVectors( angles, velocity, nullptr, nullptr );
-	VectorScale( velocity, 150, velocity );
+	velocity = velocity * ( 150 );
 	velocity[2] += 200 + crandom() * 50;
 	
 	return LaunchItem( item, ent->s.pos.trBase, velocity );
@@ -440,7 +440,7 @@ void GameItem::Think_FinishSpawningItem::execute()
 	else 
 	{
 		// drop to floor
-		VectorSet( dest, self_->s.origin[0], self_->s.origin[1], self_->s.origin[2] - 4096 );
+		dest = Vec3( self_->s.origin[0], self_->s.origin[1], self_->s.origin[2] - 4096 );
 		GameHost::trace( &tr, self_->s.origin, self_->r.mins, self_->r.maxs, dest, self_->s.number, MASK_SOLID, false );
 		if( tr.startsolid ) 
 		{

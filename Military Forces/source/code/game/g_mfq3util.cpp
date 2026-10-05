@@ -100,7 +100,7 @@ void updateTargetTracking( GameEntity *ent )
 		RotatePointAroundVector( temp, up, forward, ent->client_->ps_.turretAngle );
 		CrossProduct( up, temp, right );
 		RotatePointAroundVector( dir, right, temp, ent->client_->ps_.gunAngle );
-		VectorCopy( dir, forward );
+		forward = dir;
 	} 
 	else
 	{
@@ -158,7 +158,7 @@ void updateTargetTracking( GameEntity *ent )
 			Vec3	mid;
 			actualcat = CAT_GROUND;
 			VectorAdd( ent->tracktarget_->r.absmax, ent->tracktarget_->r.absmin, mid );
-			VectorScale( mid, 0.5f, mid );
+			mid = mid * ( 0.5f );
 			VectorSubtract( mid, ent->r.currentOrigin, diff );
 		} 
 		else 

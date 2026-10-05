@@ -318,7 +318,7 @@ bool PlayerMove::slideMove_Boat() {
 
 	// put on water, dependent on speed
 	VectorCopy( pm->ps->origin, up );
-	VectorCopy( up, down );
+	down = up;
 	up[2] += 10;
 	down[2] -= 10;
 	pm->trace( &trace,
@@ -548,12 +548,12 @@ bool PlayerMove::slideMove_Boat() {
 				CrossProduct (planes[i], planes[j], dir);
 				VectorNormalize( dir );
 				d = DotProduct( dir, pm->ps->velocity );
-				VectorScale( dir, d, clipVelocity );
+				clipVelocity = dir * ( d );
 
 				CrossProduct (planes[i], planes[j], dir);
 				VectorNormalize( dir );
 				d = DotProduct( dir, endVelocity );
-				VectorScale( dir, d, endClipVelocity );
+				endClipVelocity = dir * ( d );
 
 				// see if there is a third plane the the New move enters
 				for ( k = 0 ; k < numplanes ; k++ ) {
@@ -572,7 +572,7 @@ bool PlayerMove::slideMove_Boat() {
 
 			// if we have fixed all interactions, try another move
 			VectorCopy( clipVelocity, pm->ps->velocity );
-			VectorCopy( endClipVelocity, endVelocity );
+			endVelocity = endClipVelocity;
 			break;
 		}
 	}

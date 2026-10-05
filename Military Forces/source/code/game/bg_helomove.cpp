@@ -424,23 +424,23 @@ void PlayerMove::heloMove( )
 			VectorCopy(vehdir, forwardvel);
 			forwardvel[PITCH] = 0;				// Don't let vehicle angels effect verticle acceleration
 			AngleVectors(forwardvel, forwardvel, nullptr, nullptr );
-			VectorScale(forwardvel, curforwardspeed, forwardvel);
+			forwardvel = forwardvel * ( curforwardspeed );
 
 			// Sideways speed
 			VectorCopy(vehdir,  rightvel);
 			rightvel[PITCH] = rightvel[ROLL] = 0;
 			AngleVectors( rightvel,  nullptr, rightvel, nullptr );
-			VectorScale( rightvel, currightspeed*2.5, rightvel );
+			rightvel = rightvel * ( currightspeed*2.5 );
 
 			// Lift Speed
 			VectorCopy(vehdir,  liftvel);
 			liftvel[PITCH] = liftvel[YAW] = 0;
 			AngleVectors( liftvel, nullptr , nullptr, liftvel );
-			VectorScale( liftvel, curliftspeed, liftvel );
+			liftvel = liftvel * ( curliftspeed );
 
 			// delta vel
-			VectorAdd(forwardvel,rightvel,deltavel);
-			VectorAdd(liftvel,deltavel,deltavel);
+			deltavel = forwardvel + rightvel;
+			deltavel = liftvel + deltavel;
 
 	// brake
 	if( pm->cmd.buttons & BUTTON_BRAKE ) {
@@ -497,13 +497,13 @@ void PlayerMove::heloMove( )
 					forwardvel[PITCH] = forwardvel[ROLL] = 0;
 					AngleVectors(forwardvel, forwardvel, nullptr, nullptr );
 					pm->ps->speed = availableVehicles[pm->vehicle].turnspeed[PITCH];
-					VectorScale(forwardvel, availableVehicles[pm->vehicle].turnspeed[PITCH], forwardvel);
+					forwardvel = forwardvel * ( availableVehicles[pm->vehicle].turnspeed[PITCH] );
 			} else if (pm->cmd.forwardmove < 0) {
 					VectorCopy(vehdir, forwardvel);
 					forwardvel[PITCH] = forwardvel[ROLL] = 0;
 					AngleVectors(forwardvel, forwardvel, nullptr, nullptr );
 					pm->ps->speed = availableVehicles[pm->vehicle].turnspeed[PITCH]*10;
-					VectorScale(forwardvel, -availableVehicles[pm->vehicle].turnspeed[PITCH], forwardvel);
+					forwardvel = forwardvel * ( -availableVehicles[pm->vehicle].turnspeed[PITCH] );
 			}
 				
 			// turn the hull
@@ -515,7 +515,7 @@ void PlayerMove::heloMove( )
 			else if(pm->cmd.rightmove < 0 )
 				vehdir[YAW] += turnspeed[YAW]/2 * turnModifier;
 
-			VectorCopy(forwardvel, deltavel);
+			deltavel = forwardvel;
 		}
 	// air movement
 	} else {
@@ -822,12 +822,12 @@ bool PlayerMove::slideMove_Helo() {
 				CrossProduct (planes[i], planes[j], dir);
 				VectorNormalize( dir );
 				d = DotProduct( dir, pm->ps->velocity );
-				VectorScale( dir, d, clipVelocity );
+				clipVelocity = dir * ( d );
 
 				CrossProduct (planes[i], planes[j], dir);
 				VectorNormalize( dir );
 				d = DotProduct( dir, endVelocity );
-				VectorScale( dir, d, endClipVelocity );
+				endClipVelocity = dir * ( d );
 
 				// see if there is a third plane the the New move enters
 				for ( k = 0 ; k < numplanes ; k++ ) {
@@ -846,7 +846,7 @@ bool PlayerMove::slideMove_Helo() {
 
 			// if we have fixed all interactions, try another move
 			VectorCopy( clipVelocity, pm->ps->velocity );
-			VectorCopy( endClipVelocity, endVelocity );
+			endVelocity = endClipVelocity;
 			break;
 		}
 	}

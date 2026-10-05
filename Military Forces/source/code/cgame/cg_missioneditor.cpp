@@ -523,7 +523,7 @@ static void ME_RotateSelection( int delta )
 		AngleMod( angles[1] );
 		// move object
 		AngleVectors(angles, dir, nullptr, nullptr);
-		VectorScale(dir, dist, dir);
+		dir = dir * ( dist );
 		VectorAdd(center, dir, veh->origin);
 	}
 
@@ -543,18 +543,18 @@ static void ME_DragSelection( int x, int y )
 
 	if( vertical ) {
 		// move vertically
-		VectorSet( forward, 0, 0, 1 );
-		VectorScale( forward, -y, forward );
+		forward = Vec3( 0, 0, 1 );
+		forward = forward * ( -y );
 	} else if( rotate ) {
 		ME_RotateSelection( -x );
 		return;
 	} else {
 		// move horizontally
-		VectorSet( angles, 0, cg.predictedPlayerState.viewangles[1], 0 );
+		angles = Vec3( 0, cg.predictedPlayerState.viewangles[1], 0 );
 		AngleVectors(  angles, forward, right, nullptr );
-		VectorScale( forward, -y, forward );
-		VectorScale( right, x, right );
-		VectorAdd( forward, right, forward );
+		forward = forward * ( -y );
+		right = right * ( x );
+		forward = forward + right;
 	}
 
 	if( cgs.IGME.waypointmode ) {

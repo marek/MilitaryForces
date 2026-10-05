@@ -489,9 +489,9 @@ void CGame::drawRadarSymbols_AIR_new( int vehicle, float range, int x, int y ) {
 		VectorCopy( cg.radarEnts[i]->currentState.pos.trBase, otherpos );
 
 		// get dir and dist
-		VectorSet( pos1, otherpos[0], otherpos[1], 0 );
-		VectorSet( pos2, pos[0], pos[1], 0 );
-		VectorSubtract( pos1, pos2, dir );
+		pos1 = Vec3( otherpos[0], otherpos[1], 0 );
+		pos2 = Vec3( pos[0], pos[1], 0 );
+		dir = pos1 - pos2;
 		dist = VectorNormalize(dir);
 		// check out of range
 		if( dist > range ) 
@@ -516,7 +516,7 @@ void CGame::drawRadarSymbols_AIR_new( int vehicle, float range, int x, int y ) {
 		else if( angles[1] < 0 ) angles[1] += 360;
 		angles[0] = angles[2] = 0;
 		AngleVectors( angles, dir, nullptr, nullptr );
-		VectorScale( dir, dist, dir );
+		dir = dir * ( dist );
 
 		// check LOS and/or RADAR on
 		if( !(cg.radarEnts[i]->currentState.ONOFF & OO_RADAR) ) {
@@ -618,9 +618,9 @@ void CGame::drawRadarSymbols_GROUND_new( int vehicle, float range, int x, int y 
 			VectorCopy( cg.radarEnts[i]->currentState.pos.trBase, otherpos );
 
 			// get dir and dist
-			VectorSet( pos1, otherpos[0], otherpos[1], 0 );
-			VectorSet( pos2, pos[0], pos[1], 0 );
-			VectorSubtract( pos1, pos2, dir );
+			pos1 = Vec3( otherpos[0], otherpos[1], 0 );
+			pos2 = Vec3( pos[0], pos[1], 0 );
+			dir = pos1 - pos2;
 			dist = VectorNormalize(dir);
 			// check out of range
 			if( dist > range ) 
@@ -652,7 +652,7 @@ void CGame::drawRadarSymbols_GROUND_new( int vehicle, float range, int x, int y 
 				angles[1] += 360;
 			angles[0] = angles[2] = 0;
 			AngleVectors( angles, dir, nullptr, nullptr );
-			VectorScale( dir, dist, dir );
+			dir = dir * ( dist );
 
 			// check LOS and/or RADAR on
 			if( !(cg.radarEnts[i]->currentState.ONOFF & OO_RADAR) ) 
@@ -688,9 +688,9 @@ void CGame::drawRadarSymbols_GROUND_new( int vehicle, float range, int x, int y 
 		{
 			VectorCopy( cgs.inlineModelMidpoints[cg.radarEnts[i]->currentState.modelindex], otherpos );
 			// get dir and dist
-			VectorSet( pos1, otherpos[0], otherpos[1], 0 );
-			VectorSet( pos2, pos[0], pos[1], 0 );
-			VectorSubtract( pos1, pos2, dir );
+			pos1 = Vec3( otherpos[0], otherpos[1], 0 );
+			pos2 = Vec3( pos[0], pos[1], 0 );
+			dir = pos1 - pos2;
 			dist = VectorNormalize(dir);
 			// check out of range
 			if( dist > range ) 
@@ -718,7 +718,7 @@ void CGame::drawRadarSymbols_GROUND_new( int vehicle, float range, int x, int y 
 				angles[1] += 360;
 			angles[0] = angles[2] = 0;
 			AngleVectors( angles, dir, nullptr, nullptr );
-			VectorScale( dir, dist, dir );
+			dir = dir * ( dist );
 
 			icon = RD_BUILDING_ENEMY;
 			// friend or foe
@@ -1133,10 +1133,10 @@ void CGame::hUD_Camera(int mfdnum, int vehicle) {
 	if( cammode == CAMERA_DOWN ) {
 		Vec3 a;
 		AngleVectors( cent->currentState.angles, nullptr, nullptr, v );
-		VectorSet( a, 90, cent->currentState.angles[1], 0 );
+		a = Vec3( 90, cent->currentState.angles[1], 0 );
 		AnglesToAxis( a, cg.HUDCamera.viewaxis );
 			// position
-		VectorScale( v, availableVehicles[vehicle].mins[2], v );
+		v = v * ( availableVehicles[vehicle].mins[2] );
 		VectorAdd( cent->lerpOrigin, v, cg.HUDCamera.vieworg );
 	} else if( cammode == CAMERA_BACK ) {
 		if( (availableVehicles[vehicle].cat & CAT_GROUND) ||
@@ -1153,14 +1153,14 @@ void CGame::hUD_Camera(int mfdnum, int vehicle) {
 		} else {
 			Vec3 a, b;
 			AngleVectors( cent->currentState.angles, v, nullptr, nullptr );
-			VectorCopy( v, b );
+			b = v;
 			VectorInverse( b );
 			vectoangles( b, a );
 			a[2] = -cent->currentState.angles[2];
 			AnglesToAxis( a, cg.HUDCamera.viewaxis );
 		}
 			// position
-		VectorScale( v, availableVehicles[vehicle].mins[0], v );
+		v = v * ( availableVehicles[vehicle].mins[0] );
 		VectorAdd( cent->lerpOrigin, v, cg.HUDCamera.vieworg );
 	} else if( cammode == CAMERA_BOMB ) {
 		int speed = ps->speed/10;
@@ -1169,18 +1169,18 @@ void CGame::hUD_Camera(int mfdnum, int vehicle) {
 		int t;
 		trace_t tr;
 		AngleVectors( cent->currentState.angles, v, nullptr, nullptr );
-		VectorSet( horz, v[0], v[1], 0 );
+		horz = Vec3( v[0], v[1], 0 );
 		VectorNormalize( horz );
-		VectorSet( vert, 0, 0, 1 );
+		vert = Vec3( 0, 0, 1 );
 		alpha = DEG2RAD(cent->currentState.angles[0]);
 		// bombs never travel longer than 10 seconds (they autoexplode after that time)
 		// so we can use that for our calculations
 		for( t = 1; t <= 10; ++t ) {
 			hD = speed*t*cos(alpha);
 			vD = speed*t*sin(alpha) - DEFAULT_GRAVITY*t*t/2;
-			VectorScale( horz, hD, tempH );
-			VectorScale( vert, vD, tempV);
-			VectorAdd( tempH, tempV, v );
+			tempH = horz * ( hD );
+			tempV = vert * ( vD );
+			v = tempH + tempV;
 			VectorAdd( cent->currentState.pos.trBase, v, end );
 			VectorNormalize( v );
 			CGame::trace( &tr, cent->currentState.pos.trBase, nullptr, nullptr, end, cent->currentState.number, MASK_ALL );
@@ -1189,7 +1189,7 @@ void CGame::hUD_Camera(int mfdnum, int vehicle) {
 		vectoangles( v, end );
 		AnglesToAxis( end, cg.HUDCamera.viewaxis );
 			// position
-		VectorScale( v, -availableVehicles[vehicle].mins[0], v );
+		v = v * ( -availableVehicles[vehicle].mins[0] );
 		VectorAdd( cent->lerpOrigin, v, cg.HUDCamera.vieworg );
 	} else if( cammode == CAMERA_TARGET ) {
 		// angles
@@ -1224,7 +1224,7 @@ void CGame::hUD_Camera(int mfdnum, int vehicle) {
 			}
 		}
 			// position
-		VectorScale( v, availableVehicles[vehicle].maxs[0], v );
+		v = v * ( availableVehicles[vehicle].maxs[0] );
 		VectorAdd( cent->lerpOrigin, v, cg.HUDCamera.vieworg );
 		cg.HUDCamera.vieworg[2] += 4;
 	} 
@@ -1806,7 +1806,7 @@ void CGame::drawStatusBar_MFQ3_new( ) {
 			Vec3	start, end;
 			VectorCopy( ps->origin, start );
 			start[2] += availableVehicles[vehicle].mins[2];
-			VectorCopy( start, end );
+			end = start;
 			end[2] -= 20000;
 			CGame::trace( &tr, start, vec3_origin, vec3_origin, end, cg.snap->ps.clientNum, MASK_SOLID|MASK_WATER );
 			altitude = static_cast<int>(tr.fraction * 20000);

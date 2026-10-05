@@ -398,7 +398,7 @@ void MF_ClientSpawn( int clientNum, long cs_flags )
 	{
 		trace_t	trace;
 		Vec3	endpos;
-		VectorCopy( spawn_origin, endpos );
+		endpos = spawn_origin;
 		endpos[2] -= 512;
 		GameHost::trace (&trace, spawn_origin, nullptr, nullptr, endpos, ENTITYNUM_NONE, MASK_WATER, false );
 		if( trace.fraction == 1.0f ) 
@@ -494,7 +494,7 @@ void MF_ClientSpawn( int clientNum, long cs_flags )
 			trace_t	trace;
 			Vec3	endpos;
 			GameEntity *test;
-			VectorCopy( spawn_origin, endpos );
+			endpos = spawn_origin;
 			endpos[2] -= 128;
 			GameHost::trace (&trace, spawn_origin, nullptr, nullptr, endpos, ENTITYNUM_NONE, MASK_SOLID, false );
 			if( trace.entityNum != ENTITYNUM_NONE ) 
@@ -514,7 +514,7 @@ void MF_ClientSpawn( int clientNum, long cs_flags )
 			trace_t	trace;
 			Vec3	endpos;
 			GameEntity *test;
-			VectorCopy( spawn_origin, endpos );
+			endpos = spawn_origin;
 			endpos[2] -= 512;
 
 			GameHost::trace (&trace, spawn_origin, nullptr, nullptr, endpos, ENTITYNUM_NONE, MASK_SOLID, false );
@@ -534,7 +534,7 @@ void MF_ClientSpawn( int clientNum, long cs_flags )
 			trace_t	trace;
 			Vec3	endpos;
 			GameEntity *test;
-			VectorCopy( spawn_origin, endpos );
+			endpos = spawn_origin;
 			endpos[2] -= 512;
 
 			GameHost::trace(&trace, spawn_origin, nullptr, nullptr, endpos, ENTITYNUM_NONE, MASK_PLAYERSOLID, false );
@@ -550,7 +550,7 @@ void MF_ClientSpawn( int clientNum, long cs_flags )
 			trace_t	trace;
 			Vec3	endpos;
 			GameEntity *test;
-			VectorCopy( spawn_origin, endpos );
+			endpos = spawn_origin;
 			endpos[2] -= 512;
 			GameHost::trace(&trace, spawn_origin, nullptr, nullptr, endpos, ENTITYNUM_NONE, MASK_ALL, false );
 			if( trace.entityNum != ENTITYNUM_NONE ) 

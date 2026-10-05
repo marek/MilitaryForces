@@ -27,7 +27,7 @@ void MiscVehicle_Die::execute( GameEntity *inflictor, GameEntity *attacker, int 
 	if( self_->score_ && attacker && attacker->client_ ) {
 		Vec3	pos;
 		VectorAdd( self_->r.absmin, self_->r.absmax, pos );
-		VectorScale( pos, 0.5f, pos );
+		pos = pos * ( 0.5f );
 		AddScore( attacker, pos, Game::miscVehicle_TeamScore( self_, attacker ) );
 	}
 
@@ -190,7 +190,7 @@ void Drone_Think::execute()
 	{
 		Vec3 from, to;
 		VectorCopy( ent->r.currentOrigin, from );
-		VectorCopy( origin, to );
+		to = origin;
 		float raise = (ent->r.maxs[2] - ent->r.mins[2]) * 0.5f;
 		from[2] += raise;
 		to[2] += raise;
@@ -208,8 +208,8 @@ void Drone_Think::execute()
 		{
 			blocked_ = 0;
 		}
-		VectorCopy( origin, from );
-		VectorCopy( origin, to );
+		from = origin;
+		to = origin;
 		from[2] += 64;
 		to[2] -= 512;
 		GameHost::trace( &tr, from, nullptr, nullptr, to, ent->s.number, (cat & CAT_BOAT) ? (MASK_SOLID|MASK_WATER) : MASK_SOLID, false );
@@ -266,14 +266,14 @@ void Drone_Think::execute()
 		angles[PITCH] = angles[ROLL] = 0;
 		if( cat & CAT_HELO )
 		{
-			VectorCopy( dir, vel );
+			vel = dir;
 		}
 		else
 		{
 			AngleVectors( angles, vel, nullptr, nullptr );
 		}
 	}
-	VectorScale( vel, speed_, vel );
+	vel = vel * ( speed_ );
 
 	VectorCopy( angles, ent->s.angles );
 	VectorCopy( angles, ent->s.apos.trBase );
@@ -433,7 +433,7 @@ void Deck_Think::execute()
 	Vec3 origin, angles, velocity, forward, pos;
 	VectorCopy( parent->r.currentOrigin, origin );
 	VectorCopy( parent->s.angles, angles );
-	VectorClear( velocity );
+	velocity = Vec3();
 	if( parent->client_ ) 
 		VectorCopy( parent->client_->ps_.velocity, velocity );
 
@@ -482,7 +482,7 @@ void Deck_Think::execute()
 	}
 
 	AngleVectors( angles, forward, nullptr, nullptr );
-	VectorMA( origin, along_, forward, pos );
+	pos = origin + forward * ( along_ );
 
 	deck->s.pos.trType = TR_LINEAR;
 	deck->s.pos.trTime = theLevel.time_;

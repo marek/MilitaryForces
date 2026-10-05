@@ -201,7 +201,7 @@ void Bots::buildPads()
 		Vec3 start, end;
 		VectorCopy( pad.center, start );
 		start[2] = ent->r.absmax[2] + 8;
-		VectorCopy( start, end );
+		end = start;
 		end[2] -= 600;
 		trace_t tr;
 		GameHost::trace( &tr, start, nullptr, nullptr, end, ENTITYNUM_NONE, MASK_SOLID, false );
@@ -278,7 +278,7 @@ bool Bots::findHidePoint( GameEntity* ent, State& bot, GameEntity* threat, bool 
 			point[0] += cos( angle ) * radius;
 			point[1] += sin( angle ) * radius;
 			point[2] += 300;
-			VectorCopy( point, down );
+			down = point;
 			down[2] -= 2000;
 			trace_t tr;
 			GameHost::trace( &tr, point, nullptr, nullptr, down, ent->s.number, MASK_SOLID|MASK_WATER, false );
@@ -293,7 +293,7 @@ bool Bots::findHidePoint( GameEntity* ent, State& bot, GameEntity* threat, bool 
 			if( hullDown )
 			{
 				Vec3 top;
-				VectorCopy( point, top );
+				top = point;
 				top[2] += availableVehicles[ent->client_->vehicle_].maxs[2] + 12;
 				if( !visible( ent, top, threat ) )
 					continue;

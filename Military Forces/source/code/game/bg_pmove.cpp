@@ -279,7 +279,7 @@ void PlayerMove::flyMove( ) {
 		wishvel[2] += scale * pm->cmd.upmove;
 	}
 
-	VectorCopy (wishvel, wishdir);
+	wishdir = wishvel;
 	wishspeed = VectorNormalize(wishdir);
 
 	PlayerMove::accelerate (wishdir, wishspeed, pm_flyaccelerate);
@@ -337,7 +337,7 @@ void PlayerMove::noclipMove( ) {
 		wishvel[i] = pml.forward[i]*fmove + pml.right[i]*smove;
 	wishvel[2] += pm->cmd.upmove;
 
-	VectorCopy (wishvel, wishdir);
+	wishdir = wishvel;
 	wishspeed = VectorNormalize(wishdir);
 	wishspeed *= scale;
 

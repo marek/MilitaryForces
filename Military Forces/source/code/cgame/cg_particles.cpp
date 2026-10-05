@@ -105,7 +105,7 @@ static void CG_AttractParticles(particle_t * a, particle_t * b)
 		if(ftemp > 1.0f)
 			ftemp = 1.0f;
 	}
-	VectorScale(vtemp, a->attractionEmitter*ftemp, vtemp);
+	vtemp = vtemp * ( a->attractionEmitter*ftemp );
 	VectorAdd(vtemp,a->trAttraction,a->trAttraction);
 }
 
@@ -139,7 +139,7 @@ void ClientEntity::attractParticleToEntity( particle_t * a )
 		if(ftemp < 1.0f)
 			ftemp = 1.0f;
 	}
-	VectorScale(vtemp, a->attractionEmitter*ftemp, vtemp);
+	vtemp = vtemp * ( a->attractionEmitter*ftemp );
 	VectorAdd(vtemp,a->trAttraction,a->trAttraction);
 	
 	// If close enough, inherhit speed
@@ -147,7 +147,7 @@ void ClientEntity::attractParticleToEntity( particle_t * a )
 	{
 		VectorCopy(this->currentState.pos.trBase, vtemp);
 		VectorNormalize(vtemp);
-		VectorScale(vtemp, dtime*VectorLength(this->currentState.pos.trBase)*(1/distance),vtemp);
+		vtemp = vtemp * ( dtime*VectorLength(this->currentState.pos.trBase)*(1/distance) );
 		VectorAdd(vtemp, a->trDelta, a->trDelta);
 	}
 }
@@ -314,7 +314,7 @@ void CGame::particleThink(particleWorld_t * w, particle_t * p)
 		VectorCopy(p->trBase, result);
 	p->trDelta[2] -= 0.5 * p->gravity * dtime * dtime; 								// gravity
 	VectorAdd(p->trDelta, p->trAttraction, temp);
-	VectorMA( result, dtime, temp, result );								// basic movement
+	result = result + temp * ( dtime );								// basic movement
 											// copy final result
 
 	// *
@@ -322,8 +322,8 @@ void CGame::particleThink(particleWorld_t * w, particle_t * p)
 	// *
 	
 	// Set collision boxes
-	VectorSet( mins, -p->radius, -p->radius, -p->radius );
-	VectorSet( maxs, p->radius, p->radius, p->radius );
+	mins = Vec3( -p->radius, -p->radius, -p->radius );
+	maxs = Vec3( p->radius, p->radius, p->radius );
 	
 	CGame::trace( &trace, p->trBase, mins, maxs, result, ENTITYNUM_NONE, MASK_SOLID );
 	
@@ -406,23 +406,23 @@ static void CG_RenderParticle(particle_t * p)
 	rotate_ang[ROLL] += p->rotation;
 	AngleVectors ( rotate_ang, nullptr, rr, ru);
 
-	VectorMA (origin, -p->radius*2, ru, point);	
-	VectorMA (point, -p->radius*2, rr, point);	
+	point = origin + ru * ( -p->radius*2 );	
+	point = point + rr * ( -p->radius*2 );	
 	VectorCopy (point, verts[0].xyz);
 	verts[0].st[0] = 0;
 	verts[0].st[1] = 0;
 
-	VectorMA (point, 4*p->radius, ru, point);	
+	point = point + ru * ( 4*p->radius );	
 	VectorCopy (point, verts[1].xyz);
 	verts[1].st[0] = 0;
 	verts[1].st[1] = 1;
 
-	VectorMA (point, 4*p->radius, rr, point);	
+	point = point + rr * ( 4*p->radius );	
 	VectorCopy (point, verts[2].xyz);
 	verts[2].st[0] = 1;
 	verts[2].st[1] = 1;
 
-	VectorMA (point, -4*p->radius, ru, point);	
+	point = point + ru * ( -4*p->radius );	
 	VectorCopy (point, verts[3].xyz);
 	verts[3].st[0] = 1;
 	verts[3].st[1] = 0;

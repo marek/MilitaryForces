@@ -1245,15 +1245,15 @@ void RotatePointAroundAngles( vec3_t dst, vec3_t src, float yaw, float pitch, fl
 	RotatePointAroundVector( tmpVec, up, src, yaw );
 	VectorCopy( tmpVec, src );
 	RotatePointAroundVector( tmpVec, up, left, yaw );
-	VectorCopy( tmpVec, left );
+	left = tmpVec;
 	RotatePointAroundVector( tmpVec, up, forwards, yaw );
-	VectorCopy( tmpVec, forwards );
+	forwards = tmpVec;
 
 	// rotate point (+ left vector vector) around pitch
 	RotatePointAroundVector( tmpVec, left, src, pitch );
 	VectorCopy( tmpVec, src );
 	RotatePointAroundVector( tmpVec, left, forwards, pitch );
-	VectorCopy( tmpVec, forwards );
+	forwards = tmpVec;
 	
 	// rotate point around roll
 	RotatePointAroundVector( tmpVec, forwards, src, roll );
@@ -1317,7 +1317,7 @@ void MakeBoxFromExtents( box3_t* box, const vec3_t mins, const vec3_t maxs, cons
 	VectorCopy( maxs, box->edgePoints[BOX3_MAX]);// max point
 
 	VectorSubtract( box->edgePoints[BOX3_MIN], box->edgePoints[BOX3_MAX], temp );
-	VectorScale( temp, 0.5f, temp );
+	temp = temp * ( 0.5f );
 	VectorAdd( box->edgePoints[BOX3_MAX], temp, box->center );
 
 	AnglesToAxis( angles, box->axis );

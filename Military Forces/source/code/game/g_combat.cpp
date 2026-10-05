@@ -367,37 +367,37 @@ bool CanDamage( GameEntity* targ, vec3_t origin )
 	// use the midpoint of the bounds instead of the origin, because
 	// bmodels may have their origin is 0,0,0
 	VectorAdd (targ->r.absmin, targ->r.absmax, midpoint);
-	VectorScale (midpoint, 0.5, midpoint);
+	midpoint = midpoint * ( 0.5 );
 
-	VectorCopy (midpoint, dest);
+	dest = midpoint;
 	GameHost::trace ( &tr, origin, vec3_origin, vec3_origin, dest, ENTITYNUM_NONE, MASK_SOLID, false);
 	if (tr.fraction == 1.0 || tr.entityNum == targ->s.number)
 		return true;
 
 	// this should probably check in the plane of projection, 
 	// rather than in world coordinate, and also include Z
-	VectorCopy (midpoint, dest);
+	dest = midpoint;
 	dest[0] += 15.0;
 	dest[1] += 15.0;
 	GameHost::trace ( &tr, origin, vec3_origin, vec3_origin, dest, ENTITYNUM_NONE, MASK_SOLID, false);
 	if (tr.fraction == 1.0)
 		return true;
 
-	VectorCopy (midpoint, dest);
+	dest = midpoint;
 	dest[0] += 15.0;
 	dest[1] -= 15.0;
 	GameHost::trace ( &tr, origin, vec3_origin, vec3_origin, dest, ENTITYNUM_NONE, MASK_SOLID, false);
 	if (tr.fraction == 1.0)
 		return true;
 
-	VectorCopy (midpoint, dest);
+	dest = midpoint;
 	dest[0] -= 15.0;
 	dest[1] += 15.0;
 	GameHost::trace ( &tr, origin, vec3_origin, vec3_origin, dest, ENTITYNUM_NONE, MASK_SOLID, false);
 	if (tr.fraction == 1.0)
 		return true;
 
-	VectorCopy (midpoint, dest);
+	dest = midpoint;
 	dest[0] -= 15.0;
 	dest[1] -= 15.0;
 	GameHost::trace ( &tr, origin, vec3_origin, vec3_origin, dest, ENTITYNUM_NONE, MASK_SOLID, false);

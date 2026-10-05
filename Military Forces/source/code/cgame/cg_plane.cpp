@@ -278,7 +278,7 @@ void ClientEntity::plane( clientInfo_t *ci )
 				memset( &reticlelock, 0, sizeof(reticlelock) );	
 				reticlelock.customShader = availableWeapons[availableVehicles[ci->vehicle].weapons[this->currentState.weaponNum]].crosshairtrack;
 				reticlelock.hModel = cgs.media.reticle[ availableWeapons[availableVehicles[ci->vehicle].weapons[this->currentState.weaponNum]].crosshairtrack ];
-				VectorSet( ang, this->currentState.angles[0], this->currentState.angles[1], 0 );
+				ang = Vec3( this->currentState.angles[0], this->currentState.angles[1], 0 );
 				AnglesToAxis( ang, reticlelock.axis );
 				VectorScale( reticlelock.axis[0], 0.5f, reticlelock.axis[0] );
 				VectorScale( reticlelock.axis[1], 0.5f, reticlelock.axis[1] );
@@ -307,7 +307,7 @@ void ClientEntity::plane( clientInfo_t *ci )
 		{
 			reticle.customShader = availableWeapons[availableVehicles[ci->vehicle].weapons[this->currentState.weaponNum]].crosshair;
 			reticle.hModel = cgs.media.reticle[ availableWeapons[availableVehicles[ci->vehicle].weapons[this->currentState.weaponNum]].crosshair ];
-			VectorSet( ang, this->currentState.angles[0], this->currentState.angles[1], 0 );
+			ang = Vec3( this->currentState.angles[0], this->currentState.angles[1], 0 );
 			AnglesToAxis( ang, reticle.axis );
 			VectorScale( reticle.axis[0], 2.0f, reticle.axis[0] );
 			VectorScale( reticle.axis[1], 2.0f, reticle.axis[1] );

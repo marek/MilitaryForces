@@ -1334,7 +1334,7 @@ UI_Utils::item_Model_Paint( itemDef_t *item )
 			modelPtr->angle = (modelPtr->angle + 1) % 360;
 		}
 	}
-	VectorSet( angles, 0, modelPtr->angle, 0 );
+	angles = Vec3( 0, modelPtr->angle, 0 );
 	AnglesToAxis( angles, ent.axis );
 
 	ent.hModel = item->asset;

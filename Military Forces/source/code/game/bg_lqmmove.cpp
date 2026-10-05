@@ -29,7 +29,7 @@ void PlayerMove::lqmGroundTrace( )
 
 	// set the height
 
-	VectorSet( end, pm->ps->origin[0], (float)pm->ps->origin[1], (float)pm->ps->origin[2] + (float)pm->mins[2] + 2);
+	end = Vec3( pm->ps->origin[0], (float)pm->ps->origin[1], (float)pm->ps->origin[2] + (float)pm->mins[2] + 2 );
 
 	pm->trace (&trace, pm->ps->origin, pm->mins, pm->maxs, end, pm->ps->clientNum, pm->tracemask, false);
 	pml.groundTrace = trace;
@@ -39,8 +39,8 @@ void PlayerMove::lqmGroundTrace( )
 	if ( trace.fraction < 1.0 ) {
 		// stuck into something overhead: solid above the head, open below the feet
 		Vec3 above, below;
-		VectorSet( above, pm->ps->origin[0], pm->ps->origin[1], pm->ps->origin[2] + pm->maxs[2] + 2 );
-		VectorSet( below, pm->ps->origin[0], pm->ps->origin[1], pm->ps->origin[2] + pm->mins[2] - 4 );
+		above = Vec3( pm->ps->origin[0], pm->ps->origin[1], pm->ps->origin[2] + pm->maxs[2] + 2 );
+		below = Vec3( pm->ps->origin[0], pm->ps->origin[1], pm->ps->origin[2] + pm->mins[2] - 4 );
 		const bool overhead = trace.startsolid && ( pm->pointcontents( above, pm->ps->clientNum ) & pm->tracemask ) &&
 			!( pm->pointcontents( below, pm->ps->clientNum ) & pm->tracemask );
 		if ( overhead || ( !trace.startsolid && trace.plane.normal[2] <= 0 ) ) {
@@ -106,10 +106,10 @@ void PlayerMove::lQMMove( )
 	pm->ps->ONOFF &= ~OO_VAPOR;
 
 	// Clear vectors
-	VectorClear(forwardvel);
-	VectorClear(liftvel);
-	VectorClear(rightvel);
-	VectorClear(deltavel);
+	forwardvel = Vec3();
+	liftvel = Vec3();
+	rightvel = Vec3();
+	deltavel = Vec3();
 
     // local vectors
     VectorCopy( pm->ps->viewangles, viewdir );
@@ -163,11 +163,11 @@ void PlayerMove::lQMMove( )
 			if(pm->cmd.forwardmove > 0) {
 				anim |= A_LQM_FORWARD;
 				anim &= ~A_LQM_BACKWARD;
-				VectorScale(forwardvel, speedtemp, forwardvel);
+				forwardvel = forwardvel * ( speedtemp );
 			} else {
 				anim |= A_LQM_BACKWARD;
 				anim &= ~A_LQM_FORWARD;
-				VectorScale(forwardvel, -speedtemp, forwardvel);
+				forwardvel = forwardvel * ( -speedtemp );
 			}
 		} else
 			anim &= ~(A_LQM_FORWARD|A_LQM_BACKWARD);
@@ -182,11 +182,11 @@ void PlayerMove::lQMMove( )
 			if(pm->cmd.rightmove > 0) {
 				anim |= A_LQM_RIGHT;
 				anim &= ~A_LQM_LEFT;
-				VectorScale( rightvel, speedtemp, rightvel );
+				rightvel = rightvel * ( speedtemp );
 			} else {
 				anim |= A_LQM_LEFT;
 				anim &= ~A_LQM_RIGHT;
-				VectorScale( rightvel, -speedtemp, rightvel );
+				rightvel = rightvel * ( -speedtemp );
 			}
 		} else
 			anim &= ~(A_LQM_LEFT|A_LQM_RIGHT);
@@ -209,8 +209,8 @@ void PlayerMove::lQMMove( )
 				anim |= A_LQM_CHUTE;
 		}
 
-		VectorAdd(forwardvel, rightvel, deltavel);
-		VectorAdd(liftvel, deltavel, deltavel);
+		deltavel = forwardvel + rightvel;
+		deltavel = liftvel + deltavel;
 		// Gravity
 		deltavel[2] = std::max(deltavel[2]-DEFAULT_GRAVITY*pml.frametime ,-DEFAULT_GRAVITY);
 		// under the canopy the fall is braked to a steady sink
@@ -432,12 +432,12 @@ bool PlayerMove::slideMove_LQM() {
 				CrossProduct (planes[i], planes[j], dir);
 				VectorNormalize( dir );
 				d = DotProduct( dir, pm->ps->velocity );
-				VectorScale( dir, d, clipVelocity );
+				clipVelocity = dir * ( d );
 
 				CrossProduct (planes[i], planes[j], dir);
 				VectorNormalize( dir );
 				d = DotProduct( dir, endVelocity );
-				VectorScale( dir, d, endClipVelocity );
+				endClipVelocity = dir * ( d );
 
 				// see if there is a third plane the the New move enters
 				for ( k = 0 ; k < numplanes ; k++ ) {
@@ -456,7 +456,7 @@ bool PlayerMove::slideMove_LQM() {
 
 			// if we have fixed all interactions, try another move
 			VectorCopy( clipVelocity, pm->ps->velocity );
-			VectorCopy( endClipVelocity, endVelocity );
+			endVelocity = endClipVelocity;
 			break;
 		}
 	}
@@ -482,15 +482,15 @@ void PlayerMove::stepSlideMove_LQM() {
 	if ( slideMove_LQM() == 0 )
 		return;		// we got exactly where we wanted to go first try	
 
-	VectorCopy(start_o, down);
+	down = start_o;
 	down[2] -= STEPSIZE;
 	pm->trace (&trace, start_o, pm->mins, pm->maxs, down, pm->ps->clientNum, pm->tracemask, false);
-	VectorSet(up, 0, 0, 1);
+	up = Vec3( 0, 0, 1 );
 	// never step up when you still have up velocity
 	if ( pm->ps->velocity[2] > 0 && (trace.fraction == 1.0 || DotProduct(trace.plane.normal, up) < 0.7))
 		return;
 
-	VectorCopy (start_o, up);
+	up = start_o;
 	up[2] += STEPSIZE;
 
 	// test the player position if they were a stepheight higher

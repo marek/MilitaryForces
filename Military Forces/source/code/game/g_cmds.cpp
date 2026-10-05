@@ -1602,19 +1602,19 @@ void Rider_Leave( GameEntity *ent, bool forced )
 
 		Vec3 forward, right, yawOnly, origin;
 		int vehicle = pilot->vehicle_;
-		VectorSet( yawOnly, 0, pilot->ps_.vehicleAngles[YAW], 0 );
+		yawOnly = Vec3( 0, pilot->ps_.vehicleAngles[YAW], 0 );
 		AngleVectors( yawOnly, forward, right, nullptr );
 		VectorCopy( pilot->ps_.origin, origin );
 		if( vehicle >= 0 && availableVehicles[vehicle].hasDeck && (availableVehicles[vehicle].cat & CAT_LQM) == 0 ) 
 		{
-			VectorMA( origin, availableVehicles[vehicle].deckPos[0], forward, origin );
-			VectorMA( origin, -availableVehicles[vehicle].deckPos[1], right, origin );
+			origin = origin + forward * ( availableVehicles[vehicle].deckPos[0] );
+			origin = origin + right * ( -availableVehicles[vehicle].deckPos[1] );
 			origin[2] += availableVehicles[vehicle].deckPos[2];
 		}
 		else if( vehicle >= 0 && !(availableVehicles[vehicle].cat & CAT_LQM) ) 
 		{
 			float side = (client->sess_.seat_ & 1) ? 1.0f : -1.0f;
-			VectorMA( origin, side * (availableVehicles[vehicle].maxs[1] + 10), right, origin );
+			origin = origin + right * ( side * (availableVehicles[vehicle].maxs[1] + 10) );
 		}
 		VectorCopy( origin, client->ps_.origin );
 		VectorCopy( yawOnly, client->ps_.vehicleAngles );
@@ -1846,7 +1846,7 @@ void Cmd_Eject_f( GameEntity *ent )
 	if( parked && availableVehicles[vehicle].hasDeck ) 
 	{
 		Vec3 forward, right, yawOnly;
-		VectorSet( yawOnly, 0, client->ps_.vehicleAngles[YAW], 0 );
+		yawOnly = Vec3( 0, client->ps_.vehicleAngles[YAW], 0 );
 		AngleVectors( yawOnly, forward, right, nullptr );
 		VectorMA( client->ps_.origin, availableVehicles[vehicle].deckPos[0], forward, client->ps_.origin );
 		VectorMA( client->ps_.origin, -availableVehicles[vehicle].deckPos[1], right, client->ps_.origin );
@@ -1858,7 +1858,7 @@ void Cmd_Eject_f( GameEntity *ent )
 		// (a spot inside a slope or wall would leave the soldier stuck, or pushed far up out of it)
 		const completeVehicleData_t& soldier = availableVehicles[infantry];
 		Vec3 forward, right, yawOnly;
-		VectorSet( yawOnly, 0, client->ps_.vehicleAngles[YAW], 0 );
+		yawOnly = Vec3( 0, client->ps_.vehicleAngles[YAW], 0 );
 		AngleVectors( yawOnly, forward, right, nullptr );
 		const float beside = availableVehicles[vehicle].maxs[1] + 10, along = availableVehicles[vehicle].maxs[0] + 10;
 		const struct { const float* axis; float distance; } exits[] = { { right, beside }, { right, -beside }, { forward, -along }, { forward, along } };
@@ -1869,7 +1869,7 @@ void Cmd_Eject_f( GameEntity *ent )
 			Vec3 top, bottom;
 			trace_t tr;
 			VectorMA( client->ps_.origin, exit.distance, exit.axis, top );
-			VectorCopy( top, bottom );
+			bottom = top;
 			top[2] += lift;
 			bottom[2] -= drop;
 			GameHost::trace( &tr, top, soldier.mins, soldier.maxs, bottom, ent->s.number, MASK_PLAYERSOLID, false );

@@ -763,7 +763,7 @@ struct PlaneTasks
 			Vec3 out = { 0, start.yaw + turnDegrees, 0 }, dir, end;
 			AngleVectors( out, dir, nullptr, nullptr );
 			dir[2] = slope;
-			VectorMA( from, horizon - travelled, dir, end );
+			end = from + dir * ( horizon - travelled );
 			leg( end );
 		}
 		if( finish )

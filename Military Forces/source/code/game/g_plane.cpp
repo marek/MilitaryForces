@@ -12,11 +12,11 @@ Entity_Plane::checkForTakeoffOrLanding()
 	Vec3	endpos;
 	float height = (client_->ps_.ONOFF & OO_LANDED) ? 3 : 1 + std::max( 0.0f, -client_->ps_.velocity[2] ) * 0.1f;
 
-	VectorSet( startpos, s.pos.trBase[0], s.pos.trBase[1], s.pos.trBase[2] + r.mins[2]);
+	startpos = Vec3( s.pos.trBase[0], s.pos.trBase[1], s.pos.trBase[2] + r.mins[2] );
 	if( client_->ps_.ONOFF & OO_GEAR ) 
 		startpos[2] -= gearheight_;
 
-	VectorCopy( startpos, endpos );
+	endpos = startpos;
 	endpos[2] -= height;
 	Vec3	wheelMins = { -6, -6, 0 };
 	Vec3	wheelMaxs = { 6, 6, 0 };

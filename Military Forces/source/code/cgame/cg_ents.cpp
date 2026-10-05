@@ -282,7 +282,7 @@ void ClientEntity::item() {
 	{
 		Vec3 spinAngles;
 
-		VectorClear( spinAngles );
+		spinAngles = Vec3();
 
 		if ( item->giType == IT_HEALTH )
 		{
@@ -645,17 +645,17 @@ void CGame::adjustPositionForMover( const vec3_t in, int moverNum, int fromTime,
 	GameShared::evaluateTrajectory( &cent->currentState.pos, toTime, origin );
 	GameShared::evaluateTrajectory( &cent->currentState.apos, toTime, angles );
 
-	VectorSubtract( origin, oldOrigin, deltaOrigin );
-	VectorSubtract( angles, oldAngles, deltaAngles );
+	deltaOrigin = origin - oldOrigin;
+	deltaAngles = angles - oldAngles;
 
 	// origin change when on a rotating object
 	CG_CreateRotationMatrix( deltaAngles, transpose );
 	CG_TransposeMatrix( transpose, matrix );
 	VectorSubtract( in, oldOrigin, org );
-	VectorCopy( org, org2 );
+	org2 = org;
 	CG_RotatePoint( org2, matrix );
-	VectorSubtract( org2, org, move2 );
-	VectorAdd( deltaOrigin, move2, deltaOrigin );
+	move2 = org2 - org;
+	deltaOrigin = deltaOrigin + move2;
 
 	VectorAdd( in, deltaOrigin, out );
 }

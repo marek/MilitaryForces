@@ -781,9 +781,9 @@ struct Think_Crate : public GameEntity::EntityFunc_Think
 		}
 
 		// Create forces based on angles
-		VectorCopy(angles,  dir);
+		dir = angles;
 		AngleVectors( dir, dir, nullptr, nullptr );
-		VectorScale( dir, (float)self_->speed_/5, dir );
+		dir = dir * ( (float)self_->speed_/5 );
 		dir[2] -= self_->speed_;
 			
 		// Save angles
@@ -875,7 +875,7 @@ struct Think_FollowTarget : public GameEntity::EntityFunc_Think
 		if( self->tracktarget_->s.eType == ET_EXPLOSIVE ) 
 		{
 			VectorAdd( self->tracktarget_->r.absmin, self->tracktarget_->r.absmax, mid );
-			VectorScale( mid, 0.5f, mid );
+			mid = mid * ( 0.5f );
 		} 
 		else 
 			VectorCopy( self->tracktarget_->r.currentOrigin, mid );
@@ -958,9 +958,9 @@ struct Think_FollowTarget : public GameEntity::EntityFunc_Think
 		}
 
 		// adjust course/speed
-		VectorMA( dir, 1.85f, targdir, targdir );
+		targdir = dir + targdir * ( 1.85f );
 		VectorNormalize( targdir );
-		VectorScale( targdir, self->speed_, dir );
+		dir = targdir * ( self->speed_ );
 		
 		vectoangles( dir, targdir );
 		VectorCopy( targdir, self->s.angles );
@@ -1042,9 +1042,9 @@ void fire_antiair (GameEntity *self)
 		AngleVectors( self->client_->ps_.vehicleAngles, dir, right, up );
 		VectorInverse( right );
 	}
-	VectorMA( start, offset[0], dir, start );
-	VectorMA( start, offset[1], right, start );
-	VectorMA( start, offset[2], up, start );
+	start = start + dir * ( offset[0] );
+	start = start + right * ( offset[1] );
+	start = start + up * ( offset[2] );
 	SnapVector( start );
 
 	bolt = theLevel.spawnEntity();
@@ -1141,9 +1141,9 @@ void fire_antiground( GameEntity *self )
 		AngleVectors( self->client_->ps_.vehicleAngles, dir, right, up );
 		VectorInverse( right );
 	}
-	VectorMA( start, offset[0], dir, start );
-	VectorMA( start, offset[1], right, start );
-	VectorMA( start, offset[2], up, start );
+	start = start + dir * ( offset[0] );
+	start = start + right * ( offset[1] );
+	start = start + up * ( offset[2] );
 	SnapVector( start );
 
 	bolt = theLevel.spawnEntity();
@@ -1233,9 +1233,9 @@ void fire_ffar (GameEntity *self)
 	VehicleData::removeWeaponFromLoadout(self->client_->ps_.weaponIndex, &self->loadout_, &self->client_->ps_, nullptr, offset, self->left_ );
 	AngleVectors( self->client_->ps_.vehicleAngles, dir, right, up );
 	VectorInverse( right );
-	VectorMA( start, offset[0], dir, start );
-	VectorMA( start, offset[1], right, start );
-	VectorMA( start, offset[2], up, start );
+	start = start + dir * ( offset[0] );
+	start = start + right * ( offset[1] );
+	start = start + up * ( offset[2] );
 	SnapVector( start );
 
 	bolt = theLevel.spawnEntity();
@@ -1280,9 +1280,9 @@ void fire_ironbomb( GameEntity *self )
 	AngleVectors( self->client_->ps_.vehicleAngles, dir, right, up );
 	VectorInverse( right );
 	VectorCopy( self->s.pos.trBase, start );
-	VectorMA( start, offset[0], dir, start );
-	VectorMA( start, offset[1], right, start );
-	VectorMA( start, offset[2], up, start );
+	start = start + dir * ( offset[0] );
+	start = start + right * ( offset[1] );
+	start = start + up * ( offset[2] );
 	SnapVector( start );
 
 	bolt = theLevel.spawnEntity();
@@ -1372,10 +1372,10 @@ void fire_autocannon( GameEntity *self, bool main )
 			// the door mounts sit either side of the cabin; offset[1] is applied along the turned right vector below
 			Vec3 flatForward, flatRight, flatUp;
 			AngleVectors( self->client_->ps_.vehicleAngles, flatForward, flatRight, flatUp );
-			VectorMA( start, doorGunForward, flatForward, start );
+			start = start + flatForward * ( doorGunForward );
 			VectorMA( start, leftGun ? -doorGunSide : doorGunSide, flatRight, start );
-			VectorMA( start, doorGunUp, flatUp, start );
-			VectorClear( offset );
+			start = start + flatUp * ( doorGunUp );
+			offset = Vec3();
 		}
 		RotatePointAroundVector( temp, up, forward, turretYaw );
 		CrossProduct( up, temp, right );
@@ -1403,9 +1403,9 @@ void fire_autocannon( GameEntity *self, bool main )
 			offset[1] *= -1;
 	}
 
-	VectorMA( start, offset[0], dir, start );
-	VectorMA( start, offset[1], right, start );
-	VectorMA( start, offset[2], up, start );
+	start = start + dir * ( offset[0] );
+	start = start + right * ( offset[1] );
+	start = start + up * ( offset[2] );
 	SnapVector( start );
 
 	bolt = theLevel.spawnEntity();
@@ -1549,9 +1549,9 @@ void fire_maingun( GameEntity *self )
 
 	VectorCopy( self->s.pos.trBase, start );
 	VectorCopy( availableVehicles[self->client_->vehicle_].gunoffset, offset );
-	VectorMA( start, offset[0], dir, start );
-	VectorMA( start, offset[1], right, start );
-	VectorMA( start, offset[2], up, start );
+	start = start + dir * ( offset[0] );
+	start = start + right * ( offset[1] );
+	start = start + up * ( offset[2] );
 	SnapVector( start );
 
 	bolt = theLevel.spawnEntity();
@@ -1592,14 +1592,14 @@ void fire_flare( GameEntity *self )
 	GameEntity	*bolt;
 	Vec3		start, up;
 	
-	VectorSet( up, 0, 0, 1 );
+	up = Vec3( 0, 0, 1 );
 	VectorCopy( self->s.pos.trBase, start );
 	if( (availableVehicles[self->client_->vehicle_].cat & CAT_GROUND) ||
 		(availableVehicles[self->client_->vehicle_].cat & CAT_BOAT) ||
 		(availableVehicles[self->client_->vehicle_].cat & CAT_HELO) ) 
-		VectorMA( start, self->r.maxs[2]+3, up, start );
+		start = start + up * ( self->r.maxs[2]+3 );
 	else
-		VectorMA( start, self->r.mins[2]-3, up, start );
+		start = start + up * ( self->r.mins[2]-3 );
 	SnapVector( start );
 
 	bolt = theLevel.spawnEntity();
@@ -1675,18 +1675,18 @@ void fire_cflare( GameEntity *self)
 	Vec3		start, up;
 	int age;
 	
-	VectorSet( up, 0, 0, 1 );
+	up = Vec3( 0, 0, 1 );
 	VectorCopy( self->s.pos.trBase, start );
 	if( (availableVehicles[self->client_->vehicle_].cat & CAT_GROUND) ||
 		(availableVehicles[self->client_->vehicle_].cat & CAT_BOAT) ||
 		(availableVehicles[self->client_->vehicle_].cat & CAT_HELO) )  
 	{
-		VectorMA( start, self->r.maxs[2]+3, up, start );
+		start = start + up * ( self->r.maxs[2]+3 );
 		age = 1600;
 	}
 	else 
 	{
-		VectorMA( start, self->r.mins[2]-3, up, start );
+		start = start + up * ( self->r.mins[2]-3 );
 		age = 800;
 	}
 	SnapVector( start );
@@ -1731,9 +1731,9 @@ void drop_fueltank ( GameEntity *self )
 	AngleVectors( self->client_->ps_.vehicleAngles, dir, right, up );
 	VectorInverse( right );
 	VectorCopy( self->s.pos.trBase, start );
-	VectorMA( start, offset[0], dir, start );
-	VectorMA( start, offset[1], right, start );
-	VectorMA( start, offset[2], up, start );
+	start = start + dir * ( offset[0] );
+	start = start + right * ( offset[1] );
+	start = start + up * ( offset[2] );
 	SnapVector( start );
 
 	bolt = theLevel.spawnEntity();
@@ -1848,9 +1848,9 @@ void fire_nukebomb ( GameEntity *self )
 	AngleVectors( self->client_->ps_.vehicleAngles, dir, right, up );
 	VectorInverse( right );
 	VectorCopy( self->s.pos.trBase, start );
-	VectorMA( start, offset[0], dir, start );
-	VectorMA( start, offset[1], right, start );
-	VectorMA( start, offset[2], up, start );
+	start = start + dir * ( offset[0] );
+	start = start + right * ( offset[1] );
+	start = start + up * ( offset[2] );
 	SnapVector( start );
 
 	bolt = theLevel.spawnEntity();
@@ -1912,9 +1912,9 @@ void fire_nukemissile (GameEntity *self)
 		AngleVectors( self->client_->ps_.vehicleAngles, dir, right, up );
 		VectorInverse( right );
 	}
-	VectorMA( start, offset[0], dir, start );
-	VectorMA( start, offset[1], right, start );
-	VectorMA( start, offset[2], up, start );
+	start = start + dir * ( offset[0] );
+	start = start + right * ( offset[1] );
+	start = start + up * ( offset[2] );
 	SnapVector( start );
 
 	bolt = theLevel.spawnEntity();

@@ -431,7 +431,7 @@ void CGame::drawFlagModel( float x, float y, float w, float h, int team, bool fo
 
 	if ( !force2D && cg_draw3dIcons.integer ) {
 
-		VectorClear( angles );
+		angles = Vec3();
 
 		cm = cgs.media.redFlagModel;
 
