@@ -321,13 +321,16 @@ enum class leType_t {
 
 using enum leType_t;
 
-enum leFlag_t {
+enum class leFlag_t {
+	LEF_NONE			 = 0,
 	LEF_PUFF_DONT_SCALE  = 0x0001,			// do not scale size over time
 	LEF_TUMBLE			 = 0x0002,			// tumble over time, used for ejecting shells
 	LEF_NO_RADIUS_KILL	 = 0x0004,			// don't ()->freeLocalEntity() just because the camera is 'inside' the radius of a sprite (e.g. smoke puffs)
-	LEF_SOUND1			 = 0x0004,			// sound 1 for nuke
-	LEF_SOUND2			 = 0x0008			// sound 2 for nuke
+	LEF_SOUND1			 = 0x0008,			// sound 1 for nuke
+	LEF_SOUND2			 = 0x0010			// sound 2 for nuke
 };
+using enum leFlag_t;
+constexpr bool isFlagSet( leFlag_t ) { return true; }
 
 enum class leMarkType_t {
 	LEMT_NONE,
@@ -361,7 +364,7 @@ public:
 
 	LocalEntity	*prev, *next;
 	leType_t		leType;
-	int				leFlags;
+	leFlag_t		leFlags;
 
 	int				startTime;
 	int				endTime;
@@ -1708,7 +1711,7 @@ public:
 	static void initLocalEntities( );
 	static LocalEntity *allocLocalEntity( );
 	static void addLocalEntities( );
-	static LocalEntity *smokePuff( const vec3_t p, const vec3_t vel, float radius, float r, float g, float b, float a, float duration, int startTime, int fadeInTime, int leFlags, qhandle_t hShader );
+	static LocalEntity *smokePuff( const vec3_t p, const vec3_t vel, float radius, float r, float g, float b, float a, float duration, int startTime, int fadeInTime, leFlag_t leFlags, qhandle_t hShader );
 	static LocalEntity *makeExplosion( vec3_t origin, vec3_t dir, qhandle_t hModel, qhandle_t shader, int offset, int duration, bool isSprite );
 	static void gibPlayer( vec3_t playerOrigin );
 	static void processSnapshots( );

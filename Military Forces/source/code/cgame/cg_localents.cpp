@@ -191,7 +191,7 @@ void LocalEntity::addFragment() {
 		// still in free fall
 		VectorCopy( newOrigin, this->refEntity.origin );
 
-		if ( this->leFlags & LEF_TUMBLE ) {
+		if ( any( this->leFlags & LEF_TUMBLE ) ) {
 			vec3_t angles;
 
 			GameShared::evaluateTrajectory( &this->angles, cg.time, angles );

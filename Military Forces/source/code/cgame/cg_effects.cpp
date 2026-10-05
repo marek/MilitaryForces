@@ -22,7 +22,7 @@ LocalEntity *CGame::smokePuff( const vec3_t p, const vec3_t vel,
 				   float duration,
 				   int startTime,
 				   int fadeInTime,
-				   int leFlags,
+				   leFlag_t leFlags,
 				   qhandle_t hShader ) {
 	static int	seed = 0x92;
 	LocalEntity	*le;
@@ -182,7 +182,7 @@ void ClientEntity::nukeEffect( entityState_t * es ) {
 	refEntity_t		*re;
 
 	le = CGame::allocLocalEntity();
-	le->leFlags = 0;
+	le->leFlags = LEF_NONE;
 	le->leType = LE_NUKE;
 	le->startTime = cg.time;
 	le->endTime = cg.time + NUKE_CLOUD_ENDTIME;// 3000;//2250;

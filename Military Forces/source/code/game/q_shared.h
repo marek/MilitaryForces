@@ -171,6 +171,9 @@ typedef int intptr_t;
 #include <time.h>
 #include <ctype.h>
 #include <limits.h>
+#include <concepts>
+#include <type_traits>
+#include <utility>
 #include <algorithm>
 #include <source_location>
 #include <numbers>
@@ -973,6 +976,17 @@ inline constexpr int CVAR_PROTECTED = 0x2000; // prevent modifying this var from
 // These flags are only returned by the CvarSystem::flags() function
 inline constexpr int CVAR_MODIFIED = 0x40000000; // Cvar was modified
 inline constexpr unsigned int CVAR_NONEXISTENT = 0x80000000; // Cvar doesn't exist.
+
+// bit operators for a scoped enum that is a set of flags. An enum opts in by declaring, next to itself,
+//   constexpr bool isFlagSet( TheEnum ) { return true; }
+template<typename E> concept FlagSet = std::is_enum_v<E> && requires( E e ) { { isFlagSet( e ) } -> std::same_as<bool>; };
+template<FlagSet E> constexpr E operator|( E a, E b ) { return static_cast<E>( std::to_underlying( a ) | std::to_underlying( b ) ); }
+template<FlagSet E> constexpr E operator&( E a, E b ) { return static_cast<E>( std::to_underlying( a ) & std::to_underlying( b ) ); }
+template<FlagSet E> constexpr E operator~( E a ) { return static_cast<E>( ~std::to_underlying( a ) ); }
+template<FlagSet E> constexpr E& operator|=( E& a, E b ) { return a = a | b; }
+template<FlagSet E> constexpr E& operator&=( E& a, E b ) { return a = a & b; }
+template<FlagSet E> constexpr bool operator!( E a ) { return std::to_underlying( a ) == 0; }
+template<FlagSet E> constexpr bool any( E a ) { return std::to_underlying( a ) != 0; }
 
 // a console variable. Its value is read through asInt(), asFloat(), asBool() and asString(); only the cvar system
 // writes it.

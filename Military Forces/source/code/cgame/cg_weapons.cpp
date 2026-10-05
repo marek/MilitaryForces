@@ -1051,7 +1051,7 @@ void CGame::genericExplosion( vec3_t origin, int type )
 
 			// make smoke
 			smoke = CGame::smokePuff( adjust, up, 75 * m, 0.8f, 0.8f, 0.8f, 1.00f, (i * 2000), cg.time,
-								  0, 0, 
+								  0, LEF_NONE, 
 								  cgs.media.smokePuffShader );
 		}
 	}
@@ -1098,7 +1098,7 @@ void CGame::vehicleHit( vec3_t origin, int damage )
 				  0.8f, 0.8f, 0.8f, 1.00f,
 				  1000, 
 				  cg.time, 0,
-				  0, 
+				  LEF_NONE, 
 				  cgs.media.smokePuffShader );
 
 	smoke->leType = LE_MOVE_SCALE_FADE;
