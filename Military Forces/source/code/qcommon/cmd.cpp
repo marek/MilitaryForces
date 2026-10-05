@@ -24,18 +24,11 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "../game/q_shared.h"
 #include "qcommon.h"
 
-constexpr int MAX_CMD_BUFFER = 128*1024;
 constexpr int MAX_CMD_LINE = 1024;
 
-struct cmd_t {
-	byte	*data;
-	int		maxsize;
-	int		cursize;
-};
-
-int			cmd_wait;
-cmd_t		cmd_text;
-byte		cmd_text_buf[MAX_CMD_BUFFER];
+int					CommandBuffer::wait_;
+CommandBuffer::Text	CommandBuffer::text_;
+byte				CommandBuffer::textBuf_[CommandBuffer::maxBuffer];
 
 
 //=============================================================================
@@ -50,13 +43,9 @@ bind g "cmd use rocket ; +attack ; wait ; -attack ; cmd use blaster"
 ============
 */
 void CommandSystem::wait_f( ) {
-	if ( CommandSystem::argc() == 2 ) {
-		cmd_wait = atoi( CommandSystem::argv( 1 ) );
-		if ( cmd_wait < 0 )
-			cmd_wait = 1; // ignore the argument
-	} else {
-		cmd_wait = 1;
-	}
+	// a negative count waits once
+	const int count = CommandSystem::argc() == 2 ? atoi( CommandSystem::argv( 1 ) ) : 1;
+	CommandBuffer::wait( count < 0 ? 1 : count );
 }
 
 
@@ -75,9 +64,14 @@ CommandBuffer::init
 */
 void CommandBuffer::init ()
 {
-	cmd_text.data = cmd_text_buf;
-	cmd_text.maxsize = MAX_CMD_BUFFER;
-	cmd_text.cursize = 0;
+	text_.data = textBuf_;
+	text_.maxsize = maxBuffer;
+	text_.cursize = 0;
+}
+
+void CommandBuffer::wait( int count )
+{
+	wait_ = count;
 }
 
 /*
@@ -92,13 +86,13 @@ void CommandBuffer::addText( const char *text ) {
 	
 	l = strlen (text);
 
-	if (cmd_text.cursize + l >= cmd_text.maxsize)
+	if (text_.cursize + l >= text_.maxsize)
 	{
 		Common::printf ("CommandBuffer::addText: overflow\n");
 		return;
 	}
-	Com_Memcpy(&cmd_text.data[cmd_text.cursize], text, l);
-	cmd_text.cursize += l;
+	Com_Memcpy(&text_.data[text_.cursize], text, l);
+	text_.cursize += l;
 }
 
 
@@ -115,23 +109,23 @@ void CommandBuffer::insertText( const char *text ) {
 	int		i;
 
 	len = strlen( text ) + 1;
-	if ( len + cmd_text.cursize > cmd_text.maxsize ) {
+	if ( len + text_.cursize > text_.maxsize ) {
 		Common::printf( "CommandBuffer::insertText overflowed\n" );
 		return;
 	}
 
 	// move the existing command text
-	for ( i = cmd_text.cursize - 1 ; i >= 0 ; i-- ) {
-		cmd_text.data[ i + len ] = cmd_text.data[ i ];
+	for ( i = text_.cursize - 1 ; i >= 0 ; i-- ) {
+		text_.data[ i + len ] = text_.data[ i ];
 	}
 
 	// copy the new text in
-	Com_Memcpy( cmd_text.data, text, len - 1 );
+	Com_Memcpy( text_.data, text, len - 1 );
 
 	// add a \n
-	cmd_text.data[ len - 1 ] = '\n';
+	text_.data[ len - 1 ] = '\n';
 
-	cmd_text.cursize += len;
+	text_.cursize += len;
 }
 
 
@@ -150,7 +144,7 @@ void CommandBuffer::executeText (int exec_when, const char *text)
 			CommandSystem::executeString (text);
 		} else {
 			CommandBuffer::execute();
-			Common::dPrintf(S_COLOR_YELLOW "EXEC_NOW %s\n", cmd_text.data);
+			Common::dPrintf(S_COLOR_YELLOW "EXEC_NOW %s\n", text_.data);
 		}
 		break;
 	case EXEC_INSERT:
@@ -181,26 +175,26 @@ void CommandBuffer::execute ()
 	// breaking it for semicolon or newline.
 	bool in_star_comment = false;
 	bool in_slash_comment = false;
-	while (cmd_text.cursize)
+	while (text_.cursize)
 	{
-		if ( cmd_wait > 0 ) {
+		if ( wait_ > 0 ) {
 			// skip out while text still remains in buffer, leaving it
 			// for next frame
-			cmd_wait--;
+			wait_--;
 			break;
 		}
 
 		// find a \n or ; line break or comment: // or /* */
-		text = reinterpret_cast<char *>(cmd_text.data);
+		text = reinterpret_cast<char *>(text_.data);
 
 		quotes = 0;
-		for (i=0 ; i< cmd_text.cursize ; i++)
+		for (i=0 ; i< text_.cursize ; i++)
 		{
 			if (text[i] == '"')
 				quotes++;
 
 			if ( !(quotes&1)) {
-				if (i < cmd_text.cursize - 1) {
+				if (i < text_.cursize - 1) {
 					if (! in_star_comment && text[i] == '/' && text[i+1] == '/')
 						in_slash_comment = true;
 					else if (! in_slash_comment && text[i] == '/' && text[i+1] == '*')
@@ -234,13 +228,13 @@ void CommandBuffer::execute ()
 // this is necessary because commands (exec) can insert data at the
 // beginning of the text buffer
 
-		if (i == cmd_text.cursize)
-			cmd_text.cursize = 0;
+		if (i == text_.cursize)
+			text_.cursize = 0;
 		else
 		{
 			i++;
-			cmd_text.cursize -= i;
-			memmove (text, text+i, cmd_text.cursize);
+			text_.cursize -= i;
+			memmove (text, text+i, text_.cursize);
 		}
 
 // execute the command line
