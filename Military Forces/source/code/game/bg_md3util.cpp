@@ -53,34 +53,6 @@ bool VehicleData::findTag(const char* fileName, const char* tagname, md3Tag_t* t
 
 /*
 =================
-VehicleData::getNumberOfTags
-
-providing the file this functions returns the number of tags
-=================
-*/
-
-bool VehicleData::getNumberOfTags(const char* fileName, int* number)
-{
-	fileHandle_t	f;
-	bool		found = false;
-
-	if( !number ) return found;
-
-	if( const OpenFile file( fileName, FS_READ ); file ) {
-		f = file.handle();
-		md3Header_t head;
-		FileSystem::read(&head, sizeof(head), f);
-		*number = head.numTags;
-		found = true;
-	} else {
-		Common::printf( "Unable to open file %s\n", fileName );
-	}
-	return found;
-
-}
-
-/*
-=================
 VehicleData::getTagsContaining
 
 providing the file this functions returns the tags containing str in their name
@@ -128,28 +100,19 @@ int VehicleData::getTagsContaining(const char* fileName, const char* str, md3Tag
 =================
 VehicleData::getNumberOfFrames
 
-providing the file this functions returns the number of frames
+the number of frames in a model file, or nothing when the file is not there (quiet: part files are optional)
 =================
 */
 
-bool VehicleData::getNumberOfFrames(const char* fileName, int* number)
+std::optional<int> VehicleData::getNumberOfFrames(const char* fileName)
 {
-	fileHandle_t	f;
-	bool		found = false;
+	const OpenFile file( fileName, FS_READ );
+	if( !file )
+		return std::nullopt;
 
-	if( !number ) return found;
-
-	if( const OpenFile file( fileName, FS_READ ); file ) {
-		f = file.handle();
-		md3Header_t head;
-		FileSystem::read(&head, sizeof(head), f);
-		*number = head.numFrames;
-		found = true;
-	} else {
-		Common::printf( "Unable to open file %s\n", fileName );
-	}
-	return found;
-
+	md3Header_t head;
+	FileSystem::read(&head, sizeof(head), file.handle());
+	return head.numFrames;
 }
 
 /*

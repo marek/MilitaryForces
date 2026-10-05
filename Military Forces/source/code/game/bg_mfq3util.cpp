@@ -417,8 +417,9 @@ void VehicleData::loadAllVehicleData()
 			Com_sprintf( name, sizeof(name), "%s_gear.md3", modelbasename );
 
 			// only models that have the part file get the part
-			if( OpenFile( name, FS_READ ) && VehicleData::getNumberOfFrames( name, &num ) ) 
+			if( const auto frames = VehicleData::getNumberOfFrames( name ) ) 
 			{
+				num = *frames;
 				vec3_t min1, min2;
 
 				availableVehicles[i].maxGearFrame = num - 1;
@@ -448,8 +449,9 @@ void VehicleData::loadAllVehicleData()
 			// bay
 			Com_sprintf( name, sizeof(name), "%s_bay.md3", modelbasename );
 
-			if( OpenFile( name, FS_READ ) && VehicleData::getNumberOfFrames( name, &num ) ) 
+			if( const auto frames = VehicleData::getNumberOfFrames( name ) ) 
 			{
+				num = *frames;
 				availableVehicles[i].maxBayFrame = num - 1;
 			}
 			else 
@@ -473,7 +475,8 @@ void VehicleData::loadAllVehicleData()
 			// gear
 			Com_sprintf( name, sizeof(name), "%s_gear.md3", modelbasename );
 
-			if( OpenFile( name, FS_READ ) && VehicleData::getNumberOfFrames( name, &num ) ) {
+			if( const auto frames = VehicleData::getNumberOfFrames( name ) ) {
+				num = *frames;
 				vec3_t min1, min2;
 
 				availableVehicles[i].maxGearFrame = num - 1;
@@ -495,8 +498,9 @@ void VehicleData::loadAllVehicleData()
 			// bay
 			Com_sprintf( name, sizeof(name), "%s_bay.md3", modelbasename );
 
-			if( OpenFile( name, FS_READ ) && VehicleData::getNumberOfFrames( name, &num ) ) 
+			if( const auto frames = VehicleData::getNumberOfFrames( name ) ) 
 			{
+				num = *frames;
 				availableVehicles[i].maxBayFrame = num - 1;
 			}
 			else 

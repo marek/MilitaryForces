@@ -1168,8 +1168,7 @@ public:
 	static void getDefaultLoadoutForVehicle( int idx, completeLoadout_t* loadout, playerState_t* ps );
 	static bool removeWeaponFromLoadout( int weaponIndex, completeLoadout_t* loadout, playerState_t* ps, bool* wingtip, vec3_t pos, int launchPos );
 	static int addWeaponToLoadout( int weaponIndex, completeLoadout_t* loadout, playerState_t* ps );
-	static bool getNumberOfFrames(const char* fileName, int* number);
-	static bool getNumberOfTags(const char* fileName, int* number);
+	static std::optional<int> getNumberOfFrames(const char* fileName);
 	static int getTagsContaining(const char* fileName, const char* str, md3Tag_t* tags, int num);
 	static bool getDimensions(const char* fileName, int frame, vec3_t* maxs, vec3_t* mins);
 	static void loadAllVehicleData();
