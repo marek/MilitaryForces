@@ -142,10 +142,10 @@ void CGame::drawPlane(DrawInfo_Plane_t* drawInfo)
 
 	for( i = 0; i < BP_PLANE_MAX_PARTS; i++ ) 
 	    memset( &part[i], 0, sizeof(part[0]) );	
-    memset( &vapor, 0, sizeof(vapor) );	
-    memset( &burner, 0, sizeof(burner) );	
-    memset( &burner2, 0, sizeof(burner2) );	
-	memset( &reticle, 0, sizeof(reticle) );	
+    vapor = {};	
+    burner = {};	
+    burner2 = {};	
+	reticle = {};	
 
    // add the shadow
 	switch( cg_shadows.integer )
@@ -239,7 +239,7 @@ void CGame::drawPlane(DrawInfo_Plane_t* drawInfo)
 			if( drawInfo->basicInfo.usedLoadout->mounts[i].weapon && 
 				drawInfo->basicInfo.numWeaponsOnMount[i] ) 
 			{
-				memset( &vwep, 0, sizeof(vwep) );		
+				vwep = {};		
 				vwep.hModel = availableWeapons[drawInfo->basicInfo.usedLoadout->mounts[i].weapon].vwepHandle;
 				VectorCopy( drawInfo->basicInfo.origin, vwep.lightingOrigin );
 				AxisCopy( axisDefault, vwep.axis );
@@ -621,7 +621,7 @@ refEntity_t	    part[BP_HELO_MAX_PARTS];
 			if( drawInfo->basicInfo.usedLoadout->mounts[i].weapon && 
 				drawInfo->basicInfo.numWeaponsOnMount[i] ) 
 			{
-				memset( &vwep, 0, sizeof(vwep) );		
+				vwep = {};		
 				vwep.hModel = availableWeapons[drawInfo->basicInfo.usedLoadout->mounts[i].weapon].vwepHandle;
 				VectorCopy( drawInfo->basicInfo.origin, vwep.lightingOrigin );
 				AxisCopy( axisDefault, vwep.axis );
@@ -1016,7 +1016,7 @@ void CGame::drawLQM(DrawInfo_LQM_t* drawInfo)
 		constexpr float canopyScale = 0.45f;
 		constexpr float sway = 7.0f;
 		refEntity_t chute;
-		memset( &chute, 0, sizeof( chute ) );
+		chute = {};
 		chute.hModel = cgs.media.parachute;
 		VectorCopy( drawInfo->basicInfo.origin, chute.origin );
 		chute.origin[2] += 1.0f;

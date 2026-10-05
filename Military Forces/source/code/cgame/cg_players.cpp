@@ -104,7 +104,7 @@ void CGame::newClientInfo( int clientNum ) {
 
 	// build into a temp buffer so the defer checks can use
 	// the old value
-	memset( &newInfo, 0, sizeof( newInfo ) );
+	newInfo = {};
 
 	// isolate the player's name
 	v = Info::valueForKey(configstring, "n");
@@ -216,7 +216,7 @@ void ClientEntity::trailItem( qhandle_t hModel ) {
 	angles[ROLL] = 0;
 	AnglesToAxis( angles, axis );
 
-	memset( &ent, 0, sizeof( ent ) );
+	ent = {};
 	VectorMA( this->lerpOrigin, -16, axis[0], ent.origin );
 	ent.origin[2] += 16;
 	angles[YAW] += 90;

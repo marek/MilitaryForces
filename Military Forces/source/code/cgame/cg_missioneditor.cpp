@@ -725,7 +725,7 @@ static void ME_DrawVehicle( IGME_vehicle_t* veh )
 
 	if( veh->groundInstallation ) {
 		DrawInfo_GI_t drawInfo;
-		memset( &drawInfo, 0, sizeof(drawInfo) );
+		drawInfo = {};
 		VectorCopy( veh->angles, drawInfo.basicInfo.angles );
 		VectorCopy( veh->origin, drawInfo.basicInfo.origin );
 		AnglesToAxis( veh->angles, drawInfo.basicInfo.axis );
@@ -740,7 +740,7 @@ static void ME_DrawVehicle( IGME_vehicle_t* veh )
 		case CAT_PLANE:
 			{
 				DrawInfo_Plane_t drawInfo;
-				memset( &drawInfo, 0, sizeof(drawInfo) );
+				drawInfo = {};
 				VectorCopy( veh->angles, drawInfo.basicInfo.angles );
 				VectorCopy( veh->origin, drawInfo.basicInfo.origin );
 				AnglesToAxis( veh->angles, drawInfo.basicInfo.axis );
@@ -753,7 +753,7 @@ static void ME_DrawVehicle( IGME_vehicle_t* veh )
 		case CAT_GROUND:
 			{
 				DrawInfo_GV_t drawInfo;
-				memset( &drawInfo, 0, sizeof(drawInfo) );
+				drawInfo = {};
 				VectorCopy( veh->angles, drawInfo.basicInfo.angles );
 				VectorCopy( veh->origin, drawInfo.basicInfo.origin );
 				AnglesToAxis( veh->angles, drawInfo.basicInfo.axis );
@@ -766,7 +766,7 @@ static void ME_DrawVehicle( IGME_vehicle_t* veh )
 		case CAT_BOAT:
 			{
 				DrawInfo_Boat_t drawInfo;
-				memset( &drawInfo, 0, sizeof(drawInfo) );
+				drawInfo = {};
 				VectorCopy( veh->angles, drawInfo.basicInfo.angles );
 				VectorCopy( veh->origin, drawInfo.basicInfo.origin );
 				AnglesToAxis( veh->angles, drawInfo.basicInfo.axis );
@@ -787,7 +787,7 @@ static void ME_DrawVehicle( IGME_vehicle_t* veh )
 	if( veh->selected ) {
 		refEntity_t	sel;
 		int j;
-		memset( &sel, 0, sizeof(sel) );
+		sel = {};
 		sel.hModel = cgs.media.IGME_selector;
 		VectorCopy( veh->origin, sel.origin );
 		VectorCopy( veh->origin, sel.lightingOrigin );
@@ -1076,7 +1076,7 @@ void ME_ImportScript( const char* scriptname )
 	mission_groundInstallation_t installations[IGME_MAX_VEHICLES];
 	const char			*info, *mapname;
 
-	memset(&overview, 0, sizeof(overview));
+	overview = {};
 	memset(&vehicles[0], 0, sizeof(vehicles));
 	memset(&installations[0], 0, sizeof(installations));
 

@@ -387,9 +387,9 @@ void CGame::draw3DModel( float x, float y, float w, float h, qhandle_t model, qh
 
 	CGame::adjustFrom640( &x, &y, &w, &h );
 
-	memset( &refdef, 0, sizeof( refdef ) );
+	refdef = {};
 
-	memset( &ent, 0, sizeof( ent ) );
+	ent = {};
 	AnglesToAxis( angles, ent.axis );
 	VectorCopy( origin, ent.origin );
 	ent.hModel = model;

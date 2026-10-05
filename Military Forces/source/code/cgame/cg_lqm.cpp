@@ -63,7 +63,7 @@ void ClientEntity::lQM( clientInfo_t *ci )
 	int				ONOFF = this->currentState.ONOFF;
 
 
-	memset( &drawInfo, 0, sizeof(drawInfo) );
+	drawInfo = {};
 	drawInfo.basicInfo.vehicleIndex = ci->vehicle;
 	drawInfo.basicInfo.team = cgs.gametype >= GT_TEAM ? (ci->paintTeam ? ci->paintTeam : ci->team) : 0;
 	drawInfo.basicInfo.ONOFF = ONOFF;
@@ -135,7 +135,7 @@ void ClientEntity::lQM( clientInfo_t *ci )
 		float len;
 		float mindist = cg_thirdPersonRange.integer + availableVehicles[ci->vehicle].cam_dist[ CAMERA_V_DEFAULT ] + availableVehicles[ci->vehicle].maxs[0] + 20;
 
-		memset( &reticle, 0, sizeof(reticle) );	
+		reticle = {};	
 
 		CGame::resetReticles();
 

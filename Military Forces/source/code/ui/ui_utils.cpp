@@ -1276,7 +1276,7 @@ UI_Utils::item_Model_Paint( itemDef_t *item )
 		return;
 
 	// setup the refdef
-	memset( &refdef, 0, sizeof( refdef ) );
+	refdef = {};
 	refdef.rdflags = RDF_NOWORLDMODEL;
 	AxisClear( refdef.viewaxis );
 	x = item->window.rect.x+1;
@@ -1319,7 +1319,7 @@ UI_Utils::item_Model_Paint( itemDef_t *item )
 
 	// add the model
 
-	memset( &ent, 0, sizeof(ent) );
+	ent = {};
 
 	//adjust = 5.0 * sin( (float)uis.realtime / 500 );
 	//adjust = 360 % (int)((float)uis.realtime / 1000);

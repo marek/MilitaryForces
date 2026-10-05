@@ -33,7 +33,7 @@ void ClientEntity::boat( clientInfo_t *ci )
 	DrawInfo_Boat_t	drawInfo;
 	int				i;
 
-	memset( &drawInfo, 0, sizeof(drawInfo) );
+	drawInfo = {};
 	drawInfo.basicInfo.vehicleIndex = ci->vehicle;
 	drawInfo.basicInfo.team = cgs.gametype >= GT_TEAM ? (ci->paintTeam ? ci->paintTeam : ci->team) : 0;
 	drawInfo.basicInfo.ONOFF = this->currentState.ONOFF;
@@ -105,7 +105,7 @@ void ClientEntity::boat( clientInfo_t *ci )
 		playerState_t* ps = &cg.snap->ps;
 		float mindist = cg_thirdPersonRange.integer + availableVehicles[ci->vehicle].cam_dist[ CAMERA_V_DEFAULT ] + availableVehicles[ci->vehicle].maxs[0] + 20;
 
-		memset( &reticle, 0, sizeof(reticle) );
+		reticle = {};
 
 		CGame::resetReticles();
 
@@ -176,7 +176,7 @@ void ClientEntity::boat( clientInfo_t *ci )
 			}
 			else
 			{
-				memset( &reticlelock, 0, sizeof(reticlelock) );	
+				reticlelock = {};	
 				
 				reticlelock.customShader = availableWeapons[availableVehicles[ci->vehicle].weapons[this->currentState.weaponNum]].crosshairtrack;
 				reticlelock.hModel = cgs.media.reticle[availableWeapons[availableVehicles[ci->vehicle].weapons[this->currentState.weaponNum]].crosshairtrack];

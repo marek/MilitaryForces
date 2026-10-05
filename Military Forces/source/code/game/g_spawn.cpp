@@ -452,7 +452,7 @@ static void G_SpawnGEntityFromSpawnVars()
 	int			i;
 //	GameEntity	*ent;
 	SpawnFieldHolder sfh;
-	memset( &sfh, 0, sizeof(sfh) );
+	sfh = {};
 
 	char		*s, *value, *gametypeName;
 	static char *gametypeNames[] = {"ffa", "tournament", "single", "missioneditor", "team", "ctf", "oneflag", "obelisk", "harvester", "teamtournament"};

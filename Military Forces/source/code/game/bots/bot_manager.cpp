@@ -523,7 +523,7 @@ void Bots::runFrame()
 		ent->r.svFlags |= SVF_BOT;
 
 		usercmd_t cmd;
-		memset( &cmd, 0, sizeof( cmd ) );
+		cmd = {};
 		cmd.serverTime = theLevel.time_;
 		think( ent, bot, cmd );
 		GameHost::botUserCommand( i, &cmd );

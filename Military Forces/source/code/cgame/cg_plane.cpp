@@ -70,7 +70,7 @@ void ClientEntity::plane( clientInfo_t *ci )
 	int				ONOFF = this->currentState.ONOFF;
 	int				i;
 
-	memset( &drawInfo, 0, sizeof(drawInfo) );
+	drawInfo = {};
 	drawInfo.basicInfo.vehicleIndex = ci->vehicle;
 	drawInfo.basicInfo.team = cgs.gametype >= GT_TEAM ? (ci->paintTeam ? ci->paintTeam : ci->team) : 0;
 	drawInfo.basicInfo.ONOFF = ONOFF;
@@ -207,7 +207,7 @@ void ClientEntity::plane( clientInfo_t *ci )
 		float len;
 		float mindist = cg_thirdPersonRange.integer + availableVehicles[ci->vehicle].cam_dist[ CAMERA_V_DEFAULT ] + availableVehicles[ci->vehicle].maxs[0] + 20;
 
-		memset( &reticle, 0, sizeof(reticle) );	
+		reticle = {};	
 
 		CGame::resetReticles();
 
@@ -275,7 +275,7 @@ void ClientEntity::plane( clientInfo_t *ci )
 			}
 			else
 			{
-				memset( &reticlelock, 0, sizeof(reticlelock) );	
+				reticlelock = {};	
 				reticlelock.customShader = availableWeapons[availableVehicles[ci->vehicle].weapons[this->currentState.weaponNum]].crosshairtrack;
 				reticlelock.hModel = cgs.media.reticle[ availableWeapons[availableVehicles[ci->vehicle].weapons[this->currentState.weaponNum]].crosshairtrack ];
 				ang = Vec3( this->currentState.angles[0], this->currentState.angles[1], 0 );

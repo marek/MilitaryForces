@@ -450,7 +450,7 @@ void LocalEntity::addNuke() {
 			this->leFlags |= LEF_SOUND1;
 		}
 		// 1st nuke shockwave
-		memset(&shockwave, 0, sizeof(shockwave));
+		shockwave = {};
 		shockwave.hModel = cgs.media.nukeShockWave;
 		shockwave.reType = RT_MODEL;
 		shockwave.shaderTime = re->shaderTime;
@@ -519,7 +519,7 @@ void LocalEntity::addNuke() {
 		else {
 			c = 0;
 		}
-		memset(&shockwave, 0, sizeof(shockwave));
+		shockwave = {};
 		shockwave.hModel = cgs.media.nukeShockWave;
 		shockwave.reType = RT_MODEL;
 		shockwave.shaderTime = re->shaderTime;
@@ -554,7 +554,7 @@ void LocalEntity::addNuke() {
 	if (t > NUKE_CLOUD_STARTTIME && t < NUKE_CLOUD_ENDTIME) {
 		int i;
 		AxisClear(axis);
-		memset(&cloud, 0, sizeof(cloud));
+		cloud = {};
 		cloud.hModel = cgs.media.nukeCloudModel;
 		cloud.reType = RT_MODEL;
 		cloud.shaderTime = re->shaderTime;

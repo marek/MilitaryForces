@@ -90,7 +90,7 @@ void G_LoadMissionScripts()
 	static mission_vehicle_t	vehicles[IGME_MAX_VEHICLES];
 	static mission_groundInstallation_t installations[IGME_MAX_VEHICLES];
 
-	memset(&overview, 0, sizeof(overview));
+	overview = {};
 	memset(&vehicles[0], 0, sizeof(vehicles));
 	memset(&installations[0], 0, sizeof(installations));
 

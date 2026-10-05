@@ -19,7 +19,7 @@ void ClientEntity::misc_Plane()
 	DrawInfo_Plane_t drawInfo;
 	int				ONOFF = this->currentState.ONOFF;
 
-	memset( &drawInfo, 0, sizeof(drawInfo) );
+	drawInfo = {};
 	drawInfo.basicInfo.vehicleIndex = this->currentState.modelindex;
 	drawInfo.basicInfo.ONOFF = ONOFF;
 		
@@ -177,7 +177,7 @@ void ClientEntity::misc_GV()
 	Vec3			velocity;
 	DrawInfo_GV_t	drawInfo;
 
-	memset( &drawInfo, 0, sizeof(drawInfo) );
+	drawInfo = {};
 	drawInfo.basicInfo.vehicleIndex = this->currentState.modelindex;
 	drawInfo.basicInfo.ONOFF = this->currentState.ONOFF;
 
@@ -268,7 +268,7 @@ void ClientEntity::misc_Helo()
 	DrawInfo_Helo_t	drawInfo;
 	int i;
 
-	memset( &drawInfo, 0, sizeof(drawInfo) );
+	drawInfo = {};
 	drawInfo.basicInfo.vehicleIndex = this->currentState.modelindex;
 	drawInfo.basicInfo.ONOFF = this->currentState.ONOFF;
 
@@ -351,7 +351,7 @@ void ClientEntity::misc_Boat()
 	DrawInfo_Boat_t	drawInfo;
 	int i;
 
-	memset( &drawInfo, 0, sizeof(drawInfo) );
+	drawInfo = {};
 	drawInfo.basicInfo.vehicleIndex = this->currentState.modelindex;
 	drawInfo.basicInfo.ONOFF = this->currentState.ONOFF;
 
@@ -422,7 +422,7 @@ void ClientEntity::misc_GI()
 {
 	DrawInfo_GI_t	drawInfo;
 
-	memset( &drawInfo, 0, sizeof(drawInfo) );
+	drawInfo = {};
 	drawInfo.basicInfo.vehicleIndex = this->currentState.modelindex2;
 	drawInfo.basicInfo.ONOFF = this->currentState.ONOFF;
 

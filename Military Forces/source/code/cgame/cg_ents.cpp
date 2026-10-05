@@ -154,7 +154,7 @@ void ClientEntity::general() {
 		return;
 	}
 
-	memset (&ent, 0, sizeof(ent));
+	ent = {};
 
 	// set frame
 
@@ -227,7 +227,7 @@ void ClientEntity::item() {
 
 	item = &bg_itemlist[ es->modelindex ];
 	if ( cg_simpleItems.integer && item->giType != IT_TEAM ) {
-		memset( &ent, 0, sizeof( ent ) );
+		ent = {};
 		ent.reType = RT_SPRITE;
 		VectorCopy( this->lerpOrigin, ent.origin );
 		ent.radius = 14;
@@ -244,7 +244,7 @@ void ClientEntity::item() {
 	scale = 0.005 + this->currentState.number * 0.00001;
 	this->lerpOrigin[2] += 4 + cos( ( cg.time + 1000 ) *  scale ) * 4;
 
-	memset (&ent, 0, sizeof(ent));
+	ent = {};
 
 	// autorotate at one of two speeds
 	if ( item->giType == IT_HEALTH ) {
@@ -355,7 +355,7 @@ void ClientEntity::missile() {
 	}
 
 	// create the render entity
-	memset (&ent, 0, sizeof(ent));
+	ent = {};
 	VectorCopy( this->lerpOrigin, ent.origin);
 	VectorCopy( this->lerpOrigin, ent.oldorigin);
 
@@ -416,7 +416,7 @@ void ClientEntity::bullet_Tracer() {
 	VectorCopy( s1->angles, this->lerpAngles);
 
 	// create the render entity
-	memset (&ent, 0, sizeof(ent));
+	ent = {};
 	VectorCopy( this->lerpOrigin, ent.origin);
 	VectorCopy( this->lerpOrigin, ent.oldorigin);
 
@@ -445,7 +445,7 @@ void ClientEntity::mover() {
 	s1 = &this->currentState;
 
 	// create the render entity
-	memset (&ent, 0, sizeof(ent));
+	ent = {};
 	VectorCopy( this->lerpOrigin, ent.origin);
 	VectorCopy( this->lerpOrigin, ent.oldorigin);
 	AnglesToAxis( this->lerpAngles, ent.axis );
@@ -493,7 +493,7 @@ void ClientEntity::explosive() {
 	}
 
 	// create the render entity
-	memset (&ent, 0, sizeof(ent));
+	ent = {};
 	VectorCopy( this->lerpOrigin, ent.origin);
 	VectorCopy( this->lerpOrigin, ent.oldorigin);
 	AnglesToAxis( this->lerpAngles, ent.axis );
@@ -530,7 +530,7 @@ void ClientEntity::beam() {
 	s1 = &this->currentState;
 
 	// create the render entity
-	memset (&ent, 0, sizeof(ent));
+	ent = {};
 	VectorCopy( s1->pos.trBase, ent.origin );
 	VectorCopy( s1->origin2, ent.oldorigin );
 	AxisClear( ent.axis );
@@ -555,7 +555,7 @@ void ClientEntity::portal() {
 	s1 = &this->currentState;
 
 	// create the render entity
-	memset (&ent, 0, sizeof(ent));
+	ent = {};
 	VectorCopy( this->lerpOrigin, ent.origin );
 	VectorCopy( s1->origin2, ent.oldorigin );
 	ByteToDir( s1->eventParm, ent.axis[0] );
@@ -806,7 +806,7 @@ void ClientEntity::emptyVehicleIcon()
 	if( team < 0 || team > 2 || cgs.gametype < GT_TEAM ) 
 		team = 0;
 
-	memset( &ent, 0, sizeof(ent) );
+	ent = {};
 	VectorCopy( this->lerpOrigin, ent.origin );
 	ent.origin[2] += availableVehicles[vehicle].maxs[2] + 10;
 	ent.reType = RT_SPRITE;

@@ -187,7 +187,7 @@ ClientImpacts
 static void ClientImpacts( GameEntity *ent, pmove_t *pm )
 {
 	trace_t	trace;
-	memset( &trace, 0, sizeof( trace ) );
+	trace = {};
 
 	for( int i=0 ; i<pm->numtouch ; i++ ) 
 	{
@@ -268,7 +268,7 @@ void	Game::touchTriggers( GameEntity *ent )
 		}
 
 		trace_t		trace;
-		memset( &trace, 0, sizeof(trace) );
+		trace = {};
 
 		if( hit->touchFunc_ ) 
 			hit->touchFunc_->execute( ent, &trace );
@@ -293,7 +293,7 @@ static void NotSelectedThink( GameEntity *ent, usercmd_t *ucmd )
 	client->ps_.speed = 0;
 	
 	// set up for pmove
-	memset( &pm, 0, sizeof(pm) );
+	pm = {};
 	pm.ps = &client->ps_;
 	pm.cmd = *ucmd;
 	pm.tracemask = MASK_PLAYERSOLID & ~CONTENTS_BODY;	// spectators can fly through bodies
@@ -334,7 +334,7 @@ static void SpectatorThink( GameEntity *ent, usercmd_t *ucmd )
 		client->ps_.speed = g_spectSpeed.integer;	// faster than normal
 
 		// set up for pmove
-		memset(&pm, 0, sizeof(pm));
+		pm = {};
 		pm.ps = &client->ps_;
 		pm.cmd = *ucmd;
 		pm.tracemask = MASK_PLAYERSOLID & ~CONTENTS_BODY;	// spectators can fly through bodies
@@ -378,7 +378,7 @@ static void MissionEditorThink( GameEntity *ent, usercmd_t *ucmd )
 		client->ps_.pm_type = PM_SPECTATOR;
 		client->ps_.speed = g_spectSpeed.integer;	// faster than normal
 		// set up for pmove
-		memset(&pm, 0, sizeof(pm));
+		pm = {};
 		pm.ps = &client->ps_;
 		pm.cmd = *ucmd;
 		pm.tracemask = MASK_PLAYERSOLID & ~CONTENTS_BODY;	// spectators can fly through bodies
@@ -872,7 +872,7 @@ static void ClientThink_real( GameEntity *ent )
 	int oldEventSequence = client->ps_.eventSequence;
 
 	pmove_t		pm;
-	memset(&pm, 0, sizeof(pm));
+	pm = {};
 
 	pm.ps = &client->ps_;
 	pm.cmd = *ucmd;
