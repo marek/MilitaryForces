@@ -57,6 +57,17 @@ public:
 	static void runCinematicFrame(int handle);
 	static void customChatInit( );
 	static void loadNonIngame();
+
+private:
+	static int cvarTableSize;
+	static vmCvar_t ui_vehicleTxt;
+	static vmCvar_t ui_vehicleLoadoutTxt;
+	static vmCvar_t ui_vehicleClassTxt;
+	static vmCvar_t ui_vehicleCatTxt;
+	static vmCvar_t ui_vehicleLoadout;
+	static char lastLoadingText[MAX_INFO_VALUE];
+	static connstate_t lastConnState;
+	static bool updateOpponentModel;
 };
 
 #endif

@@ -17,14 +17,14 @@ pmove_t		*pm;
 pml_t		pml;
 
 // movement parameters
-static float	pm_stopspeed = 100.0f;
+float PlayerMove::pm_stopspeed = 100.0f;
 
-static float	pm_accelerate = 10.0f;
-static float	pm_flyaccelerate = 8.0f;
+float PlayerMove::pm_accelerate = 10.0f;
+float PlayerMove::pm_flyaccelerate = 8.0f;
 
-static float	pm_friction = 6.0f;
-static float	pm_waterfriction = 1.0f;
-static float	pm_spectatorfriction = 5.0f;
+float PlayerMove::pm_friction = 6.0f;
+float PlayerMove::pm_waterfriction = 1.0f;
+float PlayerMove::pm_spectatorfriction = 5.0f;
 
 static int		c_pmove = 0;
 

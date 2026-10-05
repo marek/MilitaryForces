@@ -43,6 +43,22 @@ public:
 	static void init( char *commandLine );
 	static void frame( );
 	static void shutdown( );
+
+private:
+	static int eventTail;
+	static int eventHead;
+	static int rd_buffersize;
+	static char *rd_buffer;
+	static bool com_gameClientRestarting;
+	static bool com_gameRestarting;
+	static int com_frameNumber;
+	static cvar_t *com_busyWait;
+	static cvar_t *com_maxfpsMinimized;
+	static cvar_t *com_maxfpsUnfocused;
+	static cvar_t *com_blood;
+	static cvar_t *com_showtrace;
+	static cvar_t *com_logfile;
+	static cvar_t *com_timedemo;
 };
 
 #endif

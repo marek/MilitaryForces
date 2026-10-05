@@ -59,11 +59,11 @@ struct console_t {
 
 console_t	con;
 
-static cvar_t		*con_conspeed;
-static cvar_t		*con_autoclear;
+cvar_t *Console::con_conspeed;
+cvar_t *Console::con_autoclear;
 cvar_t		*con_notifytime;
-static cvar_t		*con_notifylines;
-static cvar_t		*con_scale;
+cvar_t *Console::con_notifylines;
+cvar_t *Console::con_scale;
 
 
 

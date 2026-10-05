@@ -28,6 +28,10 @@ public:
 	static void capture( int samples, byte *data );
 	static void stopCapture( );
 	static void masterGain( float gain );
+
+private:
+	static cvar_t *s_muteWhenUnfocused;
+	static cvar_t *s_muteWhenMinimized;
 };
 
 #endif

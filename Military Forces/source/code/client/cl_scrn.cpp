@@ -25,7 +25,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "../ui/ui.h"
 #include "../cgame/cg.h"
 
-static bool	scr_initialized;		// ready to draw
+bool Screen::scr_initialized;		// ready to draw
 
 cvar_t		*cl_timegraph;
 static cvar_t		*cl_debuggraph;

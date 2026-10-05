@@ -72,6 +72,9 @@ public:
 	char 			soundName[MAX_QPATH];
 	int				lastTimeUsed;
 	SoundEffect	*next;
+
+private:
+	static bool madeTable;
 };
 
 struct dma_t {

@@ -81,6 +81,14 @@ public:
 	static void dropTimers();
 	static void vehicleBoundingBox();
 	static void vehicleMove();
+
+private:
+	static float pm_spectatorfriction;
+	static float pm_waterfriction;
+	static float pm_friction;
+	static float pm_flyaccelerate;
+	static float pm_accelerate;
+	static float pm_stopspeed;
 };
 
 // MFQ3

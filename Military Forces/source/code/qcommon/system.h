@@ -73,6 +73,9 @@ public:
 	static bool openFolderInFileManager( const char *path, bool create );
 	static void removePIDFile( const char *gamedir );
 	static void initPIDFile( const char *gamedir );
+
+private:
+	static char installPath[ MAX_OSPATH ];
 };
 
 #endif

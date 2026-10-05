@@ -1922,6 +1922,10 @@ private:
 	static pmove_t cg_pmove;
 	static bool localClient;
 	static int cg_drawTeam;
+
+private:
+	static markPoly_t cg_markPolys[MAX_MARK_POLYS];
+	static int consoleIdx;
 };
 extern particleWorld_t pw;
 extern refexport_t	refExport;

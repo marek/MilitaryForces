@@ -1466,7 +1466,7 @@ static const char *UI_AIFromName(const char *name) {
 
 
 
-static bool updateOpponentModel = true;
+bool Menus::updateOpponentModel = true;
 
 static void UI_NextOpponent() {
   int i = UI_TeamIndexFromName(Menus::cvar_VariableString("ui_opponentName"));
@@ -6068,8 +6068,8 @@ bool _UI_IsFullscreen( )
 
 
 
-static connstate_t	lastConnState;
-static char			lastLoadingText[MAX_INFO_VALUE];
+connstate_t Menus::lastConnState;
+char Menus::lastLoadingText[MAX_INFO_VALUE];
 
 static void UI_ReadableSize ( char *buf, int bufsize, int value )
 {
@@ -6510,13 +6510,13 @@ vmCvar_t	ui_serverStatusTimeOut;
 // (vehicle select dialog)
 vmCvar_t	ui_vehicleCat;			// vehicle catagory value
 static vmCvar_t	ui_vehicleClass;		// vehicle class value
-static vmCvar_t	ui_vehicleLoadout;		// vehicle loadout value
+vmCvar_t Menus::ui_vehicleLoadout;		// vehicle loadout value
 static vmCvar_t	ui_vehicle;				// vehicle value
 
-static vmCvar_t	ui_vehicleCatTxt;		// vehicle catagory text
-static vmCvar_t	ui_vehicleClassTxt;		// vehicle class text
-static vmCvar_t	ui_vehicleLoadoutTxt;	// vehicle loadout text
-static vmCvar_t	ui_vehicleTxt;			// vehicle text
+vmCvar_t Menus::ui_vehicleCatTxt;		// vehicle catagory text
+vmCvar_t Menus::ui_vehicleClassTxt;		// vehicle class text
+vmCvar_t Menus::ui_vehicleLoadoutTxt;	// vehicle loadout text
+vmCvar_t Menus::ui_vehicleTxt;			// vehicle text
 
 static vmCvar_t	ui_availableVehiclesTxt;	// available vehicles text
 
@@ -6666,7 +6666,7 @@ static cvarTable_t		cvarTable[] = {
 };
 
 // bk001129 - made static to avoid aliasing
-static int		cvarTableSize = sizeof(cvarTable) / sizeof(cvarTable[0]);
+int Menus::cvarTableSize = sizeof(cvarTable) / sizeof(cvarTable[0]);
 
 
 /*

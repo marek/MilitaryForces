@@ -48,6 +48,13 @@ public:
 
 	int		numpoints;
 	vec3_t	p[4];		// variable sized
+
+private:
+	static int c_removed;
+	static int c_winding_points;
+	static int c_winding_allocs;
+	static int c_peak_windings;
+	static int c_active_windings;
 };
 
 #define	MAX_POINTS_ON_WINDING	64

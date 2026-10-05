@@ -310,10 +310,10 @@ static unsigned int	fs_serverReferencedPaks[MAX_SEARCH_PATHS];			// checksums
 static char			*fs_serverReferencedPakNames[MAX_SEARCH_PATHS];		// pk3 names
 
 // last valid game folder used
-static char lastValidBase[MAX_OSPATH];
-static char lastValidComBaseGame[MAX_OSPATH];
-static char lastValidFsBaseGame[MAX_OSPATH];
-static char lastValidGame[MAX_OSPATH];
+char FileSystem::lastValidBase[MAX_OSPATH];
+char FileSystem::lastValidComBaseGame[MAX_OSPATH];
+char FileSystem::lastValidFsBaseGame[MAX_OSPATH];
+char FileSystem::lastValidGame[MAX_OSPATH];
 
 #ifdef FS_MISSING
 FILE*		missingFiles = NULL;

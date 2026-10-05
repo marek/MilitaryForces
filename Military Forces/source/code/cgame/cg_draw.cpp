@@ -40,7 +40,7 @@ CUSTOM CONSOLE
 */
 
 struct strConsoleLine consoleLine[ MAX_CONSOLE_LINES ];	// our custom console buffer
-static int consoleIdx = 0;
+int CGame::consoleIdx = 0;
 
 /*
 ===============================================================================

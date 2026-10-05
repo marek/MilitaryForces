@@ -106,6 +106,12 @@ private:
 	static cvar_t *fs_homedatapath;
 	static cvar_t *fs_homeconfigpath;
 	static char fs_gamedir[MAX_OSPATH];
+
+private:
+	static char lastValidGame[MAX_OSPATH];
+	static char lastValidFsBaseGame[MAX_OSPATH];
+	static char lastValidComBaseGame[MAX_OSPATH];
+	static char lastValidBase[MAX_OSPATH];
 };
 
 #endif

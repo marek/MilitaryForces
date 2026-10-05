@@ -203,6 +203,9 @@ public:
 	static void traceThroughPatchCollide( traceWork_t *tw, const struct patchCollide_s *pc );
 	static bool positionTestInPatchCollide( traceWork_t *tw, const struct patchCollide_s *pc );
 	static void clearLevelPatches( );
+
+private:
+	static int c_totalPatchBlocks;
 };
 
 #endif // __CM_LOCAL_H__

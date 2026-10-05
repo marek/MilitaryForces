@@ -244,6 +244,9 @@ private:
 #ifdef LEGACY_PROTOCOL
 	bool		compat_ = false;
 #endif
+
+private:
+	static char *netsrcString[2];
 };
 
 
@@ -773,6 +776,9 @@ public:
 	static void shutdownCGame( );
 	static void shutdownUI( );
 	static bool cdKeyValidate( const char *key, const char *checksum );
+
+private:
+	static cvar_t *cl_forceavidemo;
 };
 // the keyboard binding interface must be setup before execing
 // config files, but the rest of client startup will happen later

@@ -527,6 +527,12 @@ public:
 	static void top( );
 	static void bottom( );
 	static void close( );
+
+private:
+	static cvar_t *con_scale;
+	static cvar_t *con_notifylines;
+	static cvar_t *con_autoclear;
+	static cvar_t *con_conspeed;
 };
 
 
@@ -657,6 +663,9 @@ public:
 	static bool shouldIgnoreVoipSender( int sender );
 	static void playVoip( int sender, int samplecnt, const byte *data, int flags );
 	static void parseVoip( Message *msg, bool ignoreData );
+
+private:
+	static int consoleSaveBufferSize;
 };
 
 #endif // __CLIENT_H__

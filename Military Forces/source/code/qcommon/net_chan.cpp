@@ -58,7 +58,7 @@ static cvar_t		*showpackets;
 static cvar_t		*showdrop;
 cvar_t		*net_qport;
 
-static char *netsrcString[2] = {
+char *NetChannel::netsrcString[2] = {
 	"client",
 	"server"
 };

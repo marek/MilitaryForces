@@ -1462,7 +1462,7 @@ void Key_SetCatcher( int catcher ) {
 constexpr int MAX_CONSOLE_SAVE_BUFFER = 1024;
 #define			CONSOLE_HISTORY_FILE    "q3history"
 static char	consoleSaveBuffer[ MAX_CONSOLE_SAVE_BUFFER ];
-static int	consoleSaveBufferSize = 0;
+int Client::consoleSaveBufferSize = 0;
 
 /*
 ================

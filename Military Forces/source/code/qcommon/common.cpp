@@ -61,14 +61,14 @@ static cvar_t	*com_fixedtime;
 cvar_t	*com_journal;
 cvar_t	*com_maxfps;
 cvar_t	*com_altivec;
-static cvar_t	*com_timedemo;
+cvar_t *Common::com_timedemo;
 cvar_t	*com_sv_running;
 cvar_t	*com_cl_running;
-static cvar_t	*com_logfile;		// 1 = buffer log, 2 = flush after each print
+cvar_t *Common::com_logfile;		// 1 = buffer log, 2 = flush after each print
 cvar_t	*com_pipefile;
-static cvar_t	*com_showtrace;
+cvar_t *Common::com_showtrace;
 cvar_t	*com_version;
-static cvar_t	*com_blood;
+cvar_t *Common::com_blood;
 cvar_t	*com_buildScript;	// for automated data building scripts
 #ifdef CINEMATICS_INTRO
 cvar_t	*com_introPlayed;
@@ -80,9 +80,9 @@ cvar_t  *sv_packetdelay;
 cvar_t	*com_cameraMode;
 cvar_t	*com_ansiColor;
 cvar_t	*com_unfocused;
-static cvar_t	*com_maxfpsUnfocused;
+cvar_t *Common::com_maxfpsUnfocused;
 cvar_t	*com_minimized;
-static cvar_t	*com_maxfpsMinimized;
+cvar_t *Common::com_maxfpsMinimized;
 cvar_t	*com_abnormalExit;
 cvar_t	*com_standalone;
 cvar_t	*com_gamename;
@@ -92,7 +92,7 @@ cvar_t	*com_legacyprotocol;
 #endif
 cvar_t	*com_basegame;
 cvar_t  *com_homepath;
-static cvar_t	*com_busyWait;
+cvar_t *Common::com_busyWait;
 #ifndef DEDICATED
 cvar_t  *con_autochat;
 #endif
@@ -108,12 +108,12 @@ int		time_frontend;		// renderer frontend time
 int		time_backend;		// renderer backend time
 
 int			com_frameTime;
-static int			com_frameNumber;
+int Common::com_frameNumber;
 
 bool	com_errorEntered = false;
 bool	com_fullyInitialized = false;
-static bool	com_gameRestarting = false;
-static bool	com_gameClientRestarting = false;
+bool Common::com_gameRestarting = false;
+bool Common::com_gameClientRestarting = false;
 
 char	com_errorMessage[MAXPRINTMSG];
 
@@ -122,8 +122,8 @@ void CIN_CloseAllVideos( );
 
 //============================================================================
 
-static char	*rd_buffer;
-static int	rd_buffersize;
+char *Common::rd_buffer;
+int Common::rd_buffersize;
 static void	(*rd_flush)( char *buffer );
 
 void Common::beginRedirect (char *buffer, int buffersize, void (*flush)( char *) )
@@ -1923,8 +1923,8 @@ EVENT LOOP
 #define MASK_QUEUED_EVENTS ( MAX_QUEUED_EVENTS - 1 )
 
 static sysEvent_t  eventQueue[ MAX_QUEUED_EVENTS ];
-static int         eventHead = 0;
-static int         eventTail = 0;
+int Common::eventHead = 0;
+int Common::eventTail = 0;
 
 /*
 ================

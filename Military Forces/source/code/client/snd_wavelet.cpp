@@ -110,7 +110,7 @@ static short MuLawDecode(byte uLaw) {
 }
 
 short mulawToShort[256];
-static bool madeTable = false;
+bool SoundEffect::madeTable = false;
 
 static	int	NXStreamCount;
 

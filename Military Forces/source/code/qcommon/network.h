@@ -33,6 +33,9 @@ public:
 	static void NET_GetLocalAddress( void );
 	static bool getCvars();
 	static void queuePacket( int length, const void *data, netadr_t to, int offset );
+
+private:
+	static int networkingEnabled;
 };
 
 #endif

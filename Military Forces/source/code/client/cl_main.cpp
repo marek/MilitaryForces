@@ -79,7 +79,7 @@ static cvar_t	*cl_timedemoLog;
 cvar_t	*cl_autoRecordDemo;
 cvar_t	*cl_aviFrameRate;
 cvar_t	*cl_aviMotionJpeg;
-static cvar_t	*cl_forceavidemo;
+cvar_t *ClientLoop::cl_forceavidemo;
 
 cvar_t	*cl_freelook;
 cvar_t	*cl_sensitivity;

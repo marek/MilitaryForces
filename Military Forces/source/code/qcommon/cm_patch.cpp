@@ -39,7 +39,7 @@ degenerate a few triangles.  Completely degenerate rows and columns are handled
 properly.
 */
 
-static int	c_totalPatchBlocks;
+int CollisionWork::c_totalPatchBlocks;
 
 static const patchCollide_t	*debugPatchCollide;
 static const facet_t		*debugFacet;

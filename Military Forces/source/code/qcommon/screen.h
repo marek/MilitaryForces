@@ -23,6 +23,9 @@ public:
 public:
 	static void drawChar( int x, int y, float size, int ch );
 	static int strlen( const char *str );
+
+private:
+	static bool scr_initialized;
 };
 
 #endif
