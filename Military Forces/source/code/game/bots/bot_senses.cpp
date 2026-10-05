@@ -307,7 +307,7 @@ void Bots::sense( GameEntity* ent, State& bot, Sense& out )
 	}
 	if( out.enemy )
 	{
-		vec3_t target;
+		Vec3 target;
 		VectorCopy( out.enemyVisible ? out.enemy->r.currentOrigin : bot.seen[out.enemy->s.number].position, target );
 		const float dist = Distance( ent->r.currentOrigin, target );
 		const int weapon = availableVehicles[ent->client_->vehicle_].weapons[0];
@@ -318,7 +318,7 @@ void Bots::sense( GameEntity* ent, State& bot, Sense& out )
 		if( roleOf( ent->client_->vehicle_ ) == Role::Fighter && (enemyCat & (CAT_PLANE|CAT_HELO)) && dist > 1200 && dist < 6000 &&
 			character( bot ).cunning > 0.5f && out.enemy->tracktarget_ != ent )
 		{
-			vec3_t behind;
+			Vec3 behind;
 			AngleVectors( out.enemy->client_->ps_.vehicleAngles, behind, nullptr, nullptr );
 			VectorMA( target, -700.0f, behind, target );
 			target[2] -= 250.0f * character( bot ).cunning;
@@ -361,7 +361,7 @@ void Bots::sense( GameEntity* ent, State& bot, Sense& out )
 		bool seen = false;
 		if( out.enemy && out.enemyVisible )
 		{
-			vec3_t forward;
+			Vec3 forward;
 			AngleVectors( ps.viewangles, forward, nullptr, nullptr );
 			seen = DotProduct( forward, out.enemyDir ) > 0.3f || ent->tracktarget_ == out.enemy;
 		}
@@ -375,12 +375,12 @@ void Bots::sense( GameEntity* ent, State& bot, Sense& out )
 			GameEntity* other = theLevel.getEntity( i );
 			if( !other || !other->inuse_ || other->s.eType != ET_MISSILE || other->tracktarget_ != ent )
 				continue;
-			vec3_t rel;
+			Vec3 rel;
 			VectorSubtract( other->r.currentOrigin, ent->r.currentOrigin, rel );
 			const float dist = VectorLength( rel );
 			if( out.missile && dist > out.missileDist )
 				continue;
-			vec3_t relVel, angles;
+			Vec3 relVel, angles;
 			VectorSubtract( other->s.pos.trDelta, ps.velocity, relVel );
 			const float closing = -DotProduct( rel, relVel ) / std::max( dist, 1.0f );
 			vectoangles( rel, angles );

@@ -134,7 +134,7 @@ struct InfantryTasks
 	static Status walk( Mind& c )
 	{
 		Bots::State& bot = c.bot;
-		vec3_t angles;
+		Vec3 angles;
 		c.course[2] = 0;
 		vectoangles( c.course, angles );
 		c.view[YAW] = angles[YAW];
@@ -246,7 +246,7 @@ void Bots::thinkRider( GameEntity* ent, State& bot, usercmd_t& cmd, vec3_t view 
 	if( !alive( enemy ) )
 		return;
 
-	vec3_t dir, angles;
+	Vec3 dir, angles;
 	VectorSubtract( enemy->r.currentOrigin, pilot->r.currentOrigin, dir );
 	vectoangles( dir, angles );
 	view[YAW] = angles[YAW];

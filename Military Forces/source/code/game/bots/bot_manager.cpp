@@ -313,7 +313,7 @@ void Bots::think( GameEntity* ent, State& bot, usercmd_t& cmd )
 {
 	GameClient* client = ent->client_;
 	playerState_t& ps = client->ps_;
-	vec3_t view;
+	Vec3 view;
 	VectorCopy( ps.viewangles, view );
 
 	const bool selecting = client->sess_.sessionTeam_ == ClientBase::TEAM_SPECTATOR || client->vehicle_ < 0 || (ps.pm_flags & PMF_VEHICLESELECT);
@@ -442,7 +442,7 @@ void Bots::think( GameEntity* ent, State& bot, usercmd_t& cmd )
 			GameEntity* other = theLevel.getEntity( i );
 			if( other == ent || !alive( other ) || !(other->client_->ps_.objectives & ownFlag) )
 				continue;
-			vec3_t intercept;
+			Vec3 intercept;
 			const Seen& seen = bot.seen[i];
 			if( seen.time && theLevel.time_ < seen.time + memoryTime( bot ) )
 				VectorCopy( seen.position, intercept );
@@ -461,7 +461,7 @@ void Bots::think( GameEntity* ent, State& bot, usercmd_t& cmd )
 		const bool carrying = (ps.objectives & (OB_REDFLAG|OB_BLUEFLAG)) != 0;
 		const int own = client->sess_.sessionTeam_;
 		const int other = own == ClientBase::TEAM_RED ? ClientBase::TEAM_BLUE : ClientBase::TEAM_RED;
-		vec3_t flag;
+		Vec3 flag;
 		if( flagPosition( carrying ? own : other, flag ) )
 		{
 			VectorCopy( flag, bot.goal );

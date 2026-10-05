@@ -23,7 +23,7 @@ struct SurfaceTasks
 
 	static bool waterAt( const Mind& c, const vec3_t forward, float reach, bool& drop )
 	{
-		vec3_t ahead, below;
+		Vec3 ahead, below;
 		trace_t water;
 		VectorMA( c.ent->r.currentOrigin, reach, forward, ahead );
 		ahead[2] += 120;
@@ -263,7 +263,7 @@ struct SurfaceTasks
 		}
 		if( c.boat && !c.blocked )
 		{
-			vec3_t ahead;
+			Vec3 ahead;
 			VectorMA( c.ent->r.currentOrigin, 500, forward, ahead );
 			ahead[2] = c.ent->r.currentOrigin[2] - 6;
 			if( !(GameHost::pointContents( ahead, c.ent->s.number ) & MASK_WATER) )
@@ -304,7 +304,7 @@ struct SurfaceTasks
 
 	static Status steer( Mind& c )
 	{
-		vec3_t angles;
+		Vec3 angles;
 		c.course[2] = 0;
 		vectoangles( c.course, angles );
 		const float yawError = AngleSubtract( angles[YAW], c.ps.vehicleAngles[YAW] );
@@ -326,7 +326,7 @@ struct SurfaceTasks
 		{
 			const float shell = static_cast<float>( availableWeapons[selected].muzzleVelocity );
 			const float flight = c.sense.enemyDist / shell;
-			vec3_t aim, dirAim, aimAngles, known;
+			Vec3 aim, dirAim, aimAngles, known;
 			c.enemyPosition().copyTo( known );
 			VectorMA( known, flight, c.sense.enemy->client_->ps_.velocity, aim );
 			VectorSubtract( aim, c.ent->r.currentOrigin, dirAim );

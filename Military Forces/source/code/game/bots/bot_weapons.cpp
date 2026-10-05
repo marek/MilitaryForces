@@ -239,12 +239,12 @@ void Bots::bomb( GameEntity* ent, State& bot, const vec3_t target, usercmd_t& cm
 		return;
 	cmd.weapon = slot;
 
-	vec3_t flat;
+	Vec3 flat;
 	VectorSubtract( target, ent->r.currentOrigin, flat );
 	const float drop = -flat[2];
 	flat[2] = 0;
 	const float dist = VectorLength( flat );
-	vec3_t angles;
+	Vec3 angles;
 	vectoangles( flat, angles );
 	view[YAW] = angles[YAW];
 

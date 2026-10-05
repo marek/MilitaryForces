@@ -38,7 +38,7 @@ namespace
 
 	void build()
 	{
-		vec3_t boundsMins, boundsMaxs;
+		Vec3 boundsMins, boundsMaxs;
 		CollisionModel::modelBounds( 0, boundsMins, boundsMaxs );
 		worldMins = Vec3( boundsMins );
 		worldMaxs = Vec3( boundsMaxs );
@@ -68,7 +68,7 @@ namespace
 				return;
 			}
 		}
-		vec3_t boxMins = { -half, -half, -half }, boxMaxs = { half, half, half };
+		Vec3 boxMins = { -half, -half, -half }, boxMaxs = { half, half, half };
 		trace_t tr;
 		GameHost::trace( &tr, centre, boxMins, boxMaxs, centre, ENTITYNUM_NONE, MASK_PLAYERSOLID|CONTENTS_BOTCLIP, false );
 		if( !tr.startsolid && !tr.allsolid )
@@ -235,8 +235,8 @@ int AirNav::freeCount()
 
 bool AirNav::clearLine( const Vec3& a, const Vec3& b, float halfWidth )
 {
-	vec3_t boxMins = { -halfWidth, -halfWidth, -halfWidth * 0.4f };
-	vec3_t boxMaxs = { halfWidth, halfWidth, halfWidth * 0.4f };
+	Vec3 boxMins = { -halfWidth, -halfWidth, -halfWidth * 0.4f };
+	Vec3 boxMaxs = { halfWidth, halfWidth, halfWidth * 0.4f };
 	trace_t tr;
 	GameHost::trace( &tr, a, boxMins, boxMaxs, b, ENTITYNUM_NONE, MASK_PLAYERSOLID|CONTENTS_BOTCLIP, false );
 	if( tr.startsolid )

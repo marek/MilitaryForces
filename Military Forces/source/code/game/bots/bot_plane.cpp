@@ -14,7 +14,7 @@ bool Bots::turnClear( GameEntity* ent, float radius, float degrees, float climb 
 	for( float swept = 30.0f; swept <= total + 29.0f; swept += 30.0f )
 	{
 		const float angle = std::min( swept, total ) * std::numbers::pi_v<float> / 180.0f;
-		vec3_t point, dir;
+		Vec3 point, dir;
 		VectorMA( ent->r.currentOrigin, radius * sin( angle ), forward, point );
 		VectorMA( point, side * radius * (1.0f - cos( angle )), right, point );
 		point[2] += climb * radius * angle;
@@ -36,7 +36,7 @@ bool Bots::runwayBusy( int padIndex, GameEntity* self )
 		GameEntity* other = theLevel.getEntity( i );
 		if( other == self || !alive( other ) || other->client_->sess_.ridingClient_ >= 0 )
 			continue;
-		vec3_t rel;
+		Vec3 rel;
 		VectorSubtract( other->r.currentOrigin, pad.center, rel );
 		const float along = rel[0] * pad.axis[0] + rel[1] * pad.axis[1];
 		const float side = rel[1] * pad.axis[0] - rel[0] * pad.axis[1];
@@ -87,7 +87,7 @@ struct PlaneTasks
 		if( !c.bot.confined || theLevel.time_ < c.bot.chaseTime )
 			return true;
 		trace_t line;
-		vec3_t toEnemy;
+		Vec3 toEnemy;
 		VectorCopy( c.sense.enemyDir, toEnemy );
 		return !(Bots::pathBlocked( c.ent->r.currentOrigin, toEnemy, std::min( c.sense.enemyDist, 1500.0f ), c.ent->s.number, line, 60.0f ) &&
 			line.entityNum == ENTITYNUM_WORLD && !line.startsolid);
@@ -163,7 +163,7 @@ struct PlaneTasks
 				const float yaw = step * 15.0f;
 				if( Bots::runwayRun( origin, yaw, dist ) < dist )
 					continue;
-				vec3_t level = { 0, yaw, 0 }, dir, spot;
+				Vec3 level = { 0, yaw, 0 }, dir, spot;
 				AngleVectors( level, dir, nullptr, nullptr );
 				VectorMA( origin, dist, dir, spot );
 				// not a spot on the very edge: the aircraft has to stop and turn there
@@ -203,7 +203,7 @@ struct PlaneTasks
 		constexpr float groundAcceleration = 85.0f;
 		constexpr float climbSlope = 0.14f;
 		constexpr float departure = 900.0f;
-		vec3_t origin;
+		Vec3 origin;
 		VectorCopy( c.ent->r.currentOrigin, origin );
 		origin[2] -= c.sense.height;
 		if( !Bots::runwayAt( origin ) )
@@ -227,7 +227,7 @@ struct PlaneTasks
 			longest = std::max( longest, run );
 			if( run < 150 )
 				continue;
-			vec3_t level = { 0, yaw, 0 }, dir, start;
+			Vec3 level = { 0, yaw, 0 }, dir, start;
 			trace_t ground;
 			AngleVectors( level, dir, nullptr, nullptr );
 			VectorCopy( origin, start );
@@ -302,7 +302,7 @@ struct PlaneTasks
 		if( theLevel.time_ < c.bot.taxiTime )
 		{
 			constexpr float taxiSpeed = 35.0f;
-			vec3_t toSpot;
+			Vec3 toSpot;
 			VectorSubtract( c.bot.taxiSpot, c.ent->r.currentOrigin, toSpot );
 			toSpot[2] = 0;
 			c.headFor( c.bot.taxiSpot );
@@ -334,7 +334,7 @@ struct PlaneTasks
 				GameEntity* other = theLevel.getEntity( i );
 				if( other == c.ent || !alive( other ) || other->client_->sess_.ridingClient_ >= 0 )
 					continue;
-				vec3_t rel;
+				Vec3 rel;
 				VectorSubtract( other->r.currentOrigin, c.ent->r.currentOrigin, rel );
 				const float dist = VectorNormalize( rel );
 				if( dist < 320 && fabs( rel[2] * dist ) < 120 && DotProduct( rel, forward ) > 0.4f )
@@ -344,7 +344,7 @@ struct PlaneTasks
 				}
 				// stay off the path of an aircraft on its take-off roll, unless already standing in it
 				constexpr float rollSpeed = 60.0f, rollAhead = 1500.0f, rollWidth = 250.0f, onTheLine = 60.0f;
-				vec3_t track;
+				Vec3 track;
 				VectorCopy( other->client_->ps_.velocity, track );
 				track[2] = 0;
 				if( !(other->client_->ps_.ONOFF & OO_LANDED) || VectorNormalize( track ) < rollSpeed )
@@ -416,7 +416,7 @@ struct PlaneTasks
 			if( weapon && c.ps.ammo[slot] > 0 && (availableWeapons[weapon].type == WT_IRONBOMB || availableWeapons[weapon].type == WT_GUIDEDBOMB) )
 			{
 				c.forcedWeapon = slot;
-				vec3_t nose;
+				Vec3 nose;
 				AngleVectors( c.ps.vehicleAngles, nose, nullptr, nullptr );
 				const float blast = static_cast<float>( availableWeapons[weapon].damageRadius );
 				if( c.ps.weaponNum == slot && DotProduct( nose, c.sense.enemyDir ) > 0.99f && c.sense.enemyDist < 1800 &&
@@ -517,7 +517,7 @@ struct PlaneTasks
 		if( !structure )
 			return Status::Failure;
 		roam( c );
-		vec3_t target;
+		Vec3 target;
 		for( int k = 0; k < 3; k++ )
 			target[k] = (structure->r.absmin[k] + structure->r.absmax[k]) * 0.5f;
 		Bots::bomb( c.ent, c.bot, target, c.cmd, c.view );
@@ -530,7 +530,7 @@ struct PlaneTasks
 		if( !leader )
 			return Status::Failure;
 		// off the leader's wing, on the side given by the client number so two wingmen take different sides
-		vec3_t forward, right;
+		Vec3 forward, right;
 		AngleVectors( leader->client_->ps_.vehicleAngles, forward, right, nullptr );
 		VectorMA( leader->r.currentOrigin, 600.0f, forward, c.bot.goal );
 		VectorMA( c.bot.goal, (c.ent->s.number & 1) ? 300.0f : -300.0f, right, c.bot.goal );
@@ -589,7 +589,7 @@ struct PlaneTasks
 		}
 
 		const Vec3 leg = bot.path[bot.pathIndex] - here;
-		vec3_t legDir, legAngles;
+		Vec3 legDir, legAngles;
 		leg.copyTo( legDir );
 		vectoangles( legDir, legAngles );
 		const float aimAt = c.sense.enemy ? fabs( enemyTurn( c ) ) : 180.0f;
@@ -602,7 +602,7 @@ struct PlaneTasks
 		if( bot.pathIndex + 1 < bot.path.size() )
 		{
 			const Vec3 next = bot.path[bot.pathIndex + 1] - bot.path[bot.pathIndex];
-			vec3_t nextDir, nextAngles;
+			Vec3 nextDir, nextAngles;
 			next.copyTo( nextDir );
 			vectoangles( nextDir, nextAngles );
 			bot.cornerAhead = fabs( AngleSubtract( nextAngles[YAW], legAngles[YAW] ) ) > 35.0f && leg.length() < radius * 3.5f;
@@ -670,14 +670,14 @@ struct PlaneTasks
 			if( Bots::isBot( i ) && i > c.ent->s.number )
 			{
 				constexpr float sameWay = 0.5f, headOn = -0.7f;
-				vec3_t mine, theirs;
+				Vec3 mine, theirs;
 				VectorNormalize2( c.ps.velocity, mine );
 				VectorNormalize2( other->client_->ps_.velocity, theirs );
 				const float agreement = DotProduct( mine, theirs );
 				if( agreement < sameWay && agreement > headOn )
 					continue;
 			}
-			vec3_t predicted;
+			Vec3 predicted;
 			predictAircraft( other, seconds, predicted );
 			// flying alongside is fine: only a path that closes on the other aircraft is blocked
 			const float now = Distance( other->r.currentOrigin, c.ent->r.currentOrigin );
@@ -690,7 +690,7 @@ struct PlaneTasks
 
 	struct Pose
 	{
-		vec3_t	origin;
+		Vec3	origin;
 		float	yaw;
 		float	seconds;
 	};
@@ -698,7 +698,7 @@ struct PlaneTasks
 	// flies an arc of turnDegrees at the given radius and then straight on, returns the free distance up to horizon
 	static float sweepFrom( const Mind& c, const Pose& start, float radius, float turnDegrees, float slope, float horizon, float halfWidth, Pose* finish = nullptr )
 	{
-		vec3_t flat = { 0, start.yaw, 0 }, forward, right, from;
+		Vec3 flat = { 0, start.yaw, 0 }, forward, right, from;
 		AngleVectors( flat, forward, right, nullptr );
 		const float side = turnDegrees > 0 ? -1.0f : 1.0f;
 		const float total = fabs( turnDegrees );
@@ -707,7 +707,7 @@ struct PlaneTasks
 		VectorCopy( start.origin, from );
 		const auto leg = [&]( const vec3_t to ) -> bool
 		{
-			vec3_t dir;
+			Vec3 dir;
 			trace_t tr;
 			VectorSubtract( to, from, dir );
 			const float length = VectorNormalize( dir );
@@ -734,7 +734,7 @@ struct PlaneTasks
 			for( int step = 1; step <= steps; step++ )
 			{
 				const float along = length * step / steps;
-				vec3_t point;
+				Vec3 point;
 				VectorMA( from, along, dir, point );
 				if( trafficAt( c, point, start.seconds + (travelled + along) / airspeed ) )
 				{
@@ -749,7 +749,7 @@ struct PlaneTasks
 		for( float swept = std::min( 30.0f, total ); swept > 0 && travelled < horizon; swept += 30.0f )
 		{
 			const float angle = std::min( swept, total ) * std::numbers::pi_v<float> / 180.0f;
-			vec3_t point;
+			Vec3 point;
 			VectorMA( start.origin, radius * sin( angle ), forward, point );
 			VectorMA( point, side * radius * (1.0f - cos( angle )), right, point );
 			point[2] += slope * radius * angle;
@@ -760,7 +760,7 @@ struct PlaneTasks
 		}
 		if( travelled < horizon )
 		{
-			vec3_t out = { 0, start.yaw + turnDegrees, 0 }, dir, end;
+			Vec3 out = { 0, start.yaw + turnDegrees, 0 }, dir, end;
 			AngleVectors( out, dir, nullptr, nullptr );
 			dir[2] = slope;
 			VectorMA( from, horizon - travelled, dir, end );
@@ -815,7 +815,7 @@ struct PlaneTasks
 		{
 			// look more often when something is in the way
 			bot.probeTime = theLevel.time_ + (bot.confined || bot.probeBlocked ? 150 : 300);
-			vec3_t flat = { 0, yaw, 0 }, right, left;
+			Vec3 flat = { 0, yaw, 0 }, right, left;
 			trace_t tr;
 			AngleVectors( flat, nullptr, right, nullptr );
 			VectorNegate( right, left );
@@ -1004,7 +1004,7 @@ struct PlaneTasks
 	{
 		if( !c.attacking && !c.snapShot && !c.weaponsFree )
 			return Status::Success;
-		vec3_t fwd;
+		Vec3 fwd;
 		AngleVectors( c.ps.vehicleAngles, fwd, nullptr, nullptr );
 		const float aimError = acos( std::clamp( DotProduct( fwd, c.sense.enemyDir ), -1.0f, 1.0f ) ) * 180.0f / std::numbers::pi_v<float>;
 		Bots::fireWeapons( c.ent, c.bot, c.sense, c.cmd, aimError );

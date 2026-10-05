@@ -8,7 +8,7 @@
 float Bots::heightAboveGround( const vec3_t origin, int passEntity )
 {
 	trace_t tr;
-	vec3_t end;
+	Vec3 end;
 	VectorCopy( origin, end );
 	end[2] -= 16000;
 	GameHost::trace( &tr, origin, nullptr, nullptr, end, passEntity, MASK_SOLID|MASK_WATER, false );
@@ -17,11 +17,11 @@ float Bots::heightAboveGround( const vec3_t origin, int passEntity )
 
 bool Bots::pathBlocked( const vec3_t origin, const vec3_t dir, float dist, int passEntity, trace_t& tr, float halfWidth )
 {
-	vec3_t end;
+	Vec3 end;
 	VectorMA( origin, dist, dir, end );
 	if( halfWidth > 0 )
 	{
-		vec3_t mins = { -halfWidth, -halfWidth, -halfWidth * 0.4f }, maxs = { halfWidth, halfWidth, halfWidth * 0.4f };
+		Vec3 mins = { -halfWidth, -halfWidth, -halfWidth * 0.4f }, maxs = { halfWidth, halfWidth, halfWidth * 0.4f };
 		GameHost::trace( &tr, origin, mins, maxs, end, passEntity, MASK_PLAYERSOLID|CONTENTS_BOTCLIP, false );
 		return tr.fraction < 1.0f;
 	}
@@ -32,7 +32,7 @@ bool Bots::pathBlocked( const vec3_t origin, const vec3_t dir, float dist, int p
 float Bots::ceilingAbove( const vec3_t origin, int passEntity )
 {
 	trace_t tr;
-	vec3_t end;
+	Vec3 end;
 	VectorCopy( origin, end );
 	end[2] += 8000;
 	GameHost::trace( &tr, origin, nullptr, nullptr, end, passEntity, MASK_PLAYERSOLID|CONTENTS_BOTCLIP, false );
@@ -71,7 +71,7 @@ void Bots::buildRoamPoints()
 		bool near = false;
 		for( const Vec3& point : roamPoints_ )
 		{
-			vec3_t p;
+			Vec3 p;
 			point.copyTo( p );
 			if( Distance( p, pad.spot ) < 1200 )
 				near = true;
@@ -86,13 +86,13 @@ void Bots::buildRoamPoints()
 		return;
 
 	Vec3 centre = sum * (1.0f / count);
-	vec3_t origin;
+	Vec3 origin;
 	centre.copyTo( origin );
 	origin[2] = top + 1500;
 	float reach[4];
 	for( int k = 0; k < 4; k++ )
 	{
-		vec3_t dir = { k == 0 ? 1.0f : k == 1 ? -1.0f : 0.0f, k == 2 ? 1.0f : k == 3 ? -1.0f : 0.0f, 0 };
+		Vec3 dir = { k == 0 ? 1.0f : k == 1 ? -1.0f : 0.0f, k == 2 ? 1.0f : k == 3 ? -1.0f : 0.0f, 0 };
 		trace_t tr;
 		pathBlocked( origin, dir, 40000, ENTITYNUM_NONE, tr );
 		reach[k] = tr.fraction * 40000.0f;
@@ -114,7 +114,7 @@ bool Bots::steerAround( GameEntity* ent, float wantYaw, float travel, float& yaw
 	constexpr std::array<float, 9> offsets = { 0.0f, 20.0f, -20.0f, 45.0f, -45.0f, 75.0f, -75.0f, 110.0f, -110.0f };
 	for( float offset : offsets )
 	{
-		vec3_t angles = { 0, wantYaw + offset, 0 }, dir;
+		Vec3 angles = { 0, wantYaw + offset, 0 }, dir;
 		AngleVectors( angles, dir, nullptr, nullptr );
 		trace_t tr;
 		if( !pathBlocked( ent->r.currentOrigin, dir, travel, ent->s.number, tr ) || tr.entityNum != ENTITYNUM_WORLD )
@@ -128,7 +128,7 @@ bool Bots::steerAround( GameEntity* ent, float wantYaw, float travel, float& yaw
 
 bool Bots::runwayAt( const vec3_t point, float* surface )
 {
-	vec3_t start, end;
+	Vec3 start, end;
 	VectorCopy( point, start );
 	start[2] += 60;
 	VectorCopy( point, end );
@@ -145,7 +145,7 @@ bool Bots::runwayAt( const vec3_t point, float* surface )
 
 float Bots::runwayRun( const vec3_t origin, float yaw, float maxDist )
 {
-	vec3_t angles = { 0, yaw, 0 }, dir, point;
+	Vec3 angles = { 0, yaw, 0 }, dir, point;
 	AngleVectors( angles, dir, nullptr, nullptr );
 	// wheels cannot cross a step between runway pieces, so the run ends where the surface height changes
 	constexpr float maxStep = 1.5f;
@@ -198,7 +198,7 @@ void Bots::buildPads()
 		pad.category = ent->ent_category_ ? ent->ent_category_ : CAT_ANY;
 		pad.team = ent->s.generic1;
 
-		vec3_t start, end;
+		Vec3 start, end;
 		VectorCopy( pad.center, start );
 		start[2] = ent->r.absmax[2] + 8;
 		VectorCopy( start, end );
@@ -211,7 +211,7 @@ void Bots::buildPads()
 			GameEntity* ground = tr.entityNum > ENTITYNUM_WORLD ? theLevel.getEntity( tr.entityNum ) : nullptr;
 			if( ground && ground->classname_ && strcmp( ground->classname_, "func_runway" ) == 0 )
 			{
-				vec3_t spot;
+				Vec3 spot;
 				VectorCopy( pad.center, spot );
 				spot[2] = pad.z;
 				float best = 0;
@@ -223,7 +223,7 @@ void Bots::buildPads()
 					if( ahead + behind > best )
 					{
 						best = ahead + behind;
-						vec3_t angles = { 0, yaw, 0 };
+						Vec3 angles = { 0, yaw, 0 };
 						AngleVectors( angles, pad.axis, nullptr, nullptr );
 						VectorMA( spot, (ahead - behind) * 0.5f, pad.axis, pad.center );
 					}
@@ -273,7 +273,7 @@ bool Bots::findHidePoint( GameEntity* ent, State& bot, GameEntity* threat, bool 
 		for( int step = 0; step < 12; step++ )
 		{
 			const float angle = step * (2.0f * std::numbers::pi_v<float> / 12.0f);
-			vec3_t point, down;
+			Vec3 point, down;
 			VectorCopy( ent->r.currentOrigin, point );
 			point[0] += cos( angle ) * radius;
 			point[1] += sin( angle ) * radius;
@@ -292,7 +292,7 @@ bool Bots::findHidePoint( GameEntity* ent, State& bot, GameEntity* threat, bool 
 				continue;
 			if( hullDown )
 			{
-				vec3_t top;
+				Vec3 top;
 				VectorCopy( point, top );
 				top[2] += availableVehicles[ent->client_->vehicle_].maxs[2] + 12;
 				if( !visible( ent, top, threat ) )
@@ -335,7 +335,7 @@ GameEntity* Bots::findStructure( GameEntity* ent, State& bot )
 		GameEntity* other = theLevel.getEntity( i );
 		if( !other || !other->inuse_ || other->s.eType != ET_EXPLOSIVE || !other->takedamage_ || other->health_ <= 0 )
 			continue;
-		vec3_t centre;
+		Vec3 centre;
 		for( int k = 0; k < 3; k++ )
 			centre[k] = (other->r.absmin[k] + other->r.absmax[k]) * 0.5f;
 		float score = Distance( ent->r.currentOrigin, centre );
@@ -438,7 +438,7 @@ void Bots::pickGoal( GameEntity* ent, State& bot, float radius )
 		{
 			for( int tries = 0; tries < 8; tries++ )
 			{
-				vec3_t probe;
+				Vec3 probe;
 				VectorCopy( bot.goal, probe );
 				probe[2] = ent->r.currentOrigin[2] - 6;
 				if( GameHost::pointContents( probe, ent->s.number ) & MASK_WATER )

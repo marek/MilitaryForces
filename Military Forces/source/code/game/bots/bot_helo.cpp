@@ -13,7 +13,7 @@ struct HeloTasks
 
 	static bool overPad( const Mind& c )
 	{
-		vec3_t dir;
+		Vec3 dir;
 		VectorSubtract( Bots::pads_[c.bot.pad].center, c.ent->r.currentOrigin, dir );
 		dir[2] = 0;
 		return VectorLength( dir ) < 120;
@@ -96,7 +96,7 @@ struct HeloTasks
 
 	static void flyTo( Mind& c, const vec3_t point )
 	{
-		vec3_t dir;
+		Vec3 dir;
 		VectorSubtract( point, c.ent->r.currentOrigin, dir );
 		dir[2] = 0;
 		c.dist = VectorLength( dir );
@@ -176,7 +176,7 @@ struct HeloTasks
 	static Status moveToCover( Mind& c )
 	{
 		faceEnemy( c );
-		vec3_t toCover;
+		Vec3 toCover;
 		VectorSubtract( c.bot.hidePoint, c.ent->r.currentOrigin, toCover );
 		toCover[2] = 0;
 		c.dist = VectorLength( toCover );
@@ -363,7 +363,7 @@ struct HeloTasks
 		if( !bot.following )
 			return Status::Success;
 		const Vec3 waypoint = bot.path[bot.pathIndex];
-		vec3_t point;
+		Vec3 point;
 		waypoint.copyTo( point );
 		c.headFor( point );
 		c.wantHeight = std::clamp( c.sense.height + (waypoint.z() - here.z()), 60.0f, 1500.0f );
@@ -399,7 +399,7 @@ struct HeloTasks
 	static float clearAlong( const Mind& c, const vec3_t dir, float reach )
 	{
 		constexpr float margin = 24.0f;
-		vec3_t mins, maxs, end;
+		Vec3 mins, maxs, end;
 		for( int k = 0; k < 3; k++ )
 		{
 			mins[k] = c.veh.mins[k] - margin;
@@ -475,7 +475,7 @@ struct HeloTasks
 			bool found = false;
 			for( float offset : { 0.0f, 45.0f, -45.0f, 90.0f, -90.0f, 135.0f, -135.0f, 180.0f } )
 			{
-				vec3_t angles = { 0, travelYaw + offset, 0 }, dir, rising;
+				Vec3 angles = { 0, travelYaw + offset, 0 }, dir, rising;
 				AngleVectors( angles, dir, nullptr, nullptr );
 				VectorCopy( dir, rising );
 				rising[2] = climbSlope;
@@ -518,10 +518,10 @@ struct HeloTasks
 		if( speed < 20.0f )
 		{
 			constexpr float nearby = 140.0f;
-			vec3_t away = { 0, 0, 0 };
+			Vec3 away = { 0, 0, 0 };
 			for( float around = 0.0f; around < 360.0f; around += 45.0f )
 			{
-				vec3_t angles = { 0, around, 0 }, dir;
+				Vec3 angles = { 0, around, 0 }, dir;
 				AngleVectors( angles, dir, nullptr, nullptr );
 				const float free = clearAlong( c, dir, nearby );
 				if( free < nearby )
@@ -529,7 +529,7 @@ struct HeloTasks
 			}
 			if( VectorNormalize( away ) > 0.05f )
 			{
-				vec3_t angles;
+				Vec3 angles;
 				vectoangles( away, angles );
 				travelYaw = angles[YAW];
 				speed = maxSpeed * 0.12f;

@@ -42,7 +42,7 @@ void GroundNav::reset()
 void GroundNav::build()
 {
 	built_ = true;
-	vec3_t worldMins, worldMaxs;
+	Vec3 worldMins, worldMaxs;
 	CollisionModel::modelBounds( 0, worldMins, worldMaxs );
 	mins_ = Vec3( worldMins );
 	cellSize_ = 160.0f;
@@ -98,7 +98,7 @@ GroundNav::Kind GroundNav::evaluate( int cell, float referenceHeight )
 
 	const int x = cell % nx_;
 	const int y = cell / nx_;
-	vec3_t top = { mins_.x() + (x + 0.5f) * cellSize_, mins_.y() + (y + 0.5f) * cellSize_, referenceHeight + 260.0f };
+	Vec3 top = { mins_.x() + (x + 0.5f) * cellSize_, mins_.y() + (y + 0.5f) * cellSize_, referenceHeight + 260.0f };
 	vec3_t bottom = { top[0], top[1], referenceHeight - 700.0f };
 	trace_t tr;
 	GameHost::trace( &tr, top, nullptr, nullptr, bottom, ENTITYNUM_NONE, MASK_SOLID|MASK_WATER, false );
@@ -123,7 +123,7 @@ bool GroundNav::passable( int from, int to, Kind wanted )
 	const unsigned char bit = static_cast<unsigned char>( 1 << ((dy + 1) * 3 + (dx + 1) - ((dy + 1) * 3 + (dx + 1) > 4 ? 1 : 0)) );
 	if( !(edgeKnown[from] & bit) )
 	{
-		vec3_t a, b, boxMins = { -28, -28, 0 }, boxMaxs = { 28, 28, 30 };
+		Vec3 a, b, boxMins = { -28, -28, 0 }, boxMaxs = { 28, 28, 30 };
 		centre( from ).copyTo( a );
 		centre( to ).copyTo( b );
 		a[2] += 30;
@@ -159,7 +159,7 @@ bool GroundNav::lineOpen( const Vec3& a, const Vec3& b, Kind wanted )
 			return false;
 		previous = cell;
 	}
-	vec3_t from, to, boxMins = { -28, -28, 0 }, boxMaxs = { 28, 28, 30 };
+	Vec3 from, to, boxMins = { -28, -28, 0 }, boxMaxs = { 28, 28, 30 };
 	a.copyTo( from );
 	b.copyTo( to );
 	from[2] += 30;

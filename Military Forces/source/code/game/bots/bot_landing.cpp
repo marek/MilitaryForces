@@ -19,11 +19,11 @@ namespace
 		float				lateral;
 		float				pos;
 		float				axisYaw;
-		vec3_t				travel;
+		Vec3				travel;
 
 		Geometry( const Bots::Pad& runway, const Bots::Mind& c ) : pad( runway ), stall( static_cast<float>( c.veh.stallspeed ) )
 		{
-			vec3_t rel, angles;
+			Vec3 rel, angles;
 			VectorSubtract( c.ent->r.currentOrigin, pad.center, rel );
 			along = rel[0] * pad.axis[0] + rel[1] * pad.axis[1];
 			side = rel[1] * pad.axis[0] - rel[0] * pad.axis[1];
@@ -78,7 +78,7 @@ Status LandingSteps::survey( Bots::Mind& c )
 	c.bot.landStart = theLevel.time_;
 	c.bot.landOutbound = false;
 
-	vec3_t rel;
+	Vec3 rel;
 	VectorSubtract( c.ent->r.currentOrigin, pad.center, rel );
 	const float along = rel[0] * pad.axis[0] + rel[1] * pad.axis[1];
 	c.bot.landDir = along > 0 ? -1.0f : 1.0f;
@@ -89,12 +89,12 @@ Status LandingSteps::survey( Bots::Mind& c )
 	for( int k = 0; k < 2; k++ )
 	{
 		const float dir = k ? 1.0f : -1.0f;
-		vec3_t from, out;
+		Vec3 from, out;
 		trace_t tr;
 		slope[k] = 0.15f;
 		for( float d = 75.0f; d <= 2500.0f; d += d < 1000.0f ? 75.0f : 250.0f )
 		{
-			vec3_t to, boxMins = { -60, -60, 0 }, boxMaxs = { 60, 60, 4 };
+			Vec3 to, boxMins = { -60, -60, 0 }, boxMaxs = { 60, 60, 4 };
 			VectorMA( pad.center, -dir * (pad.halfLength - 150.0f + d), pad.axis, from );
 			from[2] = pad.z + 600;
 			VectorCopy( from, to );
@@ -124,7 +124,7 @@ Status LandingSteps::survey( Bots::Mind& c )
 	c.bot.landSlope = slope[chosen];
 	c.bot.landRun = std::max( 900.0f, clear[chosen] - 300.0f );
 
-	vec3_t over;
+	Vec3 over;
 	VectorCopy( pad.center, over );
 	over[2] = pad.z + 40;
 	c.bot.landCeiling = Bots::ceilingAbove( over, ENTITYNUM_NONE );
@@ -132,7 +132,7 @@ Status LandingSteps::survey( Bots::Mind& c )
 	float bestLength = -1;
 	for( float offset : { 45.0f, -45.0f, 120.0f, -120.0f } )
 	{
-		vec3_t from, lane;
+		Vec3 from, lane;
 		trace_t tr;
 		VectorScale( pad.axis, c.bot.landDir, lane );
 		VectorMA( pad.center, -(pad.halfLength - 150.0f), lane, from );
@@ -172,7 +172,7 @@ Status LandingSteps::approach( Bots::Mind& c )
 
 	if( c.bot.landOutbound )
 	{
-		vec3_t outDir, wish = { 0, g.axisYaw + 180.0f, 0 };
+		Vec3 outDir, wish = { 0, g.axisYaw + 180.0f, 0 };
 		trace_t tr;
 		AngleVectors( wish, outDir, nullptr, nullptr );
 		if( g.before > wantRun * 0.95f || Bots::pathBlocked( c.ent->r.currentOrigin, outDir, radius * 2.5f, c.ent->s.number, tr ) )
@@ -183,7 +183,7 @@ Status LandingSteps::approach( Bots::Mind& c )
 
 	const float heading = c.bot.landOutbound ? g.axisYaw + 180.0f + (g.lateral >= 0 ? -20.0f : 20.0f) :
 		g.axisYaw - std::clamp( static_cast<float>( atan2( g.lateral, radius * 2.5f ) * 180.0 / std::numbers::pi_v<float> ), -60.0f, 60.0f );
-	vec3_t wish = { 0, heading, 0 }, dir;
+	Vec3 wish = { 0, heading, 0 }, dir;
 	AngleVectors( wish, dir, nullptr, nullptr );
 	VectorMA( c.ent->r.currentOrigin, 2500.0f, dir, c.bot.goal );
 	c.bot.goal[2] = c.bot.approachHeight;
@@ -214,13 +214,13 @@ Status LandingSteps::final( Bots::Mind& c )
 		return Status::Failure;
 	}
 
-	vec3_t target;
+	Vec3 target;
 	VectorMA( g.pad.center, g.pos + 900.0f, g.travel, target );
 	target[0] += -g.travel[1] * c.bot.landOffset;
 	target[1] += g.travel[0] * c.bot.landOffset;
 	c.headFor( target );
 
-	vec3_t under;
+	Vec3 under;
 	VectorCopy( c.ent->r.currentOrigin, under );
 	under[2] = g.pad.z;
 	const bool overRunway = Bots::runwayAt( under );
@@ -232,7 +232,7 @@ Status LandingSteps::final( Bots::Mind& c )
 		c.view[PITCH] = g.above > touch + 30 ? std::clamp( (g.above - touch) / 6.0f, 2.0f, 10.0f ) : 1.5f;
 	else
 	{
-		vec3_t nose;
+		Vec3 nose;
 		trace_t tr;
 		AngleVectors( c.ps.vehicleAngles, nose, nullptr, nullptr );
 		if( c.sense.height < (shortField ? 14.0f + touch : 60.0f) ||
@@ -276,7 +276,7 @@ Status LandingSteps::taxi( Bots::Mind& c )
 	c.bot.landPhase = Ground;
 	c.direct = true;
 
-	vec3_t toSpot;
+	Vec3 toSpot;
 	VectorSubtract( pad.spot, c.ent->r.currentOrigin, toSpot );
 	toSpot[2] = 0;
 	const float spotDist = VectorLength( toSpot );

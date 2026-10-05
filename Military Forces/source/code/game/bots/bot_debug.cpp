@@ -12,7 +12,7 @@ void Bots::logDeath( GameEntity* self, GameEntity* attacker, int meansOfDeath )
 	const State& bot = states_[self->s.number];
 
 	const playerState_t& ps = self->client_->ps_;
-	vec3_t forward, start;
+	Vec3 forward, start;
 	trace_t ahead;
 	AngleVectors( ps.vehicleAngles, forward, nullptr, nullptr );
 	VectorMA( self->r.currentOrigin, -100.0f, forward, start );
@@ -33,7 +33,7 @@ void Bots::logDeath( GameEntity* self, GameEntity* attacker, int meansOfDeath )
 			nearestNum = i;
 		}
 	}
-	vec3_t below;
+	Vec3 below;
 	VectorCopy( self->r.currentOrigin, below );
 	below[2] -= heightAboveGround( self->r.currentOrigin, self->s.number ) + 4;
 
