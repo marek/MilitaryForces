@@ -37,9 +37,10 @@ ControlUtils::ControlUtils()
 	bindings_.push_back( new Binding("+zoomin",			"Zoom In",						ID_ZOOMIN,			-1,				-1,			-1, -1) );
 	bindings_.push_back( new Binding("+zoomout",		"Zoom Out",						ID_ZOOMOUT,			-1,				-1,			-1, -1) );
 	bindings_.push_back( new Binding("contact_tower",	"Contact Tower",				ID_CONTACTTOWER,	K_BACKSPACE,	-1,			-1, -1) );
-	bindings_.push_back( new Binding("radar",			"RADAR on/off",					ID_RADAR,			'r',			-1,			-1, -1) );
+	bindings_.push_back( new Binding("radar",			"RADAR on/off",					ID_RADAR,			-1,				-1,			-1, -1) );
 	bindings_.push_back( new Binding("extinfo",			"Ext.Info on/off",				ID_EXTINFO,			'-',			-1,			-1, -1) );
-	bindings_.push_back( new Binding("radarrange",		"Toggle RADAR Range",			ID_RADARRANGE,		'=',			-1,			-1, -1) );
+	// one key for both radar jobs: a tap steps the range, holding it switches the radar
+	bindings_.push_back( new Binding("+hold radarrange radar",	"RADAR: tap range, hold on/off",	ID_RADARRANGE,		'r',			-1,			-1, -1) );
 	bindings_.push_back( new Binding("mfd1_mode",		"Cycle MFD1 Mode",				ID_CYCLEMFD1,		-1,				-1,			-1, -1) );
 	bindings_.push_back( new Binding("mfd2_mode",		"Cycle MFD2 Mode",				ID_CYCLEMFD2,		-1,				-1,			-1, -1) );
 	bindings_.push_back( new Binding("eject",			"Eject",						ID_EJECT,			-1,				'o',		-1,	-1) );
