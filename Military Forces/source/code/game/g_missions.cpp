@@ -57,7 +57,9 @@ bool Game::loadOverviewAndEntities( char *filename,
 	static char			inbuffer[MAX_MISSION_TEXT];
 
 	// open the file, fill it into buffer and close it, afterwards parse it
-	len = FileSystem::fOpenFileByMode( filename, &f, FS_READ );
+	const OpenFile file( filename, FS_READ );
+	f = file.handle();
+	len = file.length();
 	if ( !f )
 	{
 		Common::printf( S_COLOR_RED "file not found: %s\n", filename );
@@ -66,13 +68,11 @@ bool Game::loadOverviewAndEntities( char *filename,
 	if ( len >= MAX_MISSION_TEXT )
 	{
 		Common::printf( S_COLOR_RED "file too large: %s is %i, max allowed is %i\n", filename, len, MAX_MISSION_TEXT );
-		FileSystem::fCloseFile( f );
 		return false;
 	}
 
 	FileSystem::read( inbuffer, len, f );
 	inbuffer[len] = 0;
-	FileSystem::fCloseFile( f );
 
 	Common::printf( S_COLOR_GREEN "Successfully opened mission script: %s\n", filename );
 

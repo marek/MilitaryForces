@@ -36,18 +36,18 @@ animation_t * CGame::parseLQMAnimationFile( const char *filename ) {
 	animations = reinterpret_cast<animation_t *>(&availableLQMAnimations.anim[availableLQMAnimations.numAnimations]);
 
 	// load the file
-	len = FileSystem::fOpenFileByMode( filename, &f, FS_READ );
+	const OpenFile file( filename, FS_READ );
+	f = file.handle();
+	len = file.length();
 	if ( len <= 0 ) {
 		return nullptr;
 	}
 	if ( len >= sizeof( text ) - 1 ) {
 		CGame::printf( "File %s too long\n", filename );
-		FileSystem::fCloseFile( f );
 		return nullptr;
 	}
 	FileSystem::read( text, len, f );
 	text[len] = 0;
-	FileSystem::fCloseFile( f );
 
 	// parse the text
 	text_p = text;

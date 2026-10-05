@@ -93,20 +93,20 @@ static void UI_LoadArenasFromFile( char *filename ) {
 	fileHandle_t	f;
 	char			buf[MAX_ARENAS_TEXT];
 
-	len = FileSystem::fOpenFileByMode( filename, &f, FS_READ );
+	const OpenFile file( filename, FS_READ );
+	f = file.handle();
+	len = file.length();
 	if ( !f ) {
 		Common::printf( S_COLOR_RED "file not found: %s\n", filename );
 		return;
 	}
 	if ( len >= MAX_ARENAS_TEXT ) {
 		Common::printf( S_COLOR_RED "file too large: %s is %i, max allowed is %i", filename, len, MAX_ARENAS_TEXT );
-		FileSystem::fCloseFile( f );
 		return;
 	}
 
 	FileSystem::read( buf, len, f );
 	buf[len] = 0;
-	FileSystem::fCloseFile( f );
 
 	ui_numArenas += Menus::parseInfos( buf, MAX_ARENAS - ui_numArenas, &ui_arenaInfos[ui_numArenas] );
 }

@@ -719,20 +719,20 @@ static char *GetMenuBuffer(const char *filename) {
 	fileHandle_t	f;
 	static char buf[MAX_MENUFILE];
 
-	len = FileSystem::fOpenFileByMode( filename, &f, FS_READ );
+	const OpenFile file( filename, FS_READ );
+	f = file.handle();
+	len = file.length();
 	if ( !f ) {
 		Common::printf( S_COLOR_RED "menu file not found: %s, using default\n", filename );
 		return defaultMenu;
 	}
 	if ( len >= MAX_MENUFILE ) {
 		Common::printf( S_COLOR_RED "menu file too large: %s is %i, max allowed is %i", filename, len, MAX_MENUFILE );
-		FileSystem::fCloseFile( f );
 		return defaultMenu;
 	}
 
 	FileSystem::read( buf, len, f );
 	buf[len] = 0;
-	FileSystem::fCloseFile( f );
 	//COM_Compress(buf);
   return buf;
 
@@ -3424,7 +3424,9 @@ static void UI_InitialiseUI( )
 	uiInfo.pCreditsData = nullptr;
 
 	// open file
-	fileSize = FileSystem::fOpenFileByMode( "ui\\credits.txt", &creditsFile, FS_READ );	
+	const OpenFile file( "ui\\credits.txt", FS_READ );
+	creditsFile = file.handle();
+	fileSize = file.length();
 	if( fileSize )
 	{
 //		int index = 0;
@@ -3456,7 +3458,6 @@ static void UI_InitialiseUI( )
 		while( pLineEnd && pCredits < (static_cast<char *>(uiInfo.pCreditsData)+fileSize) );
 
 		// close file
-		FileSystem::fCloseFile( creditsFile );
 	}
 
 

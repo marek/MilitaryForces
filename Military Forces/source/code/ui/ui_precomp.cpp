@@ -273,7 +273,9 @@ UI_PrecompilerTools::loadScriptFile( const char *filename )
 		Com_sprintf(pathname, sizeof(pathname), "%s/%s", basefolder_.c_str(), filename);
 	else
 		Com_sprintf(pathname, sizeof(pathname), "%s", filename);
-	length = FileSystem::fOpenFileByMode( pathname, &fp, FS_READ );
+	const OpenFile file( pathname, FS_READ );
+	fp = file.handle();
+	length = file.length();
 	if (!fp) return nullptr;
 
 	buffer = UI_Memtools::getClearedMemory(sizeof(Script) + length + 1);
@@ -298,7 +300,6 @@ UI_PrecompilerTools::loadScriptFile( const char *filename )
 	setScriptPunctuations(script, nullptr);
 	//
 	FileSystem::read(script->buffer_, length, fp);
-	FileSystem::fCloseFile(fp);
 	//
 	script->length_ = COM_Compress(script->buffer_);
 
