@@ -9,9 +9,7 @@
 **********************************************************************/
 #include "ui_local.h"
 
-static bool		m_entersound;		// after a frame, so caching won't disrupt the sound
 
-static bool newUI = false;
 
 
 /*

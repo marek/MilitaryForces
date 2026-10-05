@@ -43,8 +43,6 @@ constexpr int MIN_DEDICATED_COMHUNKMEGS = 1;
 #define DEF_COMHUNKMEGS_S	XSTRING(DEF_COMHUNKMEGS)
 #define DEF_COMZONEMEGS_S	XSTRING(DEF_COMZONEMEGS)
 
-static int		com_argc;
-static char	*com_argv[MAX_NUM_ARGVS+1];
 
 jmp_buf abortframe;		// an ERR_DROP occurred, exit the entire frame
 

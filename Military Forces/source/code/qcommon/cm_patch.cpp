@@ -40,8 +40,6 @@ properly.
 */
 
 static int	c_totalPatchBlocks;
-static int	c_totalPatchSurfaces;
-static int	c_totalPatchEdges;
 
 static const patchCollide_t	*debugPatchCollide;
 static const facet_t		*debugFacet;

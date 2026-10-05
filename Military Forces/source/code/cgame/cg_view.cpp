@@ -56,7 +56,6 @@ CGame::offsetVehicleView
 
 ===============
 */
-constexpr int FOCUS_DISTANCE = 512;
 //#define	_VIEW_SETTING_DISPLAY
 
 // MFQ3

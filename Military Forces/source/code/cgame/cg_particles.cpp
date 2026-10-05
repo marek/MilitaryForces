@@ -66,10 +66,6 @@ int CGame::addParticleSystem(particleWorld_t * w, particleSystem_t * s)
 	return i;
 }
 
-static void CG_KillParticleSystem(particleWorld_t * w, int index)
-{
-	w->systems[index].dead = true;
-}
 
 int CGame::addParticleEmitter(particleWorld_t * w, particleEmitter_t * e)
 {
@@ -89,10 +85,6 @@ int CGame::addParticleEmitter(particleWorld_t * w, particleEmitter_t * e)
 	return i;
 }
 
-static void CG_KillParticleEmitter(particleWorld_t * w, int index)
-{
-	w->emitters[index].dead = true;
-}
 
 // attract particle a to particle b
 static void CG_AttractParticles(particle_t * a, particle_t * b)

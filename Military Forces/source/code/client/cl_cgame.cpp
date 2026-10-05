@@ -87,26 +87,6 @@ int ClientHost::getCurrentCmdNumber()
 }
 
 
-/*
-====================
-CL_GetParseEntityState
-====================
-*/
-static bool	CL_GetParseEntityState( int parseEntityNumber, entityState_t *state ) {
-	// can't return anything that hasn't been parsed yet
-	if ( parseEntityNumber >= cl.parseEntitiesNum ) {
-		Common::error( ERR_DROP, "CL_GetParseEntityState: %i >= %i",
-			parseEntityNumber, cl.parseEntitiesNum );
-	}
-
-	// can't return anything that has been overwritten in the circular buffer
-	if ( parseEntityNumber <= cl.parseEntitiesNum - MAX_PARSE_ENTITIES ) {
-		return false;
-	}
-
-	*state = cl.parseEntities[ parseEntityNumber & ( MAX_PARSE_ENTITIES - 1 ) ];
-	return true;
-}
 
 /*
 ====================
@@ -192,15 +172,6 @@ ClientHost::addCgameCommand
 void ClientHost::addCgameCommand( const char *cmdName ) 
 {
 	CommandSystem::addCommand( cmdName, nullptr );
-}
-
-/*
-=====================
-CL_CgameError
-=====================
-*/
-static void CL_CgameError( const char *string ) {
-	Common::error( ERR_DROP, "%s", string );
 }
 
 

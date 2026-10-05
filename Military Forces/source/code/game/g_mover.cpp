@@ -1173,8 +1173,6 @@ TRAIN
 */
 
 
-constexpr int TRAIN_START_ON = 1;
-constexpr int TRAIN_TOGGLE = 2;
 constexpr int TRAIN_BLOCK_STOPS = 4;
 
 /*

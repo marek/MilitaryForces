@@ -448,41 +448,9 @@ int LAN_CompareServers( int source, int sortKey, int sortDir, int s1, int s2 ) {
 	return res;
 }
 
-/*
-====================
-LAN_GetPingQueueCount
-====================
-*/
-static int LAN_GetPingQueueCount( ) {
-	return (Client::getPingQueueCount());
-}
 
-/*
-====================
-LAN_ClearPing
-====================
-*/
-static void LAN_ClearPing( int n ) {
-	Client::clearPing( n );
-}
 
-/*
-====================
-LAN_GetPing
-====================
-*/
-static void LAN_GetPing( int n, char *buf, int buflen, int *pingtime ) {
-	Client::getPing( n, buf, buflen, pingtime );
-}
 
-/*
-====================
-LAN_GetPingInfo
-====================
-*/
-static void LAN_GetPingInfo( int n, char *buf, int buflen ) {
-	Client::getPingInfo( n, buf, buflen );
-}
 
 /*
 ====================
@@ -589,25 +557,6 @@ CL_GetGlConfig
 //	*config = cls.glconfig;
 //}
 
-/*
-====================
-GetClipboardData
-====================
-*/
-static void GetClipboardData( char *buf, int buflen ) {
-	char	*cbd;
-
-	cbd = System::getClipboardData();
-
-	if ( !cbd ) {
-		*buf = 0;
-		return;
-	}
-
-	Q_strncpyz( buf, cbd, buflen );
-
-	Zone::free( cbd );
-}
 
 /*
 ====================

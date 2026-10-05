@@ -266,8 +266,7 @@ static void IN_Button13Down() {IN_KeyDown(&in_buttons[13]);}
 static void IN_Button13Up() {IN_KeyUp(&in_buttons[13]);}
 static void IN_Button14Down() {IN_KeyDown(&in_buttons[14]);}
 static void IN_Button14Up() {IN_KeyUp(&in_buttons[14]);}
-static void IN_Button15Down() {IN_KeyDown(&in_buttons[15]);}
-static void IN_Button15Up() {IN_KeyUp(&in_buttons[15]);}
+
 
 void IN_CenterView () {
 	cl.viewangles[PITCH] = -SHORT2ANGLE(cl.snap.ps.delta_angles[PITCH]);

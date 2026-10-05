@@ -32,7 +32,6 @@ namespace
 constexpr int RESPAWN_HEALTH = 35;
 constexpr int RESPAWN_AMMO = 40;
 constexpr int RESPAWN_MEGAHEALTH = 35; //120
-constexpr int RESPAWN_POWERUP = 120;
 constexpr int RESPAWN_FUEL = 35;
 
 //======================================================================

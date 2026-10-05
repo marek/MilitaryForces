@@ -230,53 +230,6 @@ void ClientEntity::trailItem( qhandle_t hModel ) {
 
 
 
-/*
-=================
-CG_LightVerts
-=================
-*/
-static int CG_LightVerts( vec3_t normal, int numVerts, polyVert_t *verts )
-{
-	int				i, j;
-	float			incoming;
-	vec3_t			ambientLight;
-	vec3_t			lightDir;
-	vec3_t			directedLight;
-
-	refExport.LightForPoint( verts[0].xyz, ambientLight, directedLight, lightDir );
-
-	for (i = 0; i < numVerts; i++) {
-		incoming = DotProduct (normal, lightDir);
-		if ( incoming <= 0 ) {
-			verts[i].modulate[0] = ambientLight[0];
-			verts[i].modulate[1] = ambientLight[1];
-			verts[i].modulate[2] = ambientLight[2];
-			verts[i].modulate[3] = 255;
-			continue;
-		} 
-		j = ( ambientLight[0] + incoming * directedLight[0] );
-		if ( j > 255 ) {
-			j = 255;
-		}
-		verts[i].modulate[0] = j;
-
-		j = ( ambientLight[1] + incoming * directedLight[1] );
-		if ( j > 255 ) {
-			j = 255;
-		}
-		verts[i].modulate[1] = j;
-
-		j = ( ambientLight[2] + incoming * directedLight[2] );
-		if ( j > 255 ) {
-			j = 255;
-		}
-		verts[i].modulate[2] = j;
-
-		verts[i].modulate[3] = 255;
-	}
-	return true;
-}
-
 
 //=====================================================================
 

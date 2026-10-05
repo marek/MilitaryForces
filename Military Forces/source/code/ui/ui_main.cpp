@@ -85,7 +85,6 @@ static const char *teamArenaGameNames[] = {
 	"Team Tournament",
 };
 
-static int const numTeamArenaGameNames = sizeof(teamArenaGameNames) / sizeof(const char*);
 
 
 static const int numServerFilters = sizeof(serverFilters) / sizeof(serverFilter_t);
@@ -97,7 +96,6 @@ static const char *sortKeys[] = {
 	"Game Type",
 	"Ping Time"
 };
-static const int numSortKeys = sizeof(sortKeys) / sizeof(const char*);
 
 static char* netnames[] = {
 	"???",
@@ -1363,7 +1361,6 @@ static void UI_DrawMapCinematic(rectDef_t *rect, float scale, const vec4_t color
 }
 
 static bool updateModel = true;
-static bool q3Model = false;
 
 static void UI_DrawNetSource(rectDef_t *rect, float scale, const vec4_t color, int textStyle) {
 	if (ui_netSource.integer < 0 || ui_netSource.integer > uiInfo.numGameTypes) {

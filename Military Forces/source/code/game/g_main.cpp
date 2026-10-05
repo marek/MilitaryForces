@@ -551,25 +551,6 @@ static void RemoveTournamentLoser()
 	SetTeam( theLevel.getEntity(clientNum), "s" );
 }
 
-/*
-=======================
-RemoveTournamentWinner
-=======================
-*/
-static void RemoveTournamentWinner() 
-{
-	if( theLevel.numPlayingClients_ != 2 ) 
-		return;
-
-	int clientNum = theLevel.sortedClients_[0];
-
-	if( theLevel.getClient(clientNum)->pers_.connected_ != GameClient::ClientPersistant::CON_CONNECTED ) 
-		return;
-
-	// make them a spectator
-	//SetTeam( &g_entities[ clientNum ], "s" );
-	SetTeam( theLevel.getEntity(clientNum), "s" );
-}
 
 /*
 =======================
