@@ -232,7 +232,7 @@ to the clients -- only the fields that differ from the
 baseline will be transmitted
 ================
 */
-void SV_CreateBaseline() 
+static void SV_CreateBaseline() 
 {
 	EntityBase *svent;
 	size_t		entnum;	
@@ -260,7 +260,7 @@ SV_BoundMaxClients
 
 ===============
 */
-void SV_BoundMaxClients( int minimum ) 
+static void SV_BoundMaxClients( int minimum ) 
 {
 	// get the current maxclients value
 	CvarSystem::get( "sv_maxclients", "8", 0 );
@@ -288,7 +288,7 @@ NOT cause this to be called, unless the game is exited to
 the menu system first.
 ===============
 */
-void SV_Startup() 
+static void SV_Startup() 
 {
 	if( theSVS.initialized_ ) 
 		Common::error( ERR_FATAL, "SV_Startup: svs.initialized" );
@@ -352,7 +352,7 @@ void ServerMain::changeMaxClients()
 SV_ClearServer
 ================
 */
-void SV_ClearServer() 
+static void SV_ClearServer() 
 {
 	int i;
 

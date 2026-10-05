@@ -835,7 +835,7 @@ SV_StopDownload_f
 Abort a download if in progress
 ==================
 */
-void SV_StopDownload_f( SV_Client *cl ) 
+static void SV_StopDownload_f( SV_Client *cl ) 
 {
 	if( *cl->downloadName_ )
 		Common::dPrintf( "clientDownload: %d : file \"%s\" aborted\n", cl->clientNum_, cl->downloadName_ );
@@ -850,7 +850,7 @@ SV_DoneDownload_f
 Downloads are finished
 ==================
 */
-void SV_DoneDownload_f( SV_Client *cl ) 
+static void SV_DoneDownload_f( SV_Client *cl ) 
 {
 	if ( cl->state_ == SV_Client::CS_ACTIVE )
 		return;
@@ -868,7 +868,7 @@ The argument will be the last acknowledged block from the client, it should be
 the same as cl->downloadClientBlock
 ==================
 */
-void SV_NextDownload_f( SV_Client *cl )
+static void SV_NextDownload_f( SV_Client *cl )
 {
 	int block = atoi( CommandSystem::argv(1) );
 
@@ -899,7 +899,7 @@ void SV_NextDownload_f( SV_Client *cl )
 SV_BeginDownload_f
 ==================
 */
-void SV_BeginDownload_f( SV_Client *cl ) 
+static void SV_BeginDownload_f( SV_Client *cl ) 
 {
 
 	// Kill any existing download

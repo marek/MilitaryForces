@@ -89,7 +89,7 @@ SV_ExpandNewlines
 Converts newlines to "\n" so a line prints nicer
 ===============
 */
-char	*SV_ExpandNewlines( char *in ) {
+static char	*SV_ExpandNewlines( char *in ) {
 	static	char	string[1024];
 	int		l;
 
@@ -256,7 +256,7 @@ but not on every player enter or exit.
 */
 constexpr int HEARTBEAT_MSEC = 300*1000;
 constexpr int MASTERDNS_MSEC = 24*60*60*1000;
-void SV_MasterHeartbeat(const char *message)
+static void SV_MasterHeartbeat(const char *message)
 {
 	static netadr_t	adr[MAX_MASTER_SERVERS][2]; // [2] for v4 and v6 address for the same address string.
 	int			i;
@@ -700,7 +700,7 @@ SVC_FlushRedirect
 
 ================
 */
-void SV_FlushRedirect( char *outputbuf ) 
+static void SV_FlushRedirect( char *outputbuf ) 
 {
 	Network::outOfBandPrint( NS_SERVER, theSVS.redirectAddress_, "print\n%s", outputbuf );
 }
@@ -795,7 +795,7 @@ Clients that are in the game can still send
 connectionless packets.
 =================
 */
-void SV_ConnectionlessPacket( netadr_t from, Message *msg ) {
+static void SV_ConnectionlessPacket( netadr_t from, Message *msg ) {
 	char	*s;
 	char	*c;
 
@@ -906,7 +906,7 @@ SV_CalcPings
 Updates the cl->ping variables
 ===================
 */
-void SV_CalcPings() 
+static void SV_CalcPings() 
 {
 	int			total, count;
 	int			delta;
@@ -978,7 +978,7 @@ for a few seconds to make sure any final reliable message gets resent
 if necessary
 ==================
 */
-void SV_CheckTimeouts() 
+static void SV_CheckTimeouts() 
 {
 	int droppoint = theSVS.time_ - 1000 * sv_timeout->integer;
 	int zombiepoint = theSVS.time_ - 1000 * sv_zombietime->integer;
@@ -1024,7 +1024,7 @@ void SV_CheckTimeouts()
 SV_CheckPaused
 ==================
 */
-bool SV_CheckPaused() 
+static bool SV_CheckPaused() 
 {
 	if ( !cl_paused->integer ) 
 		return false;
