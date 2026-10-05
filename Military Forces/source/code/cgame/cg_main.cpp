@@ -907,10 +907,10 @@ void CGame::registerGraphics( ) {
 	cgs.media.missileTrail2Shader = refExport.RegisterShader( "missileTrail2" );
 	cgs.media.nukePuffShader = refExport.RegisterShader( "nukePuff" );
 
-	// disable for now for faster loading and less mem use
-	//for( i = 0; i < NUKE_CLOUD_FRAMES; i++) {
-	//	cgs.media.nukeCloud[i] = refExport.RegisterShader( va("nukecloud%d", i) );
-	//}
+	// the mushroom cloud's frames (without them the cloud model draws with no texture at all)
+	for( int frame = 0; frame < NUKE_CLOUD_FRAMES; frame++ ) {
+		cgs.media.nukeCloud[frame] = refExport.RegisterShader( va("nukecloud%d", frame) );
+	}
 	
 	cgs.media.selectShader = refExport.RegisterShader( "gfx/2d/select" );
 

@@ -623,11 +623,11 @@ static void CG_DevStatus_f( ) {
 	if( !cg.snap || !CvarSystem::variableIntegerValue( "sv_cheats" ) ) 
 		return;
 	const playerState_t *ps = &cg.snap->ps;
-	Common::printf( "DEVSTATUS veh %d health %d fuel %d ammo %d %d %d %d %d %d %d %d onoff %x reveal %d time %d org %.1f %.1f %.1f ground %d weapon %d %d lock %d target %d anim %d sink %.0f\n",
+	Common::printf( "DEVSTATUS veh %d health %d fuel %d ammo %d %d %d %d %d %d %d %d onoff %x reveal %d time %d org %.1f %.1f %.1f ground %d weapon %d %d lock %d target %d anim %d sink %.0f speed %d throttle %d geartimers %d %d\n",
 		cgs.clientinfo[ps->clientNum].vehicle, ps->stats[STAT_HEALTH], ps->stats[STAT_FUEL],
 		ps->ammo[0], ps->ammo[1], ps->ammo[2], ps->ammo[3], ps->ammo[4], ps->ammo[5], ps->ammo[6], ps->ammo[7],
 		ps->ONOFF, ps->timers[TIMER_REVEAL], cg.snap->serverTime, ps->origin[0], ps->origin[1], ps->origin[2], ps->groundEntityNum, ps->weaponNum, ps->weaponIndex,
-		ps->stats[STAT_LOCKINFO], ps->tracktarget, ps->vehicleAnim, -ps->velocity[2] );
+		ps->stats[STAT_LOCKINFO], ps->tracktarget, ps->vehicleAnim, -ps->velocity[2], ps->speed, ps->throttle, ps->timers[TIMER_GEAR], ps->timers[TIMER_GEARANIM] );
 }
 
 static consoleCommand_t	commands[] = {

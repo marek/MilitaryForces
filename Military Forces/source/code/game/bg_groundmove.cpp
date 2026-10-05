@@ -188,8 +188,8 @@ void PlayerMove::adjustToTerrain( )
 				pm->ps->clientNum, 
 				MASK_SOLID,
 				false);
-	// tracks and wheels rest on the surface: just enough clearance to keep the lowest point out of it
-	constexpr float groundClearance = 0.1f;
+	// one unit of clearance: with less, wheels and tracks cut into uneven ground
+	constexpr float groundClearance = 1.0f;
 	height = tr.endpos[2] - availableVehicles[pm->vehicle].mins[2] + groundClearance;
 
 	if( tr.fraction < 1.0f ) {

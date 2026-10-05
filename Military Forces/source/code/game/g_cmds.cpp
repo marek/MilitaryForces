@@ -1288,7 +1288,9 @@ void Cmd_CallVote_f( GameEntity *ent )
 
 	for( i = 1 ; i <= theLevel.maxclients_ ; i++ ) 
 	{
-		theLevel.getClient(i)->ps_.eFlags &= ~EF_VOTED;
+		// empty slots have no client
+		if( GameClient* voter = theLevel.getClient(i) )
+			voter->ps_.eFlags &= ~EF_VOTED;
 	}
 	ent->client_->ps_.eFlags |= EF_VOTED;
 
