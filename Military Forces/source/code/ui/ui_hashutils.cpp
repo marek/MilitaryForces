@@ -5,99 +5,99 @@
 
 UI_HashUtils::UI_HashUtils()
 {
-	addItemKeyword( new ItemKeyword_Name );
-	addItemKeyword( new ItemKeyword_Text );
-	addItemKeyword( new ItemKeyword_Group );
-	addItemKeyword( new ItemKeyword_Asset_Model );
-	addItemKeyword( new ItemKeyword_Asset_Shader );
-	addItemKeyword( new ItemKeyword_Model_Origin );
-	addItemKeyword( new ItemKeyword_Model_fovX );
-	addItemKeyword( new ItemKeyword_Model_fovY );
-	addItemKeyword( new ItemKeyword_Model_Rotation );
-	addItemKeyword( new ItemKeyword_Model_Angle );
-	addItemKeyword( new ItemKeyword_Rect );
-	addItemKeyword( new ItemKeyword_Style );
-	addItemKeyword( new ItemKeyword_Decoration );
-	addItemKeyword( new ItemKeyword_NotSelectable );
-	addItemKeyword( new ItemKeyword_Wrapped );
-	addItemKeyword( new ItemKeyword_AutoWrapped );
-	addItemKeyword( new ItemKeyword_HorizontalScroll );
-	addItemKeyword( new ItemKeyword_Type );
-	addItemKeyword( new ItemKeyword_ElementWidth );
-	addItemKeyword( new ItemKeyword_ElementHeight );
-	addItemKeyword( new ItemKeyword_Feeder );
-	addItemKeyword( new ItemKeyword_ElementType );
-	addItemKeyword( new ItemKeyword_Columns );
-	addItemKeyword( new ItemKeyword_Border );
-	addItemKeyword( new ItemKeyword_BorderSize );
-	addItemKeyword( new ItemKeyword_Visible );
-	addItemKeyword( new ItemKeyword_Ownerdraw );
-	addItemKeyword( new ItemKeyword_Align );
-	addItemKeyword( new ItemKeyword_TextAlign );
-	addItemKeyword( new ItemKeyword_TextAlignX );
-	addItemKeyword( new ItemKeyword_TextAlignY );
-	addItemKeyword( new ItemKeyword_TextScale );
-	addItemKeyword( new ItemKeyword_TextStyle );
-	addItemKeyword( new ItemKeyword_BackColor );
-	addItemKeyword( new ItemKeyword_ForeColor );
-	addItemKeyword( new ItemKeyword_BorderColor );
-	addItemKeyword( new ItemKeyword_OutlineColor );
-	addItemKeyword( new ItemKeyword_Background );
-	addItemKeyword( new ItemKeyword_OnFocus );
-	addItemKeyword( new ItemKeyword_LeaveFocus );
-	addItemKeyword( new ItemKeyword_MouseEnter );
-	addItemKeyword( new ItemKeyword_MouseExit );
-	addItemKeyword( new ItemKeyword_MouseEnterText );
-	addItemKeyword( new ItemKeyword_MouseExitText );
-	addItemKeyword( new ItemKeyword_Action );
-	addItemKeyword( new ItemKeyword_Special );
-	addItemKeyword( new ItemKeyword_Cvar );
-	addItemKeyword( new ItemKeyword_MaxChars );
-	addItemKeyword( new ItemKeyword_MaxPaintChars );
-	addItemKeyword( new ItemKeyword_FocusSound );
-	addItemKeyword( new ItemKeyword_CvarFloat );
-	addItemKeyword( new ItemKeyword_CvarStrList );
-	addItemKeyword( new ItemKeyword_CvarFloatList );
-	addItemKeyword( new ItemKeyword_AddColorRange );
-	addItemKeyword( new ItemKeyword_OwnerdrawFlag );
-	addItemKeyword( new ItemKeyword_EnableCvar );
-	addItemKeyword( new ItemKeyword_CvarTest );
-	addItemKeyword( new ItemKeyword_DisableCvar );
-	addItemKeyword( new ItemKeyword_ShowCvar );
-	addItemKeyword( new ItemKeyword_HideCvar );
-	addItemKeyword( new ItemKeyword_Cinematic );
-	addItemKeyword( new ItemKeyword_DoubleClick );
+	addItemKeyword( std::make_unique<ItemKeyword_Name>() );
+	addItemKeyword( std::make_unique<ItemKeyword_Text>() );
+	addItemKeyword( std::make_unique<ItemKeyword_Group>() );
+	addItemKeyword( std::make_unique<ItemKeyword_Asset_Model>() );
+	addItemKeyword( std::make_unique<ItemKeyword_Asset_Shader>() );
+	addItemKeyword( std::make_unique<ItemKeyword_Model_Origin>() );
+	addItemKeyword( std::make_unique<ItemKeyword_Model_fovX>() );
+	addItemKeyword( std::make_unique<ItemKeyword_Model_fovY>() );
+	addItemKeyword( std::make_unique<ItemKeyword_Model_Rotation>() );
+	addItemKeyword( std::make_unique<ItemKeyword_Model_Angle>() );
+	addItemKeyword( std::make_unique<ItemKeyword_Rect>() );
+	addItemKeyword( std::make_unique<ItemKeyword_Style>() );
+	addItemKeyword( std::make_unique<ItemKeyword_Decoration>() );
+	addItemKeyword( std::make_unique<ItemKeyword_NotSelectable>() );
+	addItemKeyword( std::make_unique<ItemKeyword_Wrapped>() );
+	addItemKeyword( std::make_unique<ItemKeyword_AutoWrapped>() );
+	addItemKeyword( std::make_unique<ItemKeyword_HorizontalScroll>() );
+	addItemKeyword( std::make_unique<ItemKeyword_Type>() );
+	addItemKeyword( std::make_unique<ItemKeyword_ElementWidth>() );
+	addItemKeyword( std::make_unique<ItemKeyword_ElementHeight>() );
+	addItemKeyword( std::make_unique<ItemKeyword_Feeder>() );
+	addItemKeyword( std::make_unique<ItemKeyword_ElementType>() );
+	addItemKeyword( std::make_unique<ItemKeyword_Columns>() );
+	addItemKeyword( std::make_unique<ItemKeyword_Border>() );
+	addItemKeyword( std::make_unique<ItemKeyword_BorderSize>() );
+	addItemKeyword( std::make_unique<ItemKeyword_Visible>() );
+	addItemKeyword( std::make_unique<ItemKeyword_Ownerdraw>() );
+	addItemKeyword( std::make_unique<ItemKeyword_Align>() );
+	addItemKeyword( std::make_unique<ItemKeyword_TextAlign>() );
+	addItemKeyword( std::make_unique<ItemKeyword_TextAlignX>() );
+	addItemKeyword( std::make_unique<ItemKeyword_TextAlignY>() );
+	addItemKeyword( std::make_unique<ItemKeyword_TextScale>() );
+	addItemKeyword( std::make_unique<ItemKeyword_TextStyle>() );
+	addItemKeyword( std::make_unique<ItemKeyword_BackColor>() );
+	addItemKeyword( std::make_unique<ItemKeyword_ForeColor>() );
+	addItemKeyword( std::make_unique<ItemKeyword_BorderColor>() );
+	addItemKeyword( std::make_unique<ItemKeyword_OutlineColor>() );
+	addItemKeyword( std::make_unique<ItemKeyword_Background>() );
+	addItemKeyword( std::make_unique<ItemKeyword_OnFocus>() );
+	addItemKeyword( std::make_unique<ItemKeyword_LeaveFocus>() );
+	addItemKeyword( std::make_unique<ItemKeyword_MouseEnter>() );
+	addItemKeyword( std::make_unique<ItemKeyword_MouseExit>() );
+	addItemKeyword( std::make_unique<ItemKeyword_MouseEnterText>() );
+	addItemKeyword( std::make_unique<ItemKeyword_MouseExitText>() );
+	addItemKeyword( std::make_unique<ItemKeyword_Action>() );
+	addItemKeyword( std::make_unique<ItemKeyword_Special>() );
+	addItemKeyword( std::make_unique<ItemKeyword_Cvar>() );
+	addItemKeyword( std::make_unique<ItemKeyword_MaxChars>() );
+	addItemKeyword( std::make_unique<ItemKeyword_MaxPaintChars>() );
+	addItemKeyword( std::make_unique<ItemKeyword_FocusSound>() );
+	addItemKeyword( std::make_unique<ItemKeyword_CvarFloat>() );
+	addItemKeyword( std::make_unique<ItemKeyword_CvarStrList>() );
+	addItemKeyword( std::make_unique<ItemKeyword_CvarFloatList>() );
+	addItemKeyword( std::make_unique<ItemKeyword_AddColorRange>() );
+	addItemKeyword( std::make_unique<ItemKeyword_OwnerdrawFlag>() );
+	addItemKeyword( std::make_unique<ItemKeyword_EnableCvar>() );
+	addItemKeyword( std::make_unique<ItemKeyword_CvarTest>() );
+	addItemKeyword( std::make_unique<ItemKeyword_DisableCvar>() );
+	addItemKeyword( std::make_unique<ItemKeyword_ShowCvar>() );
+	addItemKeyword( std::make_unique<ItemKeyword_HideCvar>() );
+	addItemKeyword( std::make_unique<ItemKeyword_Cinematic>() );
+	addItemKeyword( std::make_unique<ItemKeyword_DoubleClick>() );
 
 	// -----------------
 
-	addMenuKeyword( new MenuKeyword_Font );
-	addMenuKeyword( new MenuKeyword_Name );
-	addMenuKeyword( new MenuKeyword_Fullscreen );
-	addMenuKeyword( new MenuKeyword_Rect );
-	addMenuKeyword( new MenuKeyword_Style );
-	addMenuKeyword( new MenuKeyword_Visible );
-	addMenuKeyword( new MenuKeyword_OnOpen );
-	addMenuKeyword( new MenuKeyword_OnClose );
-	addMenuKeyword( new MenuKeyword_OnESC );
-	addMenuKeyword( new MenuKeyword_Border );
-	addMenuKeyword( new MenuKeyword_BorderSize );
-	addMenuKeyword( new MenuKeyword_BackColor );
-	addMenuKeyword( new MenuKeyword_ForeColor );
-	addMenuKeyword( new MenuKeyword_BorderColor );
-	addMenuKeyword( new MenuKeyword_FocusColor );
-	addMenuKeyword( new MenuKeyword_DisableColor );
-	addMenuKeyword( new MenuKeyword_OutlineColor );
-	addMenuKeyword( new MenuKeyword_Background );
-	addMenuKeyword( new MenuKeyword_Ownerdraw );
-	addMenuKeyword( new MenuKeyword_OwnerdrawFlag );
-	addMenuKeyword( new MenuKeyword_OutOfBoundsClick );
-	addMenuKeyword( new MenuKeyword_SoundLoop );
-	addMenuKeyword( new MenuKeyword_ItemDef );
-	addMenuKeyword( new MenuKeyword_Cinematic );
-	addMenuKeyword( new MenuKeyword_Popup );
-	addMenuKeyword( new MenuKeyword_FadeClamp );
-	addMenuKeyword( new MenuKeyword_FadeCycle );
-	addMenuKeyword( new MenuKeyword_FadeAmount );
+	addMenuKeyword( std::make_unique<MenuKeyword_Font>() );
+	addMenuKeyword( std::make_unique<MenuKeyword_Name>() );
+	addMenuKeyword( std::make_unique<MenuKeyword_Fullscreen>() );
+	addMenuKeyword( std::make_unique<MenuKeyword_Rect>() );
+	addMenuKeyword( std::make_unique<MenuKeyword_Style>() );
+	addMenuKeyword( std::make_unique<MenuKeyword_Visible>() );
+	addMenuKeyword( std::make_unique<MenuKeyword_OnOpen>() );
+	addMenuKeyword( std::make_unique<MenuKeyword_OnClose>() );
+	addMenuKeyword( std::make_unique<MenuKeyword_OnESC>() );
+	addMenuKeyword( std::make_unique<MenuKeyword_Border>() );
+	addMenuKeyword( std::make_unique<MenuKeyword_BorderSize>() );
+	addMenuKeyword( std::make_unique<MenuKeyword_BackColor>() );
+	addMenuKeyword( std::make_unique<MenuKeyword_ForeColor>() );
+	addMenuKeyword( std::make_unique<MenuKeyword_BorderColor>() );
+	addMenuKeyword( std::make_unique<MenuKeyword_FocusColor>() );
+	addMenuKeyword( std::make_unique<MenuKeyword_DisableColor>() );
+	addMenuKeyword( std::make_unique<MenuKeyword_OutlineColor>() );
+	addMenuKeyword( std::make_unique<MenuKeyword_Background>() );
+	addMenuKeyword( std::make_unique<MenuKeyword_Ownerdraw>() );
+	addMenuKeyword( std::make_unique<MenuKeyword_OwnerdrawFlag>() );
+	addMenuKeyword( std::make_unique<MenuKeyword_OutOfBoundsClick>() );
+	addMenuKeyword( std::make_unique<MenuKeyword_SoundLoop>() );
+	addMenuKeyword( std::make_unique<MenuKeyword_ItemDef>() );
+	addMenuKeyword( std::make_unique<MenuKeyword_Cinematic>() );
+	addMenuKeyword( std::make_unique<MenuKeyword_Popup>() );
+	addMenuKeyword( std::make_unique<MenuKeyword_FadeClamp>() );
+	addMenuKeyword( std::make_unique<MenuKeyword_FadeCycle>() );
+	addMenuKeyword( std::make_unique<MenuKeyword_FadeAmount>() );
 }
 
 UI_HashUtils::~UI_HashUtils()
@@ -153,23 +153,23 @@ UI_HashUtils::getKey( const char* keyword )
 }
 
 bool
-UI_HashUtils::addItemKeyword( KeywordHash* kh )
+UI_HashUtils::addItemKeyword( std::unique_ptr<KeywordHash> kh )
 {
-	return addKeyword( itemKeywords_, kh );
+	return addKeyword( itemKeywords_, std::move( kh ) );
 }
 
 bool
-UI_HashUtils::addMenuKeyword( KeywordHash* kh )
+UI_HashUtils::addMenuKeyword( std::unique_ptr<KeywordHash> kh )
 {
-	return addKeyword( menuKeywords_, kh );
+	return addKeyword( menuKeywords_, std::move( kh ) );
 }
 
 bool
-UI_HashUtils::addKeyword( KeywordMap& map, KeywordHash* kh )
+UI_HashUtils::addKeyword( KeywordMap& map, std::unique_ptr<KeywordHash> kh )
 {
-	// the table owns the keyword from here on (one that collides with an earlier key is dropped)
+	// a keyword that collides with an earlier key is dropped
 	const int key = getKey( kh->getKeyword().c_str() );
-	return map.emplace( key, std::unique_ptr<KeywordHash>( kh ) ).second;
+	return map.emplace( key, std::move( kh ) ).second;
 }
 
 

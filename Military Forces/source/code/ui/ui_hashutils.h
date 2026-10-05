@@ -34,10 +34,10 @@ private:
 
 	int						getKey( const char* keyword );
 
-	bool					addItemKeyword( KeywordHash* kh );
-	bool					addMenuKeyword( KeywordHash* kh );
+	bool					addItemKeyword( std::unique_ptr<KeywordHash> kh );
+	bool					addMenuKeyword( std::unique_ptr<KeywordHash> kh );
 
-	bool					addKeyword( KeywordMap& map, KeywordHash* kh );
+	bool					addKeyword( KeywordMap& map, std::unique_ptr<KeywordHash> kh );
 
 	// data
 	KeywordMap				itemKeywords_;
