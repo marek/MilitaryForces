@@ -182,6 +182,19 @@ public:
 	int writeDownloadToClient( Message *msg );
 	void userinfoChanged();
 	void executeClientCommand( const char *s, bool clientOK );
+
+	// commands a client may send, see the table in sv_client.cpp
+	void updateUserinfo_f();
+	void disconnect_f();
+	void verifyPaks_f();
+	void resetPureClient_f();
+	void beginDownload_f();
+	void nextDownload_f();
+	void stopDownload_f();
+	void doneDownload_f();
+#ifdef USE_VOIP
+	void voip_f();
+#endif
 	void think( usercmd_t *cmd );
 	void executeClientMessage( Message *msg );
 	void updateConfigstrings();

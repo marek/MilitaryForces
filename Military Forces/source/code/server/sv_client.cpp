@@ -830,84 +830,84 @@ void SV_Client::closeDownload()
 
 /*
 ==================
-SV_StopDownload_f
+SV_Client::stopDownload_f
 
 Abort a download if in progress
 ==================
 */
-static void SV_StopDownload_f( SV_Client *cl ) 
+void SV_Client::stopDownload_f()
 {
-	if( *cl->downloadName_ )
-		Common::dPrintf( "clientDownload: %d : file \"%s\" aborted\n", cl->clientNum_, cl->downloadName_ );
+	if( *this->downloadName_ )
+		Common::dPrintf( "clientDownload: %d : file \"%s\" aborted\n", this->clientNum_, this->downloadName_ );
 
-	cl->closeDownload();
+	this->closeDownload();
 }
 
 /*
 ==================
-SV_DoneDownload_f
+SV_Client::doneDownload_f
 
 Downloads are finished
 ==================
 */
-static void SV_DoneDownload_f( SV_Client *cl ) 
+void SV_Client::doneDownload_f()
 {
-	if ( cl->state_ == SV_Client::CS_ACTIVE )
+	if ( this->state_ == SV_Client::CS_ACTIVE )
 		return;
 
-	Common::dPrintf( "clientDownload: %s Done\n", cl->name_);
+	Common::dPrintf( "clientDownload: %s Done\n", this->name_);
 	// resend the game state to update any clients that entered during the download
-	cl->sendClientGameState();
+	this->sendClientGameState();
 }
 
 /*
 ==================
-SV_NextDownload_f
+SV_Client::nextDownload_f
 
 The argument will be the last acknowledged block from the client, it should be
 the same as cl->downloadClientBlock
 ==================
 */
-static void SV_NextDownload_f( SV_Client *cl )
+void SV_Client::nextDownload_f()
 {
 	int block = atoi( CommandSystem::argv(1) );
 
-	if (block == cl->downloadClientBlock_) 
+	if (block == this->downloadClientBlock_) 
 	{
-		Common::dPrintf( "clientDownload: %d : client acknowledge of block %d\n", cl->clientNum_, block );
+		Common::dPrintf( "clientDownload: %d : client acknowledge of block %d\n", this->clientNum_, block );
 
 		// Find out if we are done.  A zero-length block indicates EOF
-		if (cl->downloadBlockSize_[cl->downloadClientBlock_ % MAX_DOWNLOAD_WINDOW] == 0)
+		if (this->downloadBlockSize_[this->downloadClientBlock_ % MAX_DOWNLOAD_WINDOW] == 0)
 		{
-			Common::printf( "clientDownload: %d : file \"%s\" completed\n", cl->clientNum_, cl->downloadName_ );
-			cl->closeDownload();
+			Common::printf( "clientDownload: %d : file \"%s\" completed\n", this->clientNum_, this->downloadName_ );
+			this->closeDownload();
 			return;
 		}
 
-		cl->downloadSendTime_ = theSVS.time_;
-		cl->downloadClientBlock_++;
+		this->downloadSendTime_ = theSVS.time_;
+		this->downloadClientBlock_++;
 		return;
 	}
 	// We aren't getting an acknowledge for the correct block, drop the client
 	// FIXME: this is bad... the client will never parse the disconnect message
 	//			because the cgame isn't loaded yet
-	cl->drop( "broken download" );
+	this->drop( "broken download" );
 }
 
 /*
 ==================
-SV_BeginDownload_f
+SV_Client::beginDownload_f
 ==================
 */
-static void SV_BeginDownload_f( SV_Client *cl ) 
+void SV_Client::beginDownload_f()
 {
 
 	// Kill any existing download
-	cl->closeDownload();
+	this->closeDownload();
 
-	// cl->downloadName is non-zero now, SV_WriteDownloadToClient will see this and open
+	// this->downloadName is non-zero now, SV_WriteDownloadToClient will see this and open
 	// the file itself
-	Q_strncpyz( cl->downloadName_, CommandSystem::argv(1), sizeof(cl->downloadName_) );
+	Q_strncpyz( this->downloadName_, CommandSystem::argv(1), sizeof(this->downloadName_) );
 }
 
 /*
@@ -1191,19 +1191,19 @@ int ServerMain::sendDownloadMessages()
 
 /*
 =================
-SV_Disconnect_f
+SV_Client::disconnect_f
 
 The client is going to disconnect, so remove the connection immediately  FIXME: move to game?
 =================
 */
-static void SV_Disconnect_f( SV_Client *cl ) 
+void SV_Client::disconnect_f()
 {
-	cl->drop( "disconnected" );
+	this->drop( "disconnected" );
 }
 
 /*
 =================
-SV_VerifyPaks_f
+SV_Client::verifyPaks_f
 
 If we are pure, disconnect the client if they do no meet the following conditions:
 
@@ -1214,7 +1214,7 @@ This routine would be a bit simpler with a goto but i abstained
 
 =================
 */
-static void SV_VerifyPaks_f( SV_Client *cl ) 
+void SV_Client::verifyPaks_f()
 {
 	int nChkSum1, nChkSum2, nClientPaks, nServerPaks, i, j, nCurArg;
 	int nClientChkSum[1024];
@@ -1252,7 +1252,7 @@ static void SV_VerifyPaks_f( SV_Client *cl )
 			// since serverId is a frame count, it always goes up
 			if (atoi(pArg) < theSV.checksumFeedServerId_)
 			{
-				Common::dPrintf("ignoring outdated cp command from client %s\n", cl->name_);
+				Common::dPrintf("ignoring outdated cp command from client %s\n", this->name_);
 				return;
 			}
 		}
@@ -1361,19 +1361,19 @@ static void SV_VerifyPaks_f( SV_Client *cl )
 			break;
 		}
 
-		cl->gotCP_ = true;
+		this->gotCP_ = true;
 
 		if (bGood) 
 		{
-			cl->pureAuthentic_ = 1;
+			this->pureAuthentic_ = 1;
 		} 
 		else 
 		{
-			cl->pureAuthentic_ = 0;
-			cl->lastSnapshotTime_ = 0;
-			cl->state_ = SV_Client::CS_ACTIVE;
-			cl->sendClientSnapshot();
-			cl->drop( "Unpure Client. "
+			this->pureAuthentic_ = 0;
+			this->lastSnapshotTime_ = 0;
+			this->state_ = SV_Client::CS_ACTIVE;
+			this->sendClientSnapshot();
+			this->drop( "Unpure Client. "
 				"You may need to enable in-game downloads "
 				"to connect to this server (set "
 				"cl_allowDownload 1)" );
@@ -1383,13 +1383,13 @@ static void SV_VerifyPaks_f( SV_Client *cl )
 
 /*
 =================
-SV_ResetPureClient_f
+SV_Client::resetPureClient_f
 =================
 */
-static void SV_ResetPureClient_f( SV_Client *cl ) 
+void SV_Client::resetPureClient_f()
 {
-	cl->pureAuthentic_ = 0;
-	cl->gotCP_ = false;
+	this->pureAuthentic_ = 0;
+	this->gotCP_ = false;
 }
 
 /*
@@ -1497,17 +1497,17 @@ void SV_Client::userinfoChanged() {
 
 /*
 ==================
-SV_UpdateUserinfo_f
+SV_Client::updateUserinfo_f
 ==================
 */
-static void SV_UpdateUserinfo_f( SV_Client *cl ) 
+void SV_Client::updateUserinfo_f()
 {
-	Q_strncpyz( cl->userinfo_, CommandSystem::argv(1), sizeof(cl->userinfo_) );
+	Q_strncpyz( this->userinfo_, CommandSystem::argv(1), sizeof(this->userinfo_) );
 
-	cl->userinfoChanged();
+	this->userinfoChanged();
 	// call prog code to allow overrides
-	//VM_Call( gvm, GAME_CLIENT_USERINFO_CHANGED, cl - svs.clients );
-	theSG.clientUserInfoChanged( cl->clientNum_ );
+	//VM_Call( gvm, GAME_CLIENT_USERINFO_CHANGED, this - svs.clients );
+	theSG.clientUserInfoChanged( this->clientNum_ );
 }
 
 #ifdef USE_VOIP
@@ -1523,19 +1523,20 @@ void SV_Client::updateVoipIgnore( const char *idstr, bool ignore )
 
 /*
 ==================
-SV_Voip_f
+SV_Client::voip_f
 ==================
 */
-static void SV_Voip_f( SV_Client *cl ) {
+void SV_Client::voip_f()
+{
 	const char *cmd = CommandSystem::argv(1);
 	if (strcmp(cmd, "ignore") == 0) {
-		cl->updateVoipIgnore( CommandSystem::argv(2), true );
+		this->updateVoipIgnore( CommandSystem::argv(2), true );
 	} else if (strcmp(cmd, "unignore") == 0) {
-		cl->updateVoipIgnore( CommandSystem::argv(2), false );
+		this->updateVoipIgnore( CommandSystem::argv(2), false );
 	} else if (strcmp(cmd, "muteall") == 0) {
-		cl->muteAllVoip_ = true;
+		this->muteAllVoip_ = true;
 	} else if (strcmp(cmd, "unmuteall") == 0) {
-		cl->muteAllVoip_ = false;
+		this->muteAllVoip_ = false;
 	}
 }
 #endif
@@ -1544,21 +1545,21 @@ static void SV_Voip_f( SV_Client *cl ) {
 struct ucmd_t 
 {
 	char	*name;
-	void	(*func)( SV_Client *cl );
+	void	(SV_Client::*func)();
 };
 
 static ucmd_t ucmds[] = {
-	{"userinfo", SV_UpdateUserinfo_f},
-	{"disconnect", SV_Disconnect_f},
-	{"cp", SV_VerifyPaks_f},
-	{"vdr", SV_ResetPureClient_f},
-	{"download", SV_BeginDownload_f},
-	{"nextdl", SV_NextDownload_f},
-	{"stopdl", SV_StopDownload_f},
-	{"donedl", SV_DoneDownload_f},
+	{"userinfo", &SV_Client::updateUserinfo_f},
+	{"disconnect", &SV_Client::disconnect_f},
+	{"cp", &SV_Client::verifyPaks_f},
+	{"vdr", &SV_Client::resetPureClient_f},
+	{"download", &SV_Client::beginDownload_f},
+	{"nextdl", &SV_Client::nextDownload_f},
+	{"stopdl", &SV_Client::stopDownload_f},
+	{"donedl", &SV_Client::doneDownload_f},
 
 #ifdef USE_VOIP
-	{"voip", SV_Voip_f},
+	{"voip", &SV_Client::voip_f},
 #endif
 
 	{nullptr, nullptr}
@@ -1583,7 +1584,7 @@ void SV_Client::executeClientCommand( const char *s, bool clientOK )
 	{
 		if (!strcmp (CommandSystem::argv(0), u->name) ) 
 		{
-			u->func( this );
+			(this->*u->func)();
 			bProcessed = true;
 			break;
 		}
