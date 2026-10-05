@@ -112,7 +112,7 @@ int VehicleData::getTagsContaining(const char* fileName, const char* str, md3Tag
 		for( i = 0; i < total; ++ i ) {
 			FileSystem::read(&tag, sizeof(tag), f);
 			if( Q_strncmp( tag.name, str, len ) == 0 ) {
-				memcpy( &tags[number], &tag, sizeof(tag) );
+				tags[number] = tag;
 				number++;
 			}
 		}

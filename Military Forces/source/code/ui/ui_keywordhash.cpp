@@ -864,7 +864,7 @@ ItemKeyword_AddColorRange::func( itemDef_t *item, int handle )
 	{
 		if (item->numColors < MAX_COLOR_RANGES) 
 		{
-			memcpy(&item->colorRanges[item->numColors], &color, sizeof(color));
+			item->colorRanges[item->numColors] = color;
 			item->numColors++;
 		}
 		return true;

@@ -170,7 +170,7 @@ cvarTable_t		gameCvarTable[] = {
 
 };
 
-static int		gameCvarTableSize = sizeof( gameCvarTable ) / sizeof( gameCvarTable[0] );
+static int		gameCvarTableSize = std::size( gameCvarTable );
 
 
 void G_InitGame( int levelTime, int randomSeed );

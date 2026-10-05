@@ -175,6 +175,7 @@ typedef int intptr_t;
 #include <type_traits>
 #include <utility>
 #include <algorithm>
+#include <iterator>
 #include <source_location>
 #include <numbers>
 #include <stdint.h>

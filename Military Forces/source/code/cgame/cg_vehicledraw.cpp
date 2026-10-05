@@ -204,7 +204,7 @@ void CGame::drawPlane(DrawInfo_Plane_t* drawInfo)
 			for( ii = 1; ii < veh->engines; ++ii ) 
 			{
 				refEntity_t engine;
-				memcpy( &engine, &part[i], sizeof(engine) );
+				engine = part[i];
 				CGame::positionRotatedEntityOnTag( &engine, &part[BP_PLANE_BODY], veh->handle[BP_PLANE_BODY], engine_tags[ii-1] );
 				engine.shadowPlane = shadowPlane;
 				engine.renderfx = renderfx;

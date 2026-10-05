@@ -809,7 +809,7 @@ bool CGame::consoleCommand( ) {
 	}
 
 	// scan though all known client commands
-	for ( i = 0 ; i < sizeof( commands ) / sizeof( commands[0] ) ; i++ ) 
+	for ( i = 0 ; i < std::size( commands ); i++ ) 
 	{
 		// match?
 		if ( !Q_stricmp( cmd, commands[i].cmd ) )
@@ -836,7 +836,7 @@ so it can perform tab completion
 void CGame::initConsoleCommands( ) {
 	int		i;
 
-	for ( i = 0 ; i < sizeof( commands ) / sizeof( commands[0] ) ; i++ ) {
+	for ( i = 0 ; i < std::size( commands ); i++ ) {
 		ClientHost::addCgameCommand( commands[i].cmd );
 	}
 

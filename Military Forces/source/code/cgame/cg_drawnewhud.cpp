@@ -1089,7 +1089,7 @@ void CGame::hUD_Camera(int mfdnum, int vehicle) {
 	char	buffer[12];
 
 	// prepare refdef
-	memcpy( &cg.HUDCamera, &cg.refdef, sizeof( cg.HUDCamera) );
+	cg.HUDCamera = cg.refdef;
 	
 	// set left draw position
 	if( mfdnum == MFD_1 )

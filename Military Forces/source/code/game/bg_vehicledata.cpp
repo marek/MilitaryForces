@@ -2476,7 +2476,7 @@ completeVehicleData_t availableVehicles[] =
 	}
 };
 
-int bg_numberOfVehicles = sizeof(availableVehicles) / sizeof(availableVehicles[0]);
+int bg_numberOfVehicles = std::size( availableVehicles );
 
 // just contains data of all the available vehicles
 groundInstallationData_t availableGroundInstallations[] = 
@@ -2600,8 +2600,7 @@ groundInstallationData_t availableGroundInstallations[] =
 	},
 };
 
-int bg_numberOfGroundInstallations = sizeof(availableGroundInstallations) / 
-								sizeof(availableGroundInstallations[0]);
+int bg_numberOfGroundInstallations = std::size( availableGroundInstallations );
 
 
 const char *gameset_items[MF_MAX_GAMESETS+1] =

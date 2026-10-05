@@ -4,7 +4,7 @@
 static void CG_EjectParticle(particleWorld_t * w, particleEmitter_t * e)
 {
 	int i, j;
-	for(i = 0; i < sizeof(w->particles)/sizeof(w->particles[0]); i++)
+	for(i = 0; i < std::size( w->particles ); i++)
 	{
 		if(w->particles[i].dead)
 			break;
@@ -50,7 +50,7 @@ static void CG_EjectParticle(particleWorld_t * w, particleEmitter_t * e)
 int CGame::addParticleSystem(particleWorld_t * w, particleSystem_t * s)
 {
 	int i;
-	for(i = 0; i < sizeof(w->systems)/sizeof(w->systems[0]); i++)
+	for(i = 0; i < std::size( w->systems ); i++)
 	{
 		if(w->systems[i].dead)
 			break;
@@ -70,7 +70,7 @@ int CGame::addParticleSystem(particleWorld_t * w, particleSystem_t * s)
 int CGame::addParticleEmitter(particleWorld_t * w, particleEmitter_t * e)
 {
 	int i;
-	for(i = 0; i < sizeof(w->emitters)/sizeof(w->emitters[0]); i++)
+	for(i = 0; i < std::size( w->emitters ); i++)
 	{
 		if(w->emitters[i].dead)
 			break;

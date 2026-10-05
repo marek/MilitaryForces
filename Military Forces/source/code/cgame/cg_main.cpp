@@ -327,7 +327,7 @@ cvarTable_t		cvarTable[] = {
 	// MFQ3-
 };
 
-int		cvarTableSize = sizeof( cvarTable ) / sizeof( cvarTable[0] );
+int		cvarTableSize = std::size( cvarTable );
 
 vec4_t HUDColors[HUD_MAX] = {
 							{0.00f, 1.00f, 0.00f, 1.00f},	// HUD_GREEN

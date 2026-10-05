@@ -5103,7 +5103,7 @@ const char *Menus::feederItemText(float feederID, int index, int column, qhandle
 						if ( ui_netSource.integer == AS_LOCAL ) {
 							int nettype = atoi(Info::valueForKey(info, "nettype"));
 
-							if (nettype < 0 || nettype >= ARRAY_LEN(netnames)) {
+							if (nettype < 0 || nettype >= std::size( netnames )) {
 								nettype = 0;
 							}
 
@@ -6622,7 +6622,7 @@ static cvarTable_t		cvarTable[] = {
 };
 
 // bk001129 - made static to avoid aliasing
-int Menus::cvarTableSize = sizeof(cvarTable) / sizeof(cvarTable[0]);
+int Menus::cvarTableSize = std::size( cvarTable );
 
 
 /*

@@ -268,7 +268,7 @@ void ClientEntity::plane( clientInfo_t *ci )
 			if( ps->stats[STAT_LOCKINFO] & LI_LOCKING )
 			{
 				// copy the reticle entity as our reticle-lock entity
-				memcpy( &reticlelock, &reticle, sizeof(reticle) );
+				reticlelock = reticle;
 				reticlelock.customShader = availableWeapons[availableVehicles[ci->vehicle].weapons[this->currentState.weaponNum]].crosshairlock;
 				reticlelock.hModel = cgs.media.reticle[ availableWeapons[availableVehicles[ci->vehicle].weapons[this->currentState.weaponNum]].crosshairlock ];
 				reticlelock.frame = 1;

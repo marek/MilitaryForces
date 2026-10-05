@@ -252,7 +252,7 @@ Only in CTF games
 	{nullptr}
 };
 
-int		bg_numItems = sizeof(bg_itemlist) / sizeof(bg_itemlist[0]) - 1;
+int		bg_numItems = std::size( bg_itemlist ) - 1;
 
 
 /*

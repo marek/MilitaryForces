@@ -1759,4 +1759,4 @@ completeWeaponData_t availableWeapons[] =
 
 };
 
-int bg_numberOfWeapons = sizeof(availableWeapons) / sizeof(availableWeapons[0]);
+int bg_numberOfWeapons = std::size( availableWeapons );
