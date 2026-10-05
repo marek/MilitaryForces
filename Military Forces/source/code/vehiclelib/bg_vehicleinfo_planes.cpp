@@ -187,7 +187,7 @@ GameObjectInfo_Plane::createAllPlanes( GameObjectList& gameObjects )
 	addWeaponToLoadout(loadout, "Mk-82", "Mk-82", 12, Armament::ST_SECONDARY_WEAPON );
 	addWeaponToLoadout(loadout, "Flares", "Flares", 30, Armament::ST_NOT_SELECTABLE );
 	veh->defaultLoadouts_.insert(std::make_pair("Iron Bombs", loadout));
-	gameObjects.push_back(veh);
+	gameObjects.emplace_back(veh);
 
 	// JAS-39
 	veh = dynamic_cast<GameObjectInfo_Plane*>(createVehicle(GameObjectInfo::GO_CAT_PLANE));
@@ -223,7 +223,7 @@ GameObjectInfo_Plane::createAllPlanes( GameObjectList& gameObjects )
     veh->stallSpeed_ = 200;	
 	veh->swingAngle_ = 0;	
     veh->maxSpeed_ = 720;		
-	gameObjects.push_back(veh);
+	gameObjects.emplace_back(veh);
 
 	// A-10
 	veh = dynamic_cast<GameObjectInfo_Plane*>(createVehicle(GameObjectInfo::GO_CAT_PLANE));
@@ -259,7 +259,7 @@ GameObjectInfo_Plane::createAllPlanes( GameObjectList& gameObjects )
     veh->stallSpeed_ = 170;	
 	veh->swingAngle_ = 0;	
     veh->maxSpeed_ = 620;		
-	gameObjects.push_back(veh);
+	gameObjects.emplace_back(veh);
 
 	// F-5
 	veh = dynamic_cast<GameObjectInfo_Plane*>(createVehicle(GameObjectInfo::GO_CAT_PLANE));
@@ -295,7 +295,7 @@ GameObjectInfo_Plane::createAllPlanes( GameObjectList& gameObjects )
     veh->stallSpeed_ = 170;	
 	veh->swingAngle_ = 0;	
     veh->maxSpeed_ = 620;		
-	gameObjects.push_back(veh);
+	gameObjects.emplace_back(veh);
 
 	// F-15
 	veh = dynamic_cast<GameObjectInfo_Plane*>(createVehicle(GameObjectInfo::GO_CAT_PLANE));
@@ -331,7 +331,7 @@ GameObjectInfo_Plane::createAllPlanes( GameObjectList& gameObjects )
     veh->stallSpeed_ = 220;	
 	veh->swingAngle_ = 0;	
     veh->maxSpeed_ = 880;		
-	gameObjects.push_back(veh);
+	gameObjects.emplace_back(veh);
 
 	// F-14
 	veh = dynamic_cast<GameObjectInfo_Plane*>(createVehicle(GameObjectInfo::GO_CAT_PLANE));
@@ -367,7 +367,7 @@ GameObjectInfo_Plane::createAllPlanes( GameObjectList& gameObjects )
     veh->stallSpeed_ = 220;	
 	veh->swingAngle_ = 50;	
     veh->maxSpeed_ = 840;		
-	gameObjects.push_back(veh);
+	gameObjects.emplace_back(veh);
 
 	// F-18
 	veh = dynamic_cast<GameObjectInfo_Plane*>(createVehicle(GameObjectInfo::GO_CAT_PLANE));
@@ -403,7 +403,7 @@ GameObjectInfo_Plane::createAllPlanes( GameObjectList& gameObjects )
     veh->stallSpeed_ = 200;	
 	veh->swingAngle_ = 0;	
     veh->maxSpeed_ = 720;		
-	gameObjects.push_back(veh);
+	gameObjects.emplace_back(veh);
 
 	// B-2
 	veh = dynamic_cast<GameObjectInfo_Plane*>(createVehicle(GameObjectInfo::GO_CAT_PLANE));
@@ -439,7 +439,7 @@ GameObjectInfo_Plane::createAllPlanes( GameObjectList& gameObjects )
     veh->stallSpeed_ = 200;	
 	veh->swingAngle_ = 0;	
     veh->maxSpeed_ = 700;		
-	gameObjects.push_back(veh);
+	gameObjects.emplace_back(veh);
 
 
 
@@ -481,7 +481,7 @@ GameObjectInfo_Plane::createAllPlanes( GameObjectList& gameObjects )
     veh->stallSpeed_ = 90;	
 	veh->swingAngle_ = 0;	
     veh->maxSpeed_ = 420;		
-	gameObjects.push_back(veh);
+	gameObjects.emplace_back(veh);
 
 	// Spitfire
 	veh = dynamic_cast<GameObjectInfo_Plane*>(createVehicle(GameObjectInfo::GO_CAT_PLANE));
@@ -517,7 +517,7 @@ GameObjectInfo_Plane::createAllPlanes( GameObjectList& gameObjects )
     veh->stallSpeed_ = 85;	
 	veh->swingAngle_ = 0;	
     veh->maxSpeed_ = 400;		
-	gameObjects.push_back(veh);
+	gameObjects.emplace_back(veh);
 
 	// Bf109
 	veh = dynamic_cast<GameObjectInfo_Plane*>(createVehicle(GameObjectInfo::GO_CAT_PLANE));
@@ -553,7 +553,7 @@ GameObjectInfo_Plane::createAllPlanes( GameObjectList& gameObjects )
     veh->stallSpeed_ = 90;	
 	veh->swingAngle_ = 0;	
     veh->maxSpeed_ = 410;		
-	gameObjects.push_back(veh);
+	gameObjects.emplace_back(veh);
 
 	// Fw190
 	veh = dynamic_cast<GameObjectInfo_Plane*>(createVehicle(GameObjectInfo::GO_CAT_PLANE));
@@ -589,7 +589,7 @@ GameObjectInfo_Plane::createAllPlanes( GameObjectList& gameObjects )
     veh->stallSpeed_ = 90;	
 	veh->swingAngle_ = 0;	
     veh->maxSpeed_ = 420;		
-	gameObjects.push_back(veh);
+	gameObjects.emplace_back(veh);
 
 	// B-17
 	veh = dynamic_cast<GameObjectInfo_Plane*>(createVehicle(GameObjectInfo::GO_CAT_PLANE));
@@ -625,7 +625,7 @@ GameObjectInfo_Plane::createAllPlanes( GameObjectList& gameObjects )
     veh->stallSpeed_ = 100;	
 	veh->swingAngle_ = 0;	
     veh->maxSpeed_ = 320;		
-	gameObjects.push_back(veh);
+	gameObjects.emplace_back(veh);
 
 
 
@@ -667,7 +667,7 @@ GameObjectInfo_Plane::createAllPlanes( GameObjectList& gameObjects )
     veh->stallSpeed_ = 50;	
 	veh->swingAngle_ = 0;	
     veh->maxSpeed_ = 150;		
-	gameObjects.push_back(veh);
+	gameObjects.emplace_back(veh);
 
 	// Camel
 	veh = dynamic_cast<GameObjectInfo_Plane*>(createVehicle(GameObjectInfo::GO_CAT_PLANE));
@@ -703,7 +703,7 @@ GameObjectInfo_Plane::createAllPlanes( GameObjectList& gameObjects )
     veh->stallSpeed_ = 55;	
 	veh->swingAngle_ = 0;	
     veh->maxSpeed_ = 170;		
-	gameObjects.push_back(veh);
+	gameObjects.emplace_back(veh);
 }
 
 

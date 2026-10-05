@@ -231,31 +231,31 @@ void MF_ClientSpawn( int clientNum, long cs_flags )
 	// vehicle index for next spawning
 	int vehIndex = atoi( Info::valueForKey( userinfo, "cg_nextVehicle" ) );
 
-	GameEntity* ent;
+	std::unique_ptr<GameEntity> fresh;
 	switch( vehIndex >= 0 ? availableVehicles[vehIndex].cat : 0 )
 	{
 	case CAT_PLANE:
-		ent = new Entity_Plane;
+		fresh = std::make_unique<Entity_Plane>();
 		break;
 	case CAT_HELO:
-		ent = new Entity_Helicopter;
+		fresh = std::make_unique<Entity_Helicopter>();
 		break;
 	case CAT_GROUND:
-		ent = new Entity_GroundVehicle;
+		fresh = std::make_unique<Entity_GroundVehicle>();
 		break;
 	case CAT_BOAT:
-		ent = new Entity_Boat;
+		fresh = std::make_unique<Entity_Boat>();
 		break;
 	case CAT_LQM:
-		ent = new Entity_Infantry;
+		fresh = std::make_unique<Entity_Infantry>();
 		break;
 	default:
 		//Common::error( ERR_DROP, "Invalid vehicle type in MF_ClientSpawn" );
 #pragma message("-->make GameEntity_Spectator!!")
-		ent = new GameEntity;	// not chosen yet.. just spectator 
+		fresh = std::make_unique<GameEntity>();	// not chosen yet.. just spectator 
 		break;
 	}
-	theLevel.setPlayerEntity(ent, clientNum);
+	GameEntity* ent = theLevel.setPlayerEntity( std::move( fresh ), clientNum );
 
 	// set client
 	GameClient* client = theLevel.getClient(clientNum);

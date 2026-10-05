@@ -3,6 +3,7 @@
 
 
 #include <string>
+#include <memory>
 #include <vector>
 #include "../game/q_shared.h"
 #include "bg_vehicleextra.h"
@@ -10,8 +11,8 @@
 struct GameObjectInfo;
 struct WeaponInfo;
 
-typedef std::vector<GameObjectInfo*>	GameObjectList;
-typedef std::vector<WeaponInfo*>		WeaponList;
+typedef std::vector<std::unique_ptr<GameObjectInfo>>	GameObjectList;
+typedef std::vector<std::unique_ptr<WeaponInfo>>		WeaponList;
 
 
 struct DataManager

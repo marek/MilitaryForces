@@ -59,7 +59,7 @@ GameObjectInfo_Helicopter::createAllHelicopters( GameObjectList& gameObjects )
 	veh->tailAngle_ = 0;		
 	veh->abEffectModel_ = 0;	
     veh->maxSpeed_ = 250;		
-	gameObjects.push_back(veh);
+	gameObjects.emplace_back(veh);
 	//285,						// max gun pitch (upwards = negative) <- gearheight
 	//5,							// min gun pitch (downwards = positive) <- tailangle
 

@@ -650,9 +650,9 @@ static void SP_worldspawn()
 	//theLevel.gameEntities_.at(ENTITYNUM_WORLD)->s.number = ENTITYNUM_WORLD;// g_entities[ENTITYNUM_WORLD].s.number = ENTITYNUM_WORLD;
 	//reinterpret_cast<GameEntity*>(theLevel.gameEntities_.at(ENTITYNUM_WORLD))->classname_ = "worldspawn";// g_entities[ENTITYNUM_WORLD].classname = "worldspawn";
 	// instead we just need to add the new EntityWorld
-	EntityWorld* world = new EntityWorld;
+	auto world = std::make_unique<EntityWorld>();
 	world->init();
-	theLevel.addWorld(world);
+	theLevel.addWorld( std::move( world ) );
 
 	// see if we want a warmup time
 	GameHost::setConfigstring( CS_WARMUP, "" );

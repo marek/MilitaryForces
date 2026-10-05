@@ -19,21 +19,6 @@ DataManager::DataManager()
 
 DataManager::~DataManager()
 {
-	// empty the vehicle list, dont forget to delete the vehicles
-	for(auto & allGameObject : allGameObjects_)
-	{
-		delete allGameObject;
-		allGameObject = nullptr;
-	}
-	allGameObjects_.clear();
-
-	// empty the weapon list, dont forget to delete the weapon
-	for(auto & allWeapon : allWeapons_)
-	{
-		delete allWeapon;
-		allWeapon = nullptr;
-	}
-	allWeapons_.clear();
 
 }
 

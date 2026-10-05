@@ -75,7 +75,7 @@ GameObjectInfo_Infantry::createAllInfantry( GameObjectList& gameObjects )
 	Vector4Set( veh->shadowAdjusts_, 0, 0, 0, 0 );	
     veh->maxSpeed_ = 50;		
 	veh->animations_ = nullptr;	
-	gameObjects.push_back(veh);
+	gameObjects.emplace_back(veh);
 
 	// Female
 	veh = dynamic_cast<GameObjectInfo_Infantry*>(createVehicle(GameObjectInfo::GO_CAT_INF));
@@ -97,7 +97,7 @@ GameObjectInfo_Infantry::createAllInfantry( GameObjectList& gameObjects )
 	Vector4Set( veh->shadowAdjusts_, 0, 0, 0, 0 );	
     veh->maxSpeed_ = 50;		
 	veh->animations_ = nullptr;	
-	gameObjects.push_back(veh);
+	gameObjects.emplace_back(veh);
 }
 
 

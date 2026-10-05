@@ -42,7 +42,7 @@ WeaponInfo::createAllOther(WeaponList& weapons)
 	wep->fitsPylon_ = WeaponInfo::PF_OTW_FH;				
 	wep->basicECMVulnerability_ = 0;	
 	wep->flags_ = WF_HAS_FIRE_FRAME;
-	weapons.push_back(wep);
+	weapons.emplace_back(wep);
 
 	// FFAR (7)
 	wep = createWeapon();
@@ -74,7 +74,7 @@ WeaponInfo::createAllOther(WeaponList& weapons)
 	wep->fitsPylon_ = WeaponInfo::PF_OTW_FL;				
 	wep->basicECMVulnerability_ = 0;	
 	wep->flags_ = WF_HAS_FIRE_FRAME;
-	weapons.push_back(wep);
+	weapons.emplace_back(wep);
 
 	// flares
 	wep = createWeapon();
@@ -106,7 +106,7 @@ WeaponInfo::createAllOther(WeaponList& weapons)
 	wep->fitsPylon_ = WeaponInfo::PF_NOT_AP;				
 	wep->basicECMVulnerability_ = 0;	
 	wep->flags_ = 0;
-	weapons.push_back(wep);
+	weapons.emplace_back(wep);
 
 	// flarepod
 	wep = createWeapon();
@@ -138,7 +138,7 @@ WeaponInfo::createAllOther(WeaponList& weapons)
 	wep->fitsPylon_ = WeaponInfo::PF_MSC_FL;				
 	wep->basicECMVulnerability_ = 0;	
 	wep->flags_ = 0;
-	weapons.push_back(wep);
+	weapons.emplace_back(wep);
 }
 
 	

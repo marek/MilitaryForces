@@ -85,7 +85,7 @@ GameObjectInfo_GroundVehicle::createAllGroundVehicles( GameObjectList& gameObjec
 	veh->wheels_ = 0;		
 	veh->wheelCF_ = 0.0f;		
     veh->maxSpeed_ = 60;		
-	gameObjects.push_back(veh);
+	gameObjects.emplace_back(veh);
 	//310,						// max gun pitch (upwards = negative) <- gearheight
 	//3,							// min gun pitch (downwards = positive) <- tailangle
 
@@ -118,7 +118,7 @@ GameObjectInfo_GroundVehicle::createAllGroundVehicles( GameObjectList& gameObjec
 	veh->wheels_ = 0;		
 	veh->wheelCF_ = 0.0f;		
     veh->maxSpeed_ = 65;		
-	gameObjects.push_back(veh);
+	gameObjects.emplace_back(veh);
 	//310,						// max gun pitch (upwards = negative) <- gearheight
 	//3,							// min gun pitch (downwards = positive) <- tailangle
 
@@ -151,7 +151,7 @@ GameObjectInfo_GroundVehicle::createAllGroundVehicles( GameObjectList& gameObjec
 	veh->wheels_ = 4;		
 	veh->wheelCF_ = 8.0f;		
     veh->maxSpeed_ = 85;		
-	gameObjects.push_back(veh);
+	gameObjects.emplace_back(veh);
 	//300,						// max gun pitch (upwards = negative) <- gearheight
 	//6,							// min gun pitch (downwards = positive) <- tailangle
 
@@ -184,7 +184,7 @@ GameObjectInfo_GroundVehicle::createAllGroundVehicles( GameObjectList& gameObjec
 	veh->wheels_ = 4;		
 	veh->wheelCF_ = 8.0f;		
     veh->maxSpeed_ = 85;		
-	gameObjects.push_back(veh);
+	gameObjects.emplace_back(veh);
 	//300,						// max gun pitch (upwards = negative) <- gearheight
 	//6,							// min gun pitch (downwards = positive) <- tailangle
 
@@ -217,7 +217,7 @@ GameObjectInfo_GroundVehicle::createAllGroundVehicles( GameObjectList& gameObjec
 	veh->wheels_ = 4;		
 	veh->wheelCF_ = 9.0f;		
     veh->maxSpeed_ = 90;		
-	gameObjects.push_back(veh);
+	gameObjects.emplace_back(veh);
 	//285,						// max gun pitch (upwards = negative) <- gearheight
 	//5,							// min gun pitch (downwards = positive) <- tailangle
 
@@ -250,7 +250,7 @@ GameObjectInfo_GroundVehicle::createAllGroundVehicles( GameObjectList& gameObjec
 	veh->wheels_ = 0;		
 	veh->wheelCF_ = 0;		
     veh->maxSpeed_ = 70;		
-	gameObjects.push_back(veh);
+	gameObjects.emplace_back(veh);
 	//285,						// max gun pitch (upwards = negative) <- gearheight
 	//5,							// min gun pitch (downwards = positive) <- tailangle
 
@@ -284,7 +284,7 @@ GameObjectInfo_GroundVehicle::createAllGroundVehicles( GameObjectList& gameObjec
 	veh->wheels_ = 0;		
 	veh->wheelCF_ = 0;		
     veh->maxSpeed_ = 60;		
-	gameObjects.push_back(veh);
+	gameObjects.emplace_back(veh);
 	//335,						// max gun pitch (upwards = negative) <- gearheight
 	//3,							// min gun pitch (downwards = positive) <- tailangle
 
@@ -325,7 +325,7 @@ GameObjectInfo_GroundVehicle::createAllGroundVehicles( GameObjectList& gameObjec
 	veh->wheels_ = 0;		
 	veh->wheelCF_ = 0;		
     veh->maxSpeed_ = 60;		
-	gameObjects.push_back(veh);
+	gameObjects.emplace_back(veh);
 	//335,						// max gun pitch (upwards = negative) <- gearheight
 	//3,							// min gun pitch (downwards = positive) <- tailangle
 
@@ -358,7 +358,7 @@ GameObjectInfo_GroundVehicle::createAllGroundVehicles( GameObjectList& gameObjec
 	veh->wheels_ = 0;		
 	veh->wheelCF_ = 0;		
     veh->maxSpeed_ = 60;		
-	gameObjects.push_back(veh);
+	gameObjects.emplace_back(veh);
 	//335,						// max gun pitch (upwards = negative) <- gearheight
 	//3,							// min gun pitch (downwards = positive) <- tailangle
 
@@ -392,7 +392,7 @@ GameObjectInfo_GroundVehicle::createAllGroundVehicles( GameObjectList& gameObjec
 	veh->wheelCF_ = 0;		
     veh->maxSpeed_ = 0;		
 	veh->playerSelectable_ = false;
-	gameObjects.push_back(veh);
+	gameObjects.emplace_back(veh);
 
 
 	// static AAA turret
@@ -425,7 +425,7 @@ GameObjectInfo_GroundVehicle::createAllGroundVehicles( GameObjectList& gameObjec
 	veh->wheelCF_ = 0;		
     veh->maxSpeed_ = 0;		
 	veh->playerSelectable_ = false;
-	gameObjects.push_back(veh);
+	gameObjects.emplace_back(veh);
 }
 
 

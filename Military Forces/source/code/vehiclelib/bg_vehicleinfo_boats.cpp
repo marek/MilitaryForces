@@ -51,7 +51,7 @@ GameObjectInfo_Boat::createAllBoats( GameObjectList& gameObjects )
 	veh->maxFuel_ = 150;
 	veh->sonarInfo_ = std::make_unique<VehicleRadarInfo>(0, 3000, CAT_BOAT); 		
     veh->maxSpeed_ = 50;		
-	gameObjects.push_back(veh);
+	gameObjects.emplace_back(veh);
 	//8,							// max angle to lean when turning <- gearheight
 	//-5,							// bowangle (depends on speeed) <-tailangle 
 }

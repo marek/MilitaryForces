@@ -90,9 +90,10 @@ LevelLocals::resetClientsAndEntities()
 	num_entities_ = 0;
 }
 
-void
-LevelLocals::addEntity(GameEntity* newEnt)
+GameEntity*
+LevelLocals::addEntity(std::unique_ptr<GameEntity> owned)
 {
+	GameEntity* newEnt = owned.get();
 	// player, needs to be put in front slot
 	if( newEnt->client_ )
 	{
@@ -100,7 +101,7 @@ LevelLocals::addEntity(GameEntity* newEnt)
 		{
 			if( !gameEntities_.at(i) )
 			{
-				gameEntities_.at(i).reset( newEnt );
+				gameEntities_.at(i) = std::move( owned );
 				if( clients_.at(i).get() != newEnt->client_ )
 					clients_.at(i).reset( newEnt->client_ );
 				break;
@@ -110,15 +111,16 @@ LevelLocals::addEntity(GameEntity* newEnt)
 	// normal entity, append
 	else
 	{
-		gameEntities_.emplace_back(newEnt);
+		gameEntities_.push_back( std::move( owned ) );
 		num_entities_ = gameEntities_.size();
 	}
+	return newEnt;
 }
 
 void
-LevelLocals::addWorld(GameEntity* world)
+LevelLocals::addWorld(std::unique_ptr<GameEntity> world)
 {
-	gameEntities_.at(0).reset( world );
+	gameEntities_.at(0) = std::move( world );
 }
 
 void
@@ -166,36 +168,28 @@ LevelLocals::getClient(int clientNum)
 GameClient*
 LevelLocals::createNewClient(int clientNum)
 {
-	GameClient* client = new GameClient;
+	clients_.at(clientNum) = std::make_unique<GameClient>();
+	GameClient* client = static_cast<GameClient*>(clients_.at(clientNum).get());
 	client->ps_.clientNum = clientNum;
-
-	clients_.at(clientNum).reset( client );
 
 	return client;
 }
 
-void
-LevelLocals::setPlayerEntity(GameEntity* playerEnt, int clientNum)
+GameEntity*
+LevelLocals::setPlayerEntity(std::unique_ptr<GameEntity> playerEnt, int clientNum)
 {
 	playerEnt->client_ = static_cast<GameClient*>(clients_.at(clientNum).get());
 	playerEnt->s.number = clientNum;
-	if( gameEntities_.at(clientNum).get() != playerEnt )
-		gameEntities_.at(clientNum).reset( playerEnt );
+	gameEntities_.at(clientNum) = std::move( playerEnt );
+	return static_cast<GameEntity*>(gameEntities_.at(clientNum).get());
 }
 
 void		
 LevelLocals::createEntityFromSpawnFields(SpawnFieldHolder* sfh, spawn_t* s)
 {
-	GameEntity* ent;
 	// not much distinction yet, just to give the idea.. needs to be done properly later
-	if( !strcmp( sfh->classname_, "misc_vehicle" ) )
-	{
-		ent = new VehicleBase;
-	}
-	else
-	{
-		ent = new GameEntity;
-	}
+	std::unique_ptr<GameEntity> owned = !strcmp( sfh->classname_, "misc_vehicle" ) ? std::make_unique<VehicleBase>() : std::make_unique<GameEntity>();
+	GameEntity* ent = owned.get();
 	ent->init(gameEntities_.size());
 
 	// copy spawn fields
@@ -204,20 +198,19 @@ LevelLocals::createEntityFromSpawnFields(SpawnFieldHolder* sfh, spawn_t* s)
 	// call spawn func
 	s->spawn( ent );
 
+	// a spawn function that declines leaves the entity unused: it is dropped here
 	if( !ent->inuse_ )
-	{
-		delete ent;
 		return;
-	}
 
-	addEntity( ent );
+	addEntity( std::move( owned ) );
 }
 
 void
 LevelLocals::createItemFromSpawnFields( SpawnFieldHolder* sfh, gitem_t* item )
 {
 	// create and init the ent
-	GameEntity* ent = new GameItem;
+	std::unique_ptr<GameEntity> owned = std::make_unique<GameItem>();
+	GameEntity* ent = owned.get();
 	ent->init(gameEntities_.size());
 	setEntityFromSpawnFields(ent, sfh);
 
@@ -232,7 +225,7 @@ LevelLocals::createItemFromSpawnFields( SpawnFieldHolder* sfh, gitem_t* item )
 
 	ent->physicsBounce_ = 0.50;	
 
-	addEntity( ent );
+	addEntity( std::move( owned ) );
 }
 
 void
@@ -281,8 +274,9 @@ LevelLocals::spawnEntity()
 		GameEntity* ent = static_cast<GameEntity*>(gameEntities_.at(i).get());
 		if( !ent )
 		{
-			ent = new GameEntity;
-			ent->init(i+1);
+			gameEntities_.at(i) = std::make_unique<GameEntity>();
+			ent = static_cast<GameEntity*>(gameEntities_.at(i).get());
+			ent->init(i);
 			return ent;
 		}
 		if( ent->inuse_ )
@@ -306,10 +300,9 @@ LevelLocals::spawnEntity()
 	// we reached the end but there is still space in the vector until we hit max_gentities
 	else
 	{
-		GameEntity* ent = new GameEntity;
-		ent->init(num_entities_);
-		addEntity(ent);
-		return ent;
+		auto fresh = std::make_unique<GameEntity>();
+		fresh->init(num_entities_);
+		return addEntity( std::move( fresh ) );
 	}
 	return nullptr;
 }

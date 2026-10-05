@@ -28,9 +28,9 @@ struct LevelLocals
 	void			resetAll();					// reset all variables
 	void			resetClientsAndEntities();// reset client and entity lists (prepare for use)
 
-	void			addEntity(GameEntity* newEnt);	// add a new ent to the list, isClient = true for players only
+	GameEntity*		addEntity(std::unique_ptr<GameEntity> newEnt);	// add a new ent to the list, isClient = true for players only
 	void			removeEntity(GameEntity* entToRemove);
-	void			addWorld(GameEntity* world);
+	void			addWorld(std::unique_ptr<GameEntity> world);
 
 	GameEntity*		spawnEntity();
 
@@ -38,7 +38,7 @@ struct LevelLocals
 	GameClient*		getClient(int clientNum);
 
 	GameClient*		createNewClient(int clientNum);
-	void			setPlayerEntity(GameEntity* playerEnt, int clientNum);
+	GameEntity*		setPlayerEntity(std::unique_ptr<GameEntity> playerEnt, int clientNum);
 
 	void			createEntityFromSpawnFields(SpawnFieldHolder* sfh, spawn_t* s);
 	void			createItemFromSpawnFields(SpawnFieldHolder* sfh, gitem_t* item);
