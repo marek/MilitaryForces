@@ -153,7 +153,7 @@ void CGame::offsetVehicleView( bool spectator )
 
 	if( cg_thirdPersonAngle.value != 0.0f && !spectator ) {
 		// keep the vehicle in the middle of the picture
-		vec3_t toVehicle;
+		Vec3 toVehicle;
 		VectorSubtract( cg.refdef.vieworg, view, toVehicle );
 		vectoangles( toVehicle, cg.refdefViewAngles );
 	}
@@ -292,7 +292,7 @@ static void CGame::offsetCockpitView( void ) {
 	float			*angles;
 	float			ratio;
 	float			delta;
-	vec3_t			predictedVelocity;
+	Vec3			predictedVelocity;
 	
 	if ( cg.snap->ps.pm_type == PM_INTERMISSION ) {
 		return;
@@ -769,7 +769,7 @@ Converts a world vector point into screen coords
 */
 bool CGame::worldToScreenCoords( vec3_t worldPoint, int * pX, int * pY, bool virtualXY )
 {
-	vec3_t v, dp, n, p;
+	Vec3 v, dp, n, p;
 	float tanthetah, tanthetav;
 	float d, cv, ch, w, h;
 	float zoom = 1.0f;

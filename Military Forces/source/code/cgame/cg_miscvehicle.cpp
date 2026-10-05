@@ -14,8 +14,8 @@ CG_Misc_Plane
 
 void ClientEntity::misc_Plane() 
 {
-	vec3_t			velocity;	
-	vec3_t			smokePosition, forward;
+	Vec3			velocity;	
+	Vec3			smokePosition, forward;
 	DrawInfo_Plane_t drawInfo;
 	int				ONOFF = this->currentState.ONOFF;
 
@@ -147,9 +147,9 @@ void ClientEntity::misc_Plane()
 	// smoke
 /*	if( this->currentState.generic1 && this->miscTime > cg.time ) {
 		LocalEntity	*smoke;
-		vec3_t			up = {0, 0, 1};
-		vec3_t			pos;
-		vec3_t			forward;
+		Vec3			up = {0, 0, 1};
+		Vec3			pos;
+		Vec3			forward;
 
 		AngleVectors( this->lerpAngles, forward, NULL, NULL );
 		VectorMA( this->lerpOrigin, availableVehicles[this->currentState.modelindex].mins[0], forward, pos );
@@ -174,7 +174,7 @@ CG_Misc_GV
 
 void ClientEntity::misc_GV() 
 {
-	vec3_t			velocity;
+	Vec3			velocity;
 	DrawInfo_GV_t	drawInfo;
 
 	memset( &drawInfo, 0, sizeof(drawInfo) );
@@ -207,7 +207,7 @@ void ClientEntity::misc_GV()
 	if( (availableVehicles[this->currentState.modelindex].caps & HC_WHEELS) ) {
 		int timediff = cg.time - this->gearAnimStartTime;
 		float dist = drawInfo.basicInfo.speed * timediff / 1000;
-		vec3_t v1, v2;
+		Vec3 v1, v2;
 		float dot;
 		AngleVectors( this->currentState.angles, v1, nullptr, nullptr );
 		VectorCopy( this->currentState.pos.trDelta, v2 );
@@ -238,9 +238,9 @@ void ClientEntity::misc_GV()
 	// smoke 
 	if( this->currentState.generic1 ) {
 		LocalEntity	*smoke;
-		vec3_t			up = {0, 0, 20};
-		vec3_t			pos;
-		vec3_t			forward;
+		Vec3			up = {0, 0, 20};
+		Vec3			pos;
+		Vec3			forward;
 
 		AngleVectors( this->lerpAngles, forward, nullptr, nullptr );
 		VectorCopy( this->lerpOrigin, pos );
@@ -264,7 +264,7 @@ CG_Misc_Helo
 
 void ClientEntity::misc_Helo() 
 {
-	vec3_t			velocity;
+	Vec3			velocity;
 	DrawInfo_Helo_t	drawInfo;
 	int i;
 
@@ -310,9 +310,9 @@ void ClientEntity::misc_Helo()
 	// smoke 
 	if( this->currentState.generic1 ) {
 		LocalEntity	*smoke;
-		vec3_t			up = {0, 0, 20};
-		vec3_t			pos;
-		vec3_t			forward;
+		Vec3			up = {0, 0, 20};
+		Vec3			pos;
+		Vec3			forward;
 
 		AngleVectors( this->lerpAngles, forward, nullptr, nullptr );
 		VectorCopy( this->lerpOrigin, pos );
@@ -347,7 +347,7 @@ CG_Misc_Boat
 
 void ClientEntity::misc_Boat() 
 {
-	vec3_t			velocity;
+	Vec3			velocity;
 	DrawInfo_Boat_t	drawInfo;
 	int i;
 
@@ -392,9 +392,9 @@ void ClientEntity::misc_Boat()
 	// smoke 
 	if( this->currentState.generic1 ) {
 		LocalEntity	*smoke;
-		vec3_t			up = {0, 0, 20};
-		vec3_t			pos;
-		vec3_t			forward;
+		Vec3			up = {0, 0, 20};
+		Vec3			pos;
+		Vec3			forward;
 
 		AngleVectors( this->lerpAngles, forward, nullptr, nullptr );
 		VectorCopy( this->lerpOrigin, pos );
@@ -450,9 +450,9 @@ void ClientEntity::misc_GI()
 	// smoke 
 	if( this->currentState.generic1 ) {
 		LocalEntity	*smoke;
-		vec3_t			up = {0, 0, 20};
-		vec3_t			pos;
-		vec3_t			forward;
+		Vec3			up = {0, 0, 20};
+		Vec3			pos;
+		Vec3			forward;
 
 		AngleVectors( this->lerpAngles, forward, nullptr, nullptr );
 		VectorCopy( this->lerpOrigin, pos );

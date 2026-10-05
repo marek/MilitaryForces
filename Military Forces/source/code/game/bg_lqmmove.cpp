@@ -25,7 +25,7 @@ PlayerMove::lQMMove
 void PlayerMove::lqmGroundTrace( )
 {
 	trace_t		trace;
-	vec3_t		end;
+	Vec3		end;
 
 	// set the height
 
@@ -38,7 +38,7 @@ void PlayerMove::lqmGroundTrace( )
 	// standing on it: only a surface that faces up is ground
 	if ( trace.fraction < 1.0 ) {
 		// stuck into something overhead: solid above the head, open below the feet
-		vec3_t above, below;
+		Vec3 above, below;
 		VectorSet( above, pm->ps->origin[0], pm->ps->origin[1], pm->ps->origin[2] + pm->maxs[2] + 2 );
 		VectorSet( below, pm->ps->origin[0], pm->ps->origin[1], pm->ps->origin[2] + pm->mins[2] - 4 );
 		const bool overhead = trace.startsolid && ( pm->pointcontents( above, pm->ps->clientNum ) & pm->tracemask ) &&
@@ -98,7 +98,7 @@ void PlayerMove::lQMMove( )
 	int		maxspeed = availableVehicles[pm->vehicle].maxspeed;
 	int		maxspeed2 = sqrt((static_cast<float>(maxspeed)*maxspeed/2));
 	int		speedtemp;
-	vec3_t	liftvel, forwardvel, rightvel, deltavel;
+	Vec3	liftvel, forwardvel, rightvel, deltavel;
 
 	if( verydead ) return;
 
@@ -200,7 +200,7 @@ void PlayerMove::lQMMove( )
 
 		// a long fall opens the parachute, unless the ground is already too close
 		if( !(anim & A_LQM_CHUTE) && liftvel[2] < -LQM_CHUTE_OPEN_SPEED ) {
-			vec3_t below;
+			Vec3 below;
 			trace_t ground;
 			VectorCopy( pm->ps->origin, below );
 			below[2] -= LQM_CHUTE_MIN_HEIGHT;
@@ -280,19 +280,19 @@ Returns true if the velocity was clipped in some way
 constexpr int MAX_CLIP_PLANES = 5;
 bool PlayerMove::slideMove_LQM() {
 	int			bumpcount, numbumps;
-	vec3_t		dir;
+	Vec3		dir;
 	float		d;
 	int			numplanes;
 	vec3_t		planes[MAX_CLIP_PLANES];
-	vec3_t		primal_velocity;
-	vec3_t		clipVelocity;
+	Vec3		primal_velocity;
+	Vec3		clipVelocity;
 	int			i, j, k;
 	trace_t	trace;
-	vec3_t		end;
+	Vec3		end;
 	float		time_left;
 	float		into;
-	vec3_t		endVelocity;
-	vec3_t		endClipVelocity;
+	Vec3		endVelocity;
+	Vec3		endClipVelocity;
 	
 	numbumps = 4;
 
@@ -471,9 +471,9 @@ bool PlayerMove::slideMove_LQM() {
 }
 
 void PlayerMove::stepSlideMove_LQM() {
-	vec3_t		start_o, start_v;
+	Vec3		start_o, start_v;
 	trace_t		trace;
-	vec3_t		up, down;
+	Vec3		up, down;
 	float		stepSize;
 
 	VectorCopy (pm->ps->origin, start_o);

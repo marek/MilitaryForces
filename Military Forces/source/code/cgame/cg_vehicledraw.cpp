@@ -698,7 +698,7 @@ void CGame::drawLQM(DrawInfo_LQM_t* drawInfo)
 	int				renderfx = 0;
 	int				anim = drawInfo->anim;
 	int				i;
-	vec3_t			angles;
+	Vec3			angles;
 	vec3_t			axis[3];
 	float			diff = 0;
 	int				*lastTorsoAngle = &drawInfo->lastTorsoAngle;

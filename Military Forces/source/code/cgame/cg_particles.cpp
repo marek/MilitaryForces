@@ -89,7 +89,7 @@ int CGame::addParticleEmitter(particleWorld_t * w, particleEmitter_t * e)
 // attract particle a to particle b
 static void CG_AttractParticles(particle_t * a, particle_t * b)
 {
-	vec3_t vtemp;
+	Vec3 vtemp;
 	float ftemp;
 	float dtime = (cg.time - a->lastthink)*0.001;
 	
@@ -122,7 +122,7 @@ void ClientEntity::removeParticleSystemFromCEntity()
 //attract particle a to entity b
 void ClientEntity::attractParticleToEntity( particle_t * a )
 {
-	vec3_t vtemp;
+	Vec3 vtemp;
 	float distance;
 	float ftemp;
 	float dtime = (cg.time - a->lastthink)*0.001;
@@ -219,7 +219,7 @@ static void CG_ParticleSystemThink(particleWorld_t * w, particleSystem_t * s)
 void CGame::particleThink(particleWorld_t * w, particle_t * p)
 {
 	trace_t		trace;
-	vec3_t		mins, maxs, result, temp;
+	Vec3		mins, maxs, result, temp;
 	long		ptime = cg.time - p->birthtime;
 	float		dtime = (cg.time - p->lastthink)*0.001;
 
@@ -354,13 +354,13 @@ void CGame::particleThink(particleWorld_t * w, particle_t * p)
 static void CG_RenderParticle(particle_t * p)
 {
 	int				index;
-	vec3_t          alight, dlight, lightdir, origin, point;
+	Vec3          alight, dlight, lightdir, origin, point;
 	int             i, j;
 	long			t;
 	polyVert_t		verts[4];
 	float			dtime = (cg.time - p->lastthink)*0.001;
-	vec3_t			rr, ru;
-	vec3_t			rotate_ang;
+	Vec3			rr, ru;
+	Vec3			rotate_ang;
 	byte			shaderRGBA[4];
 
 	VectorSubtract(p->trBase, cg.refdef.vieworg, origin);

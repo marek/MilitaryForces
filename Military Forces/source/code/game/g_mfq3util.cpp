@@ -60,7 +60,7 @@ void updateTargetTracking( GameEntity *ent )
 
 	unsigned long	targetcat = 0;
 	trace_t			tr;
-	vec3_t			forward, endpos, dir;
+	Vec3			forward, endpos, dir;
 	float			radarrange = 0;
 	bool			buildings = false, groundinstallations = false;
 	GameEntity		*test;
@@ -95,7 +95,7 @@ void updateTargetTracking( GameEntity *ent )
 	if( (availableVehicles[ent->client_->vehicle_].cat & CAT_GROUND) ||
 		(availableVehicles[ent->client_->vehicle_].cat & CAT_BOAT)) 
 	{
-		vec3_t	right, up, temp;
+		Vec3	right, up, temp;
 		AngleVectors( ent->client_->ps_.vehicleAngles, forward, right, up );
 		RotatePointAroundVector( temp, up, forward, ent->client_->ps_.turretAngle );
 		CrossProduct( up, temp, right );
@@ -149,13 +149,13 @@ void updateTargetTracking( GameEntity *ent )
 	else 
 	{ 
 		// update existing target
-		vec3_t diff;
+		Vec3 diff;
 		float dot, dist;
 		int actualcat = 0;
 
 		if( ent->tracktarget_->s.eType == ET_EXPLOSIVE ) 
 		{
-			vec3_t	mid;
+			Vec3	mid;
 			actualcat = CAT_GROUND;
 			VectorAdd( ent->tracktarget_->r.absmax, ent->tracktarget_->r.absmin, mid );
 			VectorScale( mid, 0.5f, mid );

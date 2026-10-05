@@ -64,8 +64,8 @@ CG_Plane
 */
 void ClientEntity::plane( clientInfo_t *ci ) 
 {
-	vec3_t			velocity;	
-	vec3_t			smokePosition, forward;
+	Vec3			velocity;	
+	Vec3			smokePosition, forward;
 	DrawInfo_Plane_t drawInfo;
 	int				ONOFF = this->currentState.ONOFF;
 	int				i;
@@ -201,7 +201,7 @@ void ClientEntity::plane( clientInfo_t *ci )
 	if( this == &cg.predictedPlayerEntity )
 	{
 		refEntity_t		reticle;
-		vec3_t	forward, ang, end;
+		Vec3	forward, ang, end;
 		trace_t	tr;
 		playerState_t * ps = &cg.snap->ps;
 		float len;

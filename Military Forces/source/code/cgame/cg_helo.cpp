@@ -113,8 +113,8 @@ CG_Plane
 */
 void ClientEntity::helo( clientInfo_t *ci ) 
 {
-	vec3_t			velocity;	
-	vec3_t			smokePosition, forward;//, right, up, temp, start;
+	Vec3			velocity;	
+	Vec3			smokePosition, forward;//, right, up, temp, start;
 	DrawInfo_Helo_t drawInfo;
 	int				ONOFF = this->currentState.ONOFF;
 	int				i;
@@ -247,7 +247,7 @@ void ClientEntity::helo( clientInfo_t *ci )
 	if( this == &cg.predictedPlayerEntity )
 	{
 		refEntity_t	reticle;
-		vec3_t	forward, right, up, ang, start, end, temp;
+		Vec3	forward, right, up, ang, start, end, temp;
 		trace_t	tr;
 		float len;
 		playerState_t* ps = &cg.snap->ps;

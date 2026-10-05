@@ -65,7 +65,7 @@ CG_GroundVehicle
 */
 void ClientEntity::groundVehicle( clientInfo_t *ci ) 
 {
-	vec3_t			velocity;
+	Vec3			velocity;
 	DrawInfo_GV_t	drawInfo;
 
 	memset( &drawInfo, 0, sizeof(drawInfo) );
@@ -100,7 +100,7 @@ void ClientEntity::groundVehicle( clientInfo_t *ci )
 	if( (availableVehicles[ci->vehicle].caps & HC_WHEELS) ) {
 		int timediff = cg.time - this->gearAnimStartTime;
 		float dist = drawInfo.basicInfo.speed * timediff / 1000;
-		vec3_t v1, v2;
+		Vec3 v1, v2;
 		float dot;
 		AngleVectors( this->currentState.angles, v1, nullptr, nullptr );
 		VectorCopy( this->currentState.pos.trDelta, v2 );
@@ -144,7 +144,7 @@ void ClientEntity::groundVehicle( clientInfo_t *ci )
 	if( this == &cg.predictedPlayerEntity )
 	{
 		refEntity_t		reticle;
-		vec3_t	forward, right, up, ang, start, end, temp;
+		Vec3	forward, right, up, ang, start, end, temp;
 		trace_t	tr;
 		float len;
 		playerState_t* ps = &cg.snap->ps;

@@ -137,7 +137,7 @@ void CGame::impactMarkEx( qhandle_t markShader, const vec3_t origin, const vec3_
 	int				numFragments;
 	markFragment_t	markFragments[MAX_MARK_FRAGMENTS], *mf;
 	vec3_t			markPoints[MAX_MARK_POINTS];
-	vec3_t			projection;
+	Vec3			projection;
 //	bool		flip = false;
 
 
@@ -211,7 +211,7 @@ return;
 		// for each vert on the poly
 		for( j = 0, v = verts ; j < mf->numPoints ; j++, v++ )
 		{
-			vec3_t delta;
+			Vec3 delta;
 
 			VectorCopy( markPoints[mf->firstPoint + j], v->xyz );
 			VectorSubtract( v->xyz, origin, delta );

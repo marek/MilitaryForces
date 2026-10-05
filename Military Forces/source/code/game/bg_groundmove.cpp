@@ -162,7 +162,7 @@ PlayerMove::adjustToTerrain
 void PlayerMove::adjustToTerrain( ) 
 {
 	trace_t		tr;
-	vec3_t		dir, forward, right;
+	Vec3		dir, forward, right;
 	vec3_t		start[PMAX], end[PMAX];
 	float		hLength, hWidth, hLengthC, hWidthC;
 	int			i;
@@ -323,7 +323,7 @@ ends on ground that is not too steep and gets the vehicle further than sliding d
 void PlayerMove::stepSlideMove_GV()
 {
 	constexpr float drivableNormal = 0.6f;
-	vec3_t	startOrigin, startVelocity, slideOrigin, slideVelocity, up, down, mins;
+	Vec3	startOrigin, startVelocity, slideOrigin, slideVelocity, up, down, mins;
 	trace_t	trace;
 
 	VectorCopy( pm->ps->origin, startOrigin );
@@ -384,11 +384,11 @@ void PlayerMove::groundVehicleMove( )
 
     vec3_t		viewdir;
     vec3_t		vehdir;
-	vec3_t		turretdir;
+	Vec3		turretdir;
     vec3_t		diff;
     vec3_t		turnspeed;
-	vec3_t		forward, up;
-	vec3_t		temp;
+	Vec3		forward, up;
+	Vec3		temp;
     bool	dead = (pm->ps->stats[STAT_HEALTH] <= 0);
 	int			i;
 	float		smove = pm->cmd.rightmove;
@@ -565,20 +565,20 @@ Returns true if the velocity was clipped in some way
 constexpr int MAX_CLIP_PLANES = 5;
 bool PlayerMove::slideMove_GV() {
 	int			bumpcount, numbumps;
-	vec3_t		dir;
+	Vec3		dir;
 	float		d;
 	int			numplanes;
 	vec3_t		planes[MAX_CLIP_PLANES];
-	vec3_t		primal_velocity;
-	vec3_t		clipVelocity;
+	Vec3		primal_velocity;
+	Vec3		clipVelocity;
 	int			i, j, k;
 	trace_t	trace;
-	vec3_t		end;
+	Vec3		end;
 	float		time_left;
 	float		into;
-	vec3_t		endVelocity;
-	vec3_t		endClipVelocity;
-	vec3_t		mins;
+	Vec3		endVelocity;
+	Vec3		endClipVelocity;
+	Vec3		mins;
 	
 	VectorCopy( availableVehicles[pm->vehicle].mins, mins );
 	mins[2] += 4;

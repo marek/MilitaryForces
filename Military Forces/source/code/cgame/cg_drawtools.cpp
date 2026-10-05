@@ -870,7 +870,7 @@ bool CGame::polyMeshGeneratedShadow( BasicDrawInfo_t *drawInfo, float *shadowPla
 	polyVert_t verts[5][5];
 	polyVert_t vertBuff[4];
 	qhandle_t shaderHandle = -1;
-	vec3_t start, end, mins = {-1, -1, 0}, maxs = {1, 1, 0};
+	Vec3 start, end, mins = {-1, -1, 0}, maxs = {1, 1, 0};
 	trace_t	trace;
 	bool drawMesh = false;
 	bool vertInWater = false;
@@ -1354,7 +1354,7 @@ LocalEntity * ClientEntity::generic_Smoke( vec3_t smokePosition, int density )
 	// valid state to add a smoke puff local entity?
 	if( cg_smoke.integer && this->miscTime < cg.time )
 	{
-		vec3_t			up = {0, 0, 20};					// direction of smoke
+		Vec3			up = {0, 0, 20};					// direction of smoke
 		float			lifeTime = RandomInt( 50, 150 );	// general life-frames of smoke
 
 		// create puff entity

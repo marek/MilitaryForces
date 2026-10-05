@@ -115,7 +115,7 @@ void ClientEntity::entityEvent( vec3_t position )
 {
 	entityState_t	*es;
 	int				event;
-	vec3_t			dir;
+	Vec3			dir;
 	const char		*s;
 	int				clientNum;
 	clientInfo_t	*ci;

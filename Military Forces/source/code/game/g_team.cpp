@@ -618,7 +618,7 @@ GameEntity *Team_GetLocation(GameEntity *ent)
 {
 	GameEntity		*eloc, *best;
 	float			bestlen, len;
-	vec3_t			origin;
+	Vec3			origin;
 
 	best = nullptr;
 	bestlen = 3*8192.0*8192.0;

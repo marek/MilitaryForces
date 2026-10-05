@@ -299,7 +299,7 @@ grabbing them easier
 ============
 */
 bool	GameShared::playerTouchesItem( playerState_t *ps, entityState_t *item, int atTime ) {
-	vec3_t		origin;
+	Vec3		origin;
 
 	GameShared::evaluateTrajectory( &item->pos, atTime, origin );
 
@@ -407,7 +407,7 @@ GameShared::evaluateTrajectory
 void GameShared::evaluateTrajectory( const trajectory_t *tr, int atTime, vec3_t result ) {
 	float		deltaTime;
 	float		phase;
-	vec3_t		dir;
+	Vec3		dir;
 
 	switch( tr->trType ) {
 	case TR_STATIONARY:
@@ -470,7 +470,7 @@ For determining velocity at a given time
 void GameShared::evaluateTrajectoryDelta( const trajectory_t *tr, int atTime, vec3_t result ) {
 	float	deltaTime;
 	float	phase;
-	vec3_t		dir;
+	Vec3		dir;
 
 	switch( tr->trType ) {
 	case TR_STATIONARY:

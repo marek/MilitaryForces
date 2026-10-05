@@ -395,7 +395,7 @@ static void G_ParseField( const char *key, const char *value, SpawnFieldHolder *
 	SpawnField	*f;
 	byte	*b;
 	float	v;
-	vec3_t	vec;
+	Vec3	vec;
 
 	for ( f=fields ; f->name ; f++ ) 
 	{

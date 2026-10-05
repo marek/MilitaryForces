@@ -8,8 +8,8 @@ void
 Entity_Plane::checkForTakeoffOrLanding()
 {
 	trace_t	trace;
-	vec3_t	startpos;
-	vec3_t	endpos;
+	Vec3	startpos;
+	Vec3	endpos;
 	float height = (client_->ps_.ONOFF & OO_LANDED) ? 3 : 1 + std::max( 0.0f, -client_->ps_.velocity[2] ) * 0.1f;
 
 	VectorSet( startpos, s.pos.trBase[0], s.pos.trBase[1], s.pos.trBase[2] + r.mins[2]);
@@ -18,8 +18,8 @@ Entity_Plane::checkForTakeoffOrLanding()
 
 	VectorCopy( startpos, endpos );
 	endpos[2] -= height;
-	vec3_t	wheelMins = { -6, -6, 0 };
-	vec3_t	wheelMaxs = { 6, 6, 0 };
+	Vec3	wheelMins = { -6, -6, 0 };
+	Vec3	wheelMaxs = { 6, 6, 0 };
 	GameHost::trace (&trace, startpos, wheelMins, wheelMaxs, endpos, s.number, MASK_PLAYERSOLID, false );
 
 	// check for takeoff
@@ -34,7 +34,7 @@ Entity_Plane::checkForTakeoffOrLanding()
 		} 
 		else 
 		{
-			vec3_t angles;
+			Vec3 angles;
 			vectoangles( trace.plane.normal, angles );
 //			Common::printf( "maxs = %.1f, trace = %.1f\n", g_entities[trace.entityNum].r.maxs[2], trace.endpos[2]); 
 //			self->client->ps.origin[2] = g_entities[trace.entityNum].r.maxs[2] + 

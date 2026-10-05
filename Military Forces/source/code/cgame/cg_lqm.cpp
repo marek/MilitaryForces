@@ -57,8 +57,8 @@ CG_GroundVehicle
 */
 void ClientEntity::lQM( clientInfo_t *ci ) 
 {
-	vec3_t			velocity;	
-	vec3_t		    right, up, temp, start;
+	Vec3			velocity;	
+	Vec3		    right, up, temp, start;
 	DrawInfo_LQM_t drawInfo;
 	int				ONOFF = this->currentState.ONOFF;
 
@@ -129,7 +129,7 @@ void ClientEntity::lQM( clientInfo_t *ci )
 	if( this == &cg.predictedPlayerEntity )
 	{
 		refEntity_t		reticle;
-		vec3_t	forward, ang, end;
+		Vec3	forward, ang, end;
 		trace_t	tr;
 //		playerState_t * ps = &cg.snap->ps;
 		float len;

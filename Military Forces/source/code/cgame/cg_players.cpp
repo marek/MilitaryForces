@@ -208,7 +208,7 @@ CG_TrailItem
 */
 void ClientEntity::trailItem( qhandle_t hModel ) {
 	refEntity_t		ent;
-	vec3_t			angles;
+	Vec3			angles;
 	vec3_t			axis[3];
 
 	VectorCopy( this->lerpAngles, angles );

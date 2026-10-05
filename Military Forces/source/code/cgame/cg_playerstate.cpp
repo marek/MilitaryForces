@@ -21,8 +21,8 @@ static void CG_DamageFeedback( int yawByte, int pitchByte, int damage ) {
 	float		kick;
 	int			health;
 	float		scale;
-	vec3_t		dir;
-	vec3_t		angles;
+	Vec3		dir;
+	Vec3		angles;
 	float		dist;
 	float		yaw, pitch;
 

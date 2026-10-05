@@ -1951,8 +1951,8 @@ static void UI_DrawVehiclePreview( rectDef_t *rect, float scale, const vec4_t co
 	// * EXPERIMENTAL MODEL RATHER THAN PICTURE CODE *
 	refdef_t		refdef;
 	refEntity_t		plane;
-	vec3_t			origin;
-	vec3_t			angles;
+	Vec3			origin;
+	Vec3			angles;
 	float			x, y, w, h;
 	
 	static int		old = 0;
@@ -5959,7 +5959,7 @@ void _UI_SetActiveMenu( UserInterface::MenuCommand menu ) {
 	// this should be the ONLY way the menu system is brought up
 	// enusure minumum menu data is cached
   if (uiInfo.uiUtils.menu_Count() > 0) {
-		vec3_t v;
+		Vec3 v;
 		v[0] = v[1] = v[2] = 0;
 	  switch ( menu ) {
 	  case UserInterface::MenuCommand::UIMENU_NONE:

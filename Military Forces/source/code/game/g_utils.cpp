@@ -501,7 +501,7 @@ must be taken if the origin is right on a surface (snap towards start vector fir
 GameEntity *Game::tempEntity( vec3_t origin, int event ) 
 {
 	GameEntity	*e;
-	vec3_t		snapped;
+	Vec3		snapped;
 
 	e = theLevel.spawnEntity();
 	e->s.eType = ET_EVENTS + event;
@@ -543,7 +543,7 @@ void Game::killBox( GameEntity *ent )
 	int			i, num;
 	int			touch[MAX_GENTITIES];
 	GameEntity	*hit;
-	vec3_t		mins, maxs;
+	Vec3		mins, maxs;
 
 	VectorAdd( ent->client_->ps_.origin, ent->r.mins, mins );
 	VectorAdd( ent->client_->ps_.origin, ent->r.maxs, maxs );

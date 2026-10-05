@@ -87,7 +87,7 @@ Also called by event processing code
 */
 void ClientEntity::setEntitySoundPosition() {
 	if ( this->currentState.solid == SOLID_BMODEL ) {
-		vec3_t	origin;
+		Vec3	origin;
 		float	*v;
 
 		v = cgs.inlineModelMidpoints[ this->currentState.modelindex ];
@@ -280,7 +280,7 @@ void ClientEntity::item() {
 	// accompanying rings / spheres for powerups
 	if ( !cg_simpleItems.integer ) 
 	{
-		vec3_t spinAngles;
+		Vec3 spinAngles;
 
 		VectorClear( spinAngles );
 
@@ -347,7 +347,7 @@ void ClientEntity::missile() {
 
 	// add missile sound
 	if ( weapon->missileSound ) {
-		vec3_t	velocity;
+		Vec3	velocity;
 
 		GameShared::evaluateTrajectoryDelta( &this->currentState.pos, cg.time, velocity );
 
@@ -606,7 +606,7 @@ CG_RotatePoint
 ================
 */
 static void CG_RotatePoint(vec3_t point, vec3_t matrix[3]) {
-	vec3_t tvec;
+	Vec3 tvec;
 
 	VectorCopy(point, tvec);
 	point[0] = DotProduct(matrix[0], tvec);
@@ -623,10 +623,10 @@ Also called by client movement prediction code
 */
 void CGame::adjustPositionForMover( const vec3_t in, int moverNum, int fromTime, int toTime, vec3_t out ) {
 	ClientEntity	*cent;
-	vec3_t	oldOrigin, origin, deltaOrigin;
-	vec3_t	oldAngles, angles, deltaAngles;
+	Vec3	oldOrigin, origin, deltaOrigin;
+	Vec3	oldAngles, angles, deltaAngles;
 	vec3_t	matrix[3], transpose[3];
-	vec3_t	org, org2, move2;
+	Vec3	org, org2, move2;
 
 	if ( moverNum <= 0 || moverNum >= ENTITYNUM_MAX_NORMAL ) {
 		VectorCopy( in, out );
@@ -680,7 +680,7 @@ float ClientEntity::entityAngleErrorFraction() const {
 }
 
 void ClientEntity::interpolateEntityPosition() {
-	vec3_t		current, next;
+	Vec3		current, next;
 	float		f;
 
 	// it would be an internal error to find an entity that interpolates without

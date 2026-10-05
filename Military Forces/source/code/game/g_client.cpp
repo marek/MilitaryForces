@@ -80,7 +80,7 @@ SpotWouldTelefrag
 bool SpotWouldTelefrag( GameEntity *spot )
 {
 	int			touch[MAX_GENTITIES];
-	vec3_t		mins, maxs;
+	Vec3		mins, maxs;
 
 	VectorAdd( spot->s.origin, playerMins, mins );
 	VectorAdd( spot->s.origin, playerMaxs, maxs );
@@ -106,7 +106,7 @@ bool SpotWouldTelefrag( GameEntity *spot, int vehicle, bool *freshOccupant )
 	// someone who spawned moments ago is on the way out, not camping
 	constexpr int freshTime = 10000;
 	int			touch[MAX_GENTITIES];
-	vec3_t		mins, maxs;
+	Vec3		mins, maxs;
 
 	if( vehicle < 0 || vehicle >= bg_numberOfVehicles ) 
 		return SpotWouldTelefrag( spot );
@@ -147,14 +147,14 @@ bool SpotWouldTelefrag( GameEntity *spot, int vehicle, bool *freshOccupant )
 			continue;
 		if( !(availableVehicles[other->client_->vehicle_].cat & (CAT_PLANE|CAT_HELO)) )
 			continue;
-		vec3_t rel;
+		Vec3 rel;
 		VectorSubtract( spot->s.origin, other->r.currentOrigin, rel );
 		const float* velocity = other->client_->ps_.velocity;
 		const float speedSquared = DotProduct( velocity, velocity );
 		if( speedSquared < 1.0f )
 			continue;
 		const float when = std::clamp( DotProduct( rel, velocity ) / speedSquared, 0.0f, approachSeconds );
-		vec3_t miss;
+		Vec3 miss;
 		VectorMA( rel, -when, velocity, miss );
 		if( VectorLength( miss ) < approachRadius )
 			return true;
@@ -216,7 +216,7 @@ Chooses a player start, deathmatch start, etc
 static GameEntity *SelectRandomFurthestSpawnPoint( vec3_t avoidPoint, vec3_t origin, vec3_t angles, int category ) 
 {
 	GameEntity	*spot;
-	vec3_t		delta;
+	Vec3		delta;
 	float		dist;
 	float		list_dist[64];
 	GameEntity	*list_spot[64];

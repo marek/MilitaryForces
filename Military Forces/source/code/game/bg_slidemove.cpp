@@ -29,19 +29,19 @@ Returns true if the velocity was clipped in some way
 #define	MAX_CLIP_PLANES	5
 bool	PlayerMove::slideMove( bool gravity ) {
 	int			bumpcount, numbumps;
-	vec3_t		dir;
+	Vec3		dir;
 	float		d;
 	int			numplanes;
 	vec3_t		planes[MAX_CLIP_PLANES];
-	vec3_t		primal_velocity;
-	vec3_t		clipVelocity;
+	Vec3		primal_velocity;
+	Vec3		clipVelocity;
 	int			i, j, k;
 	trace_t	trace;
-	vec3_t		end;
+	Vec3		end;
 	float		time_left;
 	float		into;
-	vec3_t		endVelocity;
-	vec3_t		endClipVelocity;
+	Vec3		endVelocity;
+	Vec3		endClipVelocity;
 
 	numbumps = 4;
 

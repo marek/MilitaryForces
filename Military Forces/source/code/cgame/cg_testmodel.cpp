@@ -53,7 +53,7 @@ can then be moved around
 =================
 */
 void CGame::testModel_f () {
-	vec3_t		angles;
+	Vec3		angles;
 
 	memset( &cg.testModelEntity, 0, sizeof(cg.testModelEntity) );
 	if ( CommandSystem::argc() < 2 ) {
@@ -312,7 +312,7 @@ void CGame::addTestVehicle () {
 }
 
 void CGame::testVehicle (long cat) {
-	vec3_t		angles;
+	Vec3		angles;
 	int			i;
 
 	if( cat != CAT_PLANE && cat != CAT_GROUND ) {

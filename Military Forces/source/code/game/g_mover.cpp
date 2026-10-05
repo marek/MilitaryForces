@@ -24,8 +24,8 @@ static void MatchTeam( GameEntity *teamLeader, int moverState, int time );
 struct pushed_t 
 {
 	GameEntity	*ent;
-	vec3_t	origin;
-	vec3_t	angles;
+	Vec3	origin;
+	Vec3	angles;
 	float	deltayaw;
 };
 pushed_t	pushed[MAX_GENTITIES], *pushed_p;
@@ -89,7 +89,7 @@ G_RotatePoint
 ================
 */
 static void G_RotatePoint(vec3_t point, vec3_t matrix[3]) {
-	vec3_t tvec;
+	Vec3 tvec;
 
 	VectorCopy(point, tvec);
 	point[0] = DotProduct(matrix[0], tvec);
@@ -107,7 +107,7 @@ Returns false if the move is blocked
 static bool G_TryPushingEntity( GameEntity *check, GameEntity *pusher, vec3_t move, vec3_t amove ) 
 {
 	vec3_t		matrix[3], transpose[3];
-	vec3_t		org, org2, move2;
+	Vec3		org, org2, move2;
 	GameEntity	*block;
 
 	// EF_MOVER_STOP will just stop when contacting another entity
@@ -205,11 +205,11 @@ static bool G_MoverPush( GameEntity *pusher, vec3_t move, vec3_t amove, GameEnti
 {
 	int			i, e;
 	GameEntity	*check;
-	vec3_t		mins, maxs;
+	Vec3		mins, maxs;
 	pushed_t	*p;
 	int			entityList[MAX_GENTITIES];
 	int			listedEntities;
-	vec3_t		totalMins, totalMaxs;
+	Vec3		totalMins, totalMaxs;
 
 	*obstacle = nullptr;
 
@@ -331,9 +331,9 @@ G_MoverTeam
 */
 static void G_MoverTeam( GameEntity *ent ) 
 {
-	vec3_t		move, amove;
+	Vec3		move, amove;
 	GameEntity	*part, *obstacle;
-	vec3_t		origin, angles;
+	Vec3		origin, angles;
 
 	obstacle = nullptr;
 
@@ -422,7 +422,7 @@ SetMoverState
 */
 static void SetMoverState( GameEntity *ent, GameEntity::eMoverState moverState, int time )
 {
-	vec3_t			delta;
+	Vec3			delta;
 	float			f;
 
 	ent->moverState_ = moverState;
@@ -644,10 +644,10 @@ so the movement delta can be calculated
 */
 static void InitMover( GameEntity *ent ) 
 {
-	vec3_t		move;
+	Vec3		move;
 	float		distance;
 	float		light;
-	vec3_t		color;
+	Vec3		color;
 	bool		lightSet, colorSet;
 	char		*sound;
 
@@ -785,7 +785,7 @@ struct Think_SpawnNewDoorTrigger : public GameEntity::EntityFunc_Think
 	void execute() override
 	{
 		GameEntity		*other;
-		vec3_t		mins, maxs;
+		Vec3		mins, maxs;
 		int			i, best;
 
 		// set all of the slaves as shootable
@@ -855,9 +855,9 @@ NOMONSTER	monsters will not trigger this door
 */
 void SP_func_door (GameEntity *ent) 
 {
-	vec3_t	abs_movedir;
+	Vec3	abs_movedir;
 	float	distance;
-	vec3_t	size;
+	Vec3	size;
 	float	lip;
 
 	ent->sound1to2_ = ent->sound2to1_ = Game::soundIndex("sound/movers/doors/dr1_strt.wav");
@@ -896,7 +896,7 @@ void SP_func_door (GameEntity *ent)
 	// if "start_open", reverse position 1 and 2
 	if( ent->spawnflags_ & 1 ) 
 	{
-		vec3_t	temp;
+		Vec3	temp;
 
 		VectorCopy( ent->pos2_, temp );
 		VectorCopy( ent->s.origin, ent->pos2_ );
@@ -995,7 +995,7 @@ static void SpawnPlatTrigger( GameEntity *ent )
 	trigger->r.contents = CONTENTS_TRIGGER;
 	trigger->parent_ = ent;
 
-	vec3_t tmin, tmax;
+	Vec3 tmin, tmax;
 	tmin[0] = ent->pos1_[0] + ent->r.mins[0] + 33;
 	tmin[1] = ent->pos1_[1] + ent->r.mins[1] + 33;
 	tmin[2] = ent->pos1_[2] + ent->r.mins[2];
@@ -1139,11 +1139,11 @@ void SP_func_button( GameEntity *ent )
 	Game::spawnFloat( "lip", "4", &lip );
 
 	Game::setMovedir( ent->s.angles, ent->movedir_ );
-	vec3_t abs_movedir;
+	Vec3 abs_movedir;
 	abs_movedir[0] = fabs(ent->movedir_[0]);
 	abs_movedir[1] = fabs(ent->movedir_[1]);
 	abs_movedir[2] = fabs(ent->movedir_[2]);
-	vec3_t size;
+	Vec3 size;
 	VectorSubtract( ent->r.maxs, ent->r.mins, size );
 	float distance = abs_movedir[0] * size[0] + abs_movedir[1] * size[1] + abs_movedir[2] * size[2] - lip;
 	VectorMA (ent->pos1_, distance, ent->movedir_, ent->pos2_);
@@ -1200,7 +1200,7 @@ static void Reached_TrainImpl( GameEntity *ent )
 {
 	GameEntity		*next;
 	float			speed;
-	vec3_t			move;
+	Vec3			move;
 	float			length;
 
 	// copy the apropriate values

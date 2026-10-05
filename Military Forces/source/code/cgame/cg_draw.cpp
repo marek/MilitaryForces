@@ -425,8 +425,8 @@ Used for both the status bar and the scoreboard
 void CGame::drawFlagModel( float x, float y, float w, float h, int team, bool force2D ) {
 	qhandle_t		cm;
 	float			len;
-	vec3_t			origin, angles;
-	vec3_t			mins, maxs;
+	Vec3			origin, angles;
+	Vec3			mins, maxs;
 	qhandle_t		handle;
 
 	if ( !force2D && cg_draw3dIcons.integer ) {
@@ -1666,7 +1666,7 @@ CG_ScanForCrosshairEntity
 *//*
 static void CG_ScanForCrosshairEntity( void ) {
 	trace_t		trace;
-	vec3_t		start, end;
+	Vec3		start, end;
 	int			content;
 
 	VectorCopy( cg.refdef.vieworg, start );
@@ -2241,7 +2241,7 @@ Perform all drawing needed to completely fill the screen
 */
 void CGame::drawActive( stereoFrame_t stereoView ) {
 	float		separation;
-	vec3_t		baseOrg;
+	Vec3		baseOrg;
 
 	// optionally draw the info screen instead
 	if( !cg.snap ) {

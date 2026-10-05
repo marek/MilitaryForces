@@ -29,7 +29,7 @@ CG_Boat
 */
 void ClientEntity::boat( clientInfo_t *ci ) 
 {
-	vec3_t			velocity;
+	Vec3			velocity;
 	DrawInfo_Boat_t	drawInfo;
 	int				i;
 
@@ -99,7 +99,7 @@ void ClientEntity::boat( clientInfo_t *ci )
 	if( this == &cg.predictedPlayerEntity )
 	{
 		refEntity_t	reticle;
-		vec3_t	forward, right, up, ang, start, end, temp;
+		Vec3	forward, right, up, ang, start, end, temp;
 		trace_t	tr;
 		float len;
 		playerState_t* ps = &cg.snap->ps;

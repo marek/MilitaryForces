@@ -53,8 +53,8 @@ struct Think_ExplodeMissile : public GameEntity::EntityFunc_Think
 {
 	void execute() override
 	{
-		vec3_t		dir;
-		vec3_t		origin;
+		Vec3		dir;
+		Vec3		origin;
 
 		// update target
 		if( self_->tracktarget_ && self_->tracktarget_->client_ ) 
@@ -101,8 +101,8 @@ struct Think_ExplodeFlak : public GameEntity::EntityFunc_Think
 {
 	void execute() override
 	{
-		vec3_t		dir;
-		vec3_t		origin;
+		Vec3		dir;
+		Vec3		origin;
 
 		GameShared::evaluateTrajectory( &self_->s.pos, theLevel.time_, origin );
 		SnapVector( origin );
@@ -141,8 +141,8 @@ struct Think_ExplodeCFlare : public GameEntity::EntityFunc_Think
 {
 	void execute() override
 	{
-		vec3_t		dir;
-		vec3_t		origin;
+		Vec3		dir;
+		Vec3		origin;
 		static int	seed = 0x92;
 
 		// update target
@@ -200,12 +200,12 @@ void Game::nukeRadiusDamage( vec3_t origin, GameEntity *attacker, float damage, 
 	GameEntity	*ent;
 	int			entityList[MAX_GENTITIES];
 	int			numListedEntities;
-	vec3_t		mins, maxs;
-	vec3_t		v;
-	vec3_t		dir;
+	Vec3		mins, maxs;
+	Vec3		v;
+	Vec3		dir;
 	int			i, e;
 	trace_t		trace, trace2;
-	vec3_t		temp;
+	Vec3		temp;
 
 	if ( radius < 1 ) 
 		radius = 1;
@@ -286,9 +286,9 @@ void Game::nukeShockWave( vec3_t origin, GameEntity *attacker, float damage, flo
 	GameEntity	*ent;
 	int			entityList[MAX_GENTITIES];
 	int			numListedEntities;
-	vec3_t		mins, maxs;
-	vec3_t		v;
-	vec3_t		dir;
+	Vec3		mins, maxs;
+	Vec3		v;
+	Vec3		dir;
 	int			i, e;
 
 	if ( radius < 1 )
@@ -356,7 +356,7 @@ struct Think_NukeDamage : public GameEntity::EntityFunc_Think
 		int i;
 		float t;
 		GameEntity *ent;
-		vec3_t newangles;
+		Vec3 newangles;
 
 		self_->count_ += 100;
 
@@ -497,7 +497,7 @@ Game::burningManExplode
 */
 void Game::burningManExplode( GameEntity *ent )
 {
-	vec3_t		start, dir;
+	Vec3		start, dir;
 	static int	seed = 0x92;
 
 	VectorCopy( ent->r.currentOrigin, start );
@@ -537,7 +537,7 @@ struct Think_ExplodeNuke : public GameEntity::EntityFunc_Think
 	{
 		GameEntity	*explosion;
 		GameEntity	*te;
-		vec3_t		snapped;
+		Vec3		snapped;
 
 		// start up the explosion logic
 		explosion = theLevel.spawnEntity();
@@ -612,7 +612,7 @@ static void G_MissileImpact( GameEntity *ent, trace_t *trace )
 		// FIXME: wrong damage direction?
 		if ( ent->damage_ ) 
 		{
-			vec3_t	velocity;
+			Vec3	velocity;
 			int		actualdamage;
 
 			if( LogAccuracyHit( other, theLevel.getEntity(ent->r.ownerNum) ) )// &g_entities[ent->r.ownerNum] ) ) 
@@ -709,7 +709,7 @@ Game::runMissile
 */
 void Game::runMissile( GameEntity *ent ) 
 {
-	vec3_t		origin;
+	Vec3		origin;
 	trace_t		tr;
 	int			passent;
 
@@ -768,7 +768,7 @@ struct Think_Crate : public GameEntity::EntityFunc_Think
 {
 	void execute() override
 	{
-		vec3_t angles, pos, dir;
+		Vec3 angles, pos, dir;
 		int i;
 
 		// Get values
@@ -844,7 +844,7 @@ struct Think_FollowTarget : public GameEntity::EntityFunc_Think
 {
 	void execute() override
 	{
-		vec3_t	dir, targdir, mid, mins, maxs;
+		Vec3	dir, targdir, mid, mins, maxs;
 		float	dist, dot;
 		trace_t	tr;
 		int		i, prob, num, touch[MAX_GENTITIES], vulner;
@@ -1018,8 +1018,8 @@ fire_antiair MFQ3
 void fire_antiair (GameEntity *self) 
 {
 	GameEntity	*bolt;
-	vec3_t		dir, right, up, temp, forward;
-	vec3_t		start, offset;
+	Vec3		dir, right, up, temp, forward;
+	Vec3		start, offset;
 	bool	active = ( (self->client_->ps_.stats[STAT_LOCKINFO] & LI_LOCKING) != 0 );
 	bool	wingtip = false;
 
@@ -1117,8 +1117,8 @@ fire_antiground MFQ3
 void fire_antiground( GameEntity *self ) 
 {
 	GameEntity	*bolt;
-	vec3_t		dir, right, up;
-	vec3_t		start, offset, forward, temp;
+	Vec3		dir, right, up;
+	Vec3		start, offset, forward, temp;
 	bool		active = ( (self->client_->ps_.stats[STAT_LOCKINFO] & LI_LOCKING) != 0 );
 	bool		wingtip = false;
 
@@ -1221,8 +1221,8 @@ fire_ffar MFQ3
 void fire_ffar (GameEntity *self) 
 {
 	GameEntity	*bolt;
-	vec3_t		dir, right, up;
-	vec3_t		start, offset;
+	Vec3		dir, right, up;
+	Vec3		start, offset;
 
 	VectorCopy( self->s.pos.trBase, start );
 
@@ -1272,8 +1272,8 @@ fire_ironbomb MFQ3
 void fire_ironbomb( GameEntity *self ) 
 {
 	GameEntity	*bolt;
-	vec3_t		dir, right, up, offset;
-	vec3_t		start;
+	Vec3		dir, right, up, offset;
+	Vec3		start;
 
 //	self->left = (self->left ? false : true);
 	VehicleData::removeWeaponFromLoadout(self->client_->ps_.weaponIndex, &self->loadout_, &self->client_->ps_, nullptr, offset, 0 );
@@ -1328,9 +1328,9 @@ fire_autocannon MFQ3
 void fire_autocannon( GameEntity *self, bool main )
 {
 	GameEntity	*bolt;
-	vec3_t		dir, forward, right, up, temp;
-	vec3_t		start, offset;
-	vec3_t		spreadangle;
+	Vec3		dir, forward, right, up, temp;
+	Vec3		start, offset;
+	Vec3		spreadangle;
 	int			weapIdx = (main ? self->client_->ps_.weaponIndex : availableVehicles[self->client_->vehicle_].weapons[0]);
 	float		spreadX = availableWeapons[weapIdx].spread; 
 	float		spreadY = spreadX;
@@ -1370,7 +1370,7 @@ void fire_autocannon( GameEntity *self, bool main )
 			}
 			turretYaw = doorGunYaw( leftGun, aim );
 			// the door mounts sit either side of the cabin; offset[1] is applied along the turned right vector below
-			vec3_t flatForward, flatRight, flatUp;
+			Vec3 flatForward, flatRight, flatUp;
 			AngleVectors( self->client_->ps_.vehicleAngles, flatForward, flatRight, flatUp );
 			VectorMA( start, doorGunForward, flatForward, start );
 			VectorMA( start, leftGun ? -doorGunSide : doorGunSide, flatRight, start );
@@ -1448,8 +1448,8 @@ fire_autocannon_GI MFQ3
 void fire_autocannon_GI (GameEntity *self) 
 {
 	GameEntity	*bolt;
-	vec3_t		dir;
-	vec3_t		start;
+	Vec3		dir;
+	Vec3		start;
 	int			weapIdx = self->s.weaponIndex;
 //	float		spreadX = availableWeapons[weapIdx].spread; 
 //	float		spreadY = spreadX;
@@ -1497,7 +1497,7 @@ fire_riderGun
 void fire_riderGun( GameEntity *rider, GameEntity *vehicle, const vec3_t angles ) 
 {
 	const int weapIdx = availableVehicles[rider->client_->vehicle_].weapons[WP_MACHINEGUN];
-	vec3_t dir, right, start;
+	Vec3 dir, right, start;
 
 	AngleVectors( angles, dir, right, nullptr );
 	VectorCopy( vehicle->r.currentOrigin, start );
@@ -1539,8 +1539,8 @@ fire_maingun MFQ3
 void fire_maingun( GameEntity *self ) 
 {
 	GameEntity	*bolt;
-	vec3_t		dir, forward, right, up, temp;
-	vec3_t		start, offset;
+	Vec3		dir, forward, right, up, temp;
+	Vec3		start, offset;
 
 	AngleVectors( self->client_->ps_.vehicleAngles, forward, right, up );
 	RotatePointAroundVector( temp, up, forward, self->client_->ps_.turretAngle );
@@ -1590,7 +1590,7 @@ fire_flare MFQ3
 void fire_flare( GameEntity *self ) 
 {
 	GameEntity	*bolt;
-	vec3_t		start, up;
+	Vec3		start, up;
 	
 	VectorSet( up, 0, 0, 1 );
 	VectorCopy( self->s.pos.trBase, start );
@@ -1672,7 +1672,7 @@ fire flare cluster
 void fire_cflare( GameEntity *self) 
 {
 	GameEntity	*bolt;
-	vec3_t		start, up;
+	Vec3		start, up;
 	int age;
 	
 	VectorSet( up, 0, 0, 1 );
@@ -1723,8 +1723,8 @@ use_fueltank MFQ3
 void drop_fueltank ( GameEntity *self )
 {
 	GameEntity	*bolt;
-	vec3_t		dir, right, up, offset;
-	vec3_t		start;
+	Vec3		dir, right, up, offset;
+	Vec3		start;
 
 //	self->left = (self->left ? false : true);
 	VehicleData::removeWeaponFromLoadout(self->client_->ps_.weaponIndex, &self->loadout_, &self->client_->ps_, nullptr, offset, 0 );
@@ -1789,7 +1789,7 @@ drop_crate
 void drop_crate( GameEntity *self )
 {
 	GameEntity	*bolt;
-	vec3_t		start;
+	Vec3		start;
 
 	VehicleData::removeWeaponFromLoadout(self->client_->ps_.weaponIndex, &self->loadout_, &self->client_->ps_, nullptr, nullptr, 0 );
 
@@ -1840,8 +1840,8 @@ fire_nukebomb MFQ3
 void fire_nukebomb ( GameEntity *self ) 
 {
 	GameEntity	*bolt;
-	vec3_t		dir, right, up, offset;
-	vec3_t		start;
+	Vec3		dir, right, up, offset;
+	Vec3		start;
 
 //	self->left = (self->left ? false : true);
 	VehicleData::removeWeaponFromLoadout(self->client_->ps_.weaponIndex, &self->loadout_, &self->client_->ps_, nullptr, offset, 0 );
@@ -1889,8 +1889,8 @@ fire_nukemissile MFQ3
 void fire_nukemissile (GameEntity *self) 
 {
 	GameEntity	*bolt;
-	vec3_t		dir, right, up;
-	vec3_t		start, offset, forward, temp;
+	Vec3		dir, right, up;
+	Vec3		start, offset, forward, temp;
 	bool	wingtip = false;
 
 	VectorCopy( self->s.pos.trBase, start );
@@ -1972,7 +1972,7 @@ LaunchMissile_GI MFQ3
 void LaunchMissile_GI( GameEntity* ent )
 {
 	GameEntity	*bolt;
-	vec3_t		dir, start;
+	Vec3		dir, start;
 
 	ent->count_--;
 //	Common::printf("Launching GI missile....%d left\n", ent->count);
@@ -2031,7 +2031,7 @@ constexpr int FLAK_DEVIATION_HEIGHT = 200;
 void fire_flak_GI (GameEntity *self)
 {
 	GameEntity	*bolt;
-	vec3_t		start, offset;
+	Vec3		start, offset;
 	bool	wingtip = false;
 	int		fuse;
 	static int	seed = 0x92;

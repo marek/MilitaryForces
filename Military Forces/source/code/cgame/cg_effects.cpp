@@ -215,7 +215,7 @@ CG_FlakEffect
 void ClientEntity::flakEffect( entityState_t * es )
 {
 	LocalEntity	* smoke;
-	vec3_t			pos, velocity;
+	Vec3			pos, velocity;
 	int i, temp, puff_size;
 	static int	seed = 0x92;
 	puff_size = availableWeapons[es->weaponIndex].damageRadius / 10;
@@ -255,7 +255,7 @@ LocalEntity *CGame::makeExplosion( vec3_t origin, vec3_t dir,
 {
 	float			ang;
 	LocalEntity	*ex;
-	vec3_t			tmpVec, newOrigin;
+	Vec3			tmpVec, newOrigin;
 
 	if ( duration <= 0 ) {
 		Common::error( ERR_DROP, "CG_MakeExplosion: duration = %i", duration );
@@ -356,7 +356,7 @@ Generated a bunch of gibs launching out from the bodies location
 #define	GIB_VELOCITY	250*LQM_SCALE
 constexpr int GIB_JUMP = 250;
 void CGame::gibPlayer( vec3_t playerOrigin ) {
-	vec3_t	origin, velocity;
+	Vec3	origin, velocity;
 
 	/*
 	if ( !cg_blood.integer ) {

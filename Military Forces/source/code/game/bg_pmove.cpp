@@ -99,7 +99,7 @@ Handles both ground friction and water friction
 ==================
 */
 void PlayerMove::friction( ) {
-	vec3_t	vec;
+	Vec3	vec;
 	float	*vel;
 	float	speed, newspeed, control;
 	float	drop;
@@ -182,8 +182,8 @@ void PlayerMove::accelerate( vec3_t wishdir, float wishspeed, float accel ) {
 	}
 #else
 	// proper way (avoids strafe jump maxspeed bug), but feels bad
-	vec3_t		wishVelocity;
-	vec3_t		pushDir;
+	Vec3		wishVelocity;
+	Vec3		pushDir;
 	float		pushLen;
 	float		canPush;
 
@@ -243,9 +243,9 @@ Only with the flight powerup
 */
 void PlayerMove::flyMove( ) {
 	int		i;
-	vec3_t	wishvel;
+	Vec3	wishvel;
 	float	wishspeed;
-	vec3_t	wishdir;
+	Vec3	wishdir;
 	float	scale;
 
 	// camera bbox
@@ -295,9 +295,9 @@ PlayerMove::noclipMove
 void PlayerMove::noclipMove( ) {
 	float	speed, drop, friction, control, newspeed;
 	int			i;
-	vec3_t		wishvel;
+	Vec3		wishvel;
 	float		fmove, smove;
-	vec3_t		wishdir;
+	Vec3		wishdir;
 	float		wishspeed;
 	float		scale;
 
@@ -355,7 +355,7 @@ PlayerMove::setWaterLevel	FIXME: avoid this twice?  certainly if not moving
 =============
 */
 void PlayerMove::setWaterLevel( ) {
-	vec3_t		point, start, end;
+	Vec3		point, start, end;
 	int			cont;
 //	int			sample1;
 //	int			sample2;

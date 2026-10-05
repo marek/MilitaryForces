@@ -205,7 +205,7 @@ void Game::damage( GameEntity *targ, GameEntity *inflictor, GameEntity* attacker
 	// figure momentum add, even if the damage won't be taken
 	if ( knockback && targ->client_ )
 	{
-		vec3_t	kvel;
+		Vec3	kvel;
 		float	mass;
 
 		mass = 200;
@@ -360,9 +360,9 @@ explosions and melee attacks.
 */
 bool CanDamage( GameEntity* targ, vec3_t origin ) 
 {
-	vec3_t	dest;
+	Vec3	dest;
 	trace_t	tr;
-	vec3_t	midpoint;
+	Vec3	midpoint;
 
 	// use the midpoint of the bounds instead of the origin, because
 	// bmodels may have their origin is 0,0,0
@@ -420,9 +420,9 @@ bool Game::radiusDamage ( vec3_t origin, GameEntity* attacker, float damage, flo
 	GameEntity* ent;
 	int			entityList[MAX_GENTITIES];
 	int			numListedEntities;
-	vec3_t		mins, maxs;
-	vec3_t		v;
-	vec3_t		dir;
+	Vec3		mins, maxs;
+	Vec3		v;
+	Vec3		dir;
 	int			i, e;
 	bool		hitClient = false;
 

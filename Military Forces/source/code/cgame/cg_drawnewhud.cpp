@@ -437,15 +437,15 @@ CG_DrawRadarSymbols
 void CGame::drawRadarSymbols_AIR_new( int vehicle, float range, int x, int y ) {
 	unsigned int i;
 	ClientEntity	*self = &cg.predictedPlayerEntity;
-	vec3_t		pos, pos1, pos2;
-	vec3_t		dir;
+	Vec3		pos, pos1, pos2;
+	Vec3		dir;
 	float		dist;
 	float		scale;
 	float		hdg = self->currentState.angles[1];
 	float		angle;
-	vec3_t		angles;
+	Vec3		angles;
 	int			otherveh;
-	vec3_t		otherpos;
+	Vec3		otherpos;
 	int			icon;
 	int			drawnTargets = 0;
 	trace_t		res;
@@ -555,15 +555,15 @@ void CGame::drawRadarSymbols_GROUND_new( int vehicle, float range, int x, int y 
 {
 	unsigned int i;
 	ClientEntity	*self = &cg.predictedPlayerEntity;
-	vec3_t		pos, pos1, pos2;
-	vec3_t		dir;
+	Vec3		pos, pos1, pos2;
+	Vec3		dir;
 	float		dist;
 	float		scale;
 	float		hdg = self->currentState.angles[1];
 	float		angle;
-	vec3_t		angles;
+	Vec3		angles;
 	int			otherveh;
-	vec3_t		otherpos;
+	Vec3		otherpos;
 	int			icon;
 	int			drawnTargets = 0;
 	trace_t		res;
@@ -1082,7 +1082,7 @@ void CGame::hUD_Camera(int mfdnum, int vehicle) {
 	// any ideas anyone?
 	ClientEntity *cent = &cg.predictedPlayerEntity;
 	playerState_t *ps = &cg.predictedPlayerState;
-	vec3_t	v;
+	Vec3	v;
 	float	x, y, w, h, vx, vy, vh;
 	float	fov;
 	int		cammode;
@@ -1131,7 +1131,7 @@ void CGame::hUD_Camera(int mfdnum, int vehicle) {
 		(availableVehicles[vehicle].cat & CAT_HELO)) cammode = CAMERA_TARGET;
 
 	if( cammode == CAMERA_DOWN ) {
-		vec3_t a;
+		Vec3 a;
 		AngleVectors( cent->currentState.angles, nullptr, nullptr, v );
 		VectorSet( a, 90, cent->currentState.angles[1], 0 );
 		AnglesToAxis( a, cg.HUDCamera.viewaxis );
@@ -1142,7 +1142,7 @@ void CGame::hUD_Camera(int mfdnum, int vehicle) {
 		if( (availableVehicles[vehicle].cat & CAT_GROUND) ||
 			(availableVehicles[vehicle].cat & CAT_BOAT) ||
 			(availableVehicles[vehicle].cat & CAT_HELO)) {
-			vec3_t right, up, temp;
+			Vec3 right, up, temp;
 			AngleVectors( cent->currentState.angles, v, right, up );
 			RotatePointAroundVector( temp, up, v, cent->currentState.angles2[ROLL] );
 			CrossProduct( up, temp, right );
@@ -1151,7 +1151,7 @@ void CGame::hUD_Camera(int mfdnum, int vehicle) {
 			vectoangles( v, temp );
 			AnglesToAxis( temp, cg.HUDCamera.viewaxis );
 		} else {
-			vec3_t a, b;
+			Vec3 a, b;
 			AngleVectors( cent->currentState.angles, v, nullptr, nullptr );
 			VectorCopy( v, b );
 			VectorInverse( b );
@@ -1164,7 +1164,7 @@ void CGame::hUD_Camera(int mfdnum, int vehicle) {
 		VectorAdd( cent->lerpOrigin, v, cg.HUDCamera.vieworg );
 	} else if( cammode == CAMERA_BOMB ) {
 		int speed = ps->speed/10;
-		vec3_t horz, vert, tempH, tempV, end;
+		Vec3 horz, vert, tempH, tempV, end;
 		float hD, vD, alpha;
 		int t;
 		trace_t tr;
@@ -1194,7 +1194,7 @@ void CGame::hUD_Camera(int mfdnum, int vehicle) {
 	} else if( cammode == CAMERA_TARGET ) {
 		// angles
 		if( ps->stats[STAT_LOCKINFO] & LI_TRACKING ) {
-			vec3_t a;
+			Vec3 a;
 			ClientEntity* target = &cg_entities[cent->currentState.tracktarget];
 			bool building = false;
 
@@ -1211,7 +1211,7 @@ void CGame::hUD_Camera(int mfdnum, int vehicle) {
 			if( (availableVehicles[vehicle].cat & CAT_GROUND) ||
 				(availableVehicles[vehicle].cat & CAT_BOAT) ||
 				(availableVehicles[vehicle].cat & CAT_HELO)) {
-				vec3_t right, up, temp;
+				Vec3 right, up, temp;
 				AngleVectors( cent->currentState.angles, v, right, up );
 				RotatePointAroundVector( temp, up, v, cent->currentState.angles2[ROLL] );
 				CrossProduct( up, temp, right );
@@ -1762,7 +1762,7 @@ void CGame::drawStatusBar_MFQ3_new( ) {
 	// calc target range and heading
 	if( ps->stats[STAT_LOCKINFO] & LI_TRACKING ) {
 		ClientEntity* target = &cg_entities[cent->currentState.tracktarget];
-		vec3_t dir, angles;
+		Vec3 dir, angles;
 		if( target->currentState.eType == ET_EXPLOSIVE ) {
 			VectorSubtract( cgs.inlineModelMidpoints[target->currentState.modelindex], cent->lerpOrigin, dir );
 		} else {
@@ -1803,7 +1803,7 @@ void CGame::drawStatusBar_MFQ3_new( ) {
 			!(availableVehicles[vehicle].cat & CAT_GROUND) && !(availableVehicles[vehicle].cat & CAT_BOAT) )
 		{
 			trace_t	tr;
-			vec3_t	start, end;
+			Vec3	start, end;
 			VectorCopy( ps->origin, start );
 			start[2] += availableVehicles[vehicle].mins[2];
 			VectorCopy( start, end );

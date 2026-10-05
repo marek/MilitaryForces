@@ -27,7 +27,7 @@ void GroundInstallation_Die::execute( GameEntity *inflictor, GameEntity *attacke
 	Game::loselock(self_);
 
 	if( self_->score_ && attacker && attacker->client_ ) {
-		vec3_t	pos;
+		Vec3	pos;
 		int score;
 		VectorAdd( self_->r.absmin, self_->r.absmax, pos );
 		VectorScale( pos, 0.5f, pos );
@@ -50,7 +50,7 @@ void GroundInstallation_Die::execute( GameEntity *inflictor, GameEntity *attacke
 
 void Game::update_GI_Targets( GameEntity* ent )
 {
-	vec3_t			mins, maxs, rangevec, dir;
+	Vec3			mins, maxs, rangevec, dir;
 	float			range = availableGroundInstallations[ent->s.modelindex2].radarRange;
 	int				i, num, touch[MAX_GENTITIES];
 	GameEntity		*hit, *best = nullptr;
@@ -178,7 +178,7 @@ void GroundInstallation_Think::execute()
 	GameEntity* ent = self_;
 	float	diff, turnspeed;
 	float	timediff = theLevel.time_ - ent->s.pos.trTime;
-	vec3_t	targdir, targangles;
+	Vec3	targdir, targangles;
 	int		locktime;
 
 	Game::update_GI_Targets(ent);

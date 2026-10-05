@@ -73,7 +73,7 @@ struct Think_LocateCamera : public GameEntity::EntityFunc_Think
 {
 	void execute() override 
 	{
-		vec3_t		dir;
+		Vec3		dir;
 		GameEntity*	target;
 		GameEntity* owner;
 

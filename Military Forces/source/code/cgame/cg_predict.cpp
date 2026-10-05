@@ -72,8 +72,8 @@ void CGame::clipMoveToEntities( const vec3_t start, const vec3_t mins, const vec
 	trace_t		trace;
 	entityState_t	*ent;
 	clipHandle_t 	cmodel;
-	vec3_t		bmins, bmaxs;
-	vec3_t		origin, angles;
+	Vec3		bmins, bmaxs;
+	Vec3		origin, angles;
 	ClientEntity	*cent;
 
 	for ( i = 0 ; i < cg_numSolidEntities ; i++ ) {
@@ -507,7 +507,7 @@ void CGame::predictPlayerState( ) {
 		// to predict several commands to get to the point
 		// we want to compare
 		if ( cg.predictedPlayerState.commandTime == oldPlayerState.commandTime ) {
-			vec3_t	delta;
+			Vec3	delta;
 			float	len;
 
 			if ( cg.thisFrameTeleport ) {
@@ -518,7 +518,7 @@ void CGame::predictPlayerState( ) {
 				}
 				cg.thisFrameTeleport = false;
 			} else {
-				vec3_t	adjusted;
+				Vec3	adjusted;
 				CGame::adjustPositionForMover( cg.predictedPlayerState.origin, 
 					cg.predictedPlayerState.groundEntityNum, cg.physicsTime, cg.oldTime, adjusted );
 

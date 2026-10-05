@@ -374,8 +374,8 @@ Spawns an item and tosses it forward
 */
 GameEntity *Drop_Item( GameEntity *ent, gitem_t *item, float angle ) 
 {
-	vec3_t	velocity;
-	vec3_t	angles;
+	Vec3	velocity;
+	Vec3	angles;
 
 	VectorCopy( ent->s.apos.trBase, angles );
 	angles[YAW] += angle;
@@ -417,7 +417,7 @@ free fall from their spawn points
 void GameItem::Think_FinishSpawningItem::execute() 
 {
 	trace_t		tr;
-	vec3_t		dest;
+	Vec3		dest;
 
 	VectorSet( self_->r.mins, -ITEM_RADIUS, -ITEM_RADIUS, -ITEM_RADIUS );
 	VectorSet( self_->r.maxs, ITEM_RADIUS, ITEM_RADIUS, ITEM_RADIUS );
@@ -602,7 +602,7 @@ G_BounceItem
 */
 static void G_BounceItem( GameEntity *ent, trace_t *trace ) 
 {
-	vec3_t	velocity;
+	Vec3	velocity;
 	float	dot;
 	int		hitTime;
 
@@ -639,7 +639,7 @@ Game::runItem
 */
 void Game::runItem( GameEntity *ent )
 {
-	vec3_t		origin;
+	Vec3		origin;
 	trace_t		tr;
 	int			contents;
 	int			mask;

@@ -1041,7 +1041,7 @@ void CGame::registerGraphics( ) {
 	cgs.numInlineModels = CollisionModel::numInlineModels();
 	for ( i = 1 ; i < cgs.numInlineModels ; i++ ) {
 		char name[10];
-		vec3_t mins, maxs;
+		Vec3 mins, maxs;
 		int	j;
 
 		Com_sprintf( name, sizeof(name), "*%i", i );

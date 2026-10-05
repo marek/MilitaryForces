@@ -897,7 +897,7 @@ CGame::vehicleMuzzleFlash
 void CGame::vehicleMuzzleFlash( int weaponIdx, const refEntity_t *parent, qhandle_t parentModel, int idx ) {
 
 	refEntity_t		flash[MAX_MUZZLEFLASHES];
-	vec3_t			angles;
+	Vec3			angles;
 	unsigned int	i,j;
 	unsigned int	flashes;
 	char			tag[10];

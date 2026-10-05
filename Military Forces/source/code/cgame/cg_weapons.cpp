@@ -18,7 +18,7 @@ CGame::fFARTrail
 void CGame::fFARTrail( ClientEntity * cent, const weaponInfo_t *wi )
 {
 	LocalEntity	* smoke;
-	vec3_t			up, pos, smoke_pos, velocity;
+	Vec3			up, pos, smoke_pos, velocity;
 	int smoke_rad;
 	static int	seed = 0x92;
 	
@@ -61,7 +61,7 @@ CGame::missileTrail
 void CGame::missileTrail( ClientEntity * cent, const weaponInfo_t *wi )
 {
 	LocalEntity	* smoke;
-	vec3_t			up, pos, smoke_pos, velocity;
+	Vec3			up, pos, smoke_pos, velocity;
 	int smoke_rad;
 	static float smoke_rot = 0;
 	static int	seed = 0x92;
@@ -118,7 +118,7 @@ CGame::flareTrail
 void CGame::flareTrail( ClientEntity * cent, const weaponInfo_t *wi )
 {
 	LocalEntity	* smoke;
-	vec3_t			up, pos, smoke_pos, velocity;
+	Vec3			up, pos, smoke_pos, velocity;
 	int smoke_rad;
 	static int	seed = 0x92;
 	
@@ -153,7 +153,7 @@ void CGame::flareTrail( ClientEntity * cent, const weaponInfo_t *wi )
 
 
 void CGame::missileTrail2( ClientEntity * cent, const weaponInfo_t *wi ) {
-	vec3_t  start, end;
+	Vec3  start, end;
 	LocalEntity *le;
 	refEntity_t   *re;
 
@@ -717,7 +717,7 @@ void CGame::missileHitWall( int weaponIndex, int clientNum, vec3_t origin, vec3_
 	sfxHandle_t		sfx;
 	float			radius;
 	float			light;
-	vec3_t			lightColor;
+	Vec3			lightColor;
 	LocalEntity	*le;
 	int				r;
 	bool		isSprite;
@@ -901,14 +901,14 @@ CGame::genericExplosion
 */
 void CGame::cookOff( vec3_t origin, int vehicle )
 {
-	vec3_t up = { 0, 0, 1 };
+	Vec3 up = { 0, 0, 1 };
 
 	if( vehicle < 0 || vehicle >= bg_numberOfVehicles )
 		return;
 
 	for( int i = 0; i < 14; i++ )
 	{
-		vec3_t point;
+		Vec3 point;
 		VectorCopy( origin, point );
 		point[0] += crandom() * (1.0f + i * 0.5f);
 		point[1] += crandom() * (1.0f + i * 0.5f);
@@ -948,8 +948,8 @@ void CGame::cookOff( vec3_t origin, int vehicle )
 void CGame::genericExplosion( vec3_t origin, int type )
 {
 	LocalEntity	* le = nullptr;
-	vec3_t			up = {0, 0, 1};
-	vec3_t			adjust = {0, 0, 0};
+	Vec3			up = {0, 0, 1};
+	Vec3			adjust = {0, 0, 0};
 	int				soundIdx = -1;
 	int				i, m, offset = 0;
 	int				density = 0;
@@ -1089,7 +1089,7 @@ CGame::vehicleHit
 */
 void CGame::vehicleHit( vec3_t origin, int damage )
 {
-	vec3_t			up = {0, 0, 1};
+	Vec3			up = {0, 0, 1};
 	LocalEntity	*smoke = nullptr;
 
 	// make smoke

@@ -370,7 +370,7 @@ static void ME_SelectWaypoint( IGME_waypoint_t* wpt )
 
 static IGME_vehicle_t* ME_GetVehicleUnderCrosshair()
 {
-	vec3_t			mins, maxs, dir;
+	Vec3			mins, maxs, dir;
 	float			dist, closestDist = MAX_SELECTION_DISTANCE;
 	IGME_vehicle_t* selveh = nullptr;
 	IGME_vehicle_t*	veh = nullptr;
@@ -408,7 +408,7 @@ static IGME_vehicle_t* ME_GetVehicleUnderCrosshair()
 
 static IGME_waypoint_t* ME_GetWaypointUnderCrosshair()
 {
-	vec3_t			mins, maxs, dir;
+	Vec3			mins, maxs, dir;
 	float			dist, closestDist = MAX_SELECTION_DISTANCE;
 	IGME_waypoint_t* selwpt = nullptr;
 	IGME_waypoint_t* wpt = nullptr;
@@ -416,7 +416,7 @@ static IGME_waypoint_t* ME_GetWaypointUnderCrosshair()
 	ray3_t			ray;
 	int				i;
 	IGME_vehicle_t* selveh = ME_GetSelectedVehicle();
-	vec3_t			wmins = { -25, -25, -25 },
+	Vec3			wmins = { -25, -25, -25 },
 					wmaxs = { 25, 25, 25 };
 
 	if( !selveh ) return nullptr;
@@ -489,10 +489,10 @@ static void ME_RotateSelection( int delta )
 	IGME_vehicle_t* veh;
 	sbox3_t			box;
 	bool		boxinit = false;
-	vec3_t			mins = { -1, -1, -1 },
+	Vec3			mins = { -1, -1, -1 },
 					maxs = { 1, 1, 1 };
 	vec3_t			center;
-	vec3_t			dir, angles;
+	Vec3			dir, angles;
 	int				i;
 	float			dist;
 
@@ -536,7 +536,7 @@ static void ME_RotateSelection( int delta )
 
 static void ME_DragSelection( int x, int y )
 {
-	vec3_t			angles, forward, right;
+	Vec3			angles, forward, right;
 	int				i;
 	int			vertical = Keys::isDown(K_CTRL);
 	int			rotate = Keys::isDown(K_SHIFT);
@@ -563,7 +563,7 @@ static void ME_DragSelection( int x, int y )
 		if( !veh ) return;
 		for( i = 0; i < IGME_MAX_WAYPOINTS; ++i ) {
 			trace_t	tr;
-			vec3_t start, end;
+			Vec3 start, end;
 			wpt = &veh->waypoints[i];
 			if( !wpt->selected ) continue;
 			VectorCopy( wpt->origin, start );
@@ -575,7 +575,7 @@ static void ME_DragSelection( int x, int y )
 		IGME_vehicle_t* veh;
 		for( i = 0; i < IGME_MAX_VEHICLES; ++i ) {
 			trace_t	tr;
-			vec3_t start, end;
+			Vec3 start, end;
 			veh = &cgs.IGME.vehicles[i];
 			if( !veh->selected ) continue;
 			VectorCopy( veh->origin, start );
@@ -802,7 +802,7 @@ static void ME_DrawVehicle( IGME_vehicle_t* veh )
 	// draw waypoints
 	if( cgs.IGME.waypointmode && (veh->selected || cgs.IGME.showAllWaypoints) ) {
 		int k;
-		vec3_t lastpos, dir, ang;
+		Vec3 lastpos, dir, ang;
 		VectorCopy( veh->origin, lastpos );
 		for( k = 0; k < IGME_MAX_WAYPOINTS; ++k ) {
 			refEntity_t	wpt, lnk;

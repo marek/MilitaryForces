@@ -1268,8 +1268,8 @@ UI_Utils::item_Model_Paint( itemDef_t *item )
 	float x, y, w, h;
 	refdef_t refdef;
 	refEntity_t		ent;
-	vec3_t			mins, maxs, origin;
-	vec3_t			angles;
+	Vec3			mins, maxs, origin;
+	Vec3			angles;
 	modelDef_t *modelPtr = static_cast<modelDef_t*>(item->typeData);
 
 	if (modelPtr == nullptr) 

@@ -25,7 +25,7 @@ int Game::miscVehicle_TeamScore( GameEntity *self, GameEntity *attacker )
 void MiscVehicle_Die::execute( GameEntity *inflictor, GameEntity *attacker, int damage, int meansOfDeath )
 {
 	if( self_->score_ && attacker && attacker->client_ ) {
-		vec3_t	pos;
+		Vec3	pos;
 		VectorAdd( self_->r.absmin, self_->r.absmax, pos );
 		VectorScale( pos, 0.5f, pos );
 		AddScore( attacker, pos, Game::miscVehicle_TeamScore( self_, attacker ) );
@@ -42,7 +42,7 @@ void MiscVehicle_Die::execute( GameEntity *inflictor, GameEntity *attacker, int 
 void Game::miscVehicle_DropToGround( GameEntity *ent, float above, float below )
 {
 	trace_t	trace;
-	vec3_t	startpos, endpos;
+	Vec3	startpos, endpos;
 	unsigned int vehIndex = ent->s.modelindex;
 
 	VectorCopy( ent->s.origin, startpos );
@@ -59,7 +59,7 @@ void Game::sP_misc_plane( GameEntity *ent )
 {
 	unsigned int vehIndex = ent->s.modelindex;
 	trace_t	trace;
-	vec3_t	startpos, endpos;
+	Vec3	startpos, endpos;
 
 	VectorCopy( ent->s.origin, startpos );
 	startpos[2] += 64;
@@ -172,7 +172,7 @@ void Drone_Think::execute()
 	unsigned long cat = availableVehicles[vehIndex].cat;
 	bool flying = (cat & CAT_PLANE) || (cat & CAT_HELO);
 	float dt = (theLevel.time_ - ent->s.pos.trTime) * 0.001f;
-	vec3_t origin, dir, bearing, angles, vel;
+	Vec3 origin, dir, bearing, angles, vel;
 	trace_t tr;
 
 	GameShared::evaluateTrajectory( &ent->s.pos, theLevel.time_, origin );
@@ -188,7 +188,7 @@ void Drone_Think::execute()
 	}
 	else
 	{
-		vec3_t from, to;
+		Vec3 from, to;
 		VectorCopy( ent->r.currentOrigin, from );
 		VectorCopy( origin, to );
 		float raise = (ent->r.maxs[2] - ent->r.mins[2]) * 0.5f;
@@ -315,11 +315,11 @@ void MiscVehicle_SetRoute( GameEntity *ent, const mission_waypoint_t *wps )
 		ent->s.frame = MF_THROTTLE_MILITARY;
 	}
 
-	vec3_t dir;
+	Vec3 dir;
 	VectorSubtract( think->route_[0], ent->s.origin, dir );
 	if( !(cat & CAT_PLANE) ) dir[2] = 0;
 	if( VectorNormalize( dir ) > 0 ) {
-		vec3_t angles;
+		Vec3 angles;
 		vectoangles( dir, angles );
 		ent->s.angles[YAW] = angles[YAW];
 	}
@@ -337,7 +337,7 @@ void MiscVehicle_SetRoute( GameEntity *ent, const mission_waypoint_t *wps )
 void Abandoned_Think::execute()
 {
 	GameEntity* ent = self_;
-	vec3_t origin;
+	Vec3 origin;
 	trace_t tr;
 
 	if( ent->s.pos.trType == TR_STATIONARY )
@@ -430,7 +430,7 @@ void Deck_Think::execute()
 		return;
 	}
 
-	vec3_t origin, angles, velocity, forward, pos;
+	Vec3 origin, angles, velocity, forward, pos;
 	VectorCopy( parent->r.currentOrigin, origin );
 	VectorCopy( parent->s.angles, angles );
 	VectorClear( velocity );

@@ -1600,7 +1600,7 @@ void Rider_Leave( GameEntity *ent, bool forced )
 		// (only for someone the enemy forced out of their vehicle, so it cannot be farmed between friends)
 		client->liftPilot_ = !forced && client->downedByEnemy_ && Distance( pilot->ps_.origin, client->boardOrigin_ ) > liftJourney ? pilotNum : -1;
 
-		vec3_t forward, right, yawOnly, origin;
+		Vec3 forward, right, yawOnly, origin;
 		int vehicle = pilot->vehicle_;
 		VectorSet( yawOnly, 0, pilot->ps_.vehicleAngles[YAW], 0 );
 		AngleVectors( yawOnly, forward, right, nullptr );
@@ -1725,7 +1725,7 @@ void Game::cmd_Enter( GameEntity *ent )
 {
 	GameClient* client = ent->client_;
 	int touch[MAX_GENTITIES];
-	vec3_t mins, maxs;
+	Vec3 mins, maxs;
 
 	for( int i = 0; i < 3; i++ ) 
 	{
@@ -1845,7 +1845,7 @@ void Cmd_Eject_f( GameEntity *ent )
 
 	if( parked && availableVehicles[vehicle].hasDeck ) 
 	{
-		vec3_t forward, right, yawOnly;
+		Vec3 forward, right, yawOnly;
 		VectorSet( yawOnly, 0, client->ps_.vehicleAngles[YAW], 0 );
 		AngleVectors( yawOnly, forward, right, nullptr );
 		VectorMA( client->ps_.origin, availableVehicles[vehicle].deckPos[0], forward, client->ps_.origin );
@@ -1857,7 +1857,7 @@ void Cmd_Eject_f( GameEntity *ent )
 		// step out beside the vehicle, on whichever side has open ground to stand on: right, left, behind, in front.
 		// (a spot inside a slope or wall would leave the soldier stuck, or pushed far up out of it)
 		const completeVehicleData_t& soldier = availableVehicles[infantry];
-		vec3_t forward, right, yawOnly;
+		Vec3 forward, right, yawOnly;
 		VectorSet( yawOnly, 0, client->ps_.vehicleAngles[YAW], 0 );
 		AngleVectors( yawOnly, forward, right, nullptr );
 		const float beside = availableVehicles[vehicle].maxs[1] + 10, along = availableVehicles[vehicle].maxs[0] + 10;
@@ -1866,7 +1866,7 @@ void Cmd_Eject_f( GameEntity *ent )
 		for( const auto& exit : exits ) 
 		{
 			constexpr float lift = 24.0f, drop = 80.0f;
-			vec3_t top, bottom;
+			Vec3 top, bottom;
 			trace_t tr;
 			VectorMA( client->ps_.origin, exit.distance, exit.axis, top );
 			VectorCopy( top, bottom );

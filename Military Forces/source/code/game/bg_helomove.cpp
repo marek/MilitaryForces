@@ -262,7 +262,7 @@ void PlayerMove::heloAccelerate()
 	float	curspeed;
 	float	curspeedadjust;
 	float	totalthrottle;
-	vec3_t	vehdir;
+	Vec3	vehdir;
 	
 	// Copy Vehicle Direction
 	VectorCopy( pm->ps->vehicleAngles, vehdir );
@@ -322,13 +322,13 @@ void PlayerMove::heloMove( )
 	float	curliftspeed;
 	float	currightspeed;
 //	float	curspeed = pm->ps->speed;
-	vec3_t  forwardvel,rightvel, liftvel, deltavel;
+	Vec3  forwardvel,rightvel, liftvel, deltavel;
 	// Turret stuff
-	vec3_t		forward, up;
-	vec3_t		temp;
+	Vec3		forward, up;
+	Vec3		temp;
 	float		turret_yaw = pm->ps->turretAngle;
 	float		gun_pitch = pm->ps->gunAngle;
-	vec3_t		turretdir;
+	Vec3		turretdir;
 	float		min, max;
 	float		turnModifier = 1.0f;
 
@@ -672,19 +672,19 @@ Returns true if the velocity was clipped in some way
 constexpr int MAX_CLIP_PLANES = 5;
 bool PlayerMove::slideMove_Helo() {
 	int			bumpcount, numbumps;
-	vec3_t		dir;
+	Vec3		dir;
 	float		d;
 	int			numplanes;
 	vec3_t		planes[MAX_CLIP_PLANES];
-	vec3_t		primal_velocity;
-	vec3_t		clipVelocity;
+	Vec3		primal_velocity;
+	Vec3		clipVelocity;
 	int			i, j, k;
 	trace_t	trace;
-	vec3_t		end;
+	Vec3		end;
 	float		time_left;
 	float		into;
-	vec3_t		endVelocity;
-	vec3_t		endClipVelocity;
+	Vec3		endVelocity;
+	Vec3		endClipVelocity;
 
 	numbumps = 4;
 

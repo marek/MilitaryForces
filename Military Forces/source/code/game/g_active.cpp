@@ -47,7 +47,7 @@ static void P_DamageFeedback( GameEntity *player )
 	} 
 	else 
 	{
-		vec3_t	angles;
+		Vec3	angles;
 		vectoangles( client->damage_from_, angles );
 		client->ps_.damagePitch = angles[PITCH]/360.0 * 256;
 		client->ps_.damageYaw = angles[YAW]/360.0 * 256;
@@ -232,7 +232,7 @@ void	Game::touchTriggers( GameEntity *ent )
 	if( ent->client_->ps_.stats[STAT_HEALTH] <= 0 ) 
 		return;
 
-	vec3_t		mins, maxs;
+	Vec3		mins, maxs;
 	static vec3_t	range = { 40, 40, 52 };
 	VectorSubtract( ent->client_->ps_.origin, range, mins );
 	VectorAdd( ent->client_->ps_.origin, range, maxs );
@@ -647,7 +647,7 @@ void Game::riderThink( GameEntity *ent )
 		const int weapon = availableVehicles[client->vehicle_].weapons[WP_MACHINEGUN];
 		if( weapon ) 
 		{
-			vec3_t angles;
+			Vec3 angles;
 			Game::riderAngles( client, pilot, angles );
 			fire_riderGun( ent, vehicle, angles );
 			client->riderAmmo_--;

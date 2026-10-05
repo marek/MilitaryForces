@@ -849,7 +849,7 @@ void FindIntermissionPoint()
 			GameEntity *target = Game::pickTarget( ent->target_ );
 			if ( target ) 
 			{
-				vec3_t		dir;
+				Vec3		dir;
 				VectorSubtract( target->s.origin, theLevel.intermission_origin_, dir );
 				vectoangles( dir, theLevel.intermission_angle_ );
 			}

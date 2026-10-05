@@ -24,7 +24,7 @@ RUNWAY
 void Die_ExplosiveDie::execute( GameEntity *inflictor, GameEntity *attacker, int damage, int meansOfDeath )
 {
 	GameEntity* ent;
-	vec3_t	pos;
+	Vec3	pos;
 	VectorAdd( self_->r.absmin, self_->r.absmax, pos );
 	VectorScale( pos, 0.5f, pos );
 

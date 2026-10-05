@@ -124,7 +124,7 @@ CG_ReflectVelocity
 ================
 */
 void LocalEntity::reflectVelocity( trace_t *trace ) {
-	vec3_t	velocity;
+	Vec3	velocity;
 	float	dot;
 	int		hitTime;
 
@@ -156,7 +156,7 @@ CG_AddFragment
 ================
 */
 void LocalEntity::addFragment() {
-	vec3_t	newOrigin;
+	Vec3	newOrigin;
 	trace_t	trace;
 
 	if ( this->pos.trType == TR_STATIONARY ) {
@@ -192,7 +192,7 @@ void LocalEntity::addFragment() {
 		VectorCopy( newOrigin, this->refEntity.origin );
 
 		if ( any( this->leFlags & LEF_TUMBLE ) ) {
-			vec3_t angles;
+			Vec3 angles;
 
 			GameShared::evaluateTrajectory( &this->angles, cg.time, angles );
 			AnglesToAxis( angles, this->refEntity.axis );
@@ -259,7 +259,7 @@ CG_AddMoveScaleFade
 void LocalEntity::addMoveScaleFade() {
 	refEntity_t	*re;
 	float		c;
-	vec3_t		delta;
+	Vec3		delta;
 	float		len;
 
 	re = &this->refEntity;
@@ -307,7 +307,7 @@ There are often many of these, so it needs to be simple.
 void LocalEntity::addScaleFade() {
 	refEntity_t	*re;
 	float		c;
-	vec3_t		delta;
+	Vec3		delta;
 	float		len;
 
 	re = &this->refEntity;

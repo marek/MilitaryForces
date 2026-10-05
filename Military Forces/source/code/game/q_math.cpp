@@ -273,7 +273,7 @@ The normal will point out of the clock for clockwise ordered points
 =====================
 */
 bool PlaneFromPoints( vec4_t plane, const vec3_t a, const vec3_t b, const vec3_t c ) {
-	vec3_t	d1, d2;
+	Vec3	d1, d2;
 
 	VectorSubtract( b, a, d1 );
 	VectorSubtract( c, a, d2 );
@@ -301,7 +301,7 @@ void RotatePointAroundVector( vec3_t dst, const vec3_t dir, const vec3_t point,
 	float	tmpmat[3][3];
 	float	rot[3][3];
 	int	i;
-	vec3_t vr, vup, vf;
+	Vec3 vr, vup, vf;
 	float	rad;
 
 	vf[0] = dir[0];
@@ -361,7 +361,7 @@ void RotateAroundDirection( vec3_t axis[3], float yaw ) {
 
 	// rotate it around axis[0] by yaw
 	if ( yaw ) {
-		vec3_t	temp;
+		Vec3	temp;
 
 		VectorCopy( axis[1], temp );
 		RotatePointAroundVector( axis[1], axis[0], temp, yaw );
@@ -419,7 +419,7 @@ AnglesToAxis
 =================
 */
 void AnglesToAxis( const vec3_t angles, vec3_t axis[3] ) {
-	vec3_t	right;
+	Vec3	right;
 
 	// angle vectors returns "right" instead of "y axis"
 	AngleVectors( angles, axis[0], right, axis[2] );
@@ -568,7 +568,7 @@ void AxisCopy( vec3_t in[3], vec3_t out[3] ) {
 void ProjectPointOnPlane( vec3_t dst, const vec3_t p, const vec3_t normal )
 {
 	float d;
-	vec3_t n;
+	Vec3 n;
 	float inv_denom;
 
 	inv_denom =  DotProduct( normal, normal );
@@ -819,7 +819,7 @@ RadiusFromBounds
 */
 float RadiusFromBounds( const vec3_t mins, const vec3_t maxs ) {
 	int		i;
-	vec3_t	corner;
+	Vec3	corner;
 	float	a, b;
 
 	for (i=0 ; i<3 ; i++) {
@@ -1093,7 +1093,7 @@ void PerpendicularVector( vec3_t dst, const vec3_t src )
 	int	pos;
 	int i;
 	float minelem = 1.0F;
-	vec3_t tempvec;
+	Vec3 tempvec;
 
 	/*
 	** find the smallest magnitude axially aligned vector
@@ -1182,7 +1182,7 @@ void RotateAroundYaw( vec3_t axis[3], float angle ) {
 
 	// rotate it around axis[0] by yaw
 	if ( angle ) {
-		vec3_t	temp;
+		Vec3	temp;
 
 		VectorCopy( axis[0], temp );
 		RotatePointAroundVector( axis[0], axis[2], temp, angle );
@@ -1204,7 +1204,7 @@ void RotateAroundPitch( vec3_t axis[3], float angle ) {
 
 	// rotate it around axis[0] by yaw
 	if ( angle ) {
-		vec3_t	temp;
+		Vec3	temp;
 
 		VectorCopy( axis[0], temp );
 		RotatePointAroundVector( axis[0], axis[1], temp, angle );
@@ -1239,7 +1239,7 @@ void RotatePointAroundAngles( vec3_t dst, vec3_t src, float yaw, float pitch, fl
 {
 	// NOTE: not sure whether we are using the correct axis here, it may be an inverse or something.
 	// The function works fine for shadows, but check results if you use it for other purposes.
-	vec3_t up = {0,0,1}, forwards = {-1,0,0}, left = {0,-1,0}, tmpVec;
+	Vec3 up = {0,0,1}, forwards = {-1,0,0}, left = {0,-1,0}, tmpVec;
 
 	// rotate point (+ left vector & forwards vector) around yaw
 	RotatePointAroundVector( tmpVec, up, src, yaw );
@@ -1309,7 +1309,7 @@ Create a box3_t
 */
 void MakeBoxFromExtents( box3_t* box, const vec3_t mins, const vec3_t maxs, const vec3_t angles )
 {
-	vec3_t temp;
+	Vec3 temp;
 	
 	if( !box ) return;
 
@@ -1364,7 +1364,7 @@ void MakeRay( ray3_t* ray, const vec3_t start, const vec3_t dir )
 
 bool RayIntersectBox( const ray3_t* ray, const box3_t* bbox )
 {
-	vec3_t dir, midpoint, md, projAxis;
+	Vec3 dir, midpoint, md, projAxis;
 	float box, seg, dist;
 
 	VectorScale( ray->dir, 0.5f, dir );

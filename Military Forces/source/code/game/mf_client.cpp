@@ -206,7 +206,7 @@ GameEntity *SelectInitialSpawnPoint( vec3_t origin, vec3_t angles );
 
 void MF_ClientSpawn( int clientNum, long cs_flags ) 
 {
-	vec3_t	spawn_origin, spawn_angles;
+	Vec3	spawn_origin, spawn_angles;
 	int		i;
 	GameClient::ClientPersistant saved;
 	GameClient::ClientSession savedSess;
@@ -397,7 +397,7 @@ void MF_ClientSpawn( int clientNum, long cs_flags )
 	if(vehIndex >= 0 && (cs_flags & CS_LASTPOS && availableVehicles[vehIndex].cat & CAT_BOAT) ) 
 	{
 		trace_t	trace;
-		vec3_t	endpos;
+		Vec3	endpos;
 		VectorCopy( spawn_origin, endpos );
 		endpos[2] -= 512;
 		GameHost::trace (&trace, spawn_origin, nullptr, nullptr, endpos, ENTITYNUM_NONE, MASK_WATER, false );
@@ -492,7 +492,7 @@ void MF_ClientSpawn( int clientNum, long cs_flags )
 			// check for landed spawnpoint
 			bool landed = false;
 			trace_t	trace;
-			vec3_t	endpos;
+			Vec3	endpos;
 			GameEntity *test;
 			VectorCopy( spawn_origin, endpos );
 			endpos[2] -= 128;
@@ -512,7 +512,7 @@ void MF_ClientSpawn( int clientNum, long cs_flags )
 		else if( availableVehicles[vehIndex].cat & CAT_GROUND ) 
 		{
 			trace_t	trace;
-			vec3_t	endpos;
+			Vec3	endpos;
 			GameEntity *test;
 			VectorCopy( spawn_origin, endpos );
 			endpos[2] -= 512;
@@ -532,7 +532,7 @@ void MF_ClientSpawn( int clientNum, long cs_flags )
 		else if( availableVehicles[vehIndex].cat & CAT_LQM ) 
 		{
 			trace_t	trace;
-			vec3_t	endpos;
+			Vec3	endpos;
 			GameEntity *test;
 			VectorCopy( spawn_origin, endpos );
 			endpos[2] -= 512;
@@ -548,7 +548,7 @@ void MF_ClientSpawn( int clientNum, long cs_flags )
 		else if( availableVehicles[vehIndex].cat & CAT_BOAT )
 		{
 			trace_t	trace;
-			vec3_t	endpos;
+			Vec3	endpos;
 			GameEntity *test;
 			VectorCopy( spawn_origin, endpos );
 			endpos[2] -= 512;
