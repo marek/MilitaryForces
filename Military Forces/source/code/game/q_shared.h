@@ -908,7 +908,6 @@ qint64  LittleLong64 (qint64 l);
 float	BigFloat (const float *l);
 float	LittleFloat (const float *l);
 
-void	Swap_Init (void);
 */
 char	* QDECL va(const char *format, ...) Q_PRINTF_FUNC(1, 2);
 

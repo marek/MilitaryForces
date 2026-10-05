@@ -23,6 +23,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #ifndef __Q_PLATFORM_H
 #define __Q_PLATFORM_H
 
+#include <bit>
+#include <cstring>
+
 // this is for determining if we have an asm version of a C function
 #define idx64 0
 
@@ -367,49 +370,38 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #endif
 
 
-//endianness
-void CopyShortSwap (void *dest, void *src);
-void CopyLongSwap (void *dest, void *src);
-short ShortSwap (short l);
-int LongSwap (int l);
-float FloatSwap (const float *f);
-
+// byte order: files and network data are little-endian. The compiler knows the processor's order, so on a
+// little-endian machine these compile to nothing.
 #if defined( Q3_BIG_ENDIAN ) && defined( Q3_LITTLE_ENDIAN )
 #error "Endianness defined as both big and little"
-#elif defined( Q3_BIG_ENDIAN )
-
-#define CopyLittleShort(dest, src) CopyShortSwap(dest, src)
-#define CopyLittleLong(dest, src) CopyLongSwap(dest, src)
-#define LittleShort(x) ShortSwap(x)
-#define LittleLong(x) LongSwap(x)
-#define LittleFloat(x) FloatSwap(&x)
-#define BigShort
-#define BigLong
-#define BigFloat
-
-#elif defined( Q3_LITTLE_ENDIAN )
-
-#define CopyLittleShort(dest, src) Com_Memcpy(dest, src, 2)
-#define CopyLittleLong(dest, src) Com_Memcpy(dest, src, 4)
-#define LittleShort
-#define LittleLong
-#define LittleFloat
-#define BigShort(x) ShortSwap(x)
-#define BigLong(x) LongSwap(x)
-#define BigFloat(x) FloatSwap(&x)
-
-#elif defined( Q3_VM )
-
-#define LittleShort
-#define LittleLong
-#define LittleFloat
-#define BigShort
-#define BigLong
-#define BigFloat
-
-#else
-#error "Endianness not defined"
 #endif
+
+inline constexpr bool q_littleEndian = std::endian::native == std::endian::little;
+
+constexpr short ShortSwap( short l ) { return std::byteswap( l ); }
+constexpr int LongSwap( int l ) { return std::byteswap( l ); }
+inline float FloatSwap( const float *f ) { return std::bit_cast<float>( std::byteswap( std::bit_cast<unsigned int>( *f ) ) ); }
+
+template<typename T> constexpr T LittleShort( T x ) { return q_littleEndian ? x : static_cast<T>( ShortSwap( static_cast<short>( x ) ) ); }
+template<typename T> constexpr T LittleLong( T x ) { return q_littleEndian ? x : static_cast<T>( LongSwap( static_cast<int>( x ) ) ); }
+inline float LittleFloat( float x ) { return q_littleEndian ? x : FloatSwap( &x ); }
+template<typename T> constexpr T BigShort( T x ) { return q_littleEndian ? static_cast<T>( ShortSwap( static_cast<short>( x ) ) ) : x; }
+template<typename T> constexpr T BigLong( T x ) { return q_littleEndian ? static_cast<T>( LongSwap( static_cast<int>( x ) ) ) : x; }
+inline float BigFloat( float x ) { return q_littleEndian ? FloatSwap( &x ) : x; }
+
+// copy a little-endian value between possibly unaligned places
+inline void CopyLittleShort( void *dest, const void *src ) {
+	short value;
+	std::memcpy( &value, src, 2 );
+	value = LittleShort( value );
+	std::memcpy( dest, &value, 2 );
+}
+inline void CopyLittleLong( void *dest, const void *src ) {
+	int value;
+	std::memcpy( &value, src, 4 );
+	value = LittleLong( value );
+	std::memcpy( dest, &value, 4 );
+}
 
 
 //platform string
