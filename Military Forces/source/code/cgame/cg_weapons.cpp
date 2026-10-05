@@ -26,7 +26,7 @@ void CGame::fFARTrail( ClientEntity * cent, const weaponInfo_t *wi )
 	up[1] = 5 * Q_random(&seed);
 	up[2] = (5 - 1) * Q_random(&seed) + 1;
 
-	VectorCopy( cent->lerpOrigin, pos );
+	pos = cent->lerpOrigin;
 
 	// draw smoke slightly behind the entitiy position (using -velocity of the entity)
 	VectorCopy( cent->currentState.pos.trDelta, velocity );
@@ -70,7 +70,7 @@ void CGame::missileTrail( ClientEntity * cent, const weaponInfo_t *wi )
 	up[1] = 5 * Q_random(&seed);
 	up[2] = (5 - 1) * Q_random(&seed) + 1;
 
-	VectorCopy( cent->lerpOrigin, pos );
+	pos = cent->lerpOrigin;
 	
 	// draw smoke slightly behind the entitiy position (using -velocity of the entity)
 	VectorCopy( cent->currentState.pos.trDelta, velocity );
@@ -126,7 +126,7 @@ void CGame::flareTrail( ClientEntity * cent, const weaponInfo_t *wi )
 	up[1] = 5 * Q_random(&seed);
 	up[2] = (5 - 1) * Q_random(&seed) + 1;
 	
-	VectorCopy( cent->lerpOrigin, pos );
+	pos = cent->lerpOrigin;
 
 	// draw smoke slightly behind the entitiy position (using -velocity of the entity)
 	VectorCopy( cent->currentState.pos.trDelta, velocity );
@@ -157,8 +157,8 @@ void CGame::missileTrail2( ClientEntity * cent, const weaponInfo_t *wi ) {
 	LocalEntity *le;
 	refEntity_t   *re;
 
-	VectorCopy(cent->lastDrawnTrailPos, start);
-	VectorCopy(cent->lerpOrigin, end);
+	start = cent->lastDrawnTrailPos;
+	end = cent->lerpOrigin;
 
 
 	// Only draw every so often dispite how often a trail is said to be updated
@@ -171,7 +171,7 @@ void CGame::missileTrail2( ClientEntity * cent, const weaponInfo_t *wi ) {
 		if(cent->TimeSinceLastTrail <= cg.time - 200)
 		{
 			cent->TimeSinceLastTrail = cg.time;
-			VectorCopy(cent->lerpOrigin, cent->lastDrawnTrailPos);
+			cent->lastDrawnTrailPos = cent->lerpOrigin;
 			return;
 		}
 	
@@ -207,7 +207,7 @@ void CGame::missileTrail2( ClientEntity * cent, const weaponInfo_t *wi ) {
 
 		// Update last time & Pos
 		cent->TimeSinceLastTrail = cg.time;
-		VectorCopy(cent->lerpOrigin, cent->lastDrawnTrailPos);
+		cent->lastDrawnTrailPos = cent->lerpOrigin;
 	}
 
 
@@ -882,7 +882,7 @@ void CGame::missileHitWall( int weaponIndex, int clientNum, vec3_t origin, vec3_
 
 		// dynamic light the explosion
 		le->light = light;
-		VectorCopy( lightColor, le->lightColor );
+		le->lightColor = lightColor;
 
 		// create radius override
 		le->radius = radius;
@@ -1019,7 +1019,7 @@ void CGame::genericExplosion( vec3_t origin, int type )
 
 	// * SMOKE SPRITE *
 
-	VectorSet( le->lightColor, 1, 0.75, 0 );
+	le->lightColor = Vec3( 1, 0.75, 0 );
 
 	// and also smoke for gib/building explosion
 	if( type > 0 )

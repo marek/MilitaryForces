@@ -335,7 +335,7 @@ struct PlaneTasks
 				if( other == c.ent || !alive( other ) || other->client_->sess_.ridingClient_ >= 0 )
 					continue;
 				Vec3 rel;
-				VectorSubtract( other->r.currentOrigin, c.ent->r.currentOrigin, rel );
+				rel = other->r.currentOrigin - c.ent->r.currentOrigin;
 				const float dist = VectorNormalize( rel );
 				if( dist < 320 && fabs( rel[2] * dist ) < 120 && DotProduct( rel, forward ) > 0.4f )
 				{

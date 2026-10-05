@@ -376,7 +376,7 @@ void Bots::sense( GameEntity* ent, State& bot, Sense& out )
 			if( !other || !other->inuse_ || other->s.eType != ET_MISSILE || other->tracktarget_ != ent )
 				continue;
 			Vec3 rel;
-			VectorSubtract( other->r.currentOrigin, ent->r.currentOrigin, rel );
+			rel = other->r.currentOrigin - ent->r.currentOrigin;
 			const float dist = VectorLength( rel );
 			if( out.missile && dist > out.missileDist )
 				continue;

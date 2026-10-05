@@ -274,7 +274,7 @@ bool Bots::findHidePoint( GameEntity* ent, State& bot, GameEntity* threat, bool 
 		{
 			const float angle = step * (2.0f * std::numbers::pi_v<float> / 12.0f);
 			Vec3 point, down;
-			VectorCopy( ent->r.currentOrigin, point );
+			point = ent->r.currentOrigin;
 			point[0] += cos( angle ) * radius;
 			point[1] += sin( angle ) * radius;
 			point[2] += 300;

@@ -28,13 +28,13 @@ static void CG_EjectParticle(particleWorld_t * w, particleEmitter_t * e)
 		{
 			memset(w->particles[i].trDelta, 0, sizeof(w->particles[i].trDelta));
 		}
-		VectorAdd(e->ejectVelocity, w->particles[i].trDelta, w->particles[i].trDelta);
+		w->particles[i].trDelta = e->ejectVelocity + w->particles[i].trDelta;
 		VectorCopy(w->systems[e->parentSytem].cent->currentState.pos.trBase, w->particles[i].trBase );
 	}
 	else
 	{
-		VectorCopy(e->ejectVelocity, w->particles[i].trDelta);
-		VectorCopy(w->systems[e->parentSytem].pos, w->particles[i].trBase);
+		w->particles[i].trDelta = e->ejectVelocity;
+		w->particles[i].trBase = w->systems[e->parentSytem].pos;
 		
 	}
 	for(j = 0; j < 3; j++)
@@ -93,7 +93,7 @@ static void CG_AttractParticles(particle_t * a, particle_t * b)
 	float ftemp;
 	float dtime = (cg.time - a->lastthink)*0.001;
 	
-	VectorSubtract(b->trBase, a->trBase, vtemp);
+	vtemp = b->trBase - a->trBase;
 	ftemp = VectorNormalize(vtemp);
 	if(ftemp <= 0)
 		return;
@@ -106,7 +106,7 @@ static void CG_AttractParticles(particle_t * a, particle_t * b)
 			ftemp = 1.0f;
 	}
 	vtemp = vtemp * ( a->attractionEmitter*ftemp );
-	VectorAdd(vtemp,a->trAttraction,a->trAttraction);
+	a->trAttraction = vtemp + a->trAttraction;
 }
 
 void ClientEntity::removeParticleSystemFromLocalEntity()
@@ -140,7 +140,7 @@ void ClientEntity::attractParticleToEntity( particle_t * a )
 			ftemp = 1.0f;
 	}
 	vtemp = vtemp * ( a->attractionEmitter*ftemp );
-	VectorAdd(vtemp,a->trAttraction,a->trAttraction);
+	a->trAttraction = vtemp + a->trAttraction;
 	
 	// If close enough, inherhit speed
 	if(distance <= 100 && distance > 0)
@@ -148,7 +148,7 @@ void ClientEntity::attractParticleToEntity( particle_t * a )
 		VectorCopy(this->currentState.pos.trBase, vtemp);
 		VectorNormalize(vtemp);
 		vtemp = vtemp * ( dtime*VectorLength(this->currentState.pos.trBase)*(1/distance) );
-		VectorAdd(vtemp, a->trDelta, a->trDelta);
+		a->trDelta = vtemp + a->trDelta;
 	}
 }
 
@@ -267,7 +267,7 @@ void CGame::particleThink(particleWorld_t * w, particle_t * p)
 	// *
 	if((p->lastAttractionThink + 300 < cg.time) && (p->attractionEmitter != 0 || p->attractionSystem != 0 || p->attractionWorld != 0))
 	{
-		VectorClear(p->trAttraction);
+		p->trAttraction = Vec3();
 		for(auto & particle : w->particles)
 		{
 			if(!particle.dead)
@@ -309,11 +309,11 @@ void CGame::particleThink(particleWorld_t * w, particle_t * p)
 	// *
 	
 	if(ptime < p->acceltime)
-		VectorMA (p->trBase, (p->accel/2)*dtime*dtime, p->trDelta, result);		// acceleration
+		result = p->trBase + p->trDelta * ( (p->accel/2)*dtime*dtime );		// acceleration
 	else
-		VectorCopy(p->trBase, result);
+		result = p->trBase;
 	p->trDelta[2] -= 0.5 * p->gravity * dtime * dtime; 								// gravity
-	VectorAdd(p->trDelta, p->trAttraction, temp);
+	temp = p->trDelta + p->trAttraction;
 	result = result + temp * ( dtime );								// basic movement
 											// copy final result
 
@@ -330,7 +330,7 @@ void CGame::particleThink(particleWorld_t * w, particle_t * p)
 	// bounce/die if hit
 	if( trace.fraction == 1.0f)
 	{
-		VectorCopy(result, p->trBase);	
+		p->trBase = result;	
 	} else {
 		CG_OnParticleCollision(p);
 		if(p->dieOnCollision) {
@@ -340,7 +340,7 @@ void CGame::particleThink(particleWorld_t * w, particle_t * p)
 		} else {	//reflect the particle
 			float	len = VectorNormalize(p->trDelta);
 			VectorMA( p->trDelta, -2.0f * DotProduct( p->trDelta, trace.plane.normal ), trace.plane.normal, p->trDelta );
-			VectorScale( p->trDelta, p->bounce*len, p->trDelta );
+			p->trDelta = p->trDelta * ( p->bounce*len );
 			VectorCopy( trace.endpos, p->trBase );
 		}
 	}
@@ -399,8 +399,8 @@ static void CG_RenderParticle(particle_t * p)
 		index = static_cast<int>(p->shaderFPS * t * 0.001) % p->numShaders;
 	}
 	
-	VectorAdd(p->trAttraction, p->trDelta, origin);
-	VectorMA( p->trBase, dtime, origin, origin );
+	origin = p->trAttraction + p->trDelta;
+	origin = p->trBase + origin * ( dtime );
 													
 	vectoangles( cg.refdef.viewaxis[0], rotate_ang );
 	rotate_ang[ROLL] += p->rotation;

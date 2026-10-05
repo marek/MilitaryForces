@@ -295,7 +295,7 @@ void Game::damage( GameEntity *targ, GameEntity *inflictor, GameEntity* attacker
 		}
 		else 
 		{
-			VectorCopy ( targ->r.currentOrigin, client->damage_from_ );
+			client->damage_from_ = targ->r.currentOrigin;
 			client->damage_fromWorld_ = true;
 		}
 	}
@@ -366,7 +366,7 @@ bool CanDamage( GameEntity* targ, vec3_t origin )
 
 	// use the midpoint of the bounds instead of the origin, because
 	// bmodels may have their origin is 0,0,0
-	VectorAdd (targ->r.absmin, targ->r.absmax, midpoint);
+	midpoint = targ->r.absmin + targ->r.absmax;
 	midpoint = midpoint * ( 0.5 );
 
 	dest = midpoint;

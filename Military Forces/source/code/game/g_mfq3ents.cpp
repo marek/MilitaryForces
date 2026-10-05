@@ -25,7 +25,7 @@ void Die_ExplosiveDie::execute( GameEntity *inflictor, GameEntity *attacker, int
 {
 	GameEntity* ent;
 	Vec3	pos;
-	VectorAdd( self_->r.absmin, self_->r.absmax, pos );
+	pos = self_->r.absmin + self_->r.absmax;
 	pos = pos * ( 0.5f );
 
 	self_->r.svFlags = SVF_NOCLIENT;

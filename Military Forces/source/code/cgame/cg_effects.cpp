@@ -220,13 +220,13 @@ void ClientEntity::flakEffect( entityState_t * es )
 	static int	seed = 0x92;
 	puff_size = availableWeapons[es->weaponIndex].damageRadius / 10;
 
-	VectorCopy( this->lerpOrigin, pos );
+	pos = this->lerpOrigin;
 
 	// draw base
 	temp = availableWeapons[es->weaponIndex].damageRadius * 0.5;
 	for(i = 0; i <= 30; i++)
 	{
-			VectorCopy(this->lerpOrigin, pos);
+			pos = this->lerpOrigin;
 			pos[0] += (temp - (temp * -1) + 1) * Q_random( &seed ) + (temp * -1);
 			pos[1] += (temp - (temp * -1) + 1) * Q_random( &seed ) + (temp * -1);
 			pos[2] += (temp - (temp * -1) + 1) * Q_random( &seed ) + (temp * -1);

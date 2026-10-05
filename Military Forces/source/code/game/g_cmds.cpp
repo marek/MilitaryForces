@@ -330,7 +330,7 @@ static void Cmd_DevPlace_f( GameEntity *ent )
 		ent->client_->devHoldOrigin_[i] = atof( arg );
 	}
 	CommandSystem::argvBuffer( 4, arg, sizeof( arg ) );
-	VectorSet( ent->client_->devHoldAngles_, 0, atof( arg ), 0 );
+	ent->client_->devHoldAngles_ = Vec3( 0, atof( arg ), 0 );
 	ent->client_->devHold_ = true;
 	VectorCopy( ent->client_->devHoldOrigin_, ent->client_->ps_.origin );
 	VectorClear( ent->client_->ps_.velocity );

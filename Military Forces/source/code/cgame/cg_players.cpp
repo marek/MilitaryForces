@@ -211,7 +211,7 @@ void ClientEntity::trailItem( qhandle_t hModel ) {
 	Vec3			angles;
 	vec3_t			axis[3];
 
-	VectorCopy( this->lerpAngles, angles );
+	angles = this->lerpAngles;
 	angles[PITCH] = 0;
 	angles[ROLL] = 0;
 	AnglesToAxis( angles, axis );

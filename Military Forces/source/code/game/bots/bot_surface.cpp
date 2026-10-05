@@ -329,7 +329,7 @@ struct SurfaceTasks
 			Vec3 aim, dirAim, aimAngles, known;
 			c.enemyPosition().copyTo( known );
 			VectorMA( known, flight, c.sense.enemy->client_->ps_.velocity, aim );
-			VectorSubtract( aim, c.ent->r.currentOrigin, dirAim );
+			dirAim = aim - c.ent->r.currentOrigin;
 			const float range = VectorLength( dirAim );
 			vectoangles( dirAim, aimAngles );
 			const float arc = 0.5f * asin( std::clamp( DEFAULT_GRAVITY * range / (shell * shell), 0.0f, 1.0f ) ) * 180.0f / std::numbers::pi_v<float>;

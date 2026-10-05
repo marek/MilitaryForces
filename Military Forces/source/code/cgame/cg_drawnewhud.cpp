@@ -1202,7 +1202,7 @@ void CGame::hUD_Camera(int mfdnum, int vehicle) {
 			if( building ) {
 				VectorSubtract( cgs.inlineModelMidpoints[target->currentState.modelindex], cent->lerpOrigin, v );
 			} else {
-				VectorSubtract( target->lerpOrigin, cent->lerpOrigin, v );
+				v = target->lerpOrigin - cent->lerpOrigin;
 			}
 			VectorNormalize( v );
 			vectoangles( v, a );
@@ -1766,7 +1766,7 @@ void CGame::drawStatusBar_MFQ3_new( ) {
 		if( target->currentState.eType == ET_EXPLOSIVE ) {
 			VectorSubtract( cgs.inlineModelMidpoints[target->currentState.modelindex], cent->lerpOrigin, dir );
 		} else {
-			VectorSubtract( target->lerpOrigin, cent->lerpOrigin, dir );
+			dir = target->lerpOrigin - cent->lerpOrigin;
 		}
 		targetrange = VectorNormalize( dir );
 		vectoangles( dir, angles );

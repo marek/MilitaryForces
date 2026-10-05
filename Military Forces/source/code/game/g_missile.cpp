@@ -406,7 +406,7 @@ struct Think_NukeDamage : public GameEntity::EntityFunc_Think
 			ent->client_->ps_.delta_angles[2] += ANGLE2SHORT(newangles[2] - self_->movedir_[2]);
 
 		}
-		VectorCopy(newangles, self_->movedir_);
+		self_->movedir_ = newangles;
 	}
 };
 
@@ -500,7 +500,7 @@ void Game::burningManExplode( GameEntity *ent )
 	Vec3		start, dir;
 	static int	seed = 0x92;
 
-	VectorCopy( ent->r.currentOrigin, start );
+	start = ent->r.currentOrigin;
 
 	for( int i = 0; i < 75; i++ )
 	{
@@ -521,7 +521,7 @@ void Game::burningManExplode( GameEntity *ent )
 		VectorCopy( start, bolt->s.pos.trBase );
 		VectorScale( dir, 15, bolt->s.pos.trDelta );
 		SnapVector( bolt->s.pos.trDelta );
-		VectorCopy( start, bolt->r.currentOrigin );
+		bolt->r.currentOrigin = start;
 		GameHost::linkEntity( bolt );
 	}
 }
@@ -545,7 +545,7 @@ struct Think_ExplodeNuke : public GameEntity::EntityFunc_Think
 		explosion->s.eType = ET_EVENTS + EV_NUKE;
 		explosion->eventTime_ = theLevel.time_;
 
-		VectorCopy( self_->r.currentOrigin, snapped );
+		snapped = self_->r.currentOrigin;
 
 		SnapVector( snapped );		// save network bandwidth
 		Game::setOrigin( explosion, snapped );
@@ -561,7 +561,7 @@ struct Think_ExplodeNuke : public GameEntity::EntityFunc_Think
 		explosion->s.weaponIndex = self_->s.weaponIndex;
 		explosion->splashRadius_ = self_->splashRadius_;
 
-		VectorClear(explosion->movedir_);
+		explosion->movedir_ = Vec3();
 
 		GameHost::linkEntity( explosion );
 
@@ -772,7 +772,7 @@ struct Think_Crate : public GameEntity::EntityFunc_Think
 		int i;
 
 		// Get values
-		VectorCopy(self_->r.currentOrigin, pos);
+		pos = self_->r.currentOrigin;
 
 		// Set angles
 		for(i = 0; i < 3; i++)
@@ -874,13 +874,13 @@ struct Think_FollowTarget : public GameEntity::EntityFunc_Think
 		// direction vector and range
 		if( self->tracktarget_->s.eType == ET_EXPLOSIVE ) 
 		{
-			VectorAdd( self->tracktarget_->r.absmin, self->tracktarget_->r.absmax, mid );
+			mid = self->tracktarget_->r.absmin + self->tracktarget_->r.absmax;
 			mid = mid * ( 0.5f );
 		} 
 		else 
-			VectorCopy( self->tracktarget_->r.currentOrigin, mid );
+			mid = self->tracktarget_->r.currentOrigin;
 
-		VectorSubtract( mid, self->r.currentOrigin, targdir );
+		targdir = mid - self->r.currentOrigin;
 		dist = VectorNormalize(targdir);
 
 		// out of range (if ever possible)
@@ -1105,7 +1105,7 @@ void fire_antiair (GameEntity *self)
 	bolt->s.pos.trTime = theLevel.time_;// - MISSILE_PRESTEP_TIME;		// move a bit on the very first frame
 	VectorCopy( start, bolt->s.pos.trBase );
 	SnapVector( bolt->s.pos.trDelta );			// save net bandwidth
-	VectorCopy (start, bolt->r.currentOrigin);
+	bolt->r.currentOrigin = start;
 }
 
 
@@ -1209,7 +1209,7 @@ void fire_antiground( GameEntity *self )
 	bolt->s.pos.trTime = theLevel.time_;// - MISSILE_PRESTEP_TIME;		// move a bit on the very first frame
 	VectorCopy( start, bolt->s.pos.trBase );
 	SnapVector( bolt->s.pos.trDelta );			// save net bandwidth
-	VectorCopy (start, bolt->r.currentOrigin);
+	bolt->r.currentOrigin = start;
 }
 
 
@@ -1261,7 +1261,7 @@ void fire_ffar (GameEntity *self)
 	VectorCopy( start, bolt->s.pos.trBase );
 	VectorScale( dir, availableWeapons[self->client_->ps_.weaponIndex].muzzleVelocity, bolt->s.pos.trDelta );
 	SnapVector( bolt->s.pos.trDelta );			// save net bandwidth
-	VectorCopy (start, bolt->r.currentOrigin);
+	bolt->r.currentOrigin = start;
 }
 
 /*
@@ -1308,7 +1308,7 @@ void fire_ironbomb( GameEntity *self )
 	VectorCopy( start, bolt->s.pos.trBase );
 	VectorScale( dir, self->client_->ps_.speed/10, bolt->s.pos.trDelta );
 	SnapVector( bolt->s.pos.trDelta );			// save net bandwidth
-	VectorCopy (start, bolt->r.currentOrigin);
+	bolt->r.currentOrigin = start;
 }
 
 
@@ -1436,7 +1436,7 @@ void fire_autocannon( GameEntity *self, bool main )
 //	VectorScale( dir, availableWeapons[availableVehicles[self->client->vehicle].weapons[WP_MACHINEGUN]].muzzleVelocity, bolt->s.pos.trDelta );
 	VectorScale( dir, availableWeapons[weapIdx].muzzleVelocity, bolt->s.pos.trDelta );
 	SnapVector( bolt->s.pos.trDelta );			// save net bandwidth
-	VectorCopy (start, bolt->r.currentOrigin);
+	bolt->r.currentOrigin = start;
 }
 
 
@@ -1455,7 +1455,7 @@ void fire_autocannon_GI (GameEntity *self)
 //	float		spreadY = spreadX;
 
 	// used for spread
-	VectorSubtract( self->tracktarget_->r.currentOrigin, self->r.currentOrigin, dir );
+	dir = self->tracktarget_->r.currentOrigin - self->r.currentOrigin;
 	VectorNormalize(dir);
 	VectorCopy( self->s.pos.trBase, start );
 	start[2] += 10;
@@ -1486,7 +1486,7 @@ void fire_autocannon_GI (GameEntity *self)
 	VectorCopy( start, bolt->s.pos.trBase );
 	VectorScale( dir, availableWeapons[weapIdx].muzzleVelocity, bolt->s.pos.trDelta );
 	SnapVector( bolt->s.pos.trDelta );			// save net bandwidth
-	VectorCopy (start, bolt->r.currentOrigin);
+	bolt->r.currentOrigin = start;
 }
 
 /*
@@ -1500,7 +1500,7 @@ void fire_riderGun( GameEntity *rider, GameEntity *vehicle, const vec3_t angles 
 	Vec3 dir, right, start;
 
 	AngleVectors( angles, dir, right, nullptr );
-	VectorCopy( vehicle->r.currentOrigin, start );
+	start = vehicle->r.currentOrigin;
 	VectorMA( start, (rider->client_->sess_.seat_ & 1) ? 6.0f : -6.0f, right, start );
 	SnapVector( start );
 
@@ -1528,7 +1528,7 @@ void fire_riderGun( GameEntity *rider, GameEntity *vehicle, const vec3_t angles 
 	VectorCopy( start, bolt->s.pos.trBase );
 	VectorScale( dir, availableWeapons[weapIdx].muzzleVelocity, bolt->s.pos.trDelta );
 	SnapVector( bolt->s.pos.trDelta );
-	VectorCopy( start, bolt->r.currentOrigin );
+	bolt->r.currentOrigin = start;
 }
 
 /*
@@ -1577,7 +1577,7 @@ void fire_maingun( GameEntity *self )
 	VectorCopy( start, bolt->s.pos.trBase );
 	VectorScale( dir, availableWeapons[self->client_->ps_.weaponIndex].muzzleVelocity, bolt->s.pos.trDelta );
 	SnapVector( bolt->s.pos.trDelta );			// save net bandwidth
-	VectorCopy (start, bolt->r.currentOrigin);
+	bolt->r.currentOrigin = start;
 }
 
 
@@ -1625,7 +1625,7 @@ void fire_flare( GameEntity *self )
 		(availableVehicles[self->client_->vehicle_].cat & CAT_BOAT) ) 
 		VectorScale( up, 300, bolt->s.pos.trDelta );
 	SnapVector( bolt->s.pos.trDelta );			// save net bandwidth
-	VectorCopy (start, bolt->r.currentOrigin);
+	bolt->r.currentOrigin = start;
 
 }
 
@@ -1712,7 +1712,7 @@ void fire_cflare( GameEntity *self)
 		(availableVehicles[self->client_->vehicle_].cat & CAT_BOAT) ) 
 			VectorScale( up, 300, bolt->s.pos.trDelta );
 	SnapVector( bolt->s.pos.trDelta );			// save net bandwidth
-	VectorCopy (start, bolt->r.currentOrigin);
+	bolt->r.currentOrigin = start;
 }
 
 /*
@@ -1759,7 +1759,7 @@ void drop_fueltank ( GameEntity *self )
 	VectorCopy( start, bolt->s.pos.trBase );
 	VectorScale( dir, self->client_->ps_.speed/10, bolt->s.pos.trDelta );
 	SnapVector( bolt->s.pos.trDelta );			// save net bandwidth
-	VectorCopy (start, bolt->r.currentOrigin);
+	bolt->r.currentOrigin = start;
 }
 
 /*
@@ -1828,7 +1828,7 @@ void drop_crate( GameEntity *self )
 	VectorCopy(bolt->r.maxs, bolt->r.absmax);
 
 	VectorCopy( start, bolt->s.pos.trBase );
-	VectorCopy (start, bolt->r.currentOrigin);
+	bolt->r.currentOrigin = start;
 }
 
 
@@ -1878,7 +1878,7 @@ void fire_nukebomb ( GameEntity *self )
 	VectorCopy( start, bolt->s.pos.trBase );
 	VectorScale( dir, self->client_->ps_.speed/10, bolt->s.pos.trDelta );
 	SnapVector( bolt->s.pos.trDelta );			// save net bandwidth
-	VectorCopy (start, bolt->r.currentOrigin);
+	bolt->r.currentOrigin = start;
 }
 
 /*
@@ -1952,7 +1952,7 @@ void fire_nukemissile (GameEntity *self)
 	bolt->s.pos.trTime = theLevel.time_;// - MISSILE_PRESTEP_TIME;		// move a bit on the very first frame
 	VectorCopy( start, bolt->s.pos.trBase );
 	SnapVector( bolt->s.pos.trDelta );			// save net bandwidth
-	VectorCopy (start, bolt->r.currentOrigin);
+	bolt->r.currentOrigin = start;
 	
 }
 
@@ -1979,7 +1979,7 @@ void LaunchMissile_GI( GameEntity* ent )
 
 	VectorCopy( ent->s.pos.trBase, start );
 	start[2] += 10;
-	VectorSubtract( ent->tracktarget_->r.currentOrigin, ent->r.currentOrigin, dir );
+	dir = ent->tracktarget_->r.currentOrigin - ent->r.currentOrigin;
 	VectorNormalize(dir);
 	SnapVector( start );
 
@@ -2016,7 +2016,7 @@ void LaunchMissile_GI( GameEntity* ent )
 	bolt->s.pos.trTime = theLevel.time_;// - MISSILE_PRESTEP_TIME;		// move a bit on the very first frame
 	VectorCopy( start, bolt->s.pos.trBase );
 	SnapVector( bolt->s.pos.trDelta );			// save net bandwidth
-	VectorCopy (start, bolt->r.currentOrigin);
+	bolt->r.currentOrigin = start;
 }
 
 
@@ -2082,7 +2082,7 @@ void fire_flak_GI (GameEntity *self)
 	bolt->s.pos.trTime = theLevel.time_;// - MISSILE_PRESTEP_TIME;		// move a bit on the very first frame
 	VectorCopy( start, bolt->s.pos.trBase );
 	SnapVector( bolt->s.pos.trDelta );			// save net bandwidth
-	VectorCopy (start, bolt->r.currentOrigin);
+	bolt->r.currentOrigin = start;
 	
 }
 

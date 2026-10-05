@@ -67,7 +67,7 @@ static void ME_CopySelection()
 		VectorCopy( veh->angles, cgs.IGME.copyBufferVehicle.angles );
 		VectorClear( cgs.IGME.copyBufferVehicle.origin );
 		cgs.IGME.copyBufferVehicle.selected = veh->selected;
-		VectorCopy( veh->selectorScale, cgs.IGME.copyBufferVehicle.selectorScale );
+		cgs.IGME.copyBufferVehicle.selectorScale = veh->selectorScale;
 		cgs.IGME.copyBufferVehicle.vehidx = veh->vehidx;
 		for( i = 0; i < IGME_MAX_WAYPOINTS; ++i ) {
 			cgs.IGME.copyBufferVehicle.waypoints[i].active = veh->waypoints[i].active;
@@ -115,7 +115,7 @@ static void ME_PasteSelection()
 		VectorCopy( cgs.IGME.copyBufferVehicle.angles, veh->angles );
 		VectorCopy( cg.predictedPlayerState.origin, veh->origin );
 		veh->selected = false;
-		VectorCopy( cgs.IGME.copyBufferVehicle.selectorScale, veh->selectorScale );
+		veh->selectorScale = cgs.IGME.copyBufferVehicle.selectorScale;
 		veh->vehidx = cgs.IGME.copyBufferVehicle.vehidx;
 		for( i = 0; i < IGME_MAX_WAYPOINTS; ++i ) {
 			veh->waypoints[i].active = cgs.IGME.copyBufferVehicle.waypoints[i].active;
@@ -283,7 +283,7 @@ static void ME_DeleteSelection()
 				veh->selected = false;
 				VectorClear( veh->angles );
 				VectorClear( veh->origin );
-				VectorClear( veh->selectorScale );
+				veh->selectorScale = Vec3();
 				for( j = 0; j < IGME_MAX_WAYPOINTS; ++j ) {
 					wpt = &veh->waypoints[j];
 					if( !wpt->active ) break; // as they are all in a row

@@ -146,7 +146,7 @@ void ClientEntity::lQM( clientInfo_t *ci )
 		RotatePointAroundVector( temp, up, forward, this->lerpAngles2[ROLL] );
 		CrossProduct( up, temp, right );
 		RotatePointAroundVector( forward, right, temp, this->lerpAngles2[PITCH] );
-		VectorMA( this->lerpOrigin, availableVehicles[ci->vehicle].gunoffset[0], forward, start );
+		start = this->lerpOrigin + forward * ( availableVehicles[ci->vehicle].gunoffset[0] );
 		start = start + right * ( availableVehicles[ci->vehicle].gunoffset[1] );
 		start = start + up * ( availableVehicles[ci->vehicle].gunoffset[2] );
 		end = start + forward * ( 2000 );

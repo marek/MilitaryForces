@@ -130,13 +130,13 @@ void ClientEntity::boat( clientInfo_t *ci )
 			}
 			else
 			{
-				VectorSubtract( target->lerpOrigin, this->lerpOrigin, forward );
+				forward = target->lerpOrigin - this->lerpOrigin;
 			}
 
 			len = VectorNormalize( forward );
 			vectoangles( forward, ang );
 			AnglesToAxis( ang, reticle.axis );
-			VectorMA( this->lerpOrigin, 2000, forward, end );
+			end = this->lerpOrigin + forward * ( 2000 );
 			CGame::trace( &tr, this->lerpOrigin, nullptr, nullptr, end, cg.snap->ps.clientNum, MASK_SOLID ); 
 			
 			if( tr.entityNum > ENTITYNUM_WORLD && tr.entityNum < MAX_CLIENTS )
@@ -185,7 +185,7 @@ void ClientEntity::boat( clientInfo_t *ci )
 				RotatePointAroundVector( temp, up, forward, this->lerpAngles2[ROLL] );
 				CrossProduct( up, temp, right );
 				RotatePointAroundVector( forward, right, temp, this->lerpAngles2[PITCH] );
-				VectorMA( this->lerpOrigin, availableVehicles[ci->vehicle].gunoffset[0], forward, start );
+				start = this->lerpOrigin + forward * ( availableVehicles[ci->vehicle].gunoffset[0] );
 				start = start + right * ( availableVehicles[ci->vehicle].gunoffset[1] );
 				start = start + up * ( availableVehicles[ci->vehicle].gunoffset[2] );
 				end = start + forward * ( 2000 );
@@ -226,7 +226,7 @@ void ClientEntity::boat( clientInfo_t *ci )
 			RotatePointAroundVector( temp, up, forward, this->lerpAngles2[ROLL] );
 			CrossProduct( up, temp, right );
 			RotatePointAroundVector( forward, right, temp, this->lerpAngles2[PITCH] );
-			VectorMA( this->lerpOrigin, availableVehicles[ci->vehicle].gunoffset[0], forward, start );
+			start = this->lerpOrigin + forward * ( availableVehicles[ci->vehicle].gunoffset[0] );
 			start = start + right * ( availableVehicles[ci->vehicle].gunoffset[1] );
 			start = start + up * ( availableVehicles[ci->vehicle].gunoffset[2] );
 			end = start + forward * ( 2000 );

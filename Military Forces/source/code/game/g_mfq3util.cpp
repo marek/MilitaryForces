@@ -111,7 +111,7 @@ void updateTargetTracking( GameEntity *ent )
 	// no target yet
 	if( !ent->tracktarget_ ) 
 	{
-		VectorMA( ent->r.currentOrigin, radarrange, forward, endpos );
+		endpos = ent->r.currentOrigin + forward * ( radarrange );
 		GameHost::trace( &tr, ent->r.currentOrigin, ent->r.mins, ent->r.maxs, endpos, ent->s.number, MASK_ALL, false );
 		// nothing found
 		if( tr.entityNum == ENTITYNUM_NONE ) 
@@ -157,9 +157,9 @@ void updateTargetTracking( GameEntity *ent )
 		{
 			Vec3	mid;
 			actualcat = CAT_GROUND;
-			VectorAdd( ent->tracktarget_->r.absmax, ent->tracktarget_->r.absmin, mid );
+			mid = ent->tracktarget_->r.absmax + ent->tracktarget_->r.absmin;
 			mid = mid * ( 0.5f );
-			VectorSubtract( mid, ent->r.currentOrigin, diff );
+			diff = mid - ent->r.currentOrigin;
 		} 
 		else 
 		{
@@ -177,7 +177,7 @@ void updateTargetTracking( GameEntity *ent )
 			{
 				actualcat =	availableVehicles[ent->tracktarget_->client_->vehicle_].cat;
 			}
-			VectorSubtract( ent->tracktarget_->r.currentOrigin, ent->r.currentOrigin, diff );
+			diff = ent->tracktarget_->r.currentOrigin - ent->r.currentOrigin;
 		}
 		if( !actualcat ) 
 		{
@@ -218,7 +218,7 @@ void updateTargetTracking( GameEntity *ent )
 		}
 			
 		// check LOS
-		VectorMA( ent->r.currentOrigin, dist, diff, endpos );
+		endpos = ent->r.currentOrigin + diff * ( dist );
 		GameHost::trace( &tr, ent->r.currentOrigin, nullptr, nullptr, endpos, ent->s.number, MASK_PLAYERSOLID, false );
 		if( tr.fraction < 1 && tr.entityNum != ent->s.tracktarget ) 
 		{

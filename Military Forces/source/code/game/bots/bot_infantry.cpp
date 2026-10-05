@@ -247,7 +247,7 @@ void Bots::thinkRider( GameEntity* ent, State& bot, usercmd_t& cmd, vec3_t view 
 		return;
 
 	Vec3 dir, angles;
-	VectorSubtract( enemy->r.currentOrigin, pilot->r.currentOrigin, dir );
+	dir = enemy->r.currentOrigin - pilot->r.currentOrigin;
 	vectoangles( dir, angles );
 	view[YAW] = angles[YAW];
 	view[PITCH] = std::clamp( AngleSubtract( angles[PITCH], 0 ), -60.0f, 60.0f );

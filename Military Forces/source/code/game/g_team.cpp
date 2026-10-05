@@ -623,7 +623,7 @@ GameEntity *Team_GetLocation(GameEntity *ent)
 	best = nullptr;
 	bestlen = 3*8192.0*8192.0;
 
-	VectorCopy( ent->r.currentOrigin, origin );
+	origin = ent->r.currentOrigin;
 
 	for (eloc = theLevel.locationHead_; eloc; eloc = eloc->nextTrain_) 
 	{

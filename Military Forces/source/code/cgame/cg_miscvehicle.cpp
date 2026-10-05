@@ -123,7 +123,7 @@ void ClientEntity::misc_Plane()
 	// smoke
 	if( this->currentState.generic1 ) {
 		AngleVectors( this->lerpAngles, forward, nullptr, nullptr );
-		VectorMA( this->lerpOrigin, availableVehicles[this->currentState.modelindex].mins[0], forward, smokePosition );
+		smokePosition = this->lerpOrigin + forward * ( availableVehicles[this->currentState.modelindex].mins[0] );
 		this->generic_Smoke( smokePosition, 10 );
 	}
 
@@ -152,7 +152,7 @@ void ClientEntity::misc_Plane()
 		Vec3			forward;
 
 		AngleVectors( this->lerpAngles, forward, NULL, NULL );
-		VectorMA( this->lerpOrigin, availableVehicles[this->currentState.modelindex].mins[0], forward, pos );
+		pos = this->lerpOrigin + forward * ( availableVehicles[this->currentState.modelindex].mins[0] );
 
 		smoke = CGame::smokePuff( pos, up, 
 					  this->currentState.generic1, 
@@ -243,7 +243,7 @@ void ClientEntity::misc_GV()
 		Vec3			forward;
 
 		AngleVectors( this->lerpAngles, forward, nullptr, nullptr );
-		VectorCopy( this->lerpOrigin, pos );
+		pos = this->lerpOrigin;
 		pos[2] += 12;
 
 		smoke = CGame::smokePuff( pos, up, 
@@ -315,7 +315,7 @@ void ClientEntity::misc_Helo()
 		Vec3			forward;
 
 		AngleVectors( this->lerpAngles, forward, nullptr, nullptr );
-		VectorCopy( this->lerpOrigin, pos );
+		pos = this->lerpOrigin;
 		pos[2] += 12;
 
 		smoke = CGame::smokePuff( pos, up, 
@@ -397,7 +397,7 @@ void ClientEntity::misc_Boat()
 		Vec3			forward;
 
 		AngleVectors( this->lerpAngles, forward, nullptr, nullptr );
-		VectorCopy( this->lerpOrigin, pos );
+		pos = this->lerpOrigin;
 		pos[2] += 12;
 
 		smoke = CGame::smokePuff( pos, up, 
@@ -455,7 +455,7 @@ void ClientEntity::misc_GI()
 		Vec3			forward;
 
 		AngleVectors( this->lerpAngles, forward, nullptr, nullptr );
-		VectorCopy( this->lerpOrigin, pos );
+		pos = this->lerpOrigin;
 		pos[2] += 12;
 
 		smoke = CGame::smokePuff( pos, up, 

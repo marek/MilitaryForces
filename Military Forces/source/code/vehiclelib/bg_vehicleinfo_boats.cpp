@@ -35,14 +35,14 @@ GameObjectInfo_Boat::createAllBoats( GameObjectList& gameObjects )
 	veh->caps_ = HC_DUALGUNS;
 	veh->renderFlags_ = 0;	
     VectorSet( veh->turnSpeed_, 50, 100, 20 );		
-	VectorSet( veh->camDist_, 0, 100, 70 );
-	VectorSet( veh->camHeight_ , 0, 100, 20);		
+	veh->camDist_ = Vec3( 0, 100, 70 );
+	veh->camHeight_ = Vec3( 0, 100, 20 );		
     veh->maxHealth_ = 350;		
 	veh->shadowShader_ = SHADOW_DEFAULT;	
 	Vector4Set( veh->shadowCoords_, 4, 0, 34, 24 );	
 	Vector4Set( veh->shadowAdjusts_, 0, 0, 0, 0 );	
-	VectorSet( veh->gunoffset_, 5, 0, 8 );		
-	VectorSet( veh->cockpitview_, 0, 0, 6 );	
+	veh->gunoffset_ = Vec3( 5, 0, 8 );		
+	veh->cockpitview_ = Vec3( 0, 0, 6 );	
 	veh->airRadar_ = std::make_unique<VehicleRadarInfo>(-1, 8000, CAT_PLANE|CAT_HELO);		
 	veh->groundRadar_ = std::make_unique<VehicleRadarInfo>(0, 7000, CAT_GROUND|CAT_BOAT);			
 	veh->minThrottle_ = -5;

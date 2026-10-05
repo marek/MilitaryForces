@@ -219,7 +219,7 @@ void CGame::setNextSnap( snapshot_t *snap ) {
 					cent->errorAngles2[i] = AngleSubtract( cent->currentState.angles2[i], es->angles2[i] ) 
 						+ ( f > 0 ? f * cent->errorAngles2[i] : 0 );
 				}
-				VectorCopy( cent->lerpAngles, cent->errorAngles );
+				cent->errorAngles = cent->lerpAngles;
 				cent->errorTime = cg.time;
 				cent->errorSnapTime = snap->serverTime;
 			}

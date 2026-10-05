@@ -15,7 +15,7 @@ void Bots::logDeath( GameEntity* self, GameEntity* attacker, int meansOfDeath )
 	Vec3 forward, start;
 	trace_t ahead;
 	AngleVectors( ps.vehicleAngles, forward, nullptr, nullptr );
-	VectorMA( self->r.currentOrigin, -100.0f, forward, start );
+	start = self->r.currentOrigin + forward * ( -100.0f );
 	pathBlocked( start, forward, 600, self->s.number, ahead );
 	GameEntity* hit = ahead.fraction < 1.0f && ahead.entityNum > ENTITYNUM_WORLD ? theLevel.getEntity( ahead.entityNum ) : nullptr;
 	GameEntity* enemy = bot.enemy >= 0 ? theLevel.getEntity( bot.enemy ) : nullptr;
@@ -34,7 +34,7 @@ void Bots::logDeath( GameEntity* self, GameEntity* attacker, int meansOfDeath )
 		}
 	}
 	Vec3 below;
-	VectorCopy( self->r.currentOrigin, below );
+	below = self->r.currentOrigin;
 	below[2] -= heightAboveGround( self->r.currentOrigin, self->s.number ) + 4;
 
 	Common::printf( "BOTDEATH t %d bot %d mod %d by %d veh %d role %d goal %d age %d health %d org %.0f %.0f %.0f vel %.0f %.0f %.0f speed %d pitch %.0f roll %.0f yaw %.0f "

@@ -26,7 +26,7 @@ void MiscVehicle_Die::execute( GameEntity *inflictor, GameEntity *attacker, int 
 {
 	if( self_->score_ && attacker && attacker->client_ ) {
 		Vec3	pos;
-		VectorAdd( self_->r.absmin, self_->r.absmax, pos );
+		pos = self_->r.absmin + self_->r.absmax;
 		pos = pos * ( 0.5f );
 		AddScore( attacker, pos, Game::miscVehicle_TeamScore( self_, attacker ) );
 	}
@@ -189,7 +189,7 @@ void Drone_Think::execute()
 	else
 	{
 		Vec3 from, to;
-		VectorCopy( ent->r.currentOrigin, from );
+		from = ent->r.currentOrigin;
 		to = origin;
 		float raise = (ent->r.maxs[2] - ent->r.mins[2]) * 0.5f;
 		from[2] += raise;
@@ -197,7 +197,7 @@ void Drone_Think::execute()
 		GameHost::trace( &tr, from, ent->r.mins, ent->r.maxs, to, ent->s.number, MASK_SOLID, false );
 		if( !tr.startsolid && tr.fraction < 1.0f )
 		{
-			VectorCopy( ent->r.currentOrigin, origin );
+			origin = ent->r.currentOrigin;
 			if( ++blocked_ >= 40 )
 			{
 				next_ = (next_ + 1) % count_;
@@ -277,10 +277,10 @@ void Drone_Think::execute()
 
 	VectorCopy( angles, ent->s.angles );
 	VectorCopy( angles, ent->s.apos.trBase );
-	VectorCopy( angles, ent->r.currentAngles );
+	ent->r.currentAngles = angles;
 	ent->s.apos.trTime = theLevel.time_;
 
-	VectorCopy( origin, ent->r.currentOrigin );
+	ent->r.currentOrigin = origin;
 	VectorCopy( origin, ent->s.pos.trBase );
 	VectorCopy( vel, ent->s.pos.trDelta );
 	ent->s.pos.trType = TR_LINEAR;
@@ -359,7 +359,7 @@ void Abandoned_Think::execute()
 		Game::damage( ent, nullptr, ent, nullptr, nullptr, 100000, DAMAGE_NO_PROTECTION, MOD_CRASH, CAT_ANY );
 		return;
 	}
-	VectorCopy( origin, ent->r.currentOrigin );
+	ent->r.currentOrigin = origin;
 	ent->nextthink_ = theLevel.time_ + 50;
 	GameHost::linkEntity( ent );
 }
@@ -431,7 +431,7 @@ void Deck_Think::execute()
 	}
 
 	Vec3 origin, angles, velocity, forward, pos;
-	VectorCopy( parent->r.currentOrigin, origin );
+	origin = parent->r.currentOrigin;
 	VectorCopy( parent->s.angles, angles );
 	velocity = Vec3();
 	if( parent->client_ ) 
@@ -489,7 +489,7 @@ void Deck_Think::execute()
 	deck->s.pos.trDuration = 0;
 	VectorCopy( pos, deck->s.pos.trBase );
 	VectorCopy( velocity, deck->s.pos.trDelta );
-	VectorCopy( pos, deck->r.currentOrigin );
+	deck->r.currentOrigin = pos;
 
 	deck->s.apos.trType = TR_LINEAR;
 	deck->s.apos.trTime = theLevel.time_;
@@ -503,7 +503,7 @@ void Deck_Think::execute()
 			deck->s.apos.trDelta[k] = AngleSubtract( angles[k], lastAngles_[k] ) * scale;
 	}
 	VectorCopy( angles, deck->s.angles );
-	VectorCopy( angles, deck->r.currentAngles );
+	deck->r.currentAngles = angles;
 
 	VectorCopy( origin, lastOrigin_ );
 	VectorCopy( angles, lastAngles_ );

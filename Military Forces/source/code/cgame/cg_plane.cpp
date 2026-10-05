@@ -180,7 +180,7 @@ void ClientEntity::plane( clientInfo_t *ci )
 	if( this->currentState.generic1 ) 
 	{
 		AngleVectors( this->lerpAngles, forward, nullptr, nullptr );
-		VectorMA( this->lerpOrigin, availableVehicles[ci->vehicle].mins[0], forward, smokePosition );
+		smokePosition = this->lerpOrigin + forward * ( availableVehicles[ci->vehicle].mins[0] );
 		this->generic_Smoke( smokePosition, 10 );
 	}
 
@@ -232,13 +232,13 @@ void ClientEntity::plane( clientInfo_t *ci )
 			}
 			else
 			{
-				VectorSubtract( target->lerpOrigin, this->lerpOrigin, forward );
+				forward = target->lerpOrigin - this->lerpOrigin;
 			}
 
 			len = VectorNormalize( forward );
 			vectoangles( forward, ang );
 			AnglesToAxis( ang, reticle.axis );
-			VectorMA( this->lerpOrigin, 2000, forward, end );
+			end = this->lerpOrigin + forward * ( 2000 );
 			CGame::trace( &tr, this->lerpOrigin, nullptr, nullptr, end, cg.snap->ps.clientNum, MASK_SOLID ); 
 			if ( tr.entityNum > ENTITYNUM_WORLD && tr.entityNum < MAX_CLIENTS )
 			{
@@ -285,7 +285,7 @@ void ClientEntity::plane( clientInfo_t *ci )
 				VectorScale( reticlelock.axis[2], 0.5f, reticlelock.axis[2] );
 				reticlelock.nonNormalizedAxes = true;
 				AngleVectors(this->currentState.angles, forward, nullptr, nullptr);
-				VectorMA( this->lerpOrigin, 2000, forward, end );
+				end = this->lerpOrigin + forward * ( 2000 );
 				CGame::trace( &tr, this->lerpOrigin, nullptr, nullptr, end, cg.snap->ps.clientNum, MASK_SOLID ); 
 				VectorCopy( tr.endpos, end );
 				CGame::trace( &tr, cg.refdef.vieworg, nullptr, nullptr, end, cg.snap->ps.clientNum, MASK_SOLID ); 
@@ -314,7 +314,7 @@ void ClientEntity::plane( clientInfo_t *ci )
 			VectorScale( reticle.axis[2], 2.0f, reticle.axis[2] );
 			reticle.nonNormalizedAxes = true;
 			AngleVectors(this->currentState.angles, forward, nullptr, nullptr);
-			VectorMA( this->lerpOrigin, 2000, forward, end );
+			end = this->lerpOrigin + forward * ( 2000 );
 			CGame::trace( &tr, this->lerpOrigin, nullptr, nullptr, end, cg.snap->ps.clientNum, MASK_SOLID ); 
 			if ( tr.entityNum > ENTITYNUM_WORLD && tr.entityNum < MAX_CLIENTS ) {
 				cg.crosshairClientNum = tr.entityNum;

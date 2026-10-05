@@ -248,10 +248,10 @@ void ClientEntity::item() {
 
 	// autorotate at one of two speeds
 	if ( item->giType == IT_HEALTH ) {
-		VectorCopy( cg.autoAnglesFast, this->lerpAngles );
+		this->lerpAngles = cg.autoAnglesFast;
 		AxisCopy( cg.autoAxisFast, ent.axis );
 	} else {
-		VectorCopy( cg.autoAngles, this->lerpAngles );
+		this->lerpAngles = cg.autoAngles;
 		AxisCopy( cg.autoAxis, ent.axis );
 	}
 
@@ -743,7 +743,7 @@ void ClientEntity::vehicleLerpAngles() {
 	if ( f > 0 ) {
 		AnglesToQuat( this->errorAngles, current );
 		QuatInterpolate( out, current, f, out );
-		VectorMA( this->lerpAngles2, f, this->errorAngles2, this->lerpAngles2 );
+		this->lerpAngles2 = this->lerpAngles2 + this->errorAngles2 * ( f );
 	}
 
 	QuatToAngles( out, this->lerpAngles );

@@ -221,7 +221,7 @@ Status LandingSteps::final( Bots::Mind& c )
 	c.headFor( target );
 
 	Vec3 under;
-	VectorCopy( c.ent->r.currentOrigin, under );
+	under = c.ent->r.currentOrigin;
 	under[2] = g.pad.z;
 	const bool overRunway = Bots::runwayAt( under );
 	const float touch = fabs( c.veh.mins[2] ) + c.veh.gearheight;
@@ -277,7 +277,7 @@ Status LandingSteps::taxi( Bots::Mind& c )
 	c.direct = true;
 
 	Vec3 toSpot;
-	VectorSubtract( pad.spot, c.ent->r.currentOrigin, toSpot );
+	toSpot = pad.spot - c.ent->r.currentOrigin;
 	toSpot[2] = 0;
 	const float spotDist = VectorLength( toSpot );
 	c.headFor( pad.spot );

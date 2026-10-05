@@ -67,8 +67,8 @@ GameObjectInfo_Infantry::createAllInfantry( GameObjectList& gameObjects )
 	veh->caps_ = 0;
 	veh->renderFlags_ = 0;	
     VectorSet( veh->turnSpeed_, 50, 125, 70 );		
-	VectorSet( veh->camDist_, 0, 10, 0 );
-	VectorSet( veh->camHeight_ , 0, 10, 2.5);		
+	veh->camDist_ = Vec3( 0, 10, 0 );
+	veh->camHeight_ = Vec3( 0, 10, 2.5 );		
     veh->maxHealth_ = 20;		
 	veh->shadowShader_ = SHADOW_DEFAULT;	
 	Vector4Set( veh->shadowCoords_, 4, 0, 34, 24 );	
@@ -89,8 +89,8 @@ GameObjectInfo_Infantry::createAllInfantry( GameObjectList& gameObjects )
 	veh->caps_ = 0;
 	veh->renderFlags_ = 0;	
     VectorSet( veh->turnSpeed_, 50, 125, 70 );		
-	VectorSet( veh->camDist_, 0, 10, 0 );
-	VectorSet( veh->camHeight_ , 0, 10, 2.5);		
+	veh->camDist_ = Vec3( 0, 10, 0 );
+	veh->camHeight_ = Vec3( 0, 10, 2.5 );		
     veh->maxHealth_ = 20;		
 	veh->shadowShader_ = SHADOW_DEFAULT;	
 	Vector4Set( veh->shadowCoords_, 4, 0, 34, 24 );	

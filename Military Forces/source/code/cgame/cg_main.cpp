@@ -2064,7 +2064,7 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 		ps.cent = NULL;
 		ps.dead = false;
 		ps.lifetime = 0;
-		VectorSet(ps.pos, 0, 0, 3000);
+		ps.pos = Vec3( 0, 0, 3000 );
 		i = CGame::addParticleSystem(&pw, &ps);
 		if(i >= 0)
 		{
@@ -2087,9 +2087,9 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 		//	p.attractionEntity = 500.0f;
 
 			pe.ejectInterval = 10;
-			VectorSet(pe.ejectVelocity,0.0f,0.0f,500.0f);
-			VectorSet(pe.accelVarianceMax,100.0f,100.0f,0.0f);
-			VectorSet(pe.accelVarianceMin,-100.0f,-100.0f,0.0f);
+			pe.ejectVelocity = Vec3( 0.0f, 0.0f, 500.0f );
+			pe.accelVarianceMax = Vec3( 100.0f, 100.0f, 0.0f );
+			pe.accelVarianceMin = Vec3( -100.0f, -100.0f, 0.0f );
 			//VectorClear(pe.ejectVelocity);
 			pe.lifetime = 0;
 			pe.parentSytem = i;

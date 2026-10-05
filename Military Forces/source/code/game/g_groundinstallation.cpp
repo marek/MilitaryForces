@@ -29,7 +29,7 @@ void GroundInstallation_Die::execute( GameEntity *inflictor, GameEntity *attacke
 	if( self_->score_ && attacker && attacker->client_ ) {
 		Vec3	pos;
 		int score;
-		VectorAdd( self_->r.absmin, self_->r.absmax, pos );
+		pos = self_->r.absmin + self_->r.absmax;
 		pos = pos * ( 0.5f );
 		if( g_gametype.integer >= GT_TEAM && self_->s.generic1 == attacker->client_->ps_.persistant[PERS_TEAM] ) {
 			score = -self_->score_;
@@ -74,8 +74,8 @@ void Game::update_GI_Targets( GameEntity* ent )
 			{
 				ent->gi_nextScanTime_ = theLevel.time_ + 1500;
 				rangevec = Vec3( range, range, range );
-				VectorSubtract( ent->r.currentOrigin, rangevec, mins );
-				VectorAdd( ent->r.currentOrigin, rangevec, maxs );
+				mins = ent->r.currentOrigin - rangevec;
+				maxs = ent->r.currentOrigin + rangevec;
 				num = GameHost::areaEntities( mins, maxs, touch, MAX_GENTITIES );
 
 				for ( i=0 ; i<num ; i++ )
@@ -104,7 +104,7 @@ void Game::update_GI_Targets( GameEntity* ent )
 					GameHost::trace( &tr, ent->r.currentOrigin, nullptr, nullptr, hit->r.currentOrigin, ent->s.number, MASK_PLAYERSOLID, false );
 					if( tr.fraction < 1 && tr.entityNum != hit->s.number ) continue;
 					// check dist
-					VectorSubtract(hit->r.currentOrigin, ent->r.currentOrigin, dir);
+					dir = hit->r.currentOrigin - ent->r.currentOrigin;
 					dist = VectorNormalize(dir);
 					if( hit->client_ && (hit->client_->sess_.ridingClient_ >= 0 ||
 						VehicleData::stealthHidden( hit->client_->vehicle_, hit->client_->ps_.timers[TIMER_REVEAL], theLevel.time_, dist, range )) )
@@ -146,7 +146,7 @@ void Game::update_GI_Targets( GameEntity* ent )
 				return;
 			}
 			// check distance
-			VectorSubtract(ent->tracktarget_->r.currentOrigin, ent->r.currentOrigin, dir);
+			dir = ent->tracktarget_->r.currentOrigin - ent->r.currentOrigin;
 			if( VectorLength(dir) > range )
 			{
 				Game::loselock(ent);
@@ -185,7 +185,7 @@ void GroundInstallation_Think::execute()
 
 	if( ent->tracktarget_ )
 	{
-		VectorSubtract(ent->tracktarget_->r.currentOrigin, ent->r.currentOrigin, targdir);
+		targdir = ent->tracktarget_->r.currentOrigin - ent->r.currentOrigin;
 		vectoangles(targdir, targangles);
 		targangles[1] -= 90;
 

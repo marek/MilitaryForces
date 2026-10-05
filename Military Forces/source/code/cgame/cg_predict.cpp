@@ -93,7 +93,7 @@ void CGame::clipMoveToEntities( const vec3_t start, const vec3_t mins, const vec
 		if ( ent->solid == SOLID_BMODEL ) {
 			// special value for bmodel
 			cmodel = CollisionModel::inlineModel( ent->modelindex );
-			VectorCopy( cent->lerpAngles, angles );
+			angles = cent->lerpAngles;
 			GameShared::evaluateTrajectory( &cent->currentState.pos, cg.physicsTime, origin );
 		} else {
 			// encoded bbox
@@ -112,7 +112,7 @@ void CGame::clipMoveToEntities( const vec3_t start, const vec3_t mins, const vec
 				GameShared::evaluateTrajectory( &cent->currentState.pos, cg.physicsTime, origin );
 			} else {
 				VectorCopy( vec3_origin, angles );
-				VectorCopy( cent->lerpOrigin, origin );
+				origin = cent->lerpOrigin;
 			}
 		}
 
@@ -512,7 +512,7 @@ void CGame::predictPlayerState( ) {
 
 			if ( cg.thisFrameTeleport ) {
 				// a teleport will not cause an error decay
-				VectorClear( cg.predictedError );
+				cg.predictedError = Vec3();
 				if ( cg_showmiss.integer ) {
 					CGame::printf( "PredictionTeleport\n" );
 				}
@@ -545,11 +545,11 @@ void CGame::predictPlayerState( ) {
 						if ( f > 0 && cg_showmiss.integer ) {
 							CGame::printf("Double prediction decay: %f\n", f);
 						}
-						VectorScale( cg.predictedError, f, cg.predictedError );
+						cg.predictedError = cg.predictedError * ( f );
 					} else {
-						VectorClear( cg.predictedError );
+						cg.predictedError = Vec3();
 					}
-					VectorAdd( delta, cg.predictedError, cg.predictedError );
+					cg.predictedError = delta + cg.predictedError;
 					cg.predictedErrorTime = cg.oldTime;
 				}
 			}

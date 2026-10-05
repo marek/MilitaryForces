@@ -238,8 +238,8 @@ static bool G_MoverPush( GameEntity *pusher, vec3_t move, vec3_t amove, GameEnti
 			maxs[i] = pusher->r.absmax[i] + move[i];
 		}
 
-		VectorCopy( pusher->r.absmin, totalMins );
-		VectorCopy( pusher->r.absmax, totalMaxs );
+		totalMins = pusher->r.absmin;
+		totalMaxs = pusher->r.absmax;
 		for (i=0 ; i<3 ; i++) 
 		{
 			if ( move[i] > 0 ) 
@@ -346,8 +346,8 @@ static void G_MoverTeam( GameEntity *ent )
 		// get current position
 		GameShared::evaluateTrajectory( &part->s.pos, theLevel.time_, origin );
 		GameShared::evaluateTrajectory( &part->s.apos, theLevel.time_, angles );
-		VectorSubtract( origin, part->r.currentOrigin, move );
-		VectorSubtract( angles, part->r.currentAngles, amove );
+		move = origin - part->r.currentOrigin;
+		amove = angles - part->r.currentAngles;
 		if ( !G_MoverPush( part, move, amove, &obstacle ) ) 
 			break;	// move was blocked
 	}
@@ -440,14 +440,14 @@ static void SetMoverState( GameEntity *ent, GameEntity::eMoverState moverState, 
 		break;
 	case GameEntity::MOVER_1TO2:
 		VectorCopy( ent->pos1_, ent->s.pos.trBase );
-		VectorSubtract( ent->pos2_, ent->pos1_, delta );
+		delta = ent->pos2_ - ent->pos1_;
 		f = 1000.0 / ent->s.pos.trDuration;
 		VectorScale( delta, f, ent->s.pos.trDelta );
 		ent->s.pos.trType = TR_LINEAR_STOP;
 		break;
 	case GameEntity::MOVER_2TO1:
 		VectorCopy( ent->pos2_, ent->s.pos.trBase );
-		VectorSubtract( ent->pos1_, ent->pos2_, delta );
+		delta = ent->pos1_ - ent->pos2_;
 		f = 1000.0 / ent->s.pos.trDuration;
 		VectorScale( delta, f, ent->s.pos.trDelta );
 		ent->s.pos.trType = TR_LINEAR_STOP;
@@ -693,14 +693,14 @@ static void InitMover( GameEntity *ent )
 	ent->moverState_ = GameEntity::MOVER_POS1;
 	ent->r.svFlags = SVF_USE_CURRENT_ORIGIN;
 	ent->s.eType = ET_MOVER;
-	VectorCopy (ent->pos1_, ent->r.currentOrigin);
+	ent->r.currentOrigin = ent->pos1_;
 	GameHost::linkEntity( ent );
 
 	ent->s.pos.trType = TR_STATIONARY;
 	VectorCopy( ent->pos1_, ent->s.pos.trBase );
 
 	// calculate time to reach second position from speed
-	VectorSubtract( ent->pos2_, ent->pos1_, move );
+	move = ent->pos2_ - ent->pos1_;
 	distance = VectorLength( move );
 	if ( !ent->speed_ ) 
 		ent->speed_ = 100;
@@ -793,8 +793,8 @@ struct Think_SpawnNewDoorTrigger : public GameEntity::EntityFunc_Think
 			other->takedamage_ = true;
 
 		// find the bounds of everything on the team
-		VectorCopy (self_->r.absmin, mins);
-		VectorCopy (self_->r.absmax, maxs);
+		mins = self_->r.absmin;
+		maxs = self_->r.absmax;
 
 		for( other = self_->teamchain_ ; other ; other=other->teamchain_ ) 
 		{
@@ -891,16 +891,16 @@ void SP_func_door (GameEntity *ent)
 	abs_movedir[2] = fabs(ent->movedir_[2]);
 	VectorSubtract( ent->r.maxs, ent->r.mins, size );
 	distance = DotProduct( abs_movedir, size ) - lip;
-	VectorMA( ent->pos1_, distance, ent->movedir_, ent->pos2_ );
+	ent->pos2_ = ent->pos1_ + ent->movedir_ * ( distance );
 
 	// if "start_open", reverse position 1 and 2
 	if( ent->spawnflags_ & 1 ) 
 	{
 		Vec3	temp;
 
-		VectorCopy( ent->pos2_, temp );
+		temp = ent->pos2_;
 		VectorCopy( ent->s.origin, ent->pos2_ );
-		VectorCopy( temp, ent->pos1_ );
+		ent->pos1_ = temp;
 	}
 
 	InitMover( ent );
@@ -1060,7 +1060,7 @@ void SP_func_plat (GameEntity *ent)
 
 	// pos1 is the rest (bottom) position, pos2 is the top
 	VectorCopy( ent->s.origin, ent->pos2_ );
-	VectorCopy( ent->pos2_, ent->pos1_ );
+	ent->pos1_ = ent->pos2_;
 	ent->pos1_[2] -= height;
 
 	InitMover( ent );
@@ -1146,7 +1146,7 @@ void SP_func_button( GameEntity *ent )
 	Vec3 size;
 	VectorSubtract( ent->r.maxs, ent->r.mins, size );
 	float distance = abs_movedir[0] * size[0] + abs_movedir[1] * size[1] + abs_movedir[2] * size[2] - lip;
-	VectorMA (ent->pos1_, distance, ent->movedir_, ent->pos2_);
+	ent->pos2_ = ent->pos1_ + ent->movedir_ * ( distance );
 
 	if( ent->health_ ) 
 	{
@@ -1228,7 +1228,7 @@ static void Reached_TrainImpl( GameEntity *ent )
 		speed = 1;
 
 	// calculate duration
-	VectorSubtract( ent->pos2_, ent->pos1_, move );
+	move = ent->pos2_ - ent->pos1_;
 	length = VectorLength( move );
 
 	ent->s.pos.trDuration = length * 1000 / speed;
