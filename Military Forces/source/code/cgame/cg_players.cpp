@@ -160,10 +160,10 @@ void CGame::newClientInfo( int clientNum ) {
 	v = Info::valueForKey( configstring, "ac" );
 	newInfo.advancedControls = atoi(v);
 	if( newInfo.advancedControls )
-		CommandBuffer::addText( "+strafe" );
+		CommandBuffer::addText( "+strafe\n" );
 //		CvarSystem::set( "cl_freelook", "0" );
 	else
-		CommandBuffer::addText( "-strafe" );
+		CommandBuffer::addText( "-strafe\n" );
 //		CvarSystem::set( "cl_freelook", "1" );
 
 	// MFQ3: vehicle

@@ -73,7 +73,6 @@ struct ControlUtils
 							ControlUtils();
 							~ControlUtils();
 	
-	void					getKeyAssignment( const char *command, int* twokeys );
 	void					getConfig();
 	void					setConfig( bool restart );
 	void					setDefaults();
@@ -85,7 +84,9 @@ struct ControlUtils
 	// data
 	std::vector<Binding*>	bindings_;
 
-	char					nameBind1_[32];
+	static constexpr int	holdTime = 350;		// msec, same as the +hold command
+
+	char					nameBind1_[128];
 	char					nameBind2_[32];
 
 	static UI_Utils*		utils_;
@@ -100,7 +101,8 @@ struct ControlUtils::Binding
 							int defaultbind1,
 							int defaultbind2,
 							int bind1,
-							int bind2 );
+							int bind2,
+							int defaulthold = -1 );
 					~Binding();
 
 	const char*     command_;
@@ -110,6 +112,8 @@ struct ControlUtils::Binding
 	int				defaultbind2_;
 	int				bind1_;
 	int				bind2_;
+	int				defaulthold_;	// key whose long press runs this command
+	int				hold_;
 
 private:
 	// disabled

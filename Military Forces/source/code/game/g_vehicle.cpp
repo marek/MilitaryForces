@@ -234,8 +234,8 @@ VehicleDeathImpl( GameEntity* self, GameEntity* inflictor, GameEntity* attacker,
 		// wreck can be blown up (i.e on crash into ground)
 		self->setDie( std::make_unique<VehicleBase::VehicleDie>());
 
-		// prevent early respawning during death anim (allows 30 seconds)
-		self->client_->respawnTime_ = theLevel.time_ + 30000;
+		// the wreck falls for a while before its owner may leave it
+		self->client_->respawnTime_ = theLevel.time_ + 5000;
 	}
 
 	GameHost::linkEntity( self );

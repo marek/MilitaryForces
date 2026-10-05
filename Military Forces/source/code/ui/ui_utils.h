@@ -84,6 +84,7 @@ struct UI_Utils
 	int							item_ListBox_OverLB( itemDef_t *item, float x, float y );
 	void						item_SetMouseOver( itemDef_t *item, bool focus );
 	bool						item_Bind_HandleKey( itemDef_t *item, int key, int down );
+	void						item_Bind_Assign( itemDef_t *item, int key, bool hold );
 	bool						item_TextField_HandleKey( itemDef_t *item, int key );
 	void						item_Action( itemDef_t *item );
 	bool						item_HandleKey( itemDef_t *item, int key, int down );
@@ -235,6 +236,8 @@ protected:
 	ControlUtils*				controlUtils_;
 
 	bool						waitingForKey_;
+	int							pendingBindKey_ = -1;	// key pressed for a binding: released early it is a tap, kept down a hold
+	int							pendingBindTime_ = 0;
 
 	UI_ScrollInfo				scrollInfo_;
 

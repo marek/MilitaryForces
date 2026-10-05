@@ -619,8 +619,8 @@ static void CG_DevVehicle_f( ) {
 	CvarSystem::set( "cg_nextVehicle", CGame::argv( 1 ) );
 }
 
-// "+hold <tap command> <hold command>" gives one key two jobs: a quick tap runs the first command, keeping the key
-// down runs the second. For example: bind r "+hold radarrange radar"
+// "+hold <tap command> | <hold command>" gives one key two jobs: a quick tap runs the first command, keeping the key
+// down runs the second. For example: bind r "+hold radarrange | radar". Without arguments the bar can be left out.
 namespace
 {
 	constexpr int holdTime = 350;		// msec a key stays down before it counts as held
@@ -633,14 +633,25 @@ namespace
 		char	hold[128] = {};
 	};
 	HeldKey heldKeys[8];
+
+	// button commands are pressed and let go the way the key itself would do it
+	void runHeldCommand( const char* command, int key, bool down ) {
+		if( command[0] == '+' ) {
+			CommandBuffer::addText( va( "%c%s %d %d\n", down ? '+' : '-', command + 1, key, cg.time ) );
+		} else if( down && command[0] ) {
+			CommandBuffer::addText( va( "%s\n", command ) );
+		}
+	}
 }
 
 static void CG_HoldDown_f( ) {
-	if( CommandSystem::argc() < 4 ) {
-		Common::printf( "usage: bind <key> \"+hold <tap command> <hold command>\"\n" );
+	// the key system appends the key number and the time
+	const int last = CommandSystem::argc() - 2;
+	if( last < 2 ) {
+		Common::printf( "usage: bind <key> \"+hold <tap command> | <hold command>\"\n" );
 		return;
 	}
-	const int key = atoi( CGame::argv(3) );
+	const int key = atoi( CGame::argv(last) );
 	HeldKey* slot = nullptr;
 	for( HeldKey& held : heldKeys ) {
 		if( held.key == key ) {
@@ -656,16 +667,36 @@ static void CG_HoldDown_f( ) {
 	slot->key = key;
 	slot->downTime = cg.time;
 	slot->fired = false;
-	Q_strncpyz( slot->tap, CGame::argv(1), sizeof(slot->tap) );
-	Q_strncpyz( slot->hold, CGame::argv(2), sizeof(slot->hold) );
+	slot->tap[0] = slot->hold[0] = 0;
+
+	int bar = 0;
+	for( int i = 1; i < last && !bar; i++ ) {
+		if( !strcmp( CGame::argv(i), "|" ) ) {
+			bar = i;
+		}
+	}
+	for( int i = 1; i < last; i++ ) {
+		if( i == bar ) {
+			continue;
+		}
+		const bool tap = bar ? i < bar : i == 1;
+		char* into = tap ? slot->tap : slot->hold;
+		if( into[0] ) {
+			Q_strcat( into, sizeof(slot->tap), " " );
+		}
+		Q_strcat( into, sizeof(slot->tap), CGame::argv(i) );
+	}
 }
 
 static void CG_HoldUp_f( ) {
-	const int key = atoi( CGame::argv(3) );
+	const int key = atoi( CGame::argv( CommandSystem::argc() - 2 ) );
 	for( HeldKey& held : heldKeys ) {
 		if( held.key == key ) {
 			if( !held.fired ) {
-				CommandBuffer::addText( va( "%s\n", held.tap ) );
+				runHeldCommand( held.tap, key, true );
+				runHeldCommand( held.tap, key, false );
+			} else {
+				runHeldCommand( held.hold, key, false );
 			}
 			held.key = 0;
 		}
@@ -677,7 +708,7 @@ void CGame::runHeldKeys( ) {
 	for( HeldKey& held : heldKeys ) {
 		if( held.key && !held.fired && cg.time - held.downTime >= holdTime ) {
 			held.fired = true;
-			CommandBuffer::addText( va( "%s\n", held.hold ) );
+			runHeldCommand( held.hold, held.key, true );
 		}
 	}
 }

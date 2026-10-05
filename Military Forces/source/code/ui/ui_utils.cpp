@@ -1464,10 +1464,15 @@ UI_Utils::item_Bind_Paint( itemDef_t *item )
 
 	if (item->text) 
 	{
+		// a key kept down while assigning becomes this command's long press
+		const bool assigning = waitingForKey_ && bindItem_ == item;
+		if (assigning && pendingBindKey_ != -1 && dc_->realTime_ - pendingBindTime_ >= ControlUtils::holdTime) 
+			item_Bind_Assign(item, pendingBindKey_, true);
+
 		item_Text_Paint(item);
 		controlUtils_->bindingFromName(item->cvar);
 		dc_->drawText(item->textRect.x + item->textRect.w + 8, item->textRect.y, item->textscale, newColor,
-					controlUtils_->nameBind1_, 0, maxChars, item->textStyle);
+					assigning && waitingForKey_ ? "tap a key, or hold it for long press" : controlUtils_->nameBind1_, 0, maxChars, item->textStyle);
 	} 
 	else 
 	{
@@ -1998,7 +2003,6 @@ bool
 UI_Utils::item_Bind_HandleKey( itemDef_t *item, int key, int down ) 
 {
 	int			id;
-	int			i;
 
 	if (rect_ContainsPoint(&item->window.rect, dc_->cursorX_, dc_->cursorY_) && 
 		!waitingForKey_)
@@ -2007,38 +2011,89 @@ UI_Utils::item_Bind_HandleKey( itemDef_t *item, int key, int down )
 		{
 			waitingForKey_ = true;
 			bindItem_ = item;
+			pendingBindKey_ = -1;
 		}
 		return true;
 	}
-	else
+
+	if (!waitingForKey_ || bindItem_ == nullptr) 
+		return true;
+
+	if (key & K_CHAR_FLAG) 
+		return true;
+
+	if (!down)
 	{
-		if (!waitingForKey_ || bindItem_ == nullptr) 
+		// let go before the hold time: an ordinary key for this command
+		if (key == pendingBindKey_) 
+			item_Bind_Assign(item, key, false);
+		return true;
+	}
+
+	switch (key)
+	{
+		case K_ESCAPE:
+			waitingForKey_ = false;
+			pendingBindKey_ = -1;
 			return true;
 
-		if (key & K_CHAR_FLAG) 
+		case K_BACKSPACE:
+			id = controlUtils_->bindingIDFromName(item->cvar);
+			if (id != -1) 
+			{
+				controlUtils_->bindings_[id]->bind1_ = -1;
+				controlUtils_->bindings_[id]->bind2_ = -1;
+				controlUtils_->bindings_[id]->hold_ = -1;
+			}
+			controlUtils_->setConfig(true);
+			waitingForKey_ = false;
+			bindItem_ = nullptr;
 			return true;
 
-		switch (key)
+		case '`':
+			return true;
+	}
+
+	if (pendingBindKey_ == -1)
+	{
+		pendingBindKey_ = key;
+		pendingBindTime_ = dc_->realTime_;
+	}
+	return true;
+}
+
+void
+UI_Utils::item_Bind_Assign( itemDef_t *item, int key, bool hold ) 
+{
+	int			id;
+	int			i;
+
+	pendingBindKey_ = -1;
+
+	if (hold)
+	{
+		// the key keeps its tap command and gains this one for a long press
+		id = controlUtils_->bindingIDFromName(item->cvar);
+		if (id != -1)
 		{
-			case K_ESCAPE:
-				waitingForKey_ = false;
-				return true;
-	
-			case K_BACKSPACE:
-				id = controlUtils_->bindingIDFromName(item->cvar);
-				if (id != -1) 
-				{
-					controlUtils_->bindings_[id]->bind1_ = -1;
-					controlUtils_->bindings_[id]->bind2_ = -1;
-				}
-				controlUtils_->setConfig(true);
-				waitingForKey_ = false;
-				bindItem_ = nullptr;
-				return true;
-
-			case '`':
-				return true;
+			for (auto* binding : controlUtils_->bindings_)
+			{
+				if (binding->hold_ == key) 
+					binding->hold_ = -1;
+			}
+			ControlUtils::Binding* binding = controlUtils_->bindings_[id];
+			if (binding->bind1_ == key)
+			{
+				binding->bind1_ = binding->bind2_;
+				binding->bind2_ = -1;
+			}
+			else if (binding->bind2_ == key) 
+				binding->bind2_ = -1;
+			binding->hold_ = key;
 		}
+		controlUtils_->setConfig(true);
+		waitingForKey_ = false;
+		return;
 	}
 
 	if (key != -1)
@@ -2063,6 +2118,9 @@ UI_Utils::item_Bind_HandleKey( itemDef_t *item, int key, int down )
 
 	if (id != -1) 
 	{
+		if (controlUtils_->bindings_[id]->hold_ == key) 
+			controlUtils_->bindings_[id]->hold_ = -1;
+
 		if (key == -1) 
 		{
 			if( controlUtils_->bindings_[id]->bind1_ != -1 ) 
@@ -2095,8 +2153,6 @@ UI_Utils::item_Bind_HandleKey( itemDef_t *item, int key, int down )
 
 	controlUtils_->setConfig(true);	
 	waitingForKey_ = false;
-
-	return true;
 }
 
 bool 
@@ -3489,7 +3545,7 @@ UI_Utils::menu_HandleKey( menuDef_t *menu, int key, int down )
 		return;
 
 	inHandler = true;
-	if (waitingForKey_ && down) 
+	if (waitingForKey_) 
 	{
 		item_Bind_HandleKey(bindItem_, key, down);
 		inHandler = false;

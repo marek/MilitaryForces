@@ -1041,6 +1041,14 @@ void ClientThink_real( GameEntity *ent )
 		return;
 	}
 
+	// a body or wreck that never blows up must not keep its owner out of the game
+	if( client->vehicle_ >= 0 && client->ps_.stats[STAT_HEALTH] <= 0 && theLevel.time_ > client->respawnTime_ &&
+		( ucmd->buttons & ( BUTTON_ATTACK|BUTTON_ATTACK_MAIN ) ) )
+	{
+		respawn( ent );
+		return;
+	}
+
 	// perform once-a-second actions
 	ClientTimerActions( ent, msec );
 }

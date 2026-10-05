@@ -37,10 +37,10 @@ ControlUtils::ControlUtils()
 	bindings_.push_back( new Binding("+zoomin",			"Zoom In",						ID_ZOOMIN,			-1,				-1,			-1, -1) );
 	bindings_.push_back( new Binding("+zoomout",		"Zoom Out",						ID_ZOOMOUT,			-1,				-1,			-1, -1) );
 	bindings_.push_back( new Binding("contact_tower",	"Contact Tower",				ID_CONTACTTOWER,	K_BACKSPACE,	-1,			-1, -1) );
-	bindings_.push_back( new Binding("radar",			"RADAR on/off",					ID_RADAR,			-1,				-1,			-1, -1) );
+	bindings_.push_back( new Binding("radar",			"RADAR on/off",					ID_RADAR,			-1,				-1,			-1, -1, 'r') );
 	bindings_.push_back( new Binding("extinfo",			"Ext.Info on/off",				ID_EXTINFO,			'-',			-1,			-1, -1) );
 	// one key for both radar jobs: a tap steps the range, holding it switches the radar
-	bindings_.push_back( new Binding("+hold radarrange radar",	"RADAR: tap range, hold on/off",	ID_RADARRANGE,		'r',			-1,			-1, -1) );
+	bindings_.push_back( new Binding("radarrange",		"RADAR range",					ID_RADARRANGE,		'r',			-1,			-1, -1) );
 	bindings_.push_back( new Binding("mfd1_mode",		"Cycle MFD1 Mode",				ID_CYCLEMFD1,		-1,				-1,			-1, -1) );
 	bindings_.push_back( new Binding("mfd2_mode",		"Cycle MFD2 Mode",				ID_CYCLEMFD2,		-1,				-1,			-1, -1) );
 	bindings_.push_back( new Binding("eject",			"Eject",						ID_EJECT,			-1,				'o',		-1,	-1) );
@@ -149,64 +149,85 @@ ControlUtils::setUtils( UI_Utils* utils )
 	utils_ = utils;
 }
 
-void 
-ControlUtils::getKeyAssignment( const char* command, int* twokeys )
+// a key bound to "+hold <tap> | <hold>" runs one command on a quick tap and another when kept down
+static bool splitHold( const char* binding, char* tap, char* hold, int size )
 {
-	int		count;
-	int		j;
-	char	b[256];
+	if( Q_stricmpn( binding, "+hold ", 6 ) ) 
+		return false;
 
-	twokeys[0] = twokeys[1] = -1;
-	count = 0;
-
-	for ( j = 0; j < K_LAST_KEY; j++ )
+	const char* text = binding + 6;
+	const char* bar = strchr( text, '|' );
+	const char* space = strchr( text, ' ' );
+	const char* split = bar ? bar : space ? space : text + strlen( text );
+	Q_strncpyz( tap, text, std::min( size, static_cast<int>( split - text ) + 1 ) );
+	Q_strncpyz( hold, *split ? split + 1 : "", size );
+	for( char* s : { tap, hold } ) 
 	{
-		utils_->dc_->getBindingBuf( j, b, 256 );
-		if ( *b == 0 ) 
-			continue;
-
-		if ( !Q_stricmp( b, command ) ) 
-		{
-			twokeys[count] = j;
-			count++;
-			if (count == 2) 
-				break;
-		}
+		while( *s == ' ' ) 
+			memmove( s, s + 1, strlen( s ) );
+		for( size_t n = strlen( s ); n && s[n - 1] == ' '; n-- ) 
+			s[n - 1] = 0;
 	}
+	return true;
 }
 
 void 
 ControlUtils::getConfig()
 {
-	int		i;
-	int		twokeys[2];
-	size_t	bindCount = bindings_.size();
+	char	b[256], tap[256], hold[256];
 
-	// iterate each command, get its numeric binding
-	for( i=0; i < bindCount; i++ )
+	for( Binding* binding : bindings_ )
+		binding->bind1_ = binding->bind2_ = binding->hold_ = -1;
+
+	for( int key = 0; key < K_LAST_KEY; key++ )
 	{
-		getKeyAssignment( bindings_[i]->command_, twokeys );
+		utils_->dc_->getBindingBuf( key, b, 256 );
+		if( *b == 0 ) 
+			continue;
 
-		bindings_[i]->bind1_ = twokeys[0];
-		bindings_[i]->bind2_ = twokeys[1];
+		const bool held = splitHold( b, tap, hold, 256 );
+		for( Binding* binding : bindings_ )
+		{
+			if( !Q_stricmp( held ? tap : b, binding->command_ ) )
+			{
+				if( binding->bind1_ == -1 ) 
+					binding->bind1_ = key;
+				else if( binding->bind2_ == -1 ) 
+					binding->bind2_ = key;
+			}
+			if( held && binding->hold_ == -1 && !Q_stricmp( hold, binding->command_ ) )
+				binding->hold_ = key;
+		}
 	}
 }
 
 void 
 ControlUtils::setConfig( bool restart )
 {
-	int		i;
-	size_t	bindCount = bindings_.size();
+	char	b[256], tap[256], hold[256];
 
-	// iterate each command, get its numeric binding
-	for( i=0; i < bindCount; i++ )
+	for( int key = 0; key < K_LAST_KEY; key++ )
 	{
-		if( bindings_[i]->bind1_ != -1 )
-		{	
-			utils_->dc_->setBinding( bindings_[i]->bind1_, bindings_[i]->command_ );
+		const Binding* tapped = nullptr;
+		const Binding* held = nullptr;
+		for( const Binding* binding : bindings_ )
+		{
+			if( !tapped && ( binding->bind1_ == key || binding->bind2_ == key ) ) 
+				tapped = binding;
+			if( !held && binding->hold_ == key ) 
+				held = binding;
+		}
 
-			if( bindings_[i]->bind2_ != -1 )
-				utils_->dc_->setBinding( bindings_[i]->bind2_, bindings_[i]->command_ );
+		if( held )
+			utils_->dc_->setBinding( key, va( "+hold %s | %s", tapped ? tapped->command_ : "", held->command_ ) );
+		else if( tapped )
+			utils_->dc_->setBinding( key, tapped->command_ );
+		else
+		{
+			// a key no row claims any more loses the command this menu gave it
+			utils_->dc_->getBindingBuf( key, b, 256 );
+			if( *b && ( splitHold( b, tap, hold, 256 ) || bindingIDFromName( b ) != -1 ) )
+				utils_->dc_->setBinding( key, "" );
 		}
 	}
 
@@ -224,6 +245,7 @@ ControlUtils::setDefaults()
 	{
 		bindings_[i]->bind1_ = bindings_[i]->defaultbind1_;
 		bindings_[i]->bind2_ = bindings_[i]->defaultbind2_;
+		bindings_[i]->hold_ = bindings_[i]->defaulthold_;
 	}
 }
 
@@ -246,33 +268,29 @@ ControlUtils::bindingIDFromName( const char *name )
 void 
 ControlUtils::bindingFromName( const char *cvar ) 
 {
-	int	i, b1, b2;
-	size_t bindCount = bindings_.size();
+	char	name[32];
 
-	// iterate each command, set its default binding
-	for( i=0; i < bindCount; i++ )
+	nameBind1_[0] = 0;
+	const int id = bindingIDFromName( cvar );
+	if( id != -1 )
 	{
-		if (Q_stricmp(cvar, bindings_[i]->command_) == 0) 
+		const Binding& binding = *bindings_[id];
+		const struct { int key; const char* prefix; } keys[] = { { binding.bind1_, "" }, { binding.bind2_, "" }, { binding.hold_, "hold " } };
+		for( const auto& entry : keys )
 		{
-			b1 = bindings_[i]->bind1_;
-			if (b1 == -1) 
-				break;
+			if( entry.key == -1 ) 
+				continue;
 
-			utils_->dc_->keynumToStringBuf( b1, nameBind1_, 32 );
-			Q_strupr( nameBind1_ );
-
-			b2 = bindings_[i]->bind2_;
-			if (b2 != -1)
-			{
-				utils_->dc_->keynumToStringBuf( b2, nameBind2_, 32 );
-				Q_strupr( nameBind2_ );
-				strcat( nameBind1_, " or " );
-				strcat( nameBind1_, nameBind2_ );
-			}
-			return;
+			utils_->dc_->keynumToStringBuf( entry.key, name, sizeof(name) );
+			Q_strupr( name );
+			if( nameBind1_[0] ) 
+				Q_strcat( nameBind1_, sizeof(nameBind1_), " or " );
+			Q_strcat( nameBind1_, sizeof(nameBind1_), entry.prefix );
+			Q_strcat( nameBind1_, sizeof(nameBind1_), name );
 		}
 	}
-	strcpy( nameBind1_, "???" );
+	if( !nameBind1_[0] ) 
+		strcpy( nameBind1_, "???" );
 }
 
 ControlUtils::Binding::Binding( const char* command,
@@ -281,14 +299,17 @@ ControlUtils::Binding::Binding( const char* command,
 								int defaultbind1,
 								int defaultbind2,
 								int bind1,
-								int bind2 ) :
+								int bind2,
+								int defaulthold ) :
 	command_(command),
 	label_(label),
 	id_(id),
 	defaultbind1_(defaultbind1),
 	defaultbind2_(defaultbind2),
 	bind1_(bind1),
-	bind2_(bind2)
+	bind2_(bind2),
+	defaulthold_(defaulthold),
+	hold_(-1)
 {
 }
 

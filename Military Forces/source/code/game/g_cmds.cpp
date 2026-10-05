@@ -1854,9 +1854,35 @@ void Cmd_Eject_f( GameEntity *ent )
 	}
 	else if( parked ) 
 	{
-		vec3_t right;
-		AngleVectors( client->ps_.vehicleAngles, nullptr, right, nullptr );
-		VectorMA( client->ps_.origin, availableVehicles[vehicle].maxs[1] + 10, right, client->ps_.origin );
+		// step out beside the vehicle, on whichever side has open ground to stand on: right, left, behind, in front.
+		// (a spot inside a slope or wall would leave the soldier stuck, or pushed far up out of it)
+		const completeVehicleData_t& soldier = availableVehicles[infantry];
+		vec3_t forward, right, yawOnly;
+		VectorSet( yawOnly, 0, client->ps_.vehicleAngles[YAW], 0 );
+		AngleVectors( yawOnly, forward, right, nullptr );
+		const float beside = availableVehicles[vehicle].maxs[1] + 10, along = availableVehicles[vehicle].maxs[0] + 10;
+		const struct { const float* axis; float distance; } exits[] = { { right, beside }, { right, -beside }, { forward, -along }, { forward, along } };
+		bool out = false;
+		for( const auto& exit : exits ) 
+		{
+			constexpr float lift = 24.0f, drop = 80.0f;
+			vec3_t top, bottom;
+			trace_t tr;
+			VectorMA( client->ps_.origin, exit.distance, exit.axis, top );
+			VectorCopy( top, bottom );
+			top[2] += lift;
+			bottom[2] -= drop;
+			GameHost::trace( &tr, top, soldier.mins, soldier.maxs, bottom, ent->s.number, MASK_PLAYERSOLID, false );
+			if( !tr.startsolid && !tr.allsolid && tr.fraction < 1.0f ) 
+			{
+				VectorCopy( tr.endpos, client->ps_.origin );
+				out = true;
+				break;
+			}
+		}
+		// boxed in on every side: climb out onto the roof
+		if( !out )
+			client->ps_.origin[2] += availableVehicles[vehicle].maxs[2] + 4;
 	}
 
 	int clientNum = ent->s.number;
