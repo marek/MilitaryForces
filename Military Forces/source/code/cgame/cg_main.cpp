@@ -1868,14 +1868,6 @@ static void CG_AssetCache()
 {
 	cgUtils.dc_->assets_.gradientBar = refExport.RegisterShaderNoMip( ASSET_GRADIENTBAR );
 	cgUtils.dc_->assets_.verticalGradient = refExport.RegisterShaderNoMip( ASSET_VERTICALGRADIENT );
-	cgUtils.dc_->assets_.fxBasePic = refExport.RegisterShaderNoMip( ART_FX_BASE );
-	cgUtils.dc_->assets_.fxPic[0] = refExport.RegisterShaderNoMip( ART_FX_RED );
-	cgUtils.dc_->assets_.fxPic[1] = refExport.RegisterShaderNoMip( ART_FX_YELLOW );
-	cgUtils.dc_->assets_.fxPic[2] = refExport.RegisterShaderNoMip( ART_FX_GREEN );
-	cgUtils.dc_->assets_.fxPic[3] = refExport.RegisterShaderNoMip( ART_FX_TEAL );
-	cgUtils.dc_->assets_.fxPic[4] = refExport.RegisterShaderNoMip( ART_FX_BLUE );
-	cgUtils.dc_->assets_.fxPic[5] = refExport.RegisterShaderNoMip( ART_FX_CYAN );
-	cgUtils.dc_->assets_.fxPic[6] = refExport.RegisterShaderNoMip( ART_FX_WHITE );
 	cgUtils.dc_->assets_.scrollBar = refExport.RegisterShaderNoMip( ASSET_SCROLLBAR );
 	cgUtils.dc_->assets_.scrollBarArrowDown = refExport.RegisterShaderNoMip( ASSET_SCROLLBAR_ARROWDOWN );
 	cgUtils.dc_->assets_.scrollBarArrowUp = refExport.RegisterShaderNoMip( ASSET_SCROLLBAR_ARROWUP );

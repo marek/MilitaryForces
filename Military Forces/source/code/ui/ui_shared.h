@@ -104,15 +104,6 @@ inline constexpr int MAX_STRING_HANDLES = 4096;
 inline constexpr int MAX_SCRIPT_ARGS = 12;
 inline constexpr int MAX_EDITFIELD = 256;
 
-#define ART_FX_BASE			"menu/art/fx_base"
-#define ART_FX_BLUE			"menu/art/fx_blue"
-#define ART_FX_CYAN			"menu/art/fx_cyan"
-#define ART_FX_GREEN		"menu/art/fx_grn"
-#define ART_FX_RED			"menu/art/fx_red"
-#define ART_FX_TEAL			"menu/art/fx_teal"
-#define ART_FX_WHITE		"menu/art/fx_white"
-#define ART_FX_YELLOW		"menu/art/fx_yel"
-
 #define ASSET_GRADIENTBAR			"ui/assets/gradientbar2.tga"
 #define	ASSET_VERTICALGRADIENT		"ui/assets/verticalgradient.tga"
 #define ASSET_SCROLLBAR             "ui/assets/scrollbar.tga"
@@ -343,8 +334,6 @@ struct cachedAssets_t
   bool fontRegistered;
 
   // player settings
-  qhandle_t fxBasePic;
-  qhandle_t fxPic[7];
   qhandle_t	crosshairShader[NUM_CROSSHAIRS];
 };
 

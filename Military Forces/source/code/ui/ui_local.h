@@ -745,7 +745,6 @@ struct uiInfo_t
 	char q3HeadNames[MAX_PLAYERMODELS][64];
 	qhandle_t q3HeadIcons[MAX_PLAYERMODELS];
 
-	int effectsColor;
 
 	bool inGameLoad;
 

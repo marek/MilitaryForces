@@ -103,8 +103,6 @@ static char* netnames[] = {
 	"UDP6"
 };
 
-static int gamecodetoui[] = {4,2,3,0,5,1,6};
-static int uitogamecode[] = {4,6,2,3,1,5,7};
 
 
 static void UI_StartServerRefresh(bool full);
@@ -145,14 +143,6 @@ static void AssetCache()
 	int n;
 	uiInfo.uiUtils.dc_->assets_.gradientBar = refExport.RegisterShaderNoMip( ASSET_GRADIENTBAR );
 	uiInfo.uiUtils.dc_->assets_.verticalGradient = refExport.RegisterShaderNoMip( ASSET_VERTICALGRADIENT );
-	uiInfo.uiUtils.dc_->assets_.fxBasePic = refExport.RegisterShaderNoMip( ART_FX_BASE );
-	uiInfo.uiUtils.dc_->assets_.fxPic[0] = refExport.RegisterShaderNoMip( ART_FX_RED );
-	uiInfo.uiUtils.dc_->assets_.fxPic[1] = refExport.RegisterShaderNoMip( ART_FX_YELLOW );
-	uiInfo.uiUtils.dc_->assets_.fxPic[2] = refExport.RegisterShaderNoMip( ART_FX_GREEN );
-	uiInfo.uiUtils.dc_->assets_.fxPic[3] = refExport.RegisterShaderNoMip( ART_FX_TEAL );
-	uiInfo.uiUtils.dc_->assets_.fxPic[4] = refExport.RegisterShaderNoMip( ART_FX_BLUE );
-	uiInfo.uiUtils.dc_->assets_.fxPic[5] = refExport.RegisterShaderNoMip( ART_FX_CYAN );
-	uiInfo.uiUtils.dc_->assets_.fxPic[6] = refExport.RegisterShaderNoMip( ART_FX_WHITE );
 	uiInfo.uiUtils.dc_->assets_.scrollBar = refExport.RegisterShaderNoMip( ASSET_SCROLLBAR );
 	uiInfo.uiUtils.dc_->assets_.scrollBarArrowDown = refExport.RegisterShaderNoMip( ASSET_SCROLLBAR_ARROWDOWN );
 	uiInfo.uiUtils.dc_->assets_.scrollBarArrowUp = refExport.RegisterShaderNoMip( ASSET_SCROLLBAR_ARROWUP );
@@ -1241,13 +1231,6 @@ static void UI_DrawTeamMember(rectDef_t *rect, float scale, const vec4_t color, 
 	Text_Paint(rect->x, rect->y, scale, color, text, 0, 0, textStyle);
 }
 
-static void UI_DrawEffects(rectDef_t *rect, float scale, const vec4_t color) 
-{
-	Menus::drawHandlePic( rect->x, rect->y - 14, 128, 8, uiInfo.uiUtils.dc_->assets_.fxBasePic );
-	Menus::drawHandlePic( rect->x + uiInfo.effectsColor * 16 + 8, rect->y - 16, 16, 12, 
-		uiInfo.uiUtils.dc_->assets_.fxPic[uiInfo.effectsColor] );
-}
-
 static void UI_DrawMapPreview(rectDef_t *rect, float scale, const vec4_t color, bool net) 
 {
 	int map = (net) ? ui_currentNetMap.integer : ui_currentMap.integer;
@@ -2193,9 +2176,6 @@ void Menus::ownerDraw(float x, float y, float w, float h, float text_x, float te
     case UI_HANDICAP:
       UI_DrawHandicap(&rect, scale, color, textStyle);
       break;
-    case UI_EFFECTS:
-      UI_DrawEffects(&rect, scale, color);
-      break;
     case UI_CLANNAME:
       UI_DrawClanName(&rect, scale, color, textStyle);
       break;
@@ -2482,27 +2462,6 @@ static bool UI_Handicap_HandleKey(int flags, float *special, int key) {
 			h = 100;
 		}
   	CvarSystem::set( "handicap", va( "%i", h) );
-    return true;
-  }
-  return false;
-}
-
-static bool UI_Effects_HandleKey(int flags, float *special, int key) {
-  if (key == K_MOUSE1 || key == K_MOUSE2 || key == K_ENTER || key == K_KP_ENTER) {
-
-		if (key == K_MOUSE2) {
-	    uiInfo.effectsColor--;
-		} else {
-	    uiInfo.effectsColor++;
-		}
-
-    if( uiInfo.effectsColor > 6 ) {
-	  	uiInfo.effectsColor = 0;
-		} else if (uiInfo.effectsColor < 0) {
-	  	uiInfo.effectsColor = 6;
-		}
-
-	  CvarSystem::setValue( "color1", uitogamecode[uiInfo.effectsColor] );
     return true;
   }
   return false;
@@ -2907,9 +2866,6 @@ bool Menus::ownerDrawHandleKey(int ownerDraw, int flags, float *special, int key
   switch (ownerDraw) {
     case UI_HANDICAP:
       return UI_Handicap_HandleKey(flags, special, key);
-      break;
-    case UI_EFFECTS:
-      return UI_Effects_HandleKey(flags, special, key);
       break;
     case UI_CLANNAME:
       return UI_ClanName_HandleKey(flags, special, key);
@@ -5891,7 +5847,6 @@ void _UI_Init( bool inGameLoad )
 	//UI_LoadBots();
 
 	// sets defaults for ui temp cvars
-	uiInfo.effectsColor = gamecodetoui[static_cast<int>(CvarSystem::variableValue("color1"))-1];
 	uiInfo.currentCrosshair = CvarSystem::variableValue("cg_drawCrosshair");
 	CvarSystem::set("ui_mousePitch", (CvarSystem::variableValue("m_pitch") >= 0) ? "0" : "1");
 
