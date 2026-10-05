@@ -198,7 +198,7 @@ to a fixed color.
 Coordinates are at 640 by 480 virtual resolution
 ==================
 */
-void SCR_DrawStringExt( int x, int y, float size, const char *string, float *setColor, bool forceColor,
+static void SCR_DrawStringExt( int x, int y, float size, const char *string, float *setColor, bool forceColor,
 		bool noColorEscape ) {
 	vec4_t		color;
 	const char	*s;
@@ -331,7 +331,7 @@ int	Screen::getBigStringWidth( const char *str ) {
 SCR_DrawDemoRecording
 =================
 */
-void SCR_DrawDemoRecording( ) {
+static void SCR_DrawDemoRecording( ) {
 	char	string[1024];
 	int		pos;
 
@@ -355,7 +355,7 @@ void SCR_DrawDemoRecording( ) {
 SCR_DrawVoipMeter
 =================
 */
-void SCR_DrawVoipMeter( ) {
+static void SCR_DrawVoipMeter( ) {
 	char	buffer[16];
 	char	string[256];
 	int limit, i;
@@ -418,7 +418,7 @@ void Screen::debugGraph (float value)
 SCR_DrawDebugGraph
 ==============
 */
-void SCR_DrawDebugGraph ()
+static void SCR_DrawDebugGraph ()
 {
 	int		a, x, y, w, i, h;
 	float	v;
@@ -474,7 +474,7 @@ SCR_DrawScreenField
 This will be called twice if rendering in stereo mode
 ==================
 */
-void SCR_DrawScreenField( stereoFrame_t stereoFrame ) {
+static void SCR_DrawScreenField( stereoFrame_t stereoFrame ) {
 	bool uiFullscreen;
 
 	refExport.BeginFrame( stereoFrame );

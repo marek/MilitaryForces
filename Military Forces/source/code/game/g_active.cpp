@@ -20,7 +20,7 @@ damage values to that client for pain blends and kicks, and
 global pain sound events for all clients.
 ===============
 */
-void P_DamageFeedback( GameEntity *player ) 
+static void P_DamageFeedback( GameEntity *player ) 
 {
 	GameClient* client = player->client_;
 	if( client->ps_.pm_type == PM_DEAD ) 
@@ -86,7 +86,7 @@ P_WorldEffects
 Check for lava / slime contents and drowning
 =============
 */
-void P_WorldEffects( GameEntity *ent ) 
+static void P_WorldEffects( GameEntity *ent ) 
 {
 	int			waterlevel;
 
@@ -184,7 +184,7 @@ void P_WorldEffects( GameEntity *ent )
 ClientImpacts
 ==============
 */
-void ClientImpacts( GameEntity *ent, pmove_t *pm )
+static void ClientImpacts( GameEntity *ent, pmove_t *pm )
 {
 	trace_t	trace;
 	memset( &trace, 0, sizeof( trace ) );
@@ -282,7 +282,7 @@ NotSelectedThink
 =================
 */
 // MFQ3 for the time when no vehicle is selected
-void NotSelectedThink( GameEntity *ent, usercmd_t *ucmd ) 
+static void NotSelectedThink( GameEntity *ent, usercmd_t *ucmd ) 
 {
 	pmove_t	pm;
 	GameClient	*client;
@@ -321,7 +321,7 @@ void NotSelectedThink( GameEntity *ent, usercmd_t *ucmd )
 SpectatorThink
 =================
 */
-void SpectatorThink( GameEntity *ent, usercmd_t *ucmd ) 
+static void SpectatorThink( GameEntity *ent, usercmd_t *ucmd ) 
 {
 	pmove_t	pm;
 	GameClient	*client;
@@ -366,7 +366,7 @@ void SpectatorThink( GameEntity *ent, usercmd_t *ucmd )
 MissionEditorThink
 =================
 */
-void MissionEditorThink( GameEntity *ent, usercmd_t *ucmd ) 
+static void MissionEditorThink( GameEntity *ent, usercmd_t *ucmd ) 
 {
 	pmove_t	pm;
 	GameClient	*client;
@@ -406,7 +406,7 @@ ClientInactivityTimer
 Returns false if the client is dropped
 =================
 */
-bool ClientInactivityTimer( GameClient *client ) 
+static bool ClientInactivityTimer( GameClient *client ) 
 {
 	if( !g_inactivity.integer ) 
 	{
@@ -448,7 +448,7 @@ ClientTimerActions
 Actions that happen once a second
 ==================
 */
-void ClientTimerActions( GameEntity *ent, int msec ) 
+static void ClientTimerActions( GameEntity *ent, int msec ) 
 {
 	GameClient	*client = ent->client_;
 	client->timeResidual_ += msec;
@@ -469,7 +469,7 @@ void ClientTimerActions( GameEntity *ent, int msec )
 ClientIntermissionThink
 ====================
 */
-void ClientIntermissionThink( GameClient *client ) 
+static void ClientIntermissionThink( GameClient *client ) 
 {
 	// the level will exit when everyone wants to or after timeouts
 
@@ -492,7 +492,7 @@ Events will be passed on to the clients for presentation,
 but any server game effects are handled here
 ================
 */
-void ClientEvents( GameEntity *ent, int oldEventSequence ) 
+static void ClientEvents( GameEntity *ent, int oldEventSequence ) 
 {
 	GameClient *client = ent->client_;
 
@@ -575,7 +575,7 @@ void ClientEvents( GameEntity *ent, int oldEventSequence )
 SendPendingPredictableEvents
 ==============
 */
-void SendPendingPredictableEvents( playerState_t *ps )
+static void SendPendingPredictableEvents( playerState_t *ps )
 {
 	// if there are still events pending
 	if( ps->entityEventSequence < ps->eventSequence )
@@ -698,7 +698,7 @@ If "g_synchronousClients 1" is set, this will be called exactly
 once for each server frame, which makes for smooth demo recording.
 ==============
 */
-void ClientThink_real( GameEntity *ent ) 
+static void ClientThink_real( GameEntity *ent ) 
 {
 	GameClient	*client = ent->client_;
 
@@ -1094,7 +1094,7 @@ SpectatorClientEndFrame
 
 ==================
 */
-void SpectatorClientEndFrame( GameEntity *ent ) 
+static void SpectatorClientEndFrame( GameEntity *ent ) 
 {
 	// if we are doing a chase cam or a remote view, grab the latest info
 	if( ent->client_->sess_.spectatorState_ == GameClient::ClientSession::SPECTATOR_FOLLOW ) 

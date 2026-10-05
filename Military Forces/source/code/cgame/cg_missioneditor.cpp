@@ -7,12 +7,12 @@
 
 constexpr float MAX_SELECTION_DISTANCE = 3000.0f;
 
-void ME_DrawVehicle( IGME_vehicle_t* veh );
-void ME_CheckForSelection();
-void ME_DragSelection( int x, int y );
-void ME_DeleteSelection();
-void ME_SpawnWaypoint();
-IGME_vehicle_t* ME_GetSelectedVehicle();
+static void ME_DrawVehicle( IGME_vehicle_t* veh );
+static void ME_CheckForSelection();
+static void ME_DragSelection( int x, int y );
+static void ME_DeleteSelection();
+static void ME_SpawnWaypoint();
+static IGME_vehicle_t* ME_GetSelectedVehicle();
 
 
 
@@ -33,7 +33,7 @@ void ME_MouseEvent(int x, int y)
 	}
 }
 
-void ME_CopySelection()
+static void ME_CopySelection()
 {
 	IGME_vehicle_t* veh = nullptr;
 	int				i;
@@ -79,7 +79,7 @@ void ME_CopySelection()
 	CGame::printf( "Copied to clipboard\n" );
 }
 
-void ME_PasteSelection()
+static void ME_PasteSelection()
 {
 	IGME_vehicle_t* veh = nullptr;
 	int				i;
@@ -126,7 +126,7 @@ void ME_PasteSelection()
 	CGame::printf( "Pasted\n" );
 }
 
-void ME_ToggleWaypointMode()
+static void ME_ToggleWaypointMode()
 {
 	IGME_vehicle_t* veh = nullptr;
 
@@ -148,7 +148,7 @@ void ME_ToggleWaypointMode()
 	else CGame::printf( "Waypoint mode is OFF\n" );
 }
 
-void ME_ToggleWaypointDisplay()
+static void ME_ToggleWaypointDisplay()
 {
 	cgs.IGME.showAllWaypoints = cgs.IGME.showAllWaypoints ? false : true;
 
@@ -208,7 +208,7 @@ void CGame::draw_IGME()
 	}
 }
 
-void ME_MoveWptsBackInLine(IGME_vehicle_t* veh, int start)
+static void ME_MoveWptsBackInLine(IGME_vehicle_t* veh, int start)
 {
 	int i;
 	IGME_waypoint_t*	wpt = nullptr;
@@ -229,7 +229,7 @@ void ME_MoveWptsBackInLine(IGME_vehicle_t* veh, int start)
 	}
 }
 
-void ME_MoveWptsAheadInLine(IGME_vehicle_t* veh, int start)
+static void ME_MoveWptsAheadInLine(IGME_vehicle_t* veh, int start)
 {
 	int i;
 	IGME_waypoint_t*	wpt = nullptr;
@@ -250,7 +250,7 @@ void ME_MoveWptsAheadInLine(IGME_vehicle_t* veh, int start)
 	VectorClear( veh->waypoints[start].origin );
 }
 
-void ME_DeleteSelection() 
+static void ME_DeleteSelection() 
 {
 	int i;
 
@@ -296,7 +296,7 @@ void ME_DeleteSelection()
 	}
 }
 
-void ME_DeselectAll()
+static void ME_DeselectAll()
 {
 	int i;
 	for( i = 0; i < IGME_MAX_VEHICLES; ++i ) {
@@ -305,7 +305,7 @@ void ME_DeselectAll()
 	cgs.IGME.numSelections = 0;
 }
 
-void ME_SelectVehicle( IGME_vehicle_t* veh )
+static void ME_SelectVehicle( IGME_vehicle_t* veh )
 {
 	int multisel = Keys::isDown(K_CTRL);
 
@@ -330,7 +330,7 @@ void ME_SelectVehicle( IGME_vehicle_t* veh )
 	}
 }
 
-void ME_DeselectAllWaypoints()
+static void ME_DeselectAllWaypoints()
 {
 	IGME_vehicle_t* selveh = ME_GetSelectedVehicle();
 	int				i;
@@ -343,7 +343,7 @@ void ME_DeselectAllWaypoints()
 	cgs.IGME.numWptSelections = 0;
 }
 
-void ME_SelectWaypoint( IGME_waypoint_t* wpt )
+static void ME_SelectWaypoint( IGME_waypoint_t* wpt )
 {
 	int multisel = Keys::isDown(K_CTRL);
 
@@ -368,7 +368,7 @@ void ME_SelectWaypoint( IGME_waypoint_t* wpt )
 	}
 }
 
-IGME_vehicle_t* ME_GetVehicleUnderCrosshair()
+static IGME_vehicle_t* ME_GetVehicleUnderCrosshair()
 {
 	vec3_t			mins, maxs, dir;
 	float			dist, closestDist = MAX_SELECTION_DISTANCE;
@@ -406,7 +406,7 @@ IGME_vehicle_t* ME_GetVehicleUnderCrosshair()
 	return selveh;
 }
 
-IGME_waypoint_t* ME_GetWaypointUnderCrosshair()
+static IGME_waypoint_t* ME_GetWaypointUnderCrosshair()
 {
 	vec3_t			mins, maxs, dir;
 	float			dist, closestDist = MAX_SELECTION_DISTANCE;
@@ -444,7 +444,7 @@ IGME_waypoint_t* ME_GetWaypointUnderCrosshair()
 	return selwpt;
 }
 
-void ME_CheckForSelection()
+static void ME_CheckForSelection()
 {
 	if( cgs.IGME.waypointmode ) {
 		ME_SelectWaypoint(ME_GetWaypointUnderCrosshair());
@@ -454,7 +454,7 @@ void ME_CheckForSelection()
 }
 
 // returns first selected vehicle
-IGME_vehicle_t* ME_GetSelectedVehicle()
+static IGME_vehicle_t* ME_GetSelectedVehicle()
 {
 	int				i;
 	IGME_vehicle_t* veh = nullptr;
@@ -469,7 +469,7 @@ IGME_vehicle_t* ME_GetSelectedVehicle()
 }
 
 // returns first selected waypoint
-int ME_GetSelectedWaypointNumber()
+static int ME_GetSelectedWaypointNumber()
 {
 	int				i;
 	IGME_vehicle_t* selveh = ME_GetSelectedVehicle();
@@ -484,7 +484,7 @@ int ME_GetSelectedWaypointNumber()
 	return -1;
 }
 
-void ME_RotateSelection( int delta )
+static void ME_RotateSelection( int delta )
 {
 	IGME_vehicle_t* veh;
 	sbox3_t			box;
@@ -534,7 +534,7 @@ void ME_RotateSelection( int delta )
 
 }
 
-void ME_DragSelection( int x, int y )
+static void ME_DragSelection( int x, int y )
 {
 	vec3_t			angles, forward, right;
 	int				i;
@@ -586,7 +586,7 @@ void ME_DragSelection( int x, int y )
 	}
 }
 
-void ME_SpawnWaypoint()
+static void ME_SpawnWaypoint()
 {
 	IGME_vehicle_t* veh = ME_GetVehicleUnderCrosshair();
 	IGME_vehicle_t* selveh = ME_GetSelectedVehicle();
@@ -719,7 +719,7 @@ void ME_SpawnGroundInstallation( int idx )
 								  cg.predictedPlayerState.viewangles );
 }
 
-void ME_DrawVehicle( IGME_vehicle_t* veh ) 
+static void ME_DrawVehicle( IGME_vehicle_t* veh ) 
 {
 	if( !veh ) return;
 

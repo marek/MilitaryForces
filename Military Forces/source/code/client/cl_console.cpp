@@ -93,7 +93,7 @@ void Console::toggleConsole_f () {
 Con_ToggleMenu_f
 ===================
 */
-void Con_ToggleMenu_f( ) {
+static void Con_ToggleMenu_f( ) {
 	ClientLoop::keyEvent( K_ESCAPE, true, System::milliseconds() );
 	ClientLoop::keyEvent( K_ESCAPE, false, System::milliseconds() );
 }
@@ -103,7 +103,7 @@ void Con_ToggleMenu_f( ) {
 Con_MessageMode_f
 ================
 */
-void Con_MessageMode_f () {
+static void Con_MessageMode_f () {
 	chat_playerNum = -1;
 	chat_team = false;
 	chatField.clear();
@@ -117,7 +117,7 @@ void Con_MessageMode_f () {
 Con_MessageMode2_f
 ================
 */
-void Con_MessageMode2_f () {
+static void Con_MessageMode2_f () {
 	chat_playerNum = -1;
 	chat_team = true;
 	chatField.clear();
@@ -130,7 +130,7 @@ void Con_MessageMode2_f () {
 Con_MessageMode3_f
 ================
 */
-void Con_MessageMode3_f () {
+static void Con_MessageMode3_f () {
 	chat_playerNum = theCG.crosshairPlayer();
 	if ( chat_playerNum < 0 || chat_playerNum >= MAX_CLIENTS ) {
 		chat_playerNum = -1;
@@ -147,7 +147,7 @@ void Con_MessageMode3_f () {
 Con_MessageMode4_f
 ================
 */
-void Con_MessageMode4_f () {
+static void Con_MessageMode4_f () {
 	chat_playerNum = theCG.lastAttacker();
 	if ( chat_playerNum < 0 || chat_playerNum >= MAX_CLIENTS ) {
 		chat_playerNum = -1;
@@ -182,7 +182,7 @@ Con_Dump_f
 Save the console contents out to a file
 ================
 */
-void Con_Dump_f ()
+static void Con_Dump_f ()
 {
 	int		l, x, i;
 	short	*line;
@@ -352,7 +352,7 @@ void Console::checkResize ()
 Cmd_CompleteTxtName
 ==================
 */
-void Cmd_CompleteTxtName( char *args, int argNum ) {
+static void Cmd_CompleteTxtName( char *args, int argNum ) {
 	if( argNum == 2 ) {
 		Field_CompleteFilename( "", "txt", nullptr, false, true );
 	}
@@ -416,7 +416,7 @@ void Console::shutdown()
 Con_Linefeed
 ===============
 */
-void Con_Linefeed (bool skipnotify)
+static void Con_Linefeed (bool skipnotify)
 {
 	int		i;
 
@@ -551,7 +551,7 @@ Con_DrawInput
 Draw the editline after a ] prompt
 ================
 */
-void Con_DrawInput () {
+static void Con_DrawInput () {
 	int		y;
 
 	if ( clc.state != CA_DISCONNECTED && !(Key_GetCatcher( ) & KEYCATCH_CONSOLE ) ) {
@@ -659,7 +659,7 @@ Con_DrawSolidConsole
 Draws the console with the solid background
 ================
 */
-void Con_DrawSolidConsole( float frac ) {
+static void Con_DrawSolidConsole( float frac ) {
 	int				i, x, y;
 	int				rows;
 	short			*text;

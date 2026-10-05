@@ -170,7 +170,7 @@ Find the spot that we DON'T want to use
 ================
 */
 constexpr int MAX_SPAWN_POINTS = 128;
-GameEntity *SelectNearestDeathmatchSpawnPoint( vec3_t from ) 
+static GameEntity *SelectNearestDeathmatchSpawnPoint( vec3_t from ) 
 {
 	GameEntity	*spot;
 	vec3_t		delta;
@@ -237,7 +237,7 @@ SelectRandomFurthestSpawnPoint
 Chooses a player start, deathmatch start, etc
 ============
 */
-GameEntity *SelectRandomFurthestSpawnPoint( vec3_t avoidPoint, vec3_t origin, vec3_t angles, int category ) 
+static GameEntity *SelectRandomFurthestSpawnPoint( vec3_t avoidPoint, vec3_t origin, vec3_t angles, int category ) 
 {
 	GameEntity	*spot;
 	vec3_t		delta;

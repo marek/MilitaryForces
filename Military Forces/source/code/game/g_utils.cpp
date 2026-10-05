@@ -67,7 +67,7 @@ G_FindConfigstringIndex
 
 ================
 */
-int G_FindConfigstringIndex( char *name, int start, int max, bool create ) 
+static int G_FindConfigstringIndex( char *name, int start, int max, bool create ) 
 {
 	int		i;
 	char	s[MAX_STRING_CHARS];
@@ -602,7 +602,7 @@ void Game::sendEventFromQueue( GameEntity* ent )
 	ent->currentEventToSend_ = i;
 }
 
-void G_AddEventToQueue( GameEntity* ent, int event, int eventParm )
+static void G_AddEventToQueue( GameEntity* ent, int event, int eventParm )
 {
 	int i = ent->currentEventToAdd_;
 

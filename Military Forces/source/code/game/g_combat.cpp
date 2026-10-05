@@ -81,7 +81,7 @@ void ExplodeVehicle( GameEntity* self )
 RaySphereIntersections
 ================
 */
-int RaySphereIntersections( vec3_t origin, float radius, vec3_t point, vec3_t dir, vec3_t intersections[2] ) {
+static int RaySphereIntersections( vec3_t origin, float radius, vec3_t point, vec3_t dir, vec3_t intersections[2] ) {
 	float b, c, d, t;
 
 	//	| origin - (point + t * dir) | = radius

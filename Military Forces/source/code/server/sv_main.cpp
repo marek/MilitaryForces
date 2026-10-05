@@ -543,7 +543,7 @@ and all connected players.  Used for getting detailed information after
 the simple info query.
 ================
 */
-void SVC_Status( netadr_t from ) 
+static void SVC_Status( netadr_t from ) 
 {
 	// ignore if we are in single player
 	if ( CvarSystem::variableValue( "g_gametype" ) == GT_SINGLE_PLAYER || CvarSystem::variableValue("ui_singlePlayerActive")) 
@@ -618,7 +618,7 @@ Responds with a short info message that should be enough to determine
 if a user is interested in a server to do a full status
 ================
 */
-void SVC_Info( netadr_t from ) 
+static void SVC_Info( netadr_t from ) 
 {
 	// ignore if we are in single player
 	if ( CvarSystem::variableValue( "g_gametype" ) == GT_SINGLE_PLAYER || CvarSystem::variableValue("ui_singlePlayerActive")) 
@@ -714,7 +714,7 @@ Shift down the remaining args
 Redirect all printfs
 ===============
 */
-void SVC_RemoteCommand( netadr_t from, Message *msg ) 
+static void SVC_RemoteCommand( netadr_t from, Message *msg ) 
 {
 	bool	valid;
 	char		remaining[1024];

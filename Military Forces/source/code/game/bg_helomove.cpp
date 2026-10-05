@@ -190,7 +190,7 @@ PM_Toggle_Gear
 
 ===================
 */
-void PM_Toggle_HeloGear()
+static void PM_Toggle_HeloGear()
 {
 	if( !(availableVehicles[pm->vehicle].caps & HC_GEAR) ) {
 		return;
@@ -222,7 +222,7 @@ void PM_Toggle_HeloGear()
 	pm->ps->timers[TIMER_GEAR] = pm->cmd.serverTime + availableVehicles[pm->vehicle].gearTime + 100;
 }
 
-void PM_Helo_Brakes()
+static void PM_Helo_Brakes()
 {
 	if( pm->cmd.serverTime < pm->ps->timers[TIMER_BRAKE] ) return;
 
@@ -299,7 +299,7 @@ PlayerMove::heloMove
 
 ===================
 */
-bool	PM_SlideMove_Helo();
+static bool	PM_SlideMove_Helo();
 
 void PlayerMove::heloMove( ) 
 {
@@ -671,7 +671,7 @@ Returns true if the velocity was clipped in some way
 ==================
 */
 constexpr int MAX_CLIP_PLANES = 5;
-bool	PM_SlideMove_Helo() {
+static bool	PM_SlideMove_Helo() {
 	int			bumpcount, numbumps;
 	vec3_t		dir;
 	float		d;

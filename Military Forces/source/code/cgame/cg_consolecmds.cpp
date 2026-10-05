@@ -26,7 +26,7 @@ static char* cycleCvars[] =
 };
 
 
-void CG_TargetCommand_f( ) {
+static void CG_TargetCommand_f( ) {
 	int		targetNum;
 	char	test[4];
 
@@ -540,7 +540,7 @@ Intercepts 'say <var> <values>' commands for development purposes
 =================
 */
 
-bool CG_ExtractDeveloper( )
+static bool CG_ExtractDeveloper( )
 {
 	clientInfo_t * ci = nullptr;
 

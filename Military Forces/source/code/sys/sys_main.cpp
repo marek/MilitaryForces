@@ -59,7 +59,7 @@ static char installPath[ MAX_OSPATH ] = { 0 };
 Sys_SetBinaryPath
 =================
 */
-void Sys_SetBinaryPath(const char *path)
+static void Sys_SetBinaryPath(const char *path)
 {
 	Q_strncpyz(binaryPath, path, sizeof(binaryPath));
 }
@@ -114,7 +114,7 @@ Sys_In_Restart_f
 Restart the input subsystem
 =================
 */
-void Sys_In_Restart_f( )
+static void Sys_In_Restart_f( )
 {
 #ifndef DEDICATED
 	if( !SDL_WasInit( SDL_INIT_VIDEO ) )
@@ -489,7 +489,7 @@ Sys_FileTime
 returns -1 if not present
 ============
 */
-int Sys_FileTime( char *path )
+static int Sys_FileTime( char *path )
 {
 	struct stat buf;
 
@@ -582,7 +582,7 @@ void *Sys_LoadDll(const char *name, bool useSystemLib)
 Sys_ParseArgs
 =================
 */
-void Sys_ParseArgs( int argc, char **argv )
+static void Sys_ParseArgs( int argc, char **argv )
 {
 	if( argc == 2 )
 	{

@@ -25,7 +25,7 @@ teamgame_t teamgame;
 
 GameEntity *neutralObelisk;
 
-void Team_SetFlagStatus( int team, flagStatus_t status );
+static void Team_SetFlagStatus( int team, flagStatus_t status );
 
 void Team_InitGame( ) 
 {
@@ -183,7 +183,7 @@ bool OnSameTeam( GameEntity *ent1, GameEntity *ent2 )
 static char ctfFlagStatusRemap[] = { '0', '1', '*', '*', '2' };
 static char oneFlagStatusRemap[] = { '0', '1', '2', '3', '4' };
 
-void Team_SetFlagStatus( int team, flagStatus_t status ) 
+static void Team_SetFlagStatus( int team, flagStatus_t status ) 
 {
 	bool modified = false;
 
@@ -337,7 +337,7 @@ void Team_FragBonuses( GameEntity *targ, GameEntity *inflictor, GameEntity *atta
 
 }
 
-GameEntity* Team_ResetFlag( int team ) 
+static GameEntity* Team_ResetFlag( int team ) 
 {
 	char *c;
 	GameEntity *ent, *rent = nullptr;
@@ -374,7 +374,7 @@ GameEntity* Team_ResetFlag( int team )
 	return rent;
 }
 
-void Team_ResetFlags() 
+static void Team_ResetFlags() 
 {
 	if( g_gametype.integer == GT_CTF ) 
 	{
@@ -383,7 +383,7 @@ void Team_ResetFlags()
 	}
 }
 
-void Team_ReturnFlagSound( GameEntity *ent, int team )
+static void Team_ReturnFlagSound( GameEntity *ent, int team )
 {
 	GameEntity	*te;
 
@@ -402,7 +402,7 @@ void Team_ReturnFlagSound( GameEntity *ent, int team )
 	te->r.svFlags |= SVF_BROADCAST;
 }
 
-void Team_TakeFlagSound( GameEntity *ent, int team ) 
+static void Team_TakeFlagSound( GameEntity *ent, int team ) 
 {
 	GameEntity	*te;
 
@@ -444,7 +444,7 @@ void Team_TakeFlagSound( GameEntity *ent, int team )
 	te->r.svFlags |= SVF_BROADCAST;
 }
 
-void Team_CaptureFlagSound( GameEntity *ent, int team )
+static void Team_CaptureFlagSound( GameEntity *ent, int team )
 {
 	GameEntity	*te;
 
@@ -508,7 +508,7 @@ void Team_DroppedFlagThink( GameEntity *ent )
 Team_DroppedFlagThink
 ==============
 */
-int Team_TouchOurFlag( GameEntity *ent, GameEntity *other, int team ) 
+static int Team_TouchOurFlag( GameEntity *ent, GameEntity *other, int team ) 
 {
 	GameClient	*cl = other->client_;
 	int			enemy_flag;
@@ -561,7 +561,7 @@ int Team_TouchOurFlag( GameEntity *ent, GameEntity *other, int team )
 	return 0; // Do not respawn this automatically
 }
 
-int Team_TouchEnemyFlag( GameEntity *ent, GameEntity *other, int team ) 
+static int Team_TouchEnemyFlag( GameEntity *ent, GameEntity *other, int team ) 
 {
 	GameClient *cl = other->client_;
 
@@ -686,7 +686,7 @@ go to a random point that doesn't telefrag
 ================
 */
 constexpr int MAX_TEAM_SPAWN_POINTS = 32;
-GameEntity *SelectRandomTeamSpawnPoint( int teamstate, ClientBase::eTeam team, int idx ) 
+static GameEntity *SelectRandomTeamSpawnPoint( int teamstate, ClientBase::eTeam team, int idx ) 
 {
 	GameEntity	*spot;
 	int			count;
@@ -886,7 +886,7 @@ void CheckTeamStatus()
 
 /*-----------------------------------------------------------------*/
 
-void UpdateLevelCategories( GameEntity *ent )
+static void UpdateLevelCategories( GameEntity *ent )
 {
 	if( !ent->ent_category_ ) 
 		ent->ent_category_ = CAT_ANY;

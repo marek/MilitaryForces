@@ -48,7 +48,7 @@ void	CGame::initMarkPolys( ) {
 CG_FreeMarkPoly
 ==================
 */
-void CG_FreeMarkPoly( markPoly_t *le ) {
+static void CG_FreeMarkPoly( markPoly_t *le ) {
 	if ( !le->prevMark ) {
 		Common::error( ERR_DROP, "CG_FreeLocalEntity: not active" );
 	}
@@ -69,7 +69,7 @@ CG_AllocMark
 Will allways succeed, even if it requires freeing an old active mark
 ===================
 */
-markPoly_t	*CG_AllocMark( ) {
+static markPoly_t	*CG_AllocMark( ) {
 	markPoly_t	*le;
 	int time;
 

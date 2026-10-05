@@ -238,7 +238,7 @@ static size_t CL_cURL_CallbackWrite(void *buffer, size_t size, size_t nmemb,
 	return size*nmemb;
 }
 
-CURLcode qcurl_easy_setopt_warn(CURL *curl, CURLoption option, ...)
+static CURLcode qcurl_easy_setopt_warn(CURL *curl, CURLoption option, ...)
 {
 	CURLcode result;
 

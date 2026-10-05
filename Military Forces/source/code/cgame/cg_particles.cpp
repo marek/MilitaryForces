@@ -1,7 +1,7 @@
 #include "cg_local.h"
 
 
-void CG_EjectParticle(particleWorld_t * w, particleEmitter_t * e)
+static void CG_EjectParticle(particleWorld_t * w, particleEmitter_t * e)
 {
 	int i, j;
 	for(i = 0; i < sizeof(w->particles)/sizeof(w->particles[0]); i++)
@@ -66,7 +66,7 @@ int CGame::addParticleSystem(particleWorld_t * w, particleSystem_t * s)
 	return i;
 }
 
-void CG_KillParticleSystem(particleWorld_t * w, int index)
+static void CG_KillParticleSystem(particleWorld_t * w, int index)
 {
 	w->systems[index].dead = true;
 }
@@ -89,13 +89,13 @@ int CGame::addParticleEmitter(particleWorld_t * w, particleEmitter_t * e)
 	return i;
 }
 
-void CG_KillParticleEmitter(particleWorld_t * w, int index)
+static void CG_KillParticleEmitter(particleWorld_t * w, int index)
 {
 	w->emitters[index].dead = true;
 }
 
 // attract particle a to particle b
-void CG_AttractParticles(particle_t * a, particle_t * b)
+static void CG_AttractParticles(particle_t * a, particle_t * b)
 {
 	vec3_t vtemp;
 	float ftemp;
@@ -160,27 +160,27 @@ void ClientEntity::attractParticleToEntity( particle_t * a )
 	}
 }
 
-void CG_OnParticleDeath(particleWorld_t * w, particle_t * p)
+static void CG_OnParticleDeath(particleWorld_t * w, particle_t * p)
 {
 	w->numParticles--;
 }
 
-void CG_OnParticleCollision(particle_t * p)
+static void CG_OnParticleCollision(particle_t * p)
 {
 	
 }
 
-void CG_ParticleChildSystem(particle_t * p)
+static void CG_ParticleChildSystem(particle_t * p)
 {
 	
 }
 
-void CG_OnParticleSystemDeath(particleSystem_t * s)
+static void CG_OnParticleSystemDeath(particleSystem_t * s)
 {
 	
 }
 
-void CG_ParticleEmitterThink(particleWorld_t * w, particleEmitter_t * e)
+static void CG_ParticleEmitterThink(particleWorld_t * w, particleEmitter_t * e)
 {
 	int			i;
 	long		ptime = cg.time - e->birthtime;
@@ -208,7 +208,7 @@ void CG_ParticleEmitterThink(particleWorld_t * w, particleEmitter_t * e)
 	}
 }
 
-void CG_ParticleSystemThink(particleWorld_t * w, particleSystem_t * s)
+static void CG_ParticleSystemThink(particleWorld_t * w, particleSystem_t * s)
 {
 	long		ptime = cg.time - s->birthtime;
 	float		dtime = (cg.time - s->lastthink)*0.001;
@@ -359,7 +359,7 @@ void CGame::particleThink(particleWorld_t * w, particle_t * p)
 	p->lastthink = cg.time;
 }
 
-void CG_RenderParticle(particle_t * p)
+static void CG_RenderParticle(particle_t * p)
 {
 	int				index;
 	vec3_t          alight, dlight, lightdir, origin, point;

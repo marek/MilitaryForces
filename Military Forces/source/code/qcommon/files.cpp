@@ -343,7 +343,7 @@ bool FileSystem::initialized( ) {
 FS_PakIsPure
 =================
 */
-bool FS_PakIsPure( pack_t *pack ) {
+static bool FS_PakIsPure( pack_t *pack ) {
 	int i;
 
 	if ( fs_numServerPaks ) {
@@ -436,7 +436,7 @@ FS_fplength
 ================
 */
 
-long FS_fplength(FILE *h)
+static long FS_fplength(FILE *h)
 {
 	long		pos;
 	long		end;
@@ -633,7 +633,7 @@ FS_FileInPathExists
 Tests if path and file exists
 ================
 */
-bool FS_FileInPathExists(const char *testpath)
+static bool FS_FileInPathExists(const char *testpath)
 {
 	FILE *filep;
 
@@ -1022,7 +1022,7 @@ Return true if ext matches file extension filename
 ===========
 */
 
-bool FS_IsExt(const char *filename, const char *ext, int namelen)
+static bool FS_IsExt(const char *filename, const char *ext, int namelen)
 {
 	int extlen;
 
@@ -1044,7 +1044,7 @@ Return true if filename has a demo extension
 ===========
 */
 
-bool FS_IsDemoExt(const char *filename, int namelen)
+static bool FS_IsDemoExt(const char *filename, int namelen)
 {
 	const char *ext_test;
 	int index, protocol;
@@ -1082,7 +1082,7 @@ Returns filesize and an open FILE pointer.
 */
 extern bool		com_fullyInitialized;
 
-long FS_FOpenFileReadDir(const char *filename, searchpath_t *search, fileHandle_t *file, bool uniqueFILE, bool unpure)
+static long FS_FOpenFileReadDir(const char *filename, searchpath_t *search, fileHandle_t *file, bool uniqueFILE, bool unpure)
 {
 	long			hash;
 	pack_t		*pak;
@@ -2086,7 +2086,7 @@ Returns a uniqued list of files that match the given criteria
 from all search paths
 ===============
 */
-char **FS_ListFilteredFiles( const char *path, const char *extension,
+static char **FS_ListFilteredFiles( const char *path, const char *extension,
 	char *filter, int *numfiles, bool stripPath,
 	bool allowNonPureFilesOnDisk ) {
 	int				nfiles;
@@ -2501,7 +2501,7 @@ int	FileSystem::getModList( char *listbuf, int bufsize ) {
 FS_Dir_f
 ================
 */
-void FS_Dir_f( ) {
+static void FS_Dir_f( ) {
 	char	*path;
 	char	*extension;
 	char	**dirnames;
@@ -2537,7 +2537,7 @@ void FS_Dir_f( ) {
 FS_ConvertPath
 ===========
 */
-void FS_ConvertPath( char *s ) {
+static void FS_ConvertPath( char *s ) {
 	while (*s) {
 		if ( *s == '\\' || *s == ':' ) {
 			*s = '/';
@@ -2553,7 +2553,7 @@ FS_PathCmp
 Ignore case and seprator char distinctions
 ===========
 */
-int FS_PathCmp( const char *s1, const char *s2 ) {
+static int FS_PathCmp( const char *s1, const char *s2 ) {
 	int		c1, c2;
 
 	do {
@@ -2590,7 +2590,7 @@ int FS_PathCmp( const char *s1, const char *s2 ) {
 FS_SortFileList
 ================
 */
-void FS_SortFileList(char **filelist, int numfiles) {
+static void FS_SortFileList(char **filelist, int numfiles) {
 	int i, j, k, numsortedfiles;
 	char **sortedlist;
 
@@ -2618,7 +2618,7 @@ void FS_SortFileList(char **filelist, int numfiles) {
 FS_NewDir_f
 ================
 */
-void FS_NewDir_f( ) {
+static void FS_NewDir_f( ) {
 	char	*filter;
 	char	**dirnames;
 	int		ndirs;
@@ -2652,7 +2652,7 @@ FS_Path_f
 
 ============
 */
-void FS_Path_f( ) {
+static void FS_Path_f( ) {
 	searchpath_t	*s;
 	int				i;
 
@@ -2686,7 +2686,7 @@ void FS_Path_f( ) {
 FS_TouchFile_f
 ============
 */
-void FS_TouchFile_f( ) {
+static void FS_TouchFile_f( ) {
 	fileHandle_t	f;
 
 	if ( CommandSystem::argc() != 2 ) {
@@ -2732,7 +2732,7 @@ bool FileSystem::which(const char *filename, void *searchPath)
 FS_Which_f
 ============
 */
-void FS_Which_f( ) {
+static void FS_Which_f( ) {
 	searchpath_t	*search;
 	char		*filename;
 

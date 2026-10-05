@@ -8,7 +8,7 @@
 #include "g_entity.h"
 #include "g_level.h"
 
-void InitTrigger( GameEntity *self ) 
+static void InitTrigger( GameEntity *self ) 
 {
 	if( !VectorCompare(self->s.angles, vec3_origin) )
 		Game::setMovedir (self->s.angles, self->movedir_);
@@ -31,7 +31,7 @@ struct Think_MultiWait : public GameEntity::EntityFunc_Think
 // the trigger was just activated
 // ent->activator should be set to the activator so it can be held through a delay
 // so wait for the delay time before firing
-void multi_trigger( GameEntity *ent, GameEntity *activator ) 
+static void multi_trigger( GameEntity *ent, GameEntity *activator ) 
 {
 	ent->activator_ = activator;
 	if( ent->nextthink_ ) 

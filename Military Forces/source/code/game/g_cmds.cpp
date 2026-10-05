@@ -103,7 +103,7 @@ void Cmd_Score_f( GameEntity *ent )
 CheatsOk
 ==================
 */
-bool CheatsOk( GameEntity *ent ) 
+static bool CheatsOk( GameEntity *ent ) 
 {
 	if ( !g_cheats.integer ) 
 	{
@@ -170,7 +170,7 @@ SanitizeString
 Remove case and control characters
 ==================
 */
-void SanitizeString( char *in, char *out ) 
+static void SanitizeString( char *in, char *out ) 
 {
 	while ( *in )
 	{
@@ -198,7 +198,7 @@ Returns a player number for either a number or name string
 Returns -1 if invalid
 ==================
 */
-int ClientNumberFromString( GameEntity *to, char *s ) 
+static int ClientNumberFromString( GameEntity *to, char *s ) 
 {
 	GameClient	*cl;
 	int			idnum;
@@ -256,7 +256,7 @@ Cmd_Noclip_f
 argv(0) noclip
 ==================
 */
-void Cmd_Noclip_f( GameEntity *ent ) 
+static void Cmd_Noclip_f( GameEntity *ent ) 
 {
 	char	*msg;
 
@@ -286,7 +286,7 @@ and sends over a command to the client to resize the view,
 hide the scoreboard, and take a special screenshot
 ==================
 */
-void Cmd_LevelShot_f( GameEntity *ent )
+static void Cmd_LevelShot_f( GameEntity *ent )
 {
 	if( !CheatsOk( ent ) ) 
 		return;
@@ -312,7 +312,7 @@ void Cmd_LevelShot_f( GameEntity *ent )
 }
 
 
-void Cmd_DevPlace_f( GameEntity *ent ) 
+static void Cmd_DevPlace_f( GameEntity *ent ) 
 {
 	char	arg[MAX_TOKEN_CHARS];
 
@@ -347,7 +347,7 @@ and sends over a command to the client to resize the view,
 hide the scoreboard, and take a special screenshot
 ==================
 */
-void Cmd_TeamTask_f( GameEntity *ent )
+static void Cmd_TeamTask_f( GameEntity *ent )
 {
 	char userinfo[MAX_INFO_STRING];
 	char		arg[MAX_TOKEN_CHARS];
@@ -400,7 +400,7 @@ void Cmd_Kill_f( GameEntity *ent )
 Cmd_Tower_f
 =================
 */
-void Cmd_Tower_f( GameEntity *ent ) 
+static void Cmd_Tower_f( GameEntity *ent ) 
 {
 	if( !ent->radio_target_ ) 
 		return;
@@ -476,7 +476,7 @@ void Cmd_Radar_f( GameEntity *ent )
 Cmd_Unlock_f
 =================
 */
-void Cmd_Unlock_f( GameEntity *ent ) 
+static void Cmd_Unlock_f( GameEntity *ent ) 
 {
 	if( ent->health_ <= 0 ) {
 		return;
@@ -788,7 +788,7 @@ void StopFollowing( GameEntity *ent )
 Cmd_Team_f
 =================
 */
-void Cmd_Team_f( GameEntity *ent )
+static void Cmd_Team_f( GameEntity *ent )
 {
 	ClientBase::eTeam oldTeam;
 	char		s[MAX_TOKEN_CHARS];
@@ -844,7 +844,7 @@ void Cmd_Team_f( GameEntity *ent )
 Cmd_Follow_f
 =================
 */
-void Cmd_Follow_f( GameEntity *ent ) 
+static void Cmd_Follow_f( GameEntity *ent ) 
 {
 	int		i;
 	char	arg[MAX_TOKEN_CHARS];
@@ -968,7 +968,7 @@ void Game::sayTo( GameEntity *ent, GameEntity *other, int mode, int color, const
 
 #define EC		"\x19"
 
-void G_Say( GameEntity *ent, GameEntity *target, int mode, const char *chatText ) 
+static void G_Say( GameEntity *ent, GameEntity *target, int mode, const char *chatText ) 
 {
 	int			color;
 	char		name[64];
@@ -1093,7 +1093,7 @@ static char	*gc_orders[] = {
 	"report"
 };
 
-void Cmd_GameCommand_f( GameEntity *ent ) 
+static void Cmd_GameCommand_f( GameEntity *ent ) 
 {
 	char	str[MAX_TOKEN_CHARS];
 
@@ -1115,7 +1115,7 @@ void Cmd_GameCommand_f( GameEntity *ent )
 Cmd_Where_f
 ==================
 */
-void Cmd_Where_f( GameEntity *ent )
+static void Cmd_Where_f( GameEntity *ent )
 {
 	GameHost::sendServerCommand( ent->s.number, va("print \"%s\n\"", vtos( ent->s.origin ) ) );
 }
@@ -1137,7 +1137,7 @@ static const char *gameNames[] = {
 Cmd_CallVote_f
 ==================
 */
-void Cmd_CallVote_f( GameEntity *ent ) 
+static void Cmd_CallVote_f( GameEntity *ent ) 
 {
 	if( !g_allowVote.integer )
 	{
@@ -1305,7 +1305,7 @@ void Cmd_CallVote_f( GameEntity *ent )
 Cmd_Vote_f
 ==================
 */
-void Cmd_Vote_f( GameEntity *ent ) 
+static void Cmd_Vote_f( GameEntity *ent ) 
 {
 	char msg[64];
 
@@ -1351,7 +1351,7 @@ void Cmd_Vote_f( GameEntity *ent )
 Cmd_CallTeamVote_f
 ==================
 */
-void Cmd_CallTeamVote_f( GameEntity *ent ) 
+static void Cmd_CallTeamVote_f( GameEntity *ent ) 
 {
 	int		cs_offset;
 	ClientBase::eTeam team = ent->client_->sess_.sessionTeam_;
@@ -1507,7 +1507,7 @@ void Cmd_CallTeamVote_f( GameEntity *ent )
 Cmd_TeamVote_f
 ==================
 */
-void Cmd_TeamVote_f( GameEntity *ent )
+static void Cmd_TeamVote_f( GameEntity *ent )
 {
 	int			team, cs_offset;
 	char		msg[64];
@@ -1902,7 +1902,7 @@ void Cmd_Eject_f( GameEntity *ent )
 Cmd_ME_Spawn_f
 =================
 */
-void Cmd_ME_Spawn_f( GameEntity *ent ) 
+static void Cmd_ME_Spawn_f( GameEntity *ent ) 
 {
 
 	int		idx;
@@ -1922,7 +1922,7 @@ void Cmd_ME_Spawn_f( GameEntity *ent )
 Cmd_ME_SpawnGI_f
 =================
 */
-void Cmd_ME_SpawnGI_f( GameEntity *ent ) 
+static void Cmd_ME_SpawnGI_f( GameEntity *ent ) 
 {
 
 	int		idx;

@@ -215,7 +215,7 @@ void EditField::hist_Add()
 Hist_Prev
 ==================
 */
-EditField *Hist_Prev( )
+static EditField *Hist_Prev( )
 {
 	int hist_prev;
 	assert(hist_count <= CON_HISTORY);
@@ -236,7 +236,7 @@ EditField *Hist_Prev( )
 Hist_Next
 ==================
 */
-EditField *Hist_Next( )
+static EditField *Hist_Next( )
 {
 	assert(hist_count <= CON_HISTORY);
 	assert(hist_count >= 0);
@@ -261,7 +261,7 @@ set attributes if user did CTRL+Z and then does fg again.
 ==================
 */
 
-void CON_SigCont(int signum)
+static void CON_SigCont(int signum)
 {
 	CON_Init();
 }

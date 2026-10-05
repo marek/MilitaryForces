@@ -27,7 +27,7 @@ PM_GroundVehicle_Brakes
 ===================
 */
 
-void PM_GroundVehicle_Brakes()
+static void PM_GroundVehicle_Brakes()
 {
 	if( pm->cmd.serverTime < pm->ps->timers[TIMER_BRAKE] ) return;
 
@@ -310,7 +310,7 @@ PlayerMove::groundVehicleMove
 
 ===================
 */
-bool	PM_SlideMove_GV();
+static bool	PM_SlideMove_GV();
 
 /*
 ===================
@@ -564,7 +564,7 @@ Returns true if the velocity was clipped in some way
 ==================
 */
 constexpr int MAX_CLIP_PLANES = 5;
-bool	PM_SlideMove_GV() {
+static bool	PM_SlideMove_GV() {
 	int			bumpcount, numbumps;
 	vec3_t		dir;
 	float		d;

@@ -2360,7 +2360,7 @@ const char *CGame::getGameStatusText()
 CG_GameMiscString
 =====================
 */
-const char *CG_GameMiscString() {
+static const char *CG_GameMiscString() {
 		
 	// intermission?
 	if ( cg.snap->ps.pm_type == PM_INTERMISSION && strlen( cg.scoreboardMisc ) > 0 )

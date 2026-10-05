@@ -20,11 +20,11 @@ PlayerMove::lQMMove
 
 ===================
 */
-bool	PM_SlideMove_LQM();
-void	PM_StepSlideMove_LQM();
+static bool	PM_SlideMove_LQM();
+static void	PM_StepSlideMove_LQM();
 
 
-void PM_LQMGroundTrace( )
+static void PM_LQMGroundTrace( )
 {
 	trace_t		trace;
 	vec3_t		end;
@@ -280,7 +280,7 @@ Returns true if the velocity was clipped in some way
 ==================
 */
 constexpr int MAX_CLIP_PLANES = 5;
-bool	PM_SlideMove_LQM() {
+static bool	PM_SlideMove_LQM() {
 	int			bumpcount, numbumps;
 	vec3_t		dir;
 	float		d;
@@ -472,7 +472,7 @@ bool	PM_SlideMove_LQM() {
 	return false;
 }
 
-void PM_StepSlideMove_LQM() {
+static void PM_StepSlideMove_LQM() {
 	vec3_t		start_o, start_v;
 	trace_t		trace;
 	vec3_t		up, down;

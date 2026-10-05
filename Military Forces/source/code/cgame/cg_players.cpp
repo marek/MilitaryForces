@@ -235,7 +235,7 @@ void ClientEntity::trailItem( qhandle_t hModel ) {
 CG_LightVerts
 =================
 */
-int CG_LightVerts( vec3_t normal, int numVerts, polyVert_t *verts )
+static int CG_LightVerts( vec3_t normal, int numVerts, polyVert_t *verts )
 {
 	int				i, j;
 	float			incoming;

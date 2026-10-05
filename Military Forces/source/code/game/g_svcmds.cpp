@@ -219,7 +219,7 @@ void Game::processIPBans()
 Svcmd_AddIP_f
 =================
 */
-void Svcmd_AddIP_f ()
+static void Svcmd_AddIP_f ()
 {
 	char		str[MAX_TOKEN_CHARS];
 
@@ -239,7 +239,7 @@ void Svcmd_AddIP_f ()
 Svcmd_RemoveIP_f
 =================
 */
-void Svcmd_RemoveIP_f ()
+static void Svcmd_RemoveIP_f ()
 {
 	ipFilter_t	f;
 	int			i;
@@ -274,7 +274,7 @@ void Svcmd_RemoveIP_f ()
 Svcmd_EntityList_f
 ===================
 */
-void Svcmd_EntityList_f() 
+static void Svcmd_EntityList_f() 
 {
 	for( int e = 1; e < theLevel.num_entities_ ; e++ ) //, check++ ) 
 	{
@@ -343,7 +343,7 @@ void Svcmd_EntityList_f()
 	}
 }
 
-GameClient* ClientForString( const char *s ) 
+static GameClient* ClientForString( const char *s ) 
 {
 	GameClient*	cl;
 	int			i;
@@ -391,7 +391,7 @@ Svcmd_ForceTeam_f
 forceteam <player> <team>
 ===================
 */
-void Svcmd_ForceTeam_f() 
+static void Svcmd_ForceTeam_f() 
 {
 	GameClient*	cl;
 	char		str[MAX_TOKEN_CHARS];

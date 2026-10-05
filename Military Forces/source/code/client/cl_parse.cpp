@@ -40,7 +40,7 @@ char *svc_strings[256] = {
 	"svc_voipOpus",
 };
 
-void SHOWNET( Message *msg, char *s) {
+static void SHOWNET( Message *msg, char *s) {
 	if ( cl_shownet->integer >= 2) {
 		Common::printf ("%3i:%s\n", msg->readCount()-1, s);
 	}

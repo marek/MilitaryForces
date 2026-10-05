@@ -142,7 +142,7 @@ bool _UI_IsFullscreen( );
 
 
 
-void AssetCache() 
+static void AssetCache() 
 {
 	int n;
 	uiInfo.uiUtils.dc_->assets_.gradientBar = refExport.RegisterShaderNoMip( ASSET_GRADIENTBAR );
@@ -305,7 +305,7 @@ int Text_Height(const char *text, float scale, int limit)
 	return max * useScale;
 }
 
-void Text_PaintChar(float x, float y, float width, float height, float scale, float s, float t, float s2, float t2, qhandle_t hShader)
+static void Text_PaintChar(float x, float y, float width, float height, float scale, float s, float t, float s2, float t2, qhandle_t hShader)
 {
 	float w, h;
 	w = width * scale;
@@ -716,7 +716,7 @@ void _UI_Shutdown()
 
 static char *defaultMenu = nullptr;
 
-char *GetMenuBuffer(const char *filename) {
+static char *GetMenuBuffer(const char *filename) {
 	int	len;
 	fileHandle_t	f;
 	static char buf[MAX_MENUFILE];
@@ -740,7 +740,7 @@ char *GetMenuBuffer(const char *filename) {
 
 }
 
-bool Asset_Parse(int handle) 
+static bool Asset_Parse(int handle) 
 {
 	UI_PrecompilerTools::PC_Token  token;
 	const char *tempStr;
@@ -900,7 +900,7 @@ bool Asset_Parse(int handle)
 	return false;
 }
 
-void Font_Report() 
+static void Font_Report() 
 {
 	int i;
 	Common::printf("Font Info\n");
@@ -966,7 +966,7 @@ void Menus::parseMenu(const char *menuFile)
 	uiInfo.uiUtils.getPrecompilerTools()->freeSourceHandle(handle);
 }
 
-bool Load_Menu(int handle) 
+static bool Load_Menu(int handle) 
 {
 	UI_PrecompilerTools::PC_Token  token;
 
@@ -6135,7 +6135,7 @@ static void UI_PrintTime ( char *buf, int bufsize, int time ) {
 	}
 }
 
-void Text_PaintCenter(float x, float y, float scale, vec4_t color, const char *text, float adjust) {
+static void Text_PaintCenter(float x, float y, float scale, vec4_t color, const char *text, float adjust) {
 	int len = Text_Width(text, scale, 0);
 	Text_Paint(x - len / 2, y, scale, color, text, 0, 0, ITEM_TEXTSTYLE_SHADOWEDMORE);
 }

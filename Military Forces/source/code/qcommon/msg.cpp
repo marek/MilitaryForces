@@ -43,7 +43,7 @@ Handles byte ordering and avoids alignment errors
 
 int oldsize = 0;
 
-void MSG_initHuffman();
+static void MSG_initHuffman();
 
 Message::Message( byte *data, int length ) : data_( data ), maxSize_( length ) {
 	if (!msgInit) {
@@ -1825,7 +1825,7 @@ int msg_hData[256] = {
 13504,			// 255
 };
 
-void MSG_initHuffman() {
+static void MSG_initHuffman() {
 	int i,j;
 
 	msgInit = true;
@@ -1845,7 +1845,7 @@ MSG_HuffStats_f
 Writes the byte counts gathered with msg_huffstats 1 as a msg_hData table
 ==================
 */
-void MSG_HuffStats_f( ) {
+static void MSG_HuffStats_f( ) {
 	char	out[256 * 32];
 	int		i;
 

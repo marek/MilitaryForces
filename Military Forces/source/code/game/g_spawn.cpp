@@ -206,7 +206,7 @@ void SP_team_CTF_blueplayer( GameEntity *ent );
 void SP_team_CTF_redspawn( GameEntity *ent );
 void SP_team_CTF_bluespawn( GameEntity *ent );
 
-void SP_item_botroam( GameEntity *ent ) {};
+static void SP_item_botroam( GameEntity *ent ) {};
 
 spawn_t	spawns[] = {
 	// info entities don't do anything at all, but provide positional
@@ -305,7 +305,7 @@ returning false if not found
 ===============
 */
 //bool G_CallSpawn( GameEntity *ent )
-bool G_CallSpawn( SpawnFieldHolder *sfh )
+static bool G_CallSpawn( SpawnFieldHolder *sfh )
 {
 	spawn_t	*s;
 	gitem_t	*item;
@@ -390,7 +390,7 @@ in a gentity
 ===============
 */
 //void G_ParseField( const char *key, const char *value, GameEntity *ent ) 
-void G_ParseField( const char *key, const char *value, SpawnFieldHolder *ent ) 
+static void G_ParseField( const char *key, const char *value, SpawnFieldHolder *ent ) 
 {
 	SpawnField	*f;
 	byte	*b;
@@ -447,7 +447,7 @@ Spawn an entity and fill in all of the level fields from
 level.spawnVars[], then call the class specfic spawn function
 ===================
 */
-void G_SpawnGEntityFromSpawnVars() 
+static void G_SpawnGEntityFromSpawnVars() 
 {
 	int			i;
 //	GameEntity	*ent;
@@ -536,7 +536,7 @@ void G_SpawnGEntityFromSpawnVars()
 G_AddSpawnVarToken
 ====================
 */
-char *G_AddSpawnVarToken( const char *string ) 
+static char *G_AddSpawnVarToken( const char *string ) 
 {
 	int		l;
 	char	*dest;
@@ -616,7 +616,7 @@ Every map should have exactly one worldspawn.
 "gravity"	800 is default gravity
 "message"	Text to print during connection process
 */
-void SP_worldspawn() 
+static void SP_worldspawn() 
 {
 	char	*s;
 

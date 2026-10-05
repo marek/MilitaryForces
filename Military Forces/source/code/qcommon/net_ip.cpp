@@ -161,7 +161,7 @@ static int numIP;
 NET_ErrorString
 ====================
 */
-char *NET_ErrorString( ) {
+static char *NET_ErrorString( ) {
 #ifdef _WIN32
 	//FIXME: replace with FormatMessage?
 	switch( socketError ) {
@@ -527,7 +527,7 @@ NET_GetPacket
 Receive one packet
 ==================
 */
-bool NET_GetPacket(netadr_t *net_from, Message *net_message, fd_set *fdr)
+static bool NET_GetPacket(netadr_t *net_from, Message *net_message, fd_set *fdr)
 {
 	int 	ret;
 	struct sockaddr_storage from;
@@ -817,7 +817,7 @@ void Sys_ShowIP() {
 NET_IPSocket
 ====================
 */
-SOCKET NET_IPSocket( char *net_interface, int port, int *err ) {
+static SOCKET NET_IPSocket( char *net_interface, int port, int *err ) {
 	SOCKET				newsocket;
 	struct sockaddr_in	address;
 	ioctlarg_t			_true = 1;
@@ -885,7 +885,7 @@ SOCKET NET_IPSocket( char *net_interface, int port, int *err ) {
 NET_IP6Socket
 ====================
 */
-SOCKET NET_IP6Socket( char *net_interface, int port, struct sockaddr_in6 *bindto, int *err ) {
+static SOCKET NET_IP6Socket( char *net_interface, int port, struct sockaddr_in6 *bindto, int *err ) {
 	SOCKET				newsocket;
 	struct sockaddr_in6	address;
 	ioctlarg_t			_true = 1;
@@ -969,7 +969,7 @@ NET_SetMulticast
 Set the current multicast group
 ====================
 */
-void NET_SetMulticast6()
+static void NET_SetMulticast6()
 {
 	struct sockaddr_in6 addr;
 
@@ -1071,7 +1071,7 @@ void Network::leaveMulticast6()
 NET_OpenSocks
 ====================
 */
-void NET_OpenSocks( int port ) {
+static void NET_OpenSocks( int port ) {
 	struct sockaddr_in	address;
 	struct hostent		*h;
 	int					len;
@@ -1354,7 +1354,7 @@ void Network::NET_GetLocalAddress( void ) {
 NET_OpenIP
 ====================
 */
-void NET_OpenIP( ) {
+static void NET_OpenIP( ) {
 	int		i;
 	int		err;
 	int		port;
@@ -1623,7 +1623,7 @@ Called from Network::sleep which uses select() to determine which sockets have s
 ====================
 */
 
-void NET_Event(fd_set *fdr)
+static void NET_Event(fd_set *fdr)
 {
 	byte bufData[MAX_MSGLEN + 1];
 	netadr_t from = {NA_BAD};

@@ -462,7 +462,7 @@ bool	Network::getLoopPacket (netsrc_t sock, netadr_t *net_from, Message *net_mes
 }
 
 
-void NET_SendLoopPacket (netsrc_t sock, int length, const void *data, netadr_t to)
+static void NET_SendLoopPacket (netsrc_t sock, int length, const void *data, netadr_t to)
 {
 	int		i;
 	loopback_t	*loop;

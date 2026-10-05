@@ -176,7 +176,7 @@ static int		gameCvarTableSize = sizeof( gameCvarTable ) / sizeof( gameCvarTable[
 void G_InitGame( int levelTime, int randomSeed );
 void G_RunFrame( int levelTime );
 void G_ShutdownGame();
-void CheckExitRules();
+static void CheckExitRules();
 
 
 /*
@@ -190,7 +190,7 @@ All but the first will have the FL_TEAMSLAVE flag set and teammaster field set
 All but the last will have the teamchain field set to the next one
 ================
 */
-void G_FindTeams() 
+static void G_FindTeams() 
 {
 	GameEntity	*e, *e2;
 	int			i, j;
@@ -241,7 +241,7 @@ void G_FindTeams()
 	Common::printf ("%i teams with %i entities\n", c, c2);
 }
 
-void G_RemapTeamShaders() 
+static void G_RemapTeamShaders() 
 {
 }
 
@@ -251,7 +251,7 @@ void G_RemapTeamShaders()
 G_RegisterCvars
 =================
 */
-void G_RegisterCvars() 
+static void G_RegisterCvars() 
 {
 	int			i;
 	cvarTable_t	*cv;
@@ -287,7 +287,7 @@ void G_RegisterCvars()
 G_UpdateCvars
 =================
 */
-void G_UpdateCvars() 
+static void G_UpdateCvars() 
 {
 	int			i;
 	cvarTable_t	*cv;
@@ -492,7 +492,7 @@ If there are less than two tournament players, put a
 spectator in the game and restart
 =============
 */
-void AddTournamentPlayer()
+static void AddTournamentPlayer()
 {
 	if ( theLevel.numPlayingClients_ >= 2 ) 
 		return;
@@ -536,7 +536,7 @@ RemoveTournamentLoser
 Make the loser a spectator at the back of the line
 =======================
 */
-void RemoveTournamentLoser() 
+static void RemoveTournamentLoser() 
 {
 	if( theLevel.numPlayingClients_ != 2 ) 
 		return;
@@ -556,7 +556,7 @@ void RemoveTournamentLoser()
 RemoveTournamentWinner
 =======================
 */
-void RemoveTournamentWinner() 
+static void RemoveTournamentWinner() 
 {
 	if( theLevel.numPlayingClients_ != 2 ) 
 		return;
@@ -576,7 +576,7 @@ void RemoveTournamentWinner()
 AdjustTournamentScores
 =======================
 */
-void AdjustTournamentScores() 
+static void AdjustTournamentScores() 
 {
 	int clientNum = theLevel.sortedClients_[0];
 	GameClient* client = theLevel.getClient(clientNum);
@@ -925,7 +925,7 @@ or moved to a New level based on the "nextmap" cvar
 
 =============
 */
-void ExitLevel() 
+static void ExitLevel() 
 {
 	//bot interbreeding
 //	BotInterbreedEndMatch();
@@ -1016,7 +1016,7 @@ LogExit
 Append information about this game to the log file
 ================
 */
-void LogExit( const char *string )
+static void LogExit( const char *string )
 {
 //	bool won = true;
 
@@ -1069,7 +1069,7 @@ If one or more players have not acknowledged the continue, the game will
 wait 10 seconds before going on.
 =================
 */
-void CheckIntermissionExit() 
+static void CheckIntermissionExit() 
 {
 	if ( g_gametype.integer == GT_SINGLE_PLAYER || g_gametype.integer == GT_MISSION_EDITOR ) 
 		return;
@@ -1149,7 +1149,7 @@ void CheckIntermissionExit()
 ScoreIsTied
 =============
 */
-bool ScoreIsTied() 
+static bool ScoreIsTied() 
 {
 	if( theLevel.numPlayingClients_ < 2 ) 
 		return false;
@@ -1172,7 +1172,7 @@ and the time everyone is moved to the intermission spot, so you
 can see the last frag.
 =================
 */
-void CheckExitRules() 
+static void CheckExitRules() 
 {
 	// if at the intermission, wait for all non-bots to
 	// signal ready, then go to next level
@@ -1302,7 +1302,7 @@ CheckTournament
 Once a frame, check for changes in tournement player state
 =============
 */
-void CheckTournament() 
+static void CheckTournament() 
 {
 	// check because we run 3 game frames before calling Connect and/or ClientBegin
 	// for clients on a map_restart
@@ -1479,7 +1479,7 @@ void CheckVote()
 PrintTeam
 ==================
 */
-void PrintTeam( int team, char *message ) 
+static void PrintTeam( int team, char *message ) 
 {
 	for( int i = 1 ; i <= theLevel.maxclients_ ; i++ ) 
 	{
@@ -1570,7 +1570,7 @@ void CheckTeamLeader( int team )
 CheckTeamVote
 ==================
 */
-void CheckTeamVote( int team ) 
+static void CheckTeamVote( int team ) 
 {
 	int cs_offset;
 
@@ -1624,7 +1624,7 @@ void CheckTeamVote( int team )
 CheckCvars
 ==================
 */
-void CheckCvars( ) {
+static void CheckCvars( ) {
 	static int lastMod = -1;
 
 	if ( g_password.modificationCount != lastMod ) {

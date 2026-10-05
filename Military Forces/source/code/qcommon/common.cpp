@@ -119,7 +119,7 @@ static bool	com_gameClientRestarting = false;
 
 char	com_errorMessage[MAXPRINTMSG];
 
-void Com_WriteConfig_f( );
+static void Com_WriteConfig_f( );
 void CIN_CloseAllVideos( );
 
 //============================================================================
@@ -407,7 +407,7 @@ Com_ParseCommandLine
 Break it up into multiple console lines
 ==================
 */
-void Com_ParseCommandLine( char *commandLine ) {
+static void Com_ParseCommandLine( char *commandLine ) {
     int inq = 0;
     com_consoleLines[0] = commandLine;
     com_numConsoleLines = 1;
@@ -499,7 +499,7 @@ Returns true if any late commands were added, which
 will keep the demoloop from immediately starting
 =================
 */
-bool Com_AddStartupCommands( ) {
+static bool Com_AddStartupCommands( ) {
 	int		i;
 	bool	added;
 
@@ -573,7 +573,7 @@ void Info_Print( const char *s ) {
 Com_StringContains
 ============
 */
-char *Com_StringContains(char *str1, char *str2, int casesensitive) {
+static char *Com_StringContains(char *str1, char *str2, int casesensitive) {
 	int len, i, j;
 
 	len = strlen(str1) - strlen(str2);
@@ -1075,7 +1075,7 @@ static void Z_CheckHeap( ) {
 Z_LogZoneHeap
 ========================
 */
-void Z_LogZoneHeap( memzone_t *zone, char *name ) {
+static void Z_LogZoneHeap( memzone_t *zone, char *name ) {
 #ifdef ZONE_DEBUG
 	char dump[32], *ptr;
 	int  i, j;
@@ -1259,7 +1259,7 @@ static	int		s_smallZoneTotal;
 Com_Meminfo_f
 =================
 */
-void Com_Meminfo_f( ) {
+static void Com_Meminfo_f( ) {
 	memblock_t	*block;
 	int			zoneBytes, zoneBlocks;
 	int			smallZoneBytes;
@@ -1400,7 +1400,7 @@ void Common::touchMemory( ) {
 Com_InitZoneMemory
 =================
 */
-void Com_InitSmallZoneMemory( ) {
+static void Com_InitSmallZoneMemory( ) {
 	s_smallZoneTotal = 512 * 1024;
 	smallzone = static_cast<memzone_t *>(calloc( s_smallZoneTotal, 1 ));
 	if ( !smallzone ) {
@@ -1409,7 +1409,7 @@ void Com_InitSmallZoneMemory( ) {
 	Z_ClearZone( smallzone, s_smallZoneTotal );
 }
 
-void Com_InitZoneMemory( ) {
+static void Com_InitZoneMemory( ) {
 	cvar_t	*cv;
 
 	// Please note: com_zoneMegs can only be set on the command line, and
@@ -1522,7 +1522,7 @@ void Hunk::smallLog( ) {
 Com_InitHunkZoneMemory
 =================
 */
-void Com_InitHunkMemory( ) {
+static void Com_InitHunkMemory( ) {
 	cvar_t	*cv;
 	int nMinAlloc;
 	char *pMsg = nullptr;
@@ -1888,7 +1888,7 @@ static sysEvent_t	com_pushedEvents[MAX_PUSHED_EVENTS];
 Com_InitJournaling
 =================
 */
-void Com_InitJournaling( ) {
+static void Com_InitJournaling( ) {
 	Common::startupVariable( "journal" );
 	com_journal = CvarSystem::get ("journal", "0", CVAR_INIT);
 	if ( !com_journal->integer ) {
@@ -2032,7 +2032,7 @@ sysEvent_t Common::getSystemEvent( )
 Com_GetRealEvent
 =================
 */
-sysEvent_t	Com_GetRealEvent( ) {
+static sysEvent_t	Com_GetRealEvent( ) {
 	int			r;
 	sysEvent_t	ev;
 
@@ -2076,7 +2076,7 @@ sysEvent_t	Com_GetRealEvent( ) {
 Com_InitPushEvent
 =================
 */
-void Com_InitPushEvent( ) {
+static void Com_InitPushEvent( ) {
   // clear the static buffer array
   // this requires SE_NONE to be accepted as a valid but NOP event
   memset( com_pushedEvents, 0, sizeof(com_pushedEvents) );
@@ -2092,7 +2092,7 @@ void Com_InitPushEvent( ) {
 Com_PushEvent
 =================
 */
-void Com_PushEvent( sysEvent_t *event ) {
+static void Com_PushEvent( sysEvent_t *event ) {
 	sysEvent_t		*ev;
 	static int printedWarning = 0;
 
@@ -2123,7 +2123,7 @@ void Com_PushEvent( sysEvent_t *event ) {
 Com_GetEvent
 =================
 */
-sysEvent_t	Com_GetEvent( ) {
+static sysEvent_t	Com_GetEvent( ) {
 	if ( com_pushedEventsHead > com_pushedEventsTail ) {
 		com_pushedEventsTail++;
 		return com_pushedEvents[ (com_pushedEventsTail-1) & (MAX_PUSHED_EVENTS-1) ];
@@ -2311,7 +2311,7 @@ Com_Setenv_f
 For controlling environment variables
 ==================
 */
-void Com_Setenv_f()
+static void Com_Setenv_f()
 {
 	int argc = CommandSystem::argc();
 	char *arg1 = CommandSystem::argv(1);
@@ -2341,7 +2341,7 @@ For controlling environment variables
 ==================
 */
 
-void Com_ExecuteCfg()
+static void Com_ExecuteCfg()
 {
 	CommandBuffer::executeText(EXEC_NOW, "exec default.cfg\n");
 	CommandBuffer::execute(); // Always execute after exec to prevent text buffer overflowing
@@ -2417,7 +2417,7 @@ Expose possibility to change current running mod to the user
 ==================
 */
 
-void Com_GameRestart_f()
+static void Com_GameRestart_f()
 {
 	CvarSystem::set("fs_game", CommandSystem::argv(1));
 
@@ -2848,7 +2848,7 @@ Com_ReadFromPipe
 Read whatever is in com_pipefile, if anything, and execute it
 ===============
 */
-void Com_ReadFromPipe( )
+static void Com_ReadFromPipe( )
 {
 	static char buf[MAX_STRING_CHARS];
 	static int accu = 0;
@@ -2894,7 +2894,7 @@ void Com_ReadFromPipe( )
 
 //==================================================================
 
-void Com_WriteConfigToFile( const char *filename ) {
+static void Com_WriteConfigToFile( const char *filename ) {
 	fileHandle_t	f;
 
 	f = FileSystem::fOpenFileWrite_HomeConfig( filename );
@@ -2917,7 +2917,7 @@ Com_WriteConfiguration
 Writes key bindings and archived cvars to config file if modified
 ===============
 */
-void Com_WriteConfiguration( ) {
+static void Com_WriteConfiguration( ) {
 	// if we are quiting without fully initializing, make sure
 	// we don't write out anything
 	if ( !com_fullyInitialized ) {
@@ -2954,7 +2954,7 @@ Com_WriteConfig_f
 Write the config file to a specific name
 ===============
 */
-void Com_WriteConfig_f( ) {
+static void Com_WriteConfig_f( ) {
 	char	filename[MAX_QPATH];
 
 	if ( CommandSystem::argc() != 2 ) {
@@ -2980,7 +2980,7 @@ void Com_WriteConfig_f( ) {
 Com_ModifyMsec
 ================
 */
-int Com_ModifyMsec( int msec ) {
+static int Com_ModifyMsec( int msec ) {
 	int		clampTime;
 
 	//
@@ -3032,7 +3032,7 @@ Com_TimeVal
 =================
 */
 
-int Com_TimeVal(int minMsec)
+static int Com_TimeVal(int minMsec)
 {
 	int timeVal;
 

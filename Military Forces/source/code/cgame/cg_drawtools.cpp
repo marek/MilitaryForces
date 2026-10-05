@@ -818,7 +818,7 @@ Uses polygons to alpha blend a shadow texture onto the terrain
 ===============
 */
 
-int CG_GetVehicleShadowShader( int vehicle )
+static int CG_GetVehicleShadowShader( int vehicle )
 {
 	int			shaderIndex = -1;
 	qhandle_t	shaderHandle = 0;
@@ -1265,7 +1265,7 @@ Parses and draws (if appropriate) reticle labels
 
 constexpr int HUD_LABEL_OFFSET = 12;
 
-void CG_Parse_Reticle_Target( reticle_t * pR )
+static void CG_Parse_Reticle_Target( reticle_t * pR )
 {
 	char * pText = nullptr;
 	int client = 0;

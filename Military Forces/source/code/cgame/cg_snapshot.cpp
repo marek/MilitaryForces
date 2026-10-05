@@ -72,7 +72,7 @@ CGame::transitionSnapshot instead.
 FIXME: Also called by map_restart?
 ==================
 */
-void CG_SetInitialSnapshot( snapshot_t *snap ) {
+static void CG_SetInitialSnapshot( snapshot_t *snap ) {
 	int				i;
 	ClientEntity		*cent;
 	entityState_t	*state;

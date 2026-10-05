@@ -37,7 +37,7 @@ constexpr int RESPAWN_FUEL = 35;
 
 //======================================================================
 
-int Pickup_Ammo( GameEntity *ent, GameEntity *other )
+static int Pickup_Ammo( GameEntity *ent, GameEntity *other )
 {
 	int		quantity, i;
 
@@ -62,7 +62,7 @@ int Pickup_Ammo( GameEntity *ent, GameEntity *other )
 
 //======================================================================
 
-int Pickup_Health( GameEntity *ent, GameEntity *other )
+static int Pickup_Health( GameEntity *ent, GameEntity *other )
 {
 	int			max;
 	int			quantity;
@@ -94,7 +94,7 @@ int Pickup_Health( GameEntity *ent, GameEntity *other )
 
 //======================================================================
 
-int Pickup_Fuel( GameEntity *ent, GameEntity *other ) 
+static int Pickup_Fuel( GameEntity *ent, GameEntity *other ) 
 {
 	int			max;
 	int			quantity;
@@ -601,7 +601,7 @@ G_BounceItem
 
 ================
 */
-void G_BounceItem( GameEntity *ent, trace_t *trace ) 
+static void G_BounceItem( GameEntity *ent, trace_t *trace ) 
 {
 	vec3_t	velocity;
 	float	dot;

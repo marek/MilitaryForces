@@ -347,7 +347,7 @@ int LAN_GetServerPing( int source, int n ) {
 LAN_GetServerPtr
 ====================
 */
-serverInfo_t *LAN_GetServerPtr( int source, int n ) {
+static serverInfo_t *LAN_GetServerPtr( int source, int n ) {
 	switch (source) {
 		case AS_LOCAL :
 			if (n >= 0 && n < MAX_OTHER_SERVERS) {
@@ -453,7 +453,7 @@ int LAN_CompareServers( int source, int sortKey, int sortDir, int s1, int s2 ) {
 LAN_GetPingQueueCount
 ====================
 */
-int LAN_GetPingQueueCount( ) {
+static int LAN_GetPingQueueCount( ) {
 	return (Client::getPingQueueCount());
 }
 
@@ -462,7 +462,7 @@ int LAN_GetPingQueueCount( ) {
 LAN_ClearPing
 ====================
 */
-void LAN_ClearPing( int n ) {
+static void LAN_ClearPing( int n ) {
 	Client::clearPing( n );
 }
 
@@ -471,7 +471,7 @@ void LAN_ClearPing( int n ) {
 LAN_GetPing
 ====================
 */
-void LAN_GetPing( int n, char *buf, int buflen, int *pingtime ) {
+static void LAN_GetPing( int n, char *buf, int buflen, int *pingtime ) {
 	Client::getPing( n, buf, buflen, pingtime );
 }
 
@@ -480,7 +480,7 @@ void LAN_GetPing( int n, char *buf, int buflen, int *pingtime ) {
 LAN_GetPingInfo
 ====================
 */
-void LAN_GetPingInfo( int n, char *buf, int buflen ) {
+static void LAN_GetPingInfo( int n, char *buf, int buflen ) {
 	Client::getPingInfo( n, buf, buflen );
 }
 
@@ -594,7 +594,7 @@ CL_GetGlConfig
 GetClipboardData
 ====================
 */
-void GetClipboardData( char *buf, int buflen ) {
+static void GetClipboardData( char *buf, int buflen ) {
 	char	*cbd;
 
 	cbd = System::getClipboardData();

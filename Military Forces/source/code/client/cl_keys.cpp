@@ -611,7 +611,7 @@ Console_Key
 Handles history and console scrollback
 ====================
 */
-void Console_Key (int key) {
+static void Console_Key (int key) {
 	// ctrl-L clears screen
 	if ( key == 'l' && keys[K_CTRL].down ) {
 		CommandBuffer::addText ("clear\n");
@@ -756,7 +756,7 @@ Message_Key
 In game talk message
 ================
 */
-void Message_Key( int key ) {
+static void Message_Key( int key ) {
 
 	char	buffer[MAX_STRING_CHARS];
 
@@ -967,7 +967,7 @@ int Keys::getKey(const char *binding) {
 Key_Unbind_f
 ===================
 */
-void Key_Unbind_f ()
+static void Key_Unbind_f ()
 {
 	int		b;
 
@@ -992,7 +992,7 @@ void Key_Unbind_f ()
 Key_Unbindall_f
 ===================
 */
-void Key_Unbindall_f ()
+static void Key_Unbindall_f ()
 {
 	int		i;
 	
@@ -1007,7 +1007,7 @@ void Key_Unbindall_f ()
 Key_Bind_f
 ===================
 */
-void Key_Bind_f ()
+static void Key_Bind_f ()
 {
 	int			i, c, b;
 	char		cmd[1024];
@@ -1075,7 +1075,7 @@ Key_Bindlist_f
 
 ============
 */
-void Key_Bindlist_f( ) {
+static void Key_Bindlist_f( ) {
 	int		i;
 
 	for ( i = 0 ; i < MAX_KEYS ; i++ ) {

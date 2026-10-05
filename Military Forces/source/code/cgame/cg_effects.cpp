@@ -316,7 +316,7 @@ LocalEntity *CGame::makeExplosion( vec3_t origin, vec3_t dir,
 CG_LaunchExplode
 ==================
 */
-void CG_LaunchExplode( vec3_t origin, vec3_t velocity, qhandle_t hModel ) {
+static void CG_LaunchExplode( vec3_t origin, vec3_t velocity, qhandle_t hModel ) {
 	LocalEntity	*le;
 	refEntity_t		*re;
 
@@ -348,7 +348,7 @@ void CG_LaunchExplode( vec3_t origin, vec3_t velocity, qhandle_t hModel ) {
 CG_LaunchGib
 ==================
 */
-void CG_LaunchGib( vec3_t origin, vec3_t velocity, qhandle_t hModel ) {
+static void CG_LaunchGib( vec3_t origin, vec3_t velocity, qhandle_t hModel ) {
 	LocalEntity	*le;
 	refEntity_t		*re;
 	int				i;

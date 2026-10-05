@@ -107,7 +107,7 @@ PlayerMove::boatMove
 
 ===================
 */
-bool	PM_SlideMove_Boat();
+static bool	PM_SlideMove_Boat();
 
 void PlayerMove::boatMove( ) 
 {
@@ -307,7 +307,7 @@ Returns true if the velocity was clipped in some way
 ==================
 */
 
-bool PM_SlideMove_Boat() {
+static bool PM_SlideMove_Boat() {
 	float		time_left;
 	vec3_t		end;
 	vec3_t		up, down;
@@ -393,7 +393,7 @@ bool PM_SlideMove_Boat() {
 
 /*
 constexpr int MAX_CLIP_PLANES = 5;
-bool	PM_SlideMove_Boat() {
+static bool	PM_SlideMove_Boat() {
 	int			bumpcount, numbumps;
 	vec3_t		dir;
 	float		d;

@@ -415,7 +415,7 @@ struct Think_NukeDamage : public GameEntity::EntityFunc_Think
 G_CrateDropItems
 ================
 */
-void G_CrateDropItems(GameEntity *ent)
+static void G_CrateDropItems(GameEntity *ent)
 {
 	gitem_t		*item;
 	bool		found = false;
@@ -585,7 +585,7 @@ struct Think_ExplodeNuke : public GameEntity::EntityFunc_Think
 G_MissileImpact
 ================
 */
-void G_MissileImpact( GameEntity *ent, trace_t *trace ) 
+static void G_MissileImpact( GameEntity *ent, trace_t *trace ) 
 {
 	GameEntity* other;
 	bool		hitClient = false;

@@ -16,7 +16,7 @@
 CG_DamageFeedback
 ==============
 */
-void CG_DamageFeedback( int yawByte, int pitchByte, int damage ) {
+static void CG_DamageFeedback( int yawByte, int pitchByte, int damage ) {
 	float		left, front, up;
 	float		kick;
 	int			health;

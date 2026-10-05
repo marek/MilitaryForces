@@ -15,7 +15,7 @@ PM_Plane_Brakes
 
 ===================
 */
-void PM_Plane_Brakes()
+static void PM_Plane_Brakes()
 {
 	if( !(pm->ps->ONOFF & OO_LANDED) &&
 		!(availableVehicles[pm->vehicle].caps & HC_SPEEDBRAKE) ) {
@@ -42,7 +42,7 @@ PM_Toggle_Gear
 
 ===================
 */
-void PM_Toggle_PlaneGear()
+static void PM_Toggle_PlaneGear()
 {
 	if( !(availableVehicles[pm->vehicle].caps & HC_GEAR) ) {
 		return;

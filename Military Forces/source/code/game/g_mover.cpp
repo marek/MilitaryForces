@@ -19,7 +19,7 @@ PUSHMOVE
 ===============================================================================
 */
 
-void MatchTeam( GameEntity *teamLeader, int moverState, int time );
+static void MatchTeam( GameEntity *teamLeader, int moverState, int time );
 
 struct pushed_t 
 {
@@ -37,7 +37,7 @@ G_TestEntityPosition
 
 ============
 */
-GameEntity* G_TestEntityPosition( GameEntity *ent ) 
+static GameEntity* G_TestEntityPosition( GameEntity *ent ) 
 {
 	trace_t	tr;
 	int		mask;
@@ -64,7 +64,7 @@ GameEntity* G_TestEntityPosition( GameEntity *ent )
 G_CreateRotationMatrix
 ================
 */
-void G_CreateRotationMatrix(vec3_t angles, vec3_t matrix[3]) {
+static void G_CreateRotationMatrix(vec3_t angles, vec3_t matrix[3]) {
 	AngleVectors(angles, matrix[0], matrix[1], matrix[2]);
 	VectorInverse(matrix[1]);
 }
@@ -74,7 +74,7 @@ void G_CreateRotationMatrix(vec3_t angles, vec3_t matrix[3]) {
 G_TransposeMatrix
 ================
 */
-void G_TransposeMatrix(vec3_t matrix[3], vec3_t transpose[3]) {
+static void G_TransposeMatrix(vec3_t matrix[3], vec3_t transpose[3]) {
 	int i, j;
 	for (i = 0; i < 3; i++) {
 		for (j = 0; j < 3; j++) {
@@ -88,7 +88,7 @@ void G_TransposeMatrix(vec3_t matrix[3], vec3_t transpose[3]) {
 G_RotatePoint
 ================
 */
-void G_RotatePoint(vec3_t point, vec3_t matrix[3]) {
+static void G_RotatePoint(vec3_t point, vec3_t matrix[3]) {
 	vec3_t tvec;
 
 	VectorCopy(point, tvec);
@@ -104,7 +104,7 @@ G_TryPushingEntity
 Returns false if the move is blocked
 ==================
 */
-bool G_TryPushingEntity( GameEntity *check, GameEntity *pusher, vec3_t move, vec3_t amove ) 
+static bool G_TryPushingEntity( GameEntity *check, GameEntity *pusher, vec3_t move, vec3_t amove ) 
 {
 	vec3_t		matrix[3], transpose[3];
 	vec3_t		org, org2, move2;
@@ -201,7 +201,7 @@ otherwise riders would continue to slide.
 If false is returned, *obstacle will be the blocking entity
 ============
 */
-bool G_MoverPush( GameEntity *pusher, vec3_t move, vec3_t amove, GameEntity **obstacle ) 
+static bool G_MoverPush( GameEntity *pusher, vec3_t move, vec3_t amove, GameEntity **obstacle ) 
 {
 	int			i, e;
 	GameEntity	*check;
@@ -329,7 +329,7 @@ bool G_MoverPush( GameEntity *pusher, vec3_t move, vec3_t amove, GameEntity **ob
 G_MoverTeam
 =================
 */
-void G_MoverTeam( GameEntity *ent ) 
+static void G_MoverTeam( GameEntity *ent ) 
 {
 	vec3_t		move, amove;
 	GameEntity	*part, *obstacle;
@@ -420,7 +420,7 @@ Pos1 is "at rest", pos2 is "activated"
 SetMoverState
 ===============
 */
-void SetMoverState( GameEntity *ent, GameEntity::eMoverState moverState, int time )
+static void SetMoverState( GameEntity *ent, GameEntity::eMoverState moverState, int time )
 {
 	vec3_t			delta;
 	float			f;
@@ -465,7 +465,7 @@ All entities in a mover team will move from pos1 to pos2
 in the same amount of time
 ================
 */
-void MatchTeam( GameEntity *teamLeader, int moverState, int time ) 
+static void MatchTeam( GameEntity *teamLeader, int moverState, int time ) 
 {
 	GameEntity		*slave;
 
@@ -554,7 +554,7 @@ struct Reached_BinaryMover : public GameEntity::EntityFunc_Reached
 Use_BinaryMover
 ================
 */
-void Use_BinaryMoverImpl( GameEntity *ent, GameEntity *other, GameEntity *activator )
+static void Use_BinaryMoverImpl( GameEntity *ent, GameEntity *other, GameEntity *activator )
 {
 	int		total;
 	int		partial;
@@ -642,7 +642,7 @@ InitMover
 so the movement delta can be calculated
 ================
 */
-void InitMover( GameEntity *ent ) 
+static void InitMover( GameEntity *ent ) 
 {
 	vec3_t		move;
 	float		distance;
@@ -985,7 +985,7 @@ Elevator cars require that the trigger extend through the entire low position,
 not just sit on top of it.
 ================
 */
-void SpawnPlatTrigger( GameEntity *ent ) 
+static void SpawnPlatTrigger( GameEntity *ent ) 
 {
 	// the middle trigger will be a thin trigger just
 	// above the starting position
@@ -1198,7 +1198,7 @@ struct Think_BeginMoving : public GameEntity::EntityFunc_Think
 Reached_Train
 ===============
 */
-void Reached_TrainImpl( GameEntity *ent ) 
+static void Reached_TrainImpl( GameEntity *ent ) 
 {
 	GameEntity		*next;
 	float			speed;

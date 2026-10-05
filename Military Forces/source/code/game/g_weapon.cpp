@@ -17,7 +17,7 @@ G_BounceProjectile
 ================
 */
 // might later be of use for MFQ3
-void G_BounceProjectile( vec3_t start, vec3_t impact, vec3_t dir, vec3_t endout ) 
+static void G_BounceProjectile( vec3_t start, vec3_t impact, vec3_t dir, vec3_t endout ) 
 {
 	vec3_t v, newv;
 	float dot;

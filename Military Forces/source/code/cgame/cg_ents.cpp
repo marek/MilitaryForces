@@ -581,7 +581,7 @@ void ClientEntity::portal() {
 CG_CreateRotationMatrix
 ================
 */
-void CG_CreateRotationMatrix(vec3_t angles, vec3_t matrix[3]) {
+static void CG_CreateRotationMatrix(vec3_t angles, vec3_t matrix[3]) {
 	AngleVectors(angles, matrix[0], matrix[1], matrix[2]);
 	VectorInverse(matrix[1]);
 }
@@ -591,7 +591,7 @@ void CG_CreateRotationMatrix(vec3_t angles, vec3_t matrix[3]) {
 CG_TransposeMatrix
 ================
 */
-void CG_TransposeMatrix(vec3_t matrix[3], vec3_t transpose[3]) {
+static void CG_TransposeMatrix(vec3_t matrix[3], vec3_t transpose[3]) {
 	int i, j;
 	for (i = 0; i < 3; i++) {
 		for (j = 0; j < 3; j++) {
@@ -605,7 +605,7 @@ void CG_TransposeMatrix(vec3_t matrix[3], vec3_t transpose[3]) {
 CG_RotatePoint
 ================
 */
-void CG_RotatePoint(vec3_t point, vec3_t matrix[3]) {
+static void CG_RotatePoint(vec3_t point, vec3_t matrix[3]) {
 	vec3_t tvec;
 
 	VectorCopy(point, tvec);

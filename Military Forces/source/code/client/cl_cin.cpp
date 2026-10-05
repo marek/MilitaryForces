@@ -197,7 +197,7 @@ void Client::rllSetupTable( )
 //
 // Returns:		Number of samples placed in output buffer
 //-----------------------------------------------------------------------------
-long RllDecodeMonoToMono(unsigned char *from,short *to,unsigned int size,char signedOutput ,unsigned short flag)
+static long RllDecodeMonoToMono(unsigned char *from,short *to,unsigned int size,char signedOutput ,unsigned short flag)
 {
 	unsigned int z;
 	int prev;
@@ -228,7 +228,7 @@ long RllDecodeMonoToMono(unsigned char *from,short *to,unsigned int size,char si
 //
 // Returns:		Number of samples placed in output buffer
 //-----------------------------------------------------------------------------
-long RllDecodeMonoToStereo(unsigned char *from,short *to,unsigned int size,char signedOutput,unsigned short flag)
+static long RllDecodeMonoToStereo(unsigned char *from,short *to,unsigned int size,char signedOutput,unsigned short flag)
 {
 	unsigned int z;
 	int prev;
@@ -260,7 +260,7 @@ long RllDecodeMonoToStereo(unsigned char *from,short *to,unsigned int size,char 
 //
 // Returns:		Number of samples placed in output buffer
 //-----------------------------------------------------------------------------
-long RllDecodeStereoToStereo(unsigned char *from,short *to,unsigned int size,char signedOutput, unsigned short flag)
+static long RllDecodeStereoToStereo(unsigned char *from,short *to,unsigned int size,char signedOutput, unsigned short flag)
 {
 	unsigned int z;
 	unsigned char *zz = from;
@@ -298,7 +298,7 @@ long RllDecodeStereoToStereo(unsigned char *from,short *to,unsigned int size,cha
 //
 // Returns:		Number of samples placed in output buffer
 //-----------------------------------------------------------------------------
-long RllDecodeStereoToMono(unsigned char *from,short *to,unsigned int size,char signedOutput, unsigned short flag)
+static long RllDecodeStereoToMono(unsigned char *from,short *to,unsigned int size,char signedOutput, unsigned short flag)
 {
 	unsigned int z;
 	int prevL,prevR;
@@ -1517,7 +1517,7 @@ CIN_ResampleCinematic
 Resample cinematic to 256x256 and store in buf2
 ==================
 */
-void CIN_ResampleCinematic(int handle, int *buf2) {
+static void CIN_ResampleCinematic(int handle, int *buf2) {
 	int ix, iy, *buf3, xm, ym, ll;
 	byte	*buf;
 

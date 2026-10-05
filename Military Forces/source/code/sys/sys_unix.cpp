@@ -161,7 +161,7 @@ char *System::defaultHomeStatePath()  { return Sys_DefaultHomePath(); }
 Sys_HomeConfigPath
 ==================
 */
-char *Sys_HomeConfigPath(void)
+static char *Sys_HomeConfigPath(void)
 {
 	static char homeConfigPath[ MAX_OSPATH ] = { 0 };
 	char *p;
@@ -190,7 +190,7 @@ char *Sys_HomeConfigPath(void)
 Sys_HomeDataPath
 ==================
 */
-char *Sys_HomeDataPath(void)
+static char *Sys_HomeDataPath(void)
 {
 	static char homeDataPath[ MAX_OSPATH ] = { 0 };
 	char *p;
@@ -219,7 +219,7 @@ char *Sys_HomeDataPath(void)
 Sys_HomeStatePath
 ==================
 */
-char *Sys_HomeStatePath(void)
+static char *Sys_HomeStatePath(void)
 {
 	static char homeStatePath[ MAX_OSPATH ] = { 0 };
 	char *p;
@@ -276,7 +276,7 @@ static char *Sys_LegacyHomePath(void)
 Sys_MigrateToXDG
 ==================
 */
-bool Sys_MigrateToXDG(void)
+static bool Sys_MigrateToXDG(void)
 {
 	const char *scriptTemplate =
 		"#!/bin/sh\n"

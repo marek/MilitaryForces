@@ -780,7 +780,7 @@ void PlayerMove::vehicleBoundingBox()
 
 }
 
-void PM_Throttle_Up()
+static void PM_Throttle_Up()
 {
 	if( pm->cmd.serverTime < pm->ps->timers[TIMER_THROTTLE] ) {
 		return;
@@ -808,7 +808,7 @@ void PM_Throttle_Up()
 	pm->ps->timers[TIMER_THROTTLE] = pm->cmd.serverTime + 250;
 }
 
-void PM_Throttle_Down()
+static void PM_Throttle_Down()
 {
 	if( pm->cmd.serverTime < pm->ps->timers[TIMER_THROTTLE] ) {
 		return;
@@ -878,7 +878,7 @@ PmoveSingle
 
 ================
 */
-void PmoveSingle (pmove_t *pmove) {
+static void PmoveSingle (pmove_t *pmove) {
 	pm = pmove;
 
 	// this counter lets us debug movement problems with a journal

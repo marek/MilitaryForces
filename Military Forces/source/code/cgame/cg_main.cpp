@@ -351,7 +351,7 @@ vec4_t HUDColors[HUD_MAX] = {
 CG_RegisterCvars
 =================
 */
-void CG_RegisterCvars( ) {
+static void CG_RegisterCvars( ) {
 	int			i;
 	cvarTable_t	*cv;
 	char		var[MAX_TOKEN_CHARS];
@@ -1157,7 +1157,7 @@ void CGame::registerClients( ) {
 CG_Asset_Parse
 =================
 */
-bool CG_Asset_Parse(int handle) {
+static bool CG_Asset_Parse(int handle) {
 	UI_PrecompilerTools::PC_Token token;
 	const char *tempStr;
 
@@ -1320,7 +1320,7 @@ bool CG_Asset_Parse(int handle) {
 CG_ParseMenu
 =================
 */
-void CG_ParseMenu(const char *menuFile) {
+static void CG_ParseMenu(const char *menuFile) {
 	UI_PrecompilerTools::PC_Token token;
 	int handle;
 
@@ -1370,7 +1370,7 @@ void CG_ParseMenu(const char *menuFile) {
 CG_Load_Menu
 =================
 */
-bool CG_Load_Menu(char **p) {
+static bool CG_Load_Menu(char **p) {
 	char *token;
 
 	token = COM_ParseExt(p, true);
@@ -1873,7 +1873,7 @@ int CG_OwnerDrawWidth(int ownerDraw, float scale)
 CG_LoadHudMenu();
 =================
 */
-void CG_LoadHudMenu() {
+static void CG_LoadHudMenu() {
 	char buff[1024];
 	const char *hudSet;
 
@@ -1894,7 +1894,7 @@ CG_AssetCache
 =================
 */
 
-void CG_AssetCache()
+static void CG_AssetCache()
 {
 	cgUtils.dc_->assets_.gradientBar = refExport.RegisterShaderNoMip( ASSET_GRADIENTBAR );
 	cgUtils.dc_->assets_.verticalGradient = refExport.RegisterShaderNoMip( ASSET_VERTICALGRADIENT );

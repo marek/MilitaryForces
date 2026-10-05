@@ -58,7 +58,7 @@ void daub4(float b[], unsigned long n, int isign)
 #undef a
 }
 
-void wt1(float a[], unsigned long n, int isign)
+static void wt1(float a[], unsigned long n, int isign)
 {
 	unsigned long nn;
 	int inverseStartLength = n/4;
@@ -82,7 +82,7 @@ static unsigned char numBits[] = {
    8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,
 };
 
-byte MuLawEncode(short s) {
+static byte MuLawEncode(short s) {
 	unsigned long adjusted;
 	byte sign, exponent, mantissa;
 
@@ -97,7 +97,7 @@ byte MuLawEncode(short s) {
 	return ~(sign | (exponent<<4) | mantissa);
 }
 
-short MuLawDecode(byte uLaw) {
+static short MuLawDecode(byte uLaw) {
 	signed long adjusted;
 	byte exponent, mantissa;
 
@@ -114,7 +114,7 @@ static bool madeTable = false;
 
 static	int	NXStreamCount;
 
-void NXPutc(NXStream *stream, char out) {
+static void NXPutc(NXStream *stream, char out) {
 	stream[NXStreamCount++] = out;
 }
 
@@ -237,7 +237,7 @@ void SoundEffect::encodeMuLaw( short *packets ) {
 	}
 }
 
-void decodeMuLaw(sndBuffer *chunk, short *to) {
+static void decodeMuLaw(sndBuffer *chunk, short *to) {
 	int				i;
 	byte			*out;
 
