@@ -816,13 +816,17 @@ inline constexpr int AVI_LINE_PADDING = 4;
 //
 // server interface
 //
-void SV_Init( );
-void SV_Shutdown( const char *finalmsg );
-void SV_Frame( int msec );
-void SV_PacketEvent( netadr_t from, Message *msg );
-int SV_FrameMsec();
-bool SV_GameCommand( );
-int SV_SendQueuedPackets();
+class ServerLoop
+{
+public:
+	static void init( );
+	static void shutdown( const char *finalmsg );
+	static void frame( int msec );
+	static void packetEvent( netadr_t from, Message *msg );
+	static int frameMsec();
+	static bool gameCommand( );
+	static int sendQueuedPackets();
+};
 
 //
 // UI interface

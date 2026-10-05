@@ -1729,12 +1729,12 @@ void CL_Connect_f( ) {
 
 	if ( com_sv_running->integer && !strcmp( server, "localhost" ) ) {
 		// if running a local server, kill it
-		SV_Shutdown( "Server quit" );
+		ServerLoop::shutdown( "Server quit" );
 	}
 
 	// make sure a local server is killed
 	CvarSystem::set( "sv_killserver", "1" );
-	SV_Frame( 0 );
+	ServerLoop::frame( 0 );
 
 	noGameRestart = true;
 	CL_Disconnect( true );

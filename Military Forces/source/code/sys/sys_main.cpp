@@ -704,7 +704,7 @@ void Sys_SigHandler( int signal )
 #ifndef DEDICATED
 		CL_Shutdown(va("Received signal %d", signal), true, true);
 #endif
-		SV_Shutdown(va("Received signal %d", signal) );
+		ServerLoop::shutdown(va("Received signal %d", signal) );
 	}
 
 	if( signal == SIGTERM || signal == SIGINT )

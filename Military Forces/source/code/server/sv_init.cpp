@@ -637,13 +637,13 @@ void ServerMain::spawnServer( char *server, bool killBots )
 
 /*
 ===============
-SV_Init
+ServerLoop::init
 
 Only called at main exe startup, not for each game
 ===============
 */
 
-void SV_Init () {
+void ServerLoop::init () {
 	ServerMain::addOperatorCommands ();
 
 	// serverinfo vars
@@ -711,7 +711,7 @@ void SV_Init () {
 ==================
 ServerMain::finalMessage
 
-Used by SV_Shutdown to send a final message to all
+Used by ServerLoop::shutdown to send a final message to all
 connected clients before the server goes down.  The messages are sent immediately,
 not just stuck on the outgoing message list, because the server is going
 to totally exit after returning from this function.
@@ -749,13 +749,13 @@ void ServerMain::finalMessage( const char *message )
 
 /*
 ================
-SV_Shutdown
+ServerLoop::shutdown
 
 Called when each game quits,
 before System::quit or System::error
 ================
 */
-void SV_Shutdown( const char *finalmsg ) 
+void ServerLoop::shutdown( const char *finalmsg ) 
 {
 	if ( !com_sv_running || !com_sv_running->integer ) 
 		return;

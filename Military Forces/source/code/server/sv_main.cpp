@@ -841,7 +841,7 @@ void SV_ConnectionlessPacket( netadr_t from, Message *msg ) {
 SV_ReadPackets
 =================
 */
-void SV_PacketEvent( netadr_t from, Message *msg ) 
+void ServerLoop::packetEvent( netadr_t from, Message *msg ) 
 {
 	// check for connectionless packet (0xffffffff) first
 	if( msg->size() >= 4 && *reinterpret_cast<int *>(msg->data()) == -1) 
@@ -1056,11 +1056,11 @@ bool SV_CheckPaused()
 
 /*
 ==================
-SV_FrameMsec
+ServerLoop::frameMsec
 Return time in millseconds until processing of the next server frame.
 ==================
 */
-int SV_FrameMsec()
+int ServerLoop::frameMsec()
 {
 	if(sv_fps)
 	{
@@ -1079,13 +1079,13 @@ int SV_FrameMsec()
 
 /*
 ==================
-SV_Frame
+ServerLoop::frame
 
 Player movement occurs as a result of packet events, which
-happen before SV_Frame is called
+happen before ServerLoop::frame is called
 ==================
 */
-void SV_Frame( int msec ) 
+void ServerLoop::frame( int msec ) 
 {
 	int		frameMsec;
 	int		startTime;
@@ -1093,7 +1093,7 @@ void SV_Frame( int msec )
 	// the menu kills the server with this cvar
 	if ( sv_killserver->integer ) 
 	{
-		SV_Shutdown ("Server was killed");
+		ServerLoop::shutdown ("Server was killed");
 		CvarSystem::set( "sv_killserver", "0" );
 		return;
 	}
@@ -1125,14 +1125,14 @@ void SV_Frame( int msec )
 	// 2giga-milliseconds = 23 days, so it won't be too often
 	if ( theSVS.time_ > 0x70000000 )
 	{
-		SV_Shutdown( "Restarting server due to time wrapping" );
+		ServerLoop::shutdown( "Restarting server due to time wrapping" );
 		CommandBuffer::addText( va( "map %s\n", CvarSystem::variableString( "mapname" ) ) );
 		return;
 	}
 	// this can happen considerably earlier when lots of clients play and the map doesn't change
 	if ( theSVS.nextSnapshotEntities_ >= 0x7FFFFFFE - theSVS.numSnapshotEntities_ )
 	{
-		SV_Shutdown( "Restarting server due to numSnapshotEntities wrapping" );
+		ServerLoop::shutdown( "Restarting server due to numSnapshotEntities wrapping" );
 		CommandBuffer::addText( va( "map %s\n", CvarSystem::variableString( "mapname" ) ) );
 		return;
 	}
@@ -1245,7 +1245,7 @@ int SV_Client::rateMsec()
 
 /*
 ====================
-SV_SendQueuedPackets
+ServerLoop::sendQueuedPackets
 
 Send download messages and queued packets in the time that we're idle, i.e.
 not computing a server frame or sending client snapshots.
@@ -1253,7 +1253,7 @@ Return the time in msec until we expect to be called next
 ====================
 */
 
-int SV_SendQueuedPackets()
+int ServerLoop::sendQueuedPackets()
 {
 	int numBlocks;
 	int dlStart, deltaT, delayT;

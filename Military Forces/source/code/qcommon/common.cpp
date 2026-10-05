@@ -304,7 +304,7 @@ void QDECL Common::error( int code, const char *fmt, ... ) {
 	com_gameClientRestarting = false;
 
 	if (code == ERR_DISCONNECT || code == ERR_SERVERDISCONNECT) {
-		SV_Shutdown( "Server disconnected" );
+		ServerLoop::shutdown( "Server disconnected" );
 		if ( restartClient ) {
 			CL_Init();
 		}
@@ -316,7 +316,7 @@ void QDECL Common::error( int code, const char *fmt, ... ) {
 		longjmp (abortframe, -1);
 	} else if (code == ERR_DROP) {
 		Common::printf ("********************\nERROR: %s\n********************\n", com_errorMessage);
-		SV_Shutdown (va("Server crashed: %s",  com_errorMessage));
+		ServerLoop::shutdown (va("Server crashed: %s",  com_errorMessage));
 		if ( restartClient ) {
 			CL_Init();
 		}
@@ -326,7 +326,7 @@ void QDECL Common::error( int code, const char *fmt, ... ) {
 		com_errorEntered = false;
 		longjmp (abortframe, -1);
 	} else if ( code == ERR_NEED_CD ) {
-		SV_Shutdown( "Server didn't have CD" );
+		ServerLoop::shutdown( "Server didn't have CD" );
 		if ( restartClient ) {
 			CL_Init();
 		}
@@ -344,7 +344,7 @@ void QDECL Common::error( int code, const char *fmt, ... ) {
 		longjmp (abortframe, -1);
 	} else {
 		CL_Shutdown(va("Client fatal crashed: %s", com_errorMessage), true, true);
-		SV_Shutdown(va("Server fatal crashed: %s", com_errorMessage));
+		ServerLoop::shutdown(va("Server fatal crashed: %s", com_errorMessage));
 	}
 
 	Common::shutdown ();
@@ -369,7 +369,7 @@ void Common::quit_f( ) {
 		// which would trigger an unload of active VM error.
 		// System::quit will kill this process anyways, so
 		// a corrupt call stack makes no difference
-		SV_Shutdown(p[0] ? p : "Server quit");
+		ServerLoop::shutdown(p[0] ? p : "Server quit");
 		CL_Shutdown(p[0] ? p : "Client quit", true, true);
 		Common::shutdown ();
 		FileSystem::shutdown(true);
@@ -2149,7 +2149,7 @@ void Common::runAndTimeServerPacket( netadr_t *evFrom, Message *buf ) {
 		t1 = System::milliseconds ();
 	}
 
-	SV_PacketEvent( *evFrom, buf );
+	ServerLoop::packetEvent( *evFrom, buf );
 
 	if ( com_speeds->integer ) {
 		t2 = System::milliseconds ();
@@ -2378,7 +2378,7 @@ void Common::gameRestart(int checksumFeed, bool disconnect)
 
 		// Kill server if we have one
 		if(com_sv_running->integer)
-			SV_Shutdown("Game directory changed");
+			ServerLoop::shutdown("Game directory changed");
 
 		if(com_gameClientRestarting)
 		{
@@ -2793,7 +2793,7 @@ void Common::init( char *commandLine ) {
 	Com_RandomBytes( reinterpret_cast<byte*>(&qport), sizeof(int) );
 	Netchan_Init( qport & 0xffff );
 
-	SV_Init();
+	ServerLoop::init();
 
 	com_dedicated->modified = false;
 #ifndef DEDICATED
@@ -3093,7 +3093,7 @@ void Common::frame( ) {
 	if(!com_timedemo->integer)
 	{
 		if(com_dedicated->integer)
-			minMsec = SV_FrameMsec();
+			minMsec = ServerLoop::frameMsec();
 		else
 		{
 			if(com_minimized->integer && com_maxfpsMinimized->integer > 0)
@@ -3123,7 +3123,7 @@ void Common::frame( ) {
 	{
 		if(com_sv_running->integer)
 		{
-			timeValSV = SV_SendQueuedPackets();
+			timeValSV = ServerLoop::sendQueuedPackets();
 			
 			timeVal = Com_TimeVal(minMsec);
 
@@ -3164,7 +3164,7 @@ void Common::frame( ) {
 		timeBeforeServer = System::milliseconds ();
 	}
 
-	SV_Frame( msec );
+	ServerLoop::frame( msec );
 
 	// if "dedicated" has been modified, start up
 	// or shut down the client system.
@@ -3175,7 +3175,7 @@ void Common::frame( ) {
 		CvarSystem::get( "dedicated", "0", 0 );
 		com_dedicated->modified = false;
 		if ( !com_dedicated->integer ) {
-			SV_Shutdown( "dedicated set to 0" );
+			ServerLoop::shutdown( "dedicated set to 0" );
 			CL_FlushMemory();
 		}
 	}

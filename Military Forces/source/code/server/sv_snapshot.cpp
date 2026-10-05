@@ -807,7 +807,7 @@ void SV_Client::buildClientSnapshot()
 		state = &theSVS.snapshotEntities_[theSVS.nextSnapshotEntities_ % theSVS.numSnapshotEntities_];
 		*state = ent->s;
 		theSVS.nextSnapshotEntities_++;
-		// this should never hit, map should always be restarted first in SV_Frame
+		// this should never hit, map should always be restarted first in ServerLoop::frame
 		if ( theSVS.nextSnapshotEntities_ >= 0x7FFFFFFE ) 
 			Common::error(ERR_FATAL, "svs.nextSnapshotEntities wrapped");
 		frame->num_entities_++;

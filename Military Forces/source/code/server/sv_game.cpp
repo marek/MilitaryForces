@@ -368,12 +368,12 @@ void ServerMain::restartGameProgs( )
 
 /*
 ====================
-SV_GameCommand
+ServerLoop::gameCommand
 
 See if the current console command is claimed by the game
 ====================
 */
-bool SV_GameCommand() 
+bool ServerLoop::gameCommand() 
 {
 	if ( theSV.state_ != Server::SS_GAME ) 
 		return false;

@@ -1535,7 +1535,7 @@ SV_KillServer
 =================
 */
 void ServerMain::killServer_f( ) {
-	SV_Shutdown( "killserver" );
+	ServerLoop::shutdown( "killserver" );
 }
 
 //===========================================================
