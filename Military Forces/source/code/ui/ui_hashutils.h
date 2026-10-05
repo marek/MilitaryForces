@@ -2,6 +2,7 @@
 #define __UI_HASHUTILS_H__
 
 #include <map>
+#include <memory>
 #include <string>
 
 
@@ -26,8 +27,8 @@ private:
 							UI_HashUtils( UI_HashUtils const& );
 	UI_HashUtils&			operator=( UI_HashUtils const& );
 
-	typedef std::map<int, KeywordHash*> KeywordMap;
-	typedef std::map<int, KeywordHash*>::iterator KeywordMapIter;
+	typedef std::map<int, std::unique_ptr<KeywordHash>> KeywordMap;
+	typedef KeywordMap::iterator KeywordMapIter;
 
 	KeywordHash*			findKeyword( KeywordMap& map, const char* keyword );
 

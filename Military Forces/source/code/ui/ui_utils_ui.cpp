@@ -24,13 +24,11 @@ const int UI_UtilsUI::k_CURSOR_H = 12;
 
 UI_UtilsUI::UI_UtilsUI()
 {
-	dc_ = new UI_DisplayContextUI;
+	dc_ = std::make_unique<UI_DisplayContextUI>();
 }
 
 UI_UtilsUI::~UI_UtilsUI()
-{
-	delete dc_;
-}
+= default;
 
 
 bool 

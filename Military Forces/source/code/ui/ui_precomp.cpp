@@ -89,23 +89,23 @@ UI_PrecompilerTools::UI_PrecompilerTools() :
 	numTokens_(0)
 {
 	Directive::tools_ = this;
-	directives_.push_back(new Directive_if);
-	directives_.push_back(new Directive_ifdef);
-	directives_.push_back(new Directive_ifndef);
-	directives_.push_back(new Directive_elif);
-	directives_.push_back(new Directive_else);
-	directives_.push_back(new Directive_endif);
-	directives_.push_back(new Directive_include);
-	directives_.push_back(new Directive_define);
-	directives_.push_back(new Directive_undef);
-	directives_.push_back(new Directive_line);
-	directives_.push_back(new Directive_error);
-	directives_.push_back(new Directive_pragma);
-	directives_.push_back(new Directive_eval);
-	directives_.push_back(new Directive_evalfloat);
+	directives_.push_back( std::make_unique<Directive_if>() );
+	directives_.push_back( std::make_unique<Directive_ifdef>() );
+	directives_.push_back( std::make_unique<Directive_ifndef>() );
+	directives_.push_back( std::make_unique<Directive_elif>() );
+	directives_.push_back( std::make_unique<Directive_else>() );
+	directives_.push_back( std::make_unique<Directive_endif>() );
+	directives_.push_back( std::make_unique<Directive_include>() );
+	directives_.push_back( std::make_unique<Directive_define>() );
+	directives_.push_back( std::make_unique<Directive_undef>() );
+	directives_.push_back( std::make_unique<Directive_line>() );
+	directives_.push_back( std::make_unique<Directive_error>() );
+	directives_.push_back( std::make_unique<Directive_pragma>() );
+	directives_.push_back( std::make_unique<Directive_eval>() );
+	directives_.push_back( std::make_unique<Directive_evalfloat>() );
 
-	dollarDirectives_.push_back(new DollarDirective_evalint);
-	dollarDirectives_.push_back(new DollarDirective_evalfloat);
+	dollarDirectives_.push_back( std::make_unique<DollarDirective_evalint>() );
+	dollarDirectives_.push_back( std::make_unique<DollarDirective_evalfloat>() );
 
 	for(auto & sourceFile : sourceFiles_)
 	{
@@ -115,19 +115,6 @@ UI_PrecompilerTools::UI_PrecompilerTools() :
 
 UI_PrecompilerTools::~UI_PrecompilerTools()
 {
-	for(auto & directive : directives_)
-	{
-		delete directive;
-		directive = nullptr;
-	}
-	directives_.clear();
-
-	for(auto & dollarDirective : dollarDirectives_)
-	{
-		delete dollarDirective;
-		dollarDirective = nullptr;
-	}
-	dollarDirectives_.clear();
 }
 
 int
@@ -1425,7 +1412,7 @@ UI_PrecompilerTools::readDirective( SourceFile* source )
 	if (token.type_ == TT_NAME)
 	{
 		//find the precompiler directive
-		for (size_t i = 0; directives_.size(); ++i)
+		for (size_t i = 0; i < directives_.size(); ++i)
 		{
 			if (!strcmp(directives_[i]->name_.c_str(), token.string_))
 			{

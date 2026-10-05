@@ -14,13 +14,11 @@ const int	UI_UtilsCG::k_HUD_LABEL_BR = (k_HUD_LABEL_TL*2);
 
 UI_UtilsCG::UI_UtilsCG()
 {
-	dc_ = new UI_DisplayContextCG;
+	dc_ = std::make_unique<UI_DisplayContextCG>();
 }
 
 UI_UtilsCG::~UI_UtilsCG()
-{
-	delete dc_;
-}
+= default;
 
 float
 UI_UtilsCG::drawTimer( float y )

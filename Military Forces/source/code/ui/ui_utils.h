@@ -4,6 +4,7 @@
 #include "../ui/ui_displaycontext.h"
 #include "../ui/ui_scrollinfo.h"
 #include <map>
+#include <memory>
 #include <string>
 
 
@@ -195,7 +196,7 @@ struct UI_Utils
 
 	float						getFrameSecondFraction() { return dc_->frameTime_ / 1000.0f; }
 
-	ControlUtils*				getControlUtils() { return controlUtils_; }						
+	ControlUtils*				getControlUtils() { return controlUtils_.get(); }						
 
 	UI_PrecompilerTools*		getPrecompilerTools() { return &precomp_; }
 
@@ -206,15 +207,15 @@ struct UI_Utils
 	static const int			DOUBLE_CLICK_DELAY = 300;
 	
 	// allow public access
-	UI_DisplayContext*			dc_;
+	std::unique_ptr<UI_DisplayContext>	dc_;
 
 protected:
 
 								UI_Utils();
 	virtual						~UI_Utils();
 
-	typedef std::map<std::string,Command*> CommandMap;
-	typedef std::map<std::string,Command*>::iterator CommandMapIter;
+	typedef std::map<std::string,std::unique_ptr<Command>> CommandMap;
+	typedef CommandMap::iterator CommandMapIter;
 
 	// data members
 	CommandMap					commands_;
@@ -225,7 +226,7 @@ protected:
 	menuDef_t*					menuStack_[MAX_OPEN_MENUS];
 	int							openMenuCount_;
 
-	UI_HashUtils*				hashUtils_;
+	std::unique_ptr<UI_HashUtils>	hashUtils_;
 
 	bool						editingField_;
 	itemDef_t*					bindItem_;
@@ -233,7 +234,7 @@ protected:
 
 	itemDef_t*					itemCapture_;
 
-	ControlUtils*				controlUtils_;
+	std::unique_ptr<ControlUtils>	controlUtils_;
 
 	bool						waitingForKey_;
 	int							pendingBindKey_ = -1;	// key pressed for a binding: released early it is a tap, kept down a hold
@@ -243,7 +244,7 @@ protected:
 
 	int							lastListBoxClickTime_;
 
-	UI_CaptureBase*				captureTool_;
+	std::unique_ptr<UI_CaptureBase>	captureTool_;
 
 	vec4_t						colourVector_;
 	unsigned char				colourCharArray_[4];

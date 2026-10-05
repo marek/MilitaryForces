@@ -102,19 +102,6 @@ UI_HashUtils::UI_HashUtils()
 
 UI_HashUtils::~UI_HashUtils()
 {
-	for(auto & itemKeyword : itemKeywords_)
-	{
-		delete (itemKeyword.second);
-		itemKeyword.second = 0;
-	}
-	itemKeywords_.clear();
-
-	for(auto & menuKeyword : menuKeywords_)
-	{
-		delete (menuKeyword.second);
-		menuKeyword.second = 0;
-	}
-	menuKeywords_.clear();
 }
 
 UI_Utils* UI_HashUtils::utils_ = nullptr;
@@ -133,7 +120,7 @@ UI_HashUtils::findKeyword( KeywordMap& map, const char* keyword )
 	KeywordMapIter it = map.find( key );
 	if( it == map.end() )
 		return nullptr;
-	return it->second;
+	return it->second.get();
 }
 
 KeywordHash*
@@ -180,7 +167,9 @@ UI_HashUtils::addMenuKeyword( KeywordHash* kh )
 bool
 UI_HashUtils::addKeyword( KeywordMap& map, KeywordHash* kh )
 {
-	return map.insert( std::make_pair( getKey( kh->getKeyword().c_str() ), kh ) ).second;
+	// the table owns the keyword from here on (one that collides with an earlier key is dropped)
+	const int key = getKey( kh->getKeyword().c_str() );
+	return map.emplace( key, std::unique_ptr<KeywordHash>( kh ) ).second;
 }
 
 

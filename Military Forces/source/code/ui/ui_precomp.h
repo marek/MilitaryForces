@@ -3,6 +3,7 @@
 
 
 #include <string>
+#include <memory>
 #include <vector>
 
 
@@ -252,8 +253,8 @@ private:
 	int					numTokens_;
 
 	static Punctuation	default_punctuations[];
-	std::vector<Directive*> directives_;
-	std::vector<Directive*> dollarDirectives_;
+	std::vector<std::unique_ptr<Directive>> directives_;
+	std::vector<std::unique_ptr<Directive>> dollarDirectives_;
 };
 
 struct UI_PrecompilerTools::Punctuation

@@ -29,29 +29,29 @@ UI_Utils::UI_Utils() :
 {
 	UI_CaptureBase::setUtils(this);
 	UI_HashUtils::setUtils(this);
-	hashUtils_ = new UI_HashUtils;
+	hashUtils_ = std::make_unique<UI_HashUtils>();
 	ControlUtils::setUtils(this);
-	controlUtils_ = new ControlUtils;
+	controlUtils_ = std::make_unique<ControlUtils>();
 	Command::setUtils(this);
-	commands_.insert(std::make_pair("setfocus", new Command_SetFocus));
-	commands_.insert(std::make_pair("fadein", new Command_FadeIn));
-	commands_.insert(std::make_pair("fadeout", new Command_FadeOut));
-	commands_.insert(std::make_pair("show", new Command_Show));
-	commands_.insert(std::make_pair("hide", new Command_Hide));
-	commands_.insert(std::make_pair("setcolor", new Command_SetColor));
-	commands_.insert(std::make_pair("open", new Command_Open));
-	commands_.insert(std::make_pair("close", new Command_Close));
-	commands_.insert(std::make_pair("setasset", new Command_SetAsset));
-	commands_.insert(std::make_pair("setbackground", new Command_SetBackground));
-	commands_.insert(std::make_pair("setitemcolor", new Command_SetItemColor));
-	commands_.insert(std::make_pair("setplayermodel", new Command_SetPlayerModel));
-	commands_.insert(std::make_pair("setplayerhead", new Command_SetPlayerHead));
-	commands_.insert(std::make_pair("transition", new Command_Transition));
-	commands_.insert(std::make_pair("setcvar", new Command_SetCvar));
-	commands_.insert(std::make_pair("exec", new Command_Exec));
-	commands_.insert(std::make_pair("play", new Command_Play));
-	commands_.insert(std::make_pair("playlooped", new Command_PlayLooped));
-	commands_.insert(std::make_pair("orbit", new Command_Orbit));
+	commands_.emplace( "setfocus", std::make_unique<Command_SetFocus>() );
+	commands_.emplace( "fadein", std::make_unique<Command_FadeIn>() );
+	commands_.emplace( "fadeout", std::make_unique<Command_FadeOut>() );
+	commands_.emplace( "show", std::make_unique<Command_Show>() );
+	commands_.emplace( "hide", std::make_unique<Command_Hide>() );
+	commands_.emplace( "setcolor", std::make_unique<Command_SetColor>() );
+	commands_.emplace( "open", std::make_unique<Command_Open>() );
+	commands_.emplace( "close", std::make_unique<Command_Close>() );
+	commands_.emplace( "setasset", std::make_unique<Command_SetAsset>() );
+	commands_.emplace( "setbackground", std::make_unique<Command_SetBackground>() );
+	commands_.emplace( "setitemcolor", std::make_unique<Command_SetItemColor>() );
+	commands_.emplace( "setplayermodel", std::make_unique<Command_SetPlayerModel>() );
+	commands_.emplace( "setplayerhead", std::make_unique<Command_SetPlayerHead>() );
+	commands_.emplace( "transition", std::make_unique<Command_Transition>() );
+	commands_.emplace( "setcvar", std::make_unique<Command_SetCvar>() );
+	commands_.emplace( "exec", std::make_unique<Command_Exec>() );
+	commands_.emplace( "play", std::make_unique<Command_Play>() );
+	commands_.emplace( "playlooped", std::make_unique<Command_PlayLooped>() );
+	commands_.emplace( "orbit", std::make_unique<Command_Orbit>() );
 
 	Vector4Set( colourVector_, 1, 1, 1, 1 );
 	colourCharArray_[0] = colourCharArray_[1] = colourCharArray_[2] = colourCharArray_[3] = 255;
@@ -61,14 +61,6 @@ UI_Utils::UI_Utils() :
 
 UI_Utils::~UI_Utils() 
 {
-	for(auto & command : commands_)
-	{
-		delete (command.second);
-		command.second = 0;
-	}
-	commands_.clear();
-
-	delete hashUtils_;
 
 	//delete precomp_;
 }
@@ -2323,8 +2315,7 @@ UI_Utils::item_HandleKey( itemDef_t *item, int key, int down )
 	{
 		item_StopCapture(itemCapture_);
 		itemCapture_ = nullptr;
-		delete captureTool_;
-		captureTool_ = nullptr;
+		captureTool_.reset();
 	} 
 	else 
 	{
@@ -2403,7 +2394,7 @@ UI_Utils::item_StartCapture( itemDef_t *item, int key )
 				scrollInfo_.scrollKey_ = key;
 				scrollInfo_.scrollDir_ = (flags & WINDOW_LB_LEFTARROW) ? true : false;
 				scrollInfo_.item_ = item;
-				captureTool_ = new UI_Capture_ListBoxAuto( &scrollInfo_ );
+				captureTool_ = std::make_unique<UI_Capture_ListBoxAuto>( &scrollInfo_ );
 				itemCapture_ = item;
 			} 
 			else if (flags & WINDOW_LB_THUMB) 
@@ -2412,7 +2403,7 @@ UI_Utils::item_StartCapture( itemDef_t *item, int key )
 				scrollInfo_.item_ = item;
 				scrollInfo_.xStart_ = dc_->cursorX_;
 				scrollInfo_.yStart_ = dc_->cursorY_;
-				captureTool_ = new UI_Capture_ListBoxThumb( &scrollInfo_ );
+				captureTool_ = std::make_unique<UI_Capture_ListBoxThumb>( &scrollInfo_ );
 				itemCapture_ = item;
 			}
 			break;
@@ -2426,7 +2417,7 @@ UI_Utils::item_StartCapture( itemDef_t *item, int key )
 				scrollInfo_.item_ = item;
 				scrollInfo_.xStart_ = dc_->cursorX_;
 				scrollInfo_.yStart_ = dc_->cursorY_;
-				captureTool_ = new UI_Capture_SliderThumb( &scrollInfo_ );
+				captureTool_ = std::make_unique<UI_Capture_SliderThumb>( &scrollInfo_ );
 				itemCapture_ = item;
 			}
 			break;
@@ -3967,7 +3958,7 @@ UI_Utils::display_CaptureItem( int x, int y )
 UI_DisplayContext* 
 UI_Utils::display_GetContext() 
 {
-	return dc_;
+	return dc_.get();
 }
 
 int 
