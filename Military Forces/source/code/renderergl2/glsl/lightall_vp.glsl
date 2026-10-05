@@ -247,7 +247,8 @@ void main()
 	float NL = clamp(dot(normalize(normal), L) / sqrt(sqrLightDist), 0.0, 1.0);
 	float attenuation = CalcLightAttenuation(u_LightOrigin.w, u_LightRadius * u_LightRadius / sqrLightDist);
 
-	var_Color.rgb *= u_DirectedLight * (attenuation * NL) + u_AmbientLight;
+	// capped like the old renderer does per vertex, or models come out brighter than the world around them
+	var_Color.rgb *= min(u_DirectedLight * (attenuation * NL) + u_AmbientLight, vec3(1.0));
   #else
 	var_ColorAmbient.rgb = u_AmbientLight * var_Color.rgb;
 	var_Color.rgb *= u_DirectedLight;

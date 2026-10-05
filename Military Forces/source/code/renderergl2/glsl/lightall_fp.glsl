@@ -433,6 +433,15 @@ void main()
     #endif
   #endif
 
+  #if defined(USE_LIGHT_VECTOR)
+	// ambient plus directed light is capped like the old renderer does per vertex, or models come out brighter
+	// than the world around them
+	vec3 lightSum = lightColor * (attenuation * NL) + ambientColor;
+	vec3 lightCap = min(vec3(1.0), 1.0 / max(lightSum, vec3(0.001)));
+	lightColor *= lightCap;
+	ambientColor *= lightCap;
+  #endif
+
 	gl_FragColor.rgb  = lightColor   * reflectance * (attenuation * NL);
 	gl_FragColor.rgb += ambientColor * diffuse.rgb;
 
