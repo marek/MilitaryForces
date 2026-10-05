@@ -552,7 +552,6 @@ void CGame::registerSounds( ) {
 
 	if ( cgs.gametype >= GT_TEAM || cg_buildScript.integer ) {
 
-		cgs.media.captureAwardSound = SoundSystem::registerSound( "sound/teamplay/flagcapture_yourteam.wav", false );
 		cgs.media.redLeadsSound = SoundSystem::registerSound( "sound/feedback/redleads.wav", false );
 		cgs.media.blueLeadsSound = SoundSystem::registerSound( "sound/feedback/blueleads.wav", false );
 		cgs.media.teamsTiedSound = SoundSystem::registerSound( "sound/feedback/teamstied.wav", false );
@@ -567,9 +566,6 @@ void CGame::registerSounds( ) {
 		cgs.media.returnYourTeamSound = SoundSystem::registerSound( "sound/teamplay/flagreturn_yourteam.wav", false );
 		cgs.media.returnOpponentSound = SoundSystem::registerSound( "sound/teamplay/flagreturn_opponent.wav", false );
 
-		cgs.media.takenYourTeamSound = SoundSystem::registerSound( "sound/teamplay/flagtaken_yourteam.wav", false );
-		cgs.media.takenOpponentSound = SoundSystem::registerSound( "sound/teamplay/flagtaken_opponent.wav", false );
-
 		if ( cgs.gametype == GT_CTF || cg_buildScript.integer ) {
 			cgs.media.redFlagReturnedSound = SoundSystem::registerSound( "sound/teamplay/voc_red_returned.wav", false );
 			cgs.media.blueFlagReturnedSound = SoundSystem::registerSound( "sound/teamplay/voc_blue_returned.wav", false );
@@ -578,9 +574,6 @@ void CGame::registerSounds( ) {
 		}
 
 		cgs.media.youHaveFlagSound = SoundSystem::registerSound( "sound/teamplay/voc_you_flag.wav", false );
-		cgs.media.holyShitSound = SoundSystem::registerSound( "sound/feedback/voc_holyshit.wav", false);
-		cgs.media.yourTeamTookTheFlagSound = SoundSystem::registerSound( "sound/teamplay/voc_team_1flag.wav", false );
-		cgs.media.enemyTookTheFlagSound = SoundSystem::registerSound( "sound/teamplay/voc_enemy_1flag.wav", false );
 	}
 
 	cgs.media.respawnSound = SoundSystem::registerSound( "sound/items/respawn1.wav", false );
@@ -588,12 +581,6 @@ void CGame::registerSounds( ) {
 	cgs.media.talkSound = SoundSystem::registerSound( "sound/player/talk.wav", false );
 
 	cgs.media.hitSound = SoundSystem::registerSound( "sound/feedback/hit.wav", false );
-
-	cgs.media.impressiveSound = SoundSystem::registerSound( "sound/feedback/impressive.wav", false );
-	cgs.media.excellentSound = SoundSystem::registerSound( "sound/feedback/excellent.wav", false );
-	cgs.media.deniedSound = SoundSystem::registerSound( "sound/feedback/denied.wav", false );
-	cgs.media.assistSound = SoundSystem::registerSound( "sound/feedback/assist.wav", false );
-	cgs.media.defendSound = SoundSystem::registerSound( "sound/feedback/defense.wav", false );
 
 	cgs.media.takenLeadSound = SoundSystem::registerSound( "sound/feedback/takenlead.wav", false);
 	cgs.media.tiedLeadSound = SoundSystem::registerSound( "sound/feedback/tiedlead.wav", false);
@@ -883,9 +870,6 @@ void CGame::registerGraphics( ) {
 	cgs.media.smokePuffShader = refExport.RegisterShader( "smokePuff" );
 	cgs.media.smokePuffRageProShader = refExport.RegisterShader( "smokePuffRagePro" );
 	cgs.media.lagometerShader = refExport.RegisterShader( "lagometer" );
-	cgs.media.connectionShader = refExport.RegisterShader( "disconnected" );
-
-
 	// LQM gibs
 	cgs.media.gibAbdomen = refExport.RegisterModel( "models/gibs/abdomen.md3" );
 	cgs.media.gibArm = refExport.RegisterModel( "models/gibs/arm.md3" );
@@ -917,9 +901,6 @@ void CGame::registerGraphics( ) {
 	}
 
 	cgs.media.backTileShader = refExport.RegisterShader( "gfx/2d/backtile" );
-	cgs.media.noammoShader = refExport.RegisterShader( "icons/noammo" );
-
-
 	if ( cgs.gametype == GT_CTF || cg_buildScript.integer ) {
 		cgs.media.redFlagModel = refExport.RegisterModel( "models/flags/r_flag.md3" );
 		cgs.media.blueFlagModel = refExport.RegisterModel( "models/flags/b_flag.md3" );
@@ -932,11 +913,9 @@ void CGame::registerGraphics( ) {
 	}
 
 	if ( cgs.gametype >= GT_TEAM || cg_buildScript.integer ) {
-		cgs.media.friendShader = refExport.RegisterShader( "sprites/foe" );
 		cgs.media.teamStatusBar = refExport.RegisterShader( "gfx/2d/colorbar.tga" );
 	}
 
-	cgs.media.balloonShader = refExport.RegisterShader( "sprites/balloon3" );
 	cgs.media.particleShader = refExport.RegisterShader( "gfx/misc/particle.tga" );
 
 	// MFQ3 stuff
@@ -965,13 +944,6 @@ void CGame::registerGraphics( ) {
 	// end MFQ3
 
 	// MFQ3 HUD
-	cgs.media.HUDmain = refExport.RegisterShaderNoMip( "hud/main.tga" );
-	cgs.media.HUDradar = refExport.RegisterShaderNoMip( "hud/radar.tga" );
-	cgs.media.HUDgps = refExport.RegisterShaderNoMip( "hud/gps.tga" );
-	cgs.media.HUDext = refExport.RegisterShaderNoMip( "hud/side.tga" );
-	for( i = 0; i <= MF_THROTTLE_AFTERBURNER; i++ ) {
-		cgs.media.throttle[i] = refExport.RegisterShaderNoMip( va("hud/%i.tga",i));
-	}
 	for( i = 1; i < bg_numberOfWeapons; i++ ) {
 		availableWeapons[i].iconHandle = refExport.RegisterShaderNoMip( availableWeapons[i].iconName );
 		if( availableWeapons[i].modelName && strlen(availableWeapons[i].modelName) ) {

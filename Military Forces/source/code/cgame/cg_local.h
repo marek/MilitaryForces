@@ -749,19 +749,15 @@ struct cgMedia_t {
 
 	qhandle_t	teamStatusBar;
 
-	qhandle_t	friendShader;
 
-	qhandle_t	balloonShader;
 
 	qhandle_t	particleShader;
 
-	qhandle_t	connectionShader;
 
 	qhandle_t	selectShader;
 	qhandle_t	crosshairShader[NUM_CROSSHAIRS];
 	qhandle_t	lagometerShader;
 	qhandle_t	backTileShader;
-	qhandle_t	noammoShader;
 
 	qhandle_t	smokePuffShader;
 	qhandle_t	smokePuffRageProShader;
@@ -801,11 +797,6 @@ struct cgMedia_t {
 	qhandle_t	vehicleMuzzleFlashModel;
 
 	// MFQ3 HUD
-	qhandle_t	HUDmain;
-	qhandle_t	HUDradar;
-	qhandle_t	HUDgps;
-	qhandle_t	HUDext;
-	qhandle_t	throttle[MF_THROTTLE_AFTERBURNER+1];
 	qhandle_t	radarIcons[RD_MAX_ICONS];
 
 	// MFQ3 NEW HUD
@@ -890,11 +881,6 @@ struct cgMedia_t {
 
 	sfxHandle_t hitSound;
 	sfxHandle_t hitTeamSound;
-	sfxHandle_t impressiveSound;
-	sfxHandle_t excellentSound;
-	sfxHandle_t deniedSound;
-	sfxHandle_t assistSound;
-	sfxHandle_t defendSound;
 
 	sfxHandle_t takenLeadSound;
 	sfxHandle_t tiedLeadSound;
@@ -905,7 +891,6 @@ struct cgMedia_t {
 	sfxHandle_t watrUnSound;
 
 	// teamplay sounds
-	sfxHandle_t captureAwardSound;
 	sfxHandle_t redScoredSound;
 	sfxHandle_t blueScoredSound;
 	sfxHandle_t redLeadsSound;
@@ -916,17 +901,12 @@ struct cgMedia_t {
 	sfxHandle_t	captureOpponentSound;
 	sfxHandle_t	returnYourTeamSound;
 	sfxHandle_t	returnOpponentSound;
-	sfxHandle_t	takenYourTeamSound;
-	sfxHandle_t	takenOpponentSound;
 
 	sfxHandle_t redFlagReturnedSound;
 	sfxHandle_t blueFlagReturnedSound;
 	sfxHandle_t	enemyTookYourFlagSound;
-	sfxHandle_t	enemyTookTheFlagSound;
 	sfxHandle_t yourTeamTookEnemyFlagSound;
-	sfxHandle_t yourTeamTookTheFlagSound;
 	sfxHandle_t	youHaveFlagSound;
-	sfxHandle_t holyShitSound;
 
 	// tournament sounds
 	sfxHandle_t	count3Sound;
