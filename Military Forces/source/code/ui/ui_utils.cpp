@@ -3034,8 +3034,8 @@ UI_Utils::menu_TransitionItemByName(menuDef_t *menu, const char *p, rectDef_t re
 		{
 			item->window.flags |= (WINDOW_INTRANSITION | WINDOW_VISIBLE);
 			item->window.offsetTime = time;
-			memcpy(&item->window.rectClient, &rectFrom, sizeof(rectDef_t));
-			memcpy(&item->window.rectEffects, &rectTo, sizeof(rectDef_t));
+			item->window.rectClient = rectFrom;
+			item->window.rectEffects = rectTo;
 			item->window.rectEffects2.x = abs(rectTo.x - rectFrom.x) / amt;
 			item->window.rectEffects2.y = abs(rectTo.y - rectFrom.y) / amt;
 			item->window.rectEffects2.w = abs(rectTo.w - rectFrom.w) / amt;

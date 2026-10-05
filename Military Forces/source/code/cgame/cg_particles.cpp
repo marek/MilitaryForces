@@ -12,7 +12,7 @@ static void CG_EjectParticle(particleWorld_t * w, particleEmitter_t * e)
 	if(i >= MAX_WORLD_PARTICLES)
 		return;
 
-	memcpy(&w->particles[i], &e->particleTemplate, sizeof(particle_t));
+	w->particles[i] = e->particleTemplate;
 	
 	if(w->systems[e->parentSytem].cent != nullptr)
 	{
@@ -77,7 +77,7 @@ int CGame::addParticleEmitter(particleWorld_t * w, particleEmitter_t * e)
 	}
 	if(i >= MAX_WORLD_EMITTERS)
 		return -1;
-	memcpy(&w->emitters[i],e,sizeof(particleEmitter_t));
+	w->emitters[i] = *e;
 	w->emitters[i].dead = false;
 	w->emitters[i].birthtime = cg.time;
 	w->emitters[i].lastthink = 0;

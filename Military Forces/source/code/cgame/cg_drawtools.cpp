@@ -1057,7 +1057,7 @@ bool CGame::polyMeshGeneratedShadow( BasicDrawInfo_t *drawInfo, float *shadowPla
 		for( x = 0; x<4; x++ )
 		{
 			// copy vertex data into our temporary verts buffer
-			memcpy( &vertBuff[3], &verts[y][x], sizeof( polyVert_t ) );
+			vertBuff[3] = verts[y][x];
 			memcpy( &vertBuff[2], &verts[y][x+1], sizeof( polyVert_t ) );
 			memcpy( &vertBuff[1], &verts[y+1][x+1], sizeof( polyVert_t ) );
 			memcpy( &vertBuff[0], &verts[y+1][x], sizeof( polyVert_t ) );

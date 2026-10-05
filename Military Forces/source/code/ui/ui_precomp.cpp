@@ -848,7 +848,7 @@ UI_PrecompilerTools::scriptReadToken( Script* script, Token* token )
 	if (script->tokenavailable_)
 	{
 		script->tokenavailable_ = 0;
-		Com_Memcpy(token, &script->token_, sizeof(Token));
+		*token = script->token_;
 		return 1;
 	} //end if
 	//save script pointer
@@ -911,7 +911,7 @@ UI_PrecompilerTools::scriptReadToken( Script* script, Token* token )
 		return 0;
 	} //end if
 	//copy the token into the script structure
-	Com_Memcpy(&script->token_, token, sizeof(Token));
+	script->token_ = *token;
 	//succesfully read a token
 	return 1;
 }
@@ -1189,7 +1189,7 @@ UI_PrecompilerTools::scriptReadPrimitive( Script* script, Token* token )
 	} //end while
 	token->string_[len] = 0;
 	//copy the token into the script structure
-	Com_Memcpy(&script->token_, token, sizeof(Token));
+	script->token_ = *token;
 	//primitive reading successfull
 	return 1;
 }
@@ -1371,7 +1371,7 @@ UI_PrecompilerTools::readSourceToken( SourceFile* source, Token* token )
 		freeScript(script);
 	} //end while
 	//copy the already available token
-	Com_Memcpy(token, source->tokens_, sizeof(Token));
+	*token = *source->tokens_;
 	//free the read token
 	t = source->tokens_;
 	source->tokens_ = source->tokens_->next_;
@@ -1527,7 +1527,7 @@ UI_PrecompilerTools::readToken( SourceFile* source, Token* token )
 			} //end if
 		}
 		//copy token for unreading
-		Com_Memcpy(&source->token_, token, sizeof(Token));
+		source->token_ = *token;
 		//found a token
 		return true;
 	}
@@ -1544,7 +1544,7 @@ UI_PrecompilerTools::copyToken( Token* token )
 		Common::error(ERR_FATAL, "out of token space\n");
 		return nullptr;
 	}
-	Com_Memcpy(t, token, sizeof(Token));
+	*t = *token;
 	t->next_ = nullptr;
 	numTokens_++;
 	return t;

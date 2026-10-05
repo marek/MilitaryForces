@@ -56,7 +56,7 @@ bool VehicleData::distributeWeaponsOnPylons( int idx, completeLoadout_t* loadout
 	if( !num ) return false;
 
 	for( i = 0; i < num; ++i ) {
-		memcpy( &loadout->mounts[i].tag, &tags[i], sizeof(md3Tag_t) );
+		loadout->mounts[i].tag = tags[i];
 	}
 
 //#ifdef _DEBUG
@@ -155,7 +155,7 @@ void VehicleData::getDefaultLoadoutForVehicle( int idx, completeLoadout_t* loado
 		return;
 
 //	Common::printf("Getting default loadout for %s (%s)\n", availableVehicles[idx].descriptiveName, where );
-	memcpy( loadout, &availableLoadouts[idx], sizeof(completeLoadout_t) );
+	*loadout = availableLoadouts[idx];
 	if( ps )
 		for( i = 0; i < 32; ++i )
 			ps->numWeaponsOnMount[i] = loadout->mounts[i].num;

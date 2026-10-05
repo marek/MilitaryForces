@@ -151,10 +151,10 @@ animation_t * CGame::parseLQMAnimationFile( const char *filename ) {
 	}
 
 	// crouch backward animation
-	memcpy(&animations[LEGS_BACKCR], &animations[LEGS_WALKCR], sizeof(animation_t));
+	animations[LEGS_BACKCR] = animations[LEGS_WALKCR];
 	animations[LEGS_BACKCR].reversed = true;
 	// walk backward animation
-	memcpy(&animations[LEGS_BACKWALK], &animations[LEGS_WALK], sizeof(animation_t));
+	animations[LEGS_BACKWALK] = animations[LEGS_WALK];
 	animations[LEGS_BACKWALK].reversed = true;
 	// flag moving fast
 	animations[FLAG_RUN].firstFrame = 0;
