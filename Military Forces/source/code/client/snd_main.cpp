@@ -308,7 +308,7 @@ void SoundSystem::clearSoundBuffer( )
 S_SoundInfo
 =================
 */
-void S_SoundInfo( )
+static void S_SoundInfo( )
 {
 	if( si.SoundInfo ) {
 		si.SoundInfo( );
@@ -320,7 +320,7 @@ void S_SoundInfo( )
 S_SoundList
 =================
 */
-void S_SoundList( )
+static void S_SoundList( )
 {
 	if( si.SoundList ) {
 		si.SoundList( );
@@ -398,7 +398,7 @@ void SoundSystem::masterGain( float gain )
 S_Play_f
 =================
 */
-void S_Play_f( ) {
+static void S_Play_f( ) {
 	int 		i;
 	int			c;
 	sfxHandle_t	h;
@@ -428,7 +428,7 @@ void S_Play_f( ) {
 S_Music_f
 =================
 */
-void S_Music_f( ) {
+static void S_Music_f( ) {
 	int		c;
 
 	if( !si.StartBackgroundTrack ) {
@@ -453,7 +453,7 @@ void S_Music_f( ) {
 S_Music_f
 =================
 */
-void S_StopMusic_f( )
+static void S_StopMusic_f( )
 {
 	if(!si.StopBackgroundTrack)
 		return;

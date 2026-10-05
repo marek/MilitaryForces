@@ -54,7 +54,7 @@ snd_codec_t ogg_codec =
 // callbacks for vobisfile
 
 // fread() replacement
-size_t S_OGG_Callback_read(void *ptr, size_t size, size_t nmemb, void *datasource)
+static size_t S_OGG_Callback_read(void *ptr, size_t size, size_t nmemb, void *datasource)
 {
 	SoundStream *stream;
 	int byteSize = 0;
@@ -107,7 +107,7 @@ size_t S_OGG_Callback_read(void *ptr, size_t size, size_t nmemb, void *datasourc
 }
 
 // fseek() replacement
-int S_OGG_Callback_seek(void *datasource, ogg_int64_t offset, int whence)
+static int S_OGG_Callback_seek(void *datasource, ogg_int64_t offset, int whence)
 {
 	SoundStream *stream;
 	int retVal = 0;
@@ -189,14 +189,14 @@ int S_OGG_Callback_seek(void *datasource, ogg_int64_t offset, int whence)
 }
 
 // fclose() replacement
-int S_OGG_Callback_close(void *datasource)
+static int S_OGG_Callback_close(void *datasource)
 {
 	// we do nothing here and close all things manually in S_OGG_CodecCloseStream()
 	return 0;
 }
 
 // ftell() replacement
-long S_OGG_Callback_tell(void *datasource)
+static long S_OGG_Callback_tell(void *datasource)
 {
 	SoundStream   *stream;
 

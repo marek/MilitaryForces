@@ -28,7 +28,7 @@ CM_PointLeafnum_r
 
 ==================
 */
-int CM_PointLeafnum_r( const vec3_t p, int num ) {
+static int CM_PointLeafnum_r( const vec3_t p, int num ) {
 	float		d;
 	cNode_t		*node;
 	cplane_t	*plane;
@@ -70,7 +70,7 @@ LEAF LISTING
 */
 
 
-void CM_StoreLeafs( leafList_t *ll, int nodenum ) {
+void CollisionWork::storeLeafs( leafList_t *ll, int nodenum ) {
 	int		leafNum;
 
 	leafNum = -1 - nodenum;
@@ -87,7 +87,7 @@ void CM_StoreLeafs( leafList_t *ll, int nodenum ) {
 	ll->list[ ll->count++ ] = leafNum;
 }
 
-void CM_StoreBrushes( leafList_t *ll, int nodenum ) {
+void CollisionWork::storeBrushes( leafList_t *ll, int nodenum ) {
 	int			i, k;
 	int			leafnum;
 	int			brushnum;
@@ -137,7 +137,7 @@ CollisionModel::boxLeafnums
 Fills in a list of all the leafs touched
 =============
 */
-void CM_BoxLeafnums_r( leafList_t *ll, int nodenum ) {
+void CollisionWork::boxLeafnums_r( leafList_t *ll, int nodenum ) {
 	cplane_t	*plane;
 	cNode_t		*node;
 	int			s;
@@ -157,7 +157,7 @@ void CM_BoxLeafnums_r( leafList_t *ll, int nodenum ) {
 			nodenum = node->children[1];
 		} else {
 			// go down both
-			CM_BoxLeafnums_r( ll, node->children[0] );
+			CollisionWork::boxLeafnums_r( ll, node->children[0] );
 			nodenum = node->children[1];
 		}
 
@@ -179,11 +179,11 @@ int	CollisionModel::boxLeafnums( const vec3_t mins, const vec3_t maxs, int *list
 	ll.count = 0;
 	ll.maxcount = listsize;
 	ll.list = list;
-	ll.storeLeafs = CM_StoreLeafs;
+	ll.storeLeafs = CollisionWork::storeLeafs;
 	ll.lastLeaf = 0;
 	ll.overflowed = false;
 
-	CM_BoxLeafnums_r( &ll, 0 );
+	CollisionWork::boxLeafnums_r( &ll, 0 );
 
 	*lastLeaf = ll.lastLeaf;
 	return ll.count;
@@ -191,10 +191,10 @@ int	CollisionModel::boxLeafnums( const vec3_t mins, const vec3_t maxs, int *list
 
 /*
 ==================
-CM_BoxBrushes
+CollisionWork::boxBrushes
 ==================
 */
-int CM_BoxBrushes( const vec3_t mins, const vec3_t maxs, cbrush_t **list, int listsize ) {
+int CollisionWork::boxBrushes( const vec3_t mins, const vec3_t maxs, cbrush_t **list, int listsize ) {
 	leafList_t	ll;
 
 	cm.checkcount++;
@@ -204,11 +204,11 @@ int CM_BoxBrushes( const vec3_t mins, const vec3_t maxs, cbrush_t **list, int li
 	ll.count = 0;
 	ll.maxcount = listsize;
 	ll.list = static_cast<int *>((void *)list);
-	ll.storeLeafs = CM_StoreBrushes;
+	ll.storeLeafs = CollisionWork::storeBrushes;
 	ll.lastLeaf = 0;
 	ll.overflowed = false;
 	
-	CM_BoxLeafnums_r( &ll, 0 );
+	CollisionWork::boxLeafnums_r( &ll, 0 );
 
 	return ll.count;
 }
@@ -238,7 +238,7 @@ int CollisionModel::pointContents( const vec3_t p, clipHandle_t model ) {
 	}
 
 	if ( model ) {
-		clipm = CM_ClipHandleToModel( model );
+		clipm = CollisionWork::clipHandleToModel( model );
 		leaf = &clipm->leaf;
 	} else {
 		leafnum = CM_PointLeafnum_r (p, 0);
@@ -250,7 +250,7 @@ int CollisionModel::pointContents( const vec3_t p, clipHandle_t model ) {
 		brushnum = cm.leafbrushes[leaf->firstLeafBrush+k];
 		b = &cm.brushes[brushnum];
 
-		if ( !CM_BoundsIntersectPoint( b->bounds[0], b->bounds[1], p ) ) {
+		if ( !CollisionWork::boundsIntersectPoint( b->bounds[0], b->bounds[1], p ) ) {
 			continue;
 		}
 
@@ -331,7 +331,7 @@ AREAPORTALS
 ===============================================================================
 */
 
-void CM_FloodArea_r( int areaNum, int floodnum) {
+static void CM_FloodArea_r( int areaNum, int floodnum) {
 	int		i;
 	cArea_t *area;
 	int		*con;
@@ -356,11 +356,11 @@ void CM_FloodArea_r( int areaNum, int floodnum) {
 
 /*
 ====================
-CM_FloodAreaConnections
+CollisionWork::floodAreaConnections
 
 ====================
 */
-void	CM_FloodAreaConnections( ) {
+void	CollisionWork::floodAreaConnections( ) {
 	int		i;
 	cArea_t	*area;
 	int		floodnum;
@@ -406,7 +406,7 @@ void	CollisionModel::adjustAreaPortalState( int area1, int area2, bool open ) {
 		}
 	}
 
-	CM_FloodAreaConnections ();
+	CollisionWork::floodAreaConnections ();
 }
 
 /*
@@ -482,10 +482,10 @@ int CollisionModel::writeAreaBits (byte *buffer, int area)
 
 /*
 ====================
-CM_BoundsIntersect
+CollisionWork::boundsIntersect
 ====================
 */
-bool CM_BoundsIntersect( const vec3_t mins, const vec3_t maxs, const vec3_t mins2, const vec3_t maxs2 )
+bool CollisionWork::boundsIntersect( const vec3_t mins, const vec3_t maxs, const vec3_t mins2, const vec3_t maxs2 )
 {
 	if (maxs[0] < mins2[0] - SURFACE_CLIP_EPSILON ||
 		maxs[1] < mins2[1] - SURFACE_CLIP_EPSILON ||
@@ -502,10 +502,10 @@ bool CM_BoundsIntersect( const vec3_t mins, const vec3_t maxs, const vec3_t mins
 
 /*
 ====================
-CM_BoundsIntersectPoint
+CollisionWork::boundsIntersectPoint
 ====================
 */
-bool CM_BoundsIntersectPoint( const vec3_t mins, const vec3_t maxs, const vec3_t point )
+bool CollisionWork::boundsIntersectPoint( const vec3_t mins, const vec3_t maxs, const vec3_t point )
 {
 	if (maxs[0] < point[0] - SURFACE_CLIP_EPSILON ||
 		maxs[1] < point[1] - SURFACE_CLIP_EPSILON ||

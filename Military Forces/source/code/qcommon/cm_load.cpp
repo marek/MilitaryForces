@@ -72,8 +72,6 @@ cbrush_t	*box_brush;
 
 
 
-void	CM_InitBoxHull ();
-void	CM_FloodAreaConnections ();
 
 
 /*
@@ -214,7 +212,7 @@ CM_BoundBrush
 
 =================
 */
-void CM_BoundBrush( cbrush_t *b ) {
+static void CM_BoundBrush( cbrush_t *b ) {
 	b->bounds[0][0] = -b->sides[0].plane->dist;
 	b->bounds[1][0] = b->sides[1].plane->dist;
 
@@ -552,17 +550,17 @@ void CMod_LoadPatches( lump_t *surfs, lump_t *verts ) {
 		patch->surfaceFlags = cm.shaders[shaderNum].surfaceFlags;
 
 		// create the internal facet structure
-		patch->pc = CM_GeneratePatchCollide( width, height, points );
+		patch->pc = CollisionWork::generatePatchCollide( width, height, points );
 	}
 }
 
 //==================================================================
 
-unsigned CM_LumpChecksum(lump_t *lump) {
+static unsigned CM_LumpChecksum(lump_t *lump) {
 	return LittleLong (Com_BlockChecksum (cmod_base + lump->fileofs, lump->filelen));
 }
 
-unsigned CM_Checksum(dheader_t *header) {
+static unsigned CM_Checksum(dheader_t *header) {
 	unsigned checksums[16];
 	checksums[0] = CM_LumpChecksum(&header->lumps[LUMP_SHADERS]);
 	checksums[1] = CM_LumpChecksum(&header->lumps[LUMP_LEAFS]);
@@ -615,7 +613,7 @@ void CollisionModel::loadMap( const char *name, bool clientload, int *checksum )
 
 	// free old stuff
 	Com_Memset( &cm, 0, sizeof( cm ) );
-	CM_ClearLevelPatches();
+	CollisionWork::clearLevelPatches();
 
 	if ( !name[0] ) {
 		cm.numLeafs = 1;
@@ -671,9 +669,9 @@ void CollisionModel::loadMap( const char *name, bool clientload, int *checksum )
 	// we are NOT freeing the file, because it is cached for the ref
 	FileSystem::freeFile (buf.v);
 
-	CM_InitBoxHull ();
+	CollisionWork::initBoxHull ();
 
-	CM_FloodAreaConnections ();
+	CollisionWork::floodAreaConnections ();
 
 	// allow this to be cached if it is loaded by the server
 	if ( !clientload ) {
@@ -688,17 +686,17 @@ CollisionModel::clearMap
 */
 void CollisionModel::clearMap( ) {
 	Com_Memset( &cm, 0, sizeof( cm ) );
-	CM_ClearLevelPatches();
+	CollisionWork::clearLevelPatches();
 }
 
 /*
 ==================
-CM_ClipHandleToModel
+CollisionWork::clipHandleToModel
 ==================
 */
-cmodel_t	*CM_ClipHandleToModel( clipHandle_t handle ) {
+cmodel_t	*CollisionWork::clipHandleToModel( clipHandle_t handle ) {
 	if ( handle < 0 ) {
-		Common::error( ERR_DROP, "CM_ClipHandleToModel: bad handle %i", handle );
+		Common::error( ERR_DROP, "CollisionWork::clipHandleToModel: bad handle %i", handle );
 	}
 	if ( handle < cm.numSubModels ) {
 		return &cm.cmodels[handle];
@@ -707,10 +705,10 @@ cmodel_t	*CM_ClipHandleToModel( clipHandle_t handle ) {
 		return &box_model;
 	}
 	if ( handle < MAX_SUBMODELS ) {
-		Common::error( ERR_DROP, "CM_ClipHandleToModel: bad handle %i < %i < %i", 
+		Common::error( ERR_DROP, "CollisionWork::clipHandleToModel: bad handle %i < %i < %i", 
 			cm.numSubModels, handle, MAX_SUBMODELS );
 	}
-	Common::error( ERR_DROP, "CM_ClipHandleToModel: bad handle %i", handle + MAX_SUBMODELS );
+	Common::error( ERR_DROP, "CollisionWork::clipHandleToModel: bad handle %i", handle + MAX_SUBMODELS );
 
 	return nullptr;
 
@@ -759,13 +757,13 @@ int		CollisionModel::leafArea( int leafnum ) {
 
 /*
 ===================
-CM_InitBoxHull
+CollisionWork::initBoxHull
 
 Set up the planes and nodes so that the six floats of a bounding box
 can just be stored out and get a proper clipping hull structure.
 ===================
 */
-void CM_InitBoxHull ()
+void CollisionWork::initBoxHull ()
 {
 	int			i;
 	int			side;
@@ -855,7 +853,7 @@ CollisionModel::modelBounds
 void CollisionModel::modelBounds( clipHandle_t model, vec3_t mins, vec3_t maxs ) {
 	cmodel_t	*cmod;
 
-	cmod = CM_ClipHandleToModel( model );
+	cmod = CollisionWork::clipHandleToModel( model );
 	VectorCopy( cmod->mins, mins );
 	VectorCopy( cmod->maxs, maxs );
 }

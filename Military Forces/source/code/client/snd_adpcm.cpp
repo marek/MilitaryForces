@@ -53,7 +53,7 @@ static int stepsizeTable[89] = {
 };
 
    
-void S_AdpcmEncode( short indata[], char outdata[], int len, struct adpcm_state *state ) {
+static void S_AdpcmEncode( short indata[], char outdata[], int len, struct adpcm_state *state ) {
     short *inp;			/* Input buffer pointer */
     signed char *outp;		/* output buffer pointer */
     int val;			/* Current input sample value */

@@ -27,10 +27,10 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 This file does not reference any globals, and has these entry points:
 
-void CM_ClearLevelPatches( void );
-struct patchCollide_s	*CM_GeneratePatchCollide( int width, int height, const vec3_t *points );
-void CM_TraceThroughPatchCollide( traceWork_t *tw, const struct patchCollide_s *pc );
-bool CM_PositionTestInPatchCollide( traceWork_t *tw, const struct patchCollide_s *pc );
+void CollisionWork::clearLevelPatches( void );
+struct patchCollide_s	*CollisionWork::generatePatchCollide( int width, int height, const vec3_t *points );
+void CollisionWork::traceThroughPatchCollide( traceWork_t *tw, const struct patchCollide_s *pc );
+bool CollisionWork::positionTestInPatchCollide( traceWork_t *tw, const struct patchCollide_s *pc );
 void CollisionModel::drawDebugSurface( void (*drawPoly)(int color, int numPoints, flaot *points) );
 
 
@@ -50,10 +50,10 @@ static vec3_t		debugBlockPoints[4];
 
 /*
 =================
-CM_ClearLevelPatches
+CollisionWork::clearLevelPatches
 =================
 */
-void CM_ClearLevelPatches( ) {
+void CollisionWork::clearLevelPatches( ) {
 	debugPatchCollide = nullptr;
 	debugFacet = nullptr;
 }
@@ -387,7 +387,7 @@ static	facet_t			facets[MAX_FACETS];
 CM_PlaneEqual
 ==================
 */
-int CM_PlaneEqual(patchPlane_t *p, float plane[4], int *flipped) {
+static int CM_PlaneEqual(patchPlane_t *p, float plane[4], int *flipped) {
 	float invplane[4];
 
 	if (
@@ -421,7 +421,7 @@ int CM_PlaneEqual(patchPlane_t *p, float plane[4], int *flipped) {
 CM_SnapVector
 ==================
 */
-void CM_SnapVector(vec3_t normal) {
+static void CM_SnapVector(vec3_t normal) {
 	int		i;
 
 	for (i=0 ; i<3 ; i++)
@@ -446,7 +446,7 @@ void CM_SnapVector(vec3_t normal) {
 CM_FindPlane2
 ==================
 */
-int CM_FindPlane2(float plane[4], int *flipped) {
+static int CM_FindPlane2(float plane[4], int *flipped) {
 	int i;
 
 	// see if the points are close enough to an existing plane
@@ -782,7 +782,7 @@ static bool CM_ValidateFacet( facet_t *facet ) {
 CM_AddFacetBevels
 ==================
 */
-void CM_AddFacetBevels( facet_t *facet ) {
+static void CM_AddFacetBevels( facet_t *facet ) {
 
 	int i, j, k, l;
 	int axis, dir, flipped;
@@ -1124,7 +1124,7 @@ static void CM_PatchCollideFromGrid( cGrid_t *grid, patchCollide_t *pf ) {
 
 /*
 ===================
-CM_GeneratePatchCollide
+CollisionWork::generatePatchCollide
 
 Creates an internal structure that will be used to perform
 collision detection with a patch mesh.
@@ -1132,7 +1132,7 @@ collision detection with a patch mesh.
 Points is packed as concatenated rows.
 ===================
 */
-struct patchCollide_s	*CM_GeneratePatchCollide( int width, int height, vec3_t *points ) {
+struct patchCollide_s	*CollisionWork::generatePatchCollide( int width, int height, vec3_t *points ) {
 	patchCollide_t	*pf;
 	cGrid_t			grid;
 	int				i, j;
@@ -1215,7 +1215,7 @@ CM_TracePointThroughPatchCollide
   special case for point traces because the patch collide "brushes" have no volume
 ====================
 */
-void CM_TracePointThroughPatchCollide( traceWork_t *tw, const struct patchCollide_s *pc ) {
+static void CM_TracePointThroughPatchCollide( traceWork_t *tw, const struct patchCollide_s *pc ) {
 	bool	frontFacing[MAX_PATCH_PLANES];
 	float		intersection[MAX_PATCH_PLANES];
 	float		intersect;
@@ -1315,7 +1315,7 @@ void CM_TracePointThroughPatchCollide( traceWork_t *tw, const struct patchCollid
 CM_CheckFacetPlane
 ====================
 */
-int CM_CheckFacetPlane(float *plane, vec3_t start, vec3_t end, float *enterFrac, float *leaveFrac, int *hit) {
+static int CM_CheckFacetPlane(float *plane, vec3_t start, vec3_t end, float *enterFrac, float *leaveFrac, int *hit) {
 	float d1, d2, f;
 
 	*hit = false;
@@ -1358,10 +1358,10 @@ int CM_CheckFacetPlane(float *plane, vec3_t start, vec3_t end, float *enterFrac,
 
 /*
 ====================
-CM_TraceThroughPatchCollide
+CollisionWork::traceThroughPatchCollide
 ====================
 */
-void CM_TraceThroughPatchCollide( traceWork_t *tw, const struct patchCollide_s *pc ) {
+void CollisionWork::traceThroughPatchCollide( traceWork_t *tw, const struct patchCollide_s *pc ) {
 	int i, j, hit, hitnum;
 	float offset, enterFrac, leaveFrac, t;
 	patchPlane_t *pcPlanes;
@@ -1372,7 +1372,7 @@ void CM_TraceThroughPatchCollide( traceWork_t *tw, const struct patchCollide_s *
 	static cvar_t *cv;
 #endif //BSPC
 
-	if ( !CM_BoundsIntersect( tw->bounds[0], tw->bounds[1],
+	if ( !CollisionWork::boundsIntersect( tw->bounds[0], tw->bounds[1],
 				pc->bounds[0], pc->bounds[1] ) ) {
 		return;
 	}
@@ -1499,10 +1499,10 @@ POSITION TEST
 
 /*
 ====================
-CM_PositionTestInPatchCollide
+CollisionWork::positionTestInPatchCollide
 ====================
 */
-bool CM_PositionTestInPatchCollide( traceWork_t *tw, const struct patchCollide_s *pc ) {
+bool CollisionWork::positionTestInPatchCollide( traceWork_t *tw, const struct patchCollide_s *pc ) {
 	int i, j;
 	float offset, t;
 	patchPlane_t *pcPlanes;

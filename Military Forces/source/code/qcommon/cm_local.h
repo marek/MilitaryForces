@@ -184,22 +184,25 @@ struct leafList_s {
 using leafList_t = leafList_s;
 
 
-int CM_BoxBrushes( const vec3_t mins, const vec3_t maxs, cbrush_t **list, int listsize );
+// helpers the collision files share; their signatures use types only these files know
+class CollisionWork
+{
+public:
+	static int boxBrushes( const vec3_t mins, const vec3_t maxs, cbrush_t **list, int listsize );
+	static void storeLeafs( leafList_t *ll, int nodenum );
+	static void storeBrushes( leafList_t *ll, int nodenum );
+	static void boxLeafnums_r( leafList_t *ll, int nodenum );
+	static cmodel_t *clipHandleToModel( clipHandle_t handle );
+	static bool boundsIntersect( const vec3_t mins, const vec3_t maxs, const vec3_t mins2, const vec3_t maxs2 );
+	static bool boundsIntersectPoint( const vec3_t mins, const vec3_t maxs, const vec3_t point );
+	static void initBoxHull();
+	static void floodAreaConnections();
 
-void CM_StoreLeafs( leafList_t *ll, int nodenum );
-void CM_StoreBrushes( leafList_t *ll, int nodenum );
-
-void CM_BoxLeafnums_r( leafList_t *ll, int nodenum );
-
-cmodel_t	*CM_ClipHandleToModel( clipHandle_t handle );
-bool CM_BoundsIntersect( const vec3_t mins, const vec3_t maxs, const vec3_t mins2, const vec3_t maxs2 );
-bool CM_BoundsIntersectPoint( const vec3_t mins, const vec3_t maxs, const vec3_t point );
-
-// cm_patch.c
-
-struct patchCollide_s	*CM_GeneratePatchCollide( int width, int height, vec3_t *points );
-void CM_TraceThroughPatchCollide( traceWork_t *tw, const struct patchCollide_s *pc );
-bool CM_PositionTestInPatchCollide( traceWork_t *tw, const struct patchCollide_s *pc );
-void CM_ClearLevelPatches( );
+	// cm_patch.cpp
+	static struct patchCollide_s *generatePatchCollide( int width, int height, vec3_t *points );
+	static void traceThroughPatchCollide( traceWork_t *tw, const struct patchCollide_s *pc );
+	static bool positionTestInPatchCollide( traceWork_t *tw, const struct patchCollide_s *pc );
+	static void clearLevelPatches( );
+};
 
 #endif // __CM_LOCAL_H__
