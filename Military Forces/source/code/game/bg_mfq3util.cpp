@@ -372,7 +372,6 @@ void VehicleData::loadAllVehicleData()
 	int i, j, num;
 	char* modelbasename = nullptr;
 	char name[128];
-	fileHandle_t	f;
 	md3Tag_t tag;
 	float diff;
 	vec3_t max, min;
@@ -417,13 +416,11 @@ void VehicleData::loadAllVehicleData()
 			// gear
 			Com_sprintf( name, sizeof(name), "%s_gear.md3", modelbasename );
 
-			FileSystem::fOpenFileByMode(name, &f, FS_READ);
-
-			if(f &&  VehicleData::getNumberOfFrames( name, &num ) ) 
+			// only models that have the part file get the part
+			if( OpenFile( name, FS_READ ) && VehicleData::getNumberOfFrames( name, &num ) ) 
 			{
 				vec3_t min1, min2;
 
-				FileSystem::fCloseFile(f);
 				availableVehicles[i].maxGearFrame = num - 1;
 				
 				if(!availableVehicles[i].gearheight)
@@ -451,11 +448,8 @@ void VehicleData::loadAllVehicleData()
 			// bay
 			Com_sprintf( name, sizeof(name), "%s_bay.md3", modelbasename );
 
-			FileSystem::fOpenFileByMode(name, &f, FS_READ);
-
-			if(f && VehicleData::getNumberOfFrames( name, &num ) ) 
+			if( OpenFile( name, FS_READ ) && VehicleData::getNumberOfFrames( name, &num ) ) 
 			{
-				FileSystem::fCloseFile(f);
 				availableVehicles[i].maxBayFrame = num - 1;
 			}
 			else 
@@ -479,12 +473,9 @@ void VehicleData::loadAllVehicleData()
 			// gear
 			Com_sprintf( name, sizeof(name), "%s_gear.md3", modelbasename );
 
-			FileSystem::fOpenFileByMode(name, &f, FS_READ);
-
-			if(f &&  VehicleData::getNumberOfFrames( name, &num ) ) {
+			if( OpenFile( name, FS_READ ) && VehicleData::getNumberOfFrames( name, &num ) ) {
 				vec3_t min1, min2;
 
-				FileSystem::fCloseFile(f);
 				availableVehicles[i].maxGearFrame = num - 1;
 
 				
@@ -504,11 +495,8 @@ void VehicleData::loadAllVehicleData()
 			// bay
 			Com_sprintf( name, sizeof(name), "%s_bay.md3", modelbasename );
 
-			FileSystem::fOpenFileByMode(name, &f, FS_READ);
-
-			if(f && VehicleData::getNumberOfFrames( name, &num ) ) 
+			if( OpenFile( name, FS_READ ) && VehicleData::getNumberOfFrames( name, &num ) ) 
 			{
-				FileSystem::fCloseFile(f);
 				availableVehicles[i].maxBayFrame = num - 1;
 			}
 			else 
@@ -543,11 +531,8 @@ void VehicleData::loadAllVehicleData()
 			if(availableVehicles[i].wheels)
 			{
 				Com_sprintf( name, sizeof(name), "%s_w1.md3", modelbasename );
-				FileSystem::fOpenFileByMode(name, &f, FS_READ);
-				if(f)
+				if( OpenFile( name, FS_READ ) )
 				{
-					FileSystem::fCloseFile(f);
-		
 					VehicleData::findTag(name, "tag_wheel", &tag);
 					VehicleData::getDimensions( name, 0, &max, &min );
 					diff = max[2] - min[2];
