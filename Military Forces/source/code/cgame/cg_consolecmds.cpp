@@ -619,6 +619,69 @@ static void CG_DevVehicle_f( ) {
 	CvarSystem::set( "cg_nextVehicle", CGame::argv( 1 ) );
 }
 
+// "+hold <tap command> <hold command>" gives one key two jobs: a quick tap runs the first command, keeping the key
+// down runs the second. For example: bind r "+hold radarrange radar"
+namespace
+{
+	constexpr int holdTime = 350;		// msec a key stays down before it counts as held
+	struct HeldKey
+	{
+		int		key = 0;				// 0: slot free
+		int		downTime = 0;
+		bool	fired = false;
+		char	tap[128] = {};
+		char	hold[128] = {};
+	};
+	HeldKey heldKeys[8];
+}
+
+static void CG_HoldDown_f( ) {
+	if( CommandSystem::argc() < 4 ) {
+		Common::printf( "usage: bind <key> \"+hold <tap command> <hold command>\"\n" );
+		return;
+	}
+	const int key = atoi( CGame::argv(3) );
+	HeldKey* slot = nullptr;
+	for( HeldKey& held : heldKeys ) {
+		if( held.key == key ) {
+			return;						// key repeat while it is already down
+		}
+		if( !held.key && !slot ) {
+			slot = &held;
+		}
+	}
+	if( !slot ) {
+		return;
+	}
+	slot->key = key;
+	slot->downTime = cg.time;
+	slot->fired = false;
+	Q_strncpyz( slot->tap, CGame::argv(1), sizeof(slot->tap) );
+	Q_strncpyz( slot->hold, CGame::argv(2), sizeof(slot->hold) );
+}
+
+static void CG_HoldUp_f( ) {
+	const int key = atoi( CGame::argv(3) );
+	for( HeldKey& held : heldKeys ) {
+		if( held.key == key ) {
+			if( !held.fired ) {
+				CommandBuffer::addText( va( "%s\n", held.tap ) );
+			}
+			held.key = 0;
+		}
+	}
+}
+
+// called every frame: a key that has been down long enough runs its hold command once
+void CGame::runHeldKeys( ) {
+	for( HeldKey& held : heldKeys ) {
+		if( held.key && !held.fired && cg.time - held.downTime >= holdTime ) {
+			held.fired = true;
+			CommandBuffer::addText( va( "%s\n", held.hold ) );
+		}
+	}
+}
+
 static void CG_DevStatus_f( ) {
 	if( !cg.snap || !CvarSystem::variableIntegerValue( "sv_cheats" ) ) 
 		return;
@@ -668,6 +731,8 @@ static consoleCommand_t	commands[] = {
 	{ "+cameradown", CGame::cameraDown_f },
 	{ "-cameradown", CGame::adjustReset_f },
 	{ "radarrange", CGame::toggleRadarRange_f },
+	{ "+hold", CG_HoldDown_f },
+	{ "-hold", CG_HoldUp_f },
 	{ "mfd1_mode", CGame::set_MFD1_Mode_f },
 	{ "mfd2_mode", CGame::set_MFD2_Mode_f },
 	{ "mfd1_page", CGame::set_MFD1_Page_f },

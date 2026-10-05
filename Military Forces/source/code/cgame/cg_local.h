@@ -1795,6 +1795,7 @@ public:
 public:
 	static void toggleGps_f();
 	static void toggleRadarRange_f();
+	static void runHeldKeys();
 	static void set_MFD_Mode( int num );
 	static void set_MFD1_Mode_f();
 	static void set_MFD2_Mode_f();

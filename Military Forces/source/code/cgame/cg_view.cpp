@@ -733,6 +733,7 @@ void CGame::drawActiveFrame( int serverTime, stereoFrame_t stereoView, bool demo
 		}
 		cg.oldTime = cg.time;
 		CGame::addLagometerFrameInfo();
+		CGame::runHeldKeys();
 	}
 	if (cg_timescale.value != cg_timescaleFadeEnd.value) {
 		if (cg_timescale.value < cg_timescaleFadeEnd.value) {
