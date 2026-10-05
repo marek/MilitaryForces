@@ -1462,11 +1462,11 @@ static void S_AL_SrcUpdate( )
 			continue;
 
 		// Update source parameters
-		if((s_alGain->modified) || (s_volume->modified))
+		if((s_alGain->modified()) || (s_volume->modified()))
 			curSource->curGain = s_alGain->asFloat() * s_volume->asFloat();
-		if((s_alRolloff->modified) && (!curSource->local))
+		if((s_alRolloff->modified()) && (!curSource->local))
 			qalSourcef(curSource->alSource, AL_ROLLOFF_FACTOR, s_alRolloff->asFloat());
-		if(s_alMinDistance->modified)
+		if(s_alMinDistance->modified())
 			qalSourcef(curSource->alSource, AL_REFERENCE_DISTANCE, s_alMinDistance->asFloat());
 
 		if(curSource->isLooping)
@@ -2277,7 +2277,7 @@ static void S_AL_Update( )
 {
 	int i;
 
-	if(s_muted->modified)
+	if(s_muted->modified())
 	{
 		// muted state changed. Let S_AL_Gain turn up all sources again.
 		for(i = 0; i < srcCount; i++)
@@ -2286,7 +2286,7 @@ static void S_AL_Update( )
 				S_AL_Gain(srcList[i].alSource, srcList[i].scaleGain);
 		}
 		
-		s_muted->modified = false;
+		s_muted->setModified( false );
 	}
 
 	// Update SFX channels
@@ -2298,33 +2298,33 @@ static void S_AL_Update( )
 	S_AL_MusicUpdate();
 
 	// Doppler
-	if(s_doppler->modified)
+	if(s_doppler->modified())
 	{
-		s_alDopplerFactor->modified = true;
-		s_doppler->modified = false;
+		s_alDopplerFactor->setModified( true );
+		s_doppler->setModified( false );
 	}
 
 	// Doppler parameters
-	if(s_alDopplerFactor->modified)
+	if(s_alDopplerFactor->modified())
 	{
 		if(s_doppler->asInt())
 			qalDopplerFactor(s_alDopplerFactor->asFloat());
 		else
 			qalDopplerFactor(0.0f);
-		s_alDopplerFactor->modified = false;
+		s_alDopplerFactor->setModified( false );
 	}
-	if(s_alDopplerSpeed->modified)
+	if(s_alDopplerSpeed->modified())
 	{
 		qalSpeedOfSound(s_alDopplerSpeed->asFloat());
-		s_alDopplerSpeed->modified = false;
+		s_alDopplerSpeed->setModified( false );
 	}
 
 	// Clear the modified flags on the other cvars
-	s_alGain->modified = false;
-	s_volume->modified = false;
-	s_musicVolume->modified = false;
-	s_alMinDistance->modified = false;
-	s_alRolloff->modified = false;
+	s_alGain->setModified( false );
+	s_volume->setModified( false );
+	s_musicVolume->setModified( false );
+	s_alMinDistance->setModified( false );
+	s_alRolloff->setModified( false );
 }
 
 /*

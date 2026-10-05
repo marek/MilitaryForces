@@ -263,7 +263,7 @@ static void SV_BoundMaxClients( int minimum )
 	// get the current maxclients value
 	CvarSystem::get( "sv_maxclients", "8", 0 );
 
-	sv_maxclients->modified = false;
+	sv_maxclients->setModified( false );
 
 	if( sv_maxclients->asInt() < minimum ) 
 	{
@@ -423,7 +423,7 @@ void ServerMain::spawnServer( char *server, bool killBots )
 		SV_Startup();
 	} else {
 		// check for maxclients change
-		if ( sv_maxclients->modified ) {
+		if ( sv_maxclients->modified() ) {
 			ServerMain::changeMaxClients();
 		}
 	}
@@ -491,7 +491,7 @@ void ServerMain::spawnServer( char *server, bool killBots )
 	ServerMain::initGame();
 
 	// don't allow a map_restart if game is modified
-	sv_gametype->modified = false;
+	sv_gametype->setModified( false );
 
 	// run a few frames to allow everything to settle
 	for ( i = 0 ;i < 3 ; i++ ) 

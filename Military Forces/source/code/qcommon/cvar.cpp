@@ -86,8 +86,8 @@ cvar_t * CvarSystem::findVar( const char *var_name ) {
 
 	hash = generateHashValue(var_name);
 	
-	for (var=hashTable_[hash] ; var ; var=var->hashNext) {
-		if (!Q_stricmp(var_name, var->name)) {
+	for (var=hashTable_[hash] ; var ; var=var->hashNext_) {
+		if (!Q_stricmp(var_name, var->name_)) {
 			return var;
 		}
 	}
@@ -170,10 +170,10 @@ int CvarSystem::flags(const char *var_name)
 		return CVAR_NONEXISTENT;
 	else
 	{
-		if(var->modified)
-			return var->flags | CVAR_MODIFIED;
+		if(var->modified_)
+			return var->flags_ | CVAR_MODIFIED;
 		else
-			return var->flags;
+			return var->flags_;
 	}
 }
 
@@ -186,10 +186,10 @@ void CvarSystem::commandCompletion(void (*callback)(const char *s))
 {
 	cvar_t		*cvar;
 	
-	for(cvar = vars_; cvar; cvar = cvar->next)
+	for(cvar = vars_; cvar; cvar = cvar->next_)
 	{
-		if(cvar->name)
-			callback(cvar->name);
+		if(cvar->name_)
+			callback(cvar->name_);
 	}
 }
 
@@ -205,7 +205,7 @@ const char * CvarSystem::validate( cvar_t *var,
 	float valuef;
 	bool changed = false;
 
-	if( !var->validate )
+	if( !var->validate_ )
 		return value;
 
 	if( !value )
@@ -215,12 +215,12 @@ const char * CvarSystem::validate( cvar_t *var,
 	{
 		valuef = atof( value );
 
-		if( var->integral )
+		if( var->integral_ )
 		{
 			if( !Q_isintegral( valuef ) )
 			{
 				if( warn )
-					Common::printf( "WARNING: cvar '%s' must be integral", var->name );
+					Common::printf( "WARNING: cvar '%s' must be integral", var->name_ );
 
 				valuef = static_cast<int>(valuef);
 				changed = true;
@@ -230,46 +230,46 @@ const char * CvarSystem::validate( cvar_t *var,
 	else
 	{
 		if( warn )
-			Common::printf( "WARNING: cvar '%s' must be numeric", var->name );
+			Common::printf( "WARNING: cvar '%s' must be numeric", var->name_ );
 
-		valuef = atof( var->resetString );
+		valuef = atof( var->resetString_ );
 		changed = true;
 	}
 
-	if( valuef < var->min )
+	if( valuef < var->min_ )
 	{
 		if( warn )
 		{
 			if( changed )
 				Common::printf( " and is" );
 			else
-				Common::printf( "WARNING: cvar '%s'", var->name );
+				Common::printf( "WARNING: cvar '%s'", var->name_ );
 
-			if( Q_isintegral( var->min ) )
-				Common::printf( " out of range (min %d)", static_cast<int>(var->min) );
+			if( Q_isintegral( var->min_ ) )
+				Common::printf( " out of range (min %d)", static_cast<int>(var->min_) );
 			else
-				Common::printf( " out of range (min %f)", var->min );
+				Common::printf( " out of range (min %f)", var->min_ );
 		}
 
-		valuef = var->min;
+		valuef = var->min_;
 		changed = true;
 	}
-	else if( valuef > var->max )
+	else if( valuef > var->max_ )
 	{
 		if( warn )
 		{
 			if( changed )
 				Common::printf( " and is" );
 			else
-				Common::printf( "WARNING: cvar '%s'", var->name );
+				Common::printf( "WARNING: cvar '%s'", var->name_ );
 
-			if( Q_isintegral( var->max ) )
-				Common::printf( " out of range (max %d)", static_cast<int>(var->max) );
+			if( Q_isintegral( var->max_ ) )
+				Common::printf( " out of range (max %d)", static_cast<int>(var->max_) );
 			else
-				Common::printf( " out of range (max %f)", var->max );
+				Common::printf( " out of range (max %f)", var->max_ );
 		}
 
-		valuef = var->max;
+		valuef = var->max_;
 		changed = true;
 	}
 
@@ -333,12 +333,12 @@ cvar_t *CvarSystem::get( const char *var_name, const char *var_value, int flags 
 		var_value = validate(var, var_value, false);
 
 		// Make sure the game code cannot mark engine-added variables as gamecode vars
-		if(var->flags & CVAR_VM_CREATED)
+		if(var->flags_ & CVAR_VM_CREATED)
 		{
 			if(!(flags & CVAR_VM_CREATED))
-				var->flags &= ~CVAR_VM_CREATED;
+				var->flags_ &= ~CVAR_VM_CREATED;
 		}
-		else if (!(var->flags & CVAR_USER_CREATED))
+		else if (!(var->flags_ & CVAR_USER_CREATED))
 		{
 			if(flags & CVAR_VM_CREATED)
 				flags &= ~CVAR_VM_CREATED;
@@ -346,29 +346,29 @@ cvar_t *CvarSystem::get( const char *var_name, const char *var_value, int flags 
 
 		// if the C code is now specifying a variable that the user already
 		// set a value for, take the new value as the reset value
-		if(var->flags & CVAR_USER_CREATED)
+		if(var->flags_ & CVAR_USER_CREATED)
 		{
-			var->flags &= ~CVAR_USER_CREATED;
-			Zone::free( var->resetString );
-			var->resetString = CopyString( var_value );
+			var->flags_ &= ~CVAR_USER_CREATED;
+			Zone::free( var->resetString_ );
+			var->resetString_ = CopyString( var_value );
 
 			if(flags & CVAR_ROM)
 			{
 				// this variable was set by the user,
 				// so force it to value given by the engine.
 
-				if(var->latchedString)
-					Zone::free(var->latchedString);
+				if(var->latchedString_)
+					Zone::free(var->latchedString_);
 				
-				var->latchedString = CopyString(var_value);
+				var->latchedString_ = CopyString(var_value);
 			}
 		}
 		
 		// Make sure servers cannot mark engine-added variables as SERVER_CREATED
-		if(var->flags & CVAR_SERVER_CREATED)
+		if(var->flags_ & CVAR_SERVER_CREATED)
 		{
 			if(!(flags & CVAR_SERVER_CREATED))
-				var->flags &= ~CVAR_SERVER_CREATED;
+				var->flags_ &= ~CVAR_SERVER_CREATED;
 		}
 		else
 		{
@@ -376,23 +376,23 @@ cvar_t *CvarSystem::get( const char *var_name, const char *var_value, int flags 
 				flags &= ~CVAR_SERVER_CREATED;
 		}
 		
-		var->flags |= flags;
+		var->flags_ |= flags;
 
 		// only allow one non-empty reset string without a warning
-		if ( !var->resetString[0] ) {
+		if ( !var->resetString_[0] ) {
 			// we don't have a reset string yet
-			Zone::free( var->resetString );
-			var->resetString = CopyString( var_value );
-		} else if ( var_value[0] && strcmp( var->resetString, var_value ) ) {
+			Zone::free( var->resetString_ );
+			var->resetString_ = CopyString( var_value );
+		} else if ( var_value[0] && strcmp( var->resetString_, var_value ) ) {
 			Common::dPrintf( "Warning: cvar \"%s\" given initial values: \"%s\" and \"%s\"\n",
-				var_name, var->resetString, var_value );
+				var_name, var->resetString_, var_value );
 		}
 		// if we have a latched string, take that value now
-		if ( var->latchedString ) {
+		if ( var->latchedString_ ) {
 			char *s;
 
-			s = var->latchedString;
-			var->latchedString = nullptr;	// otherwise cvar_set2 would free it
+			s = var->latchedString_;
+			var->latchedString_ = nullptr;	// otherwise cvar_set2 would free it
 			CvarSystem::set2( var_name, s, true );
 			Zone::free( s );
 		}
@@ -411,7 +411,7 @@ cvar_t *CvarSystem::get( const char *var_name, const char *var_value, int flags 
 	// find a free cvar
 	for(index = 0; index < MAX_CVARS; index++)
 	{
-		if(!indexes_[index].name)
+		if(!indexes_[index].name_)
 			break;
 	}
 
@@ -428,36 +428,36 @@ cvar_t *CvarSystem::get( const char *var_name, const char *var_value, int flags 
 	if(index >= numIndexes_)
 		numIndexes_ = index + 1;
 		
-	var->name = CopyString (var_name);
+	var->name_ = CopyString (var_name);
 	var->string_ = CopyString (var_value);
-	var->modified = true;
-	var->modificationCount = 1;
+	var->modified_ = true;
+	var->modificationCount_ = 1;
 	var->value_ = atof (var->string_);
 	var->integer_ = atoi(var->string_);
-	var->resetString = CopyString( var_value );
-	var->validate = false;
-	var->description = nullptr;
+	var->resetString_ = CopyString( var_value );
+	var->validate_ = false;
+	var->description_ = nullptr;
 
 	// link the variable in
-	var->next = vars_;
+	var->next_ = vars_;
 	if(vars_)
-		vars_->prev = var;
+		vars_->prev_ = var;
 
-	var->prev = nullptr;
+	var->prev_ = nullptr;
 	vars_ = var;
 
-	var->flags = flags;
+	var->flags_ = flags;
 	// note what types of cvars have been modified (userinfo, archive, serverinfo, systeminfo)
-	modifiedFlags_ |= var->flags;
+	modifiedFlags_ |= var->flags_;
 
 	hash = generateHashValue(var_name);
-	var->hashIndex = hash;
+	var->hashIndex_ = hash;
 
-	var->hashNext = hashTable_[hash];
+	var->hashNext_ = hashTable_[hash];
 	if(hashTable_[hash])
-		hashTable_[hash]->hashPrev = var;
+		hashTable_[hash]->hashPrev_ = var;
 
-	var->hashPrev = nullptr;
+	var->hashPrev_ = nullptr;
 	hashTable_[hash] = var;
 
 	return var;
@@ -472,25 +472,25 @@ Prints the value, default, and latched string of the given variable
 */
 void CvarSystem::print( cvar_t *v ) {
 	Common::printf ("\"%s\" is:\"%s" S_COLOR_WHITE "\"",
-			v->name, v->string_ );
+			v->name_, v->string_ );
 
-	if ( !( v->flags & CVAR_ROM ) ) {
-		if ( !Q_stricmp( v->string_, v->resetString ) ) {
+	if ( !( v->flags_ & CVAR_ROM ) ) {
+		if ( !Q_stricmp( v->string_, v->resetString_ ) ) {
 			Common::printf (", the default" );
 		} else {
 			Common::printf (" default:\"%s" S_COLOR_WHITE "\"",
-					v->resetString );
+					v->resetString_ );
 		}
 	}
 
 	Common::printf ("\n");
 
-	if ( v->latchedString ) {
-		Common::printf( "latched: \"%s\"\n", v->latchedString );
+	if ( v->latchedString_ ) {
+		Common::printf( "latched: \"%s\"\n", v->latchedString_ );
 	}
 
-	if ( v->description ) {
-		Common::printf( "%s\n", v->description );
+	if ( v->description_ ) {
+		Common::printf( "%s\n", v->description_ );
 	}
 }
 
@@ -530,56 +530,56 @@ cvar_t *CvarSystem::set2( const char *var_name, const char *value, bool force ) 
 	}
 
 	if (!value ) {
-		value = var->resetString;
+		value = var->resetString_;
 	}
 
 	value = validate(var, value, true);
 
-	if((var->flags & CVAR_LATCH) && var->latchedString)
+	if((var->flags_ & CVAR_LATCH) && var->latchedString_)
 	{
 		if(!strcmp(value, var->string_))
 		{
-			Zone::free(var->latchedString);
-			var->latchedString = nullptr;
+			Zone::free(var->latchedString_);
+			var->latchedString_ = nullptr;
 			return var;
 		}
 
-		if(!strcmp(value, var->latchedString))
+		if(!strcmp(value, var->latchedString_))
 			return var;
 	}
 	else if(!strcmp(value, var->string_))
 		return var;
 
 	// note what types of cvars have been modified (userinfo, archive, serverinfo, systeminfo)
-	modifiedFlags_ |= var->flags;
+	modifiedFlags_ |= var->flags_;
 
 	if (!force)
 	{
-		if (var->flags & CVAR_ROM)
+		if (var->flags_ & CVAR_ROM)
 		{
 			Common::printf ("%s is read only.\n", var_name);
 			return var;
 		}
 
-		if (var->flags & CVAR_INIT)
+		if (var->flags_ & CVAR_INIT)
 		{
 			Common::printf ("%s is write protected.\n", var_name);
 			return var;
 		}
 
-		if ((var->flags & CVAR_CHEAT) && !cheats_->integer_)
+		if ((var->flags_ & CVAR_CHEAT) && !cheats_->integer_)
 		{
 			Common::printf ("%s is cheat protected.\n", var_name);
 			return var;
 		}
 		
-		if (var->flags & CVAR_LATCH)
+		if (var->flags_ & CVAR_LATCH)
 		{
-			if (var->latchedString)
+			if (var->latchedString_)
 			{
-				if (strcmp(value, var->latchedString) == 0)
+				if (strcmp(value, var->latchedString_) == 0)
 					return var;
-				Zone::free (var->latchedString);
+				Zone::free (var->latchedString_);
 			}
 			else
 			{
@@ -588,26 +588,26 @@ cvar_t *CvarSystem::set2( const char *var_name, const char *value, bool force ) 
 			}
 
 			Common::printf ("%s will be changed upon restarting.\n", var_name);
-			var->latchedString = CopyString(value);
-			var->modified = true;
-			var->modificationCount++;
+			var->latchedString_ = CopyString(value);
+			var->modified_ = true;
+			var->modificationCount_++;
 			return var;
 		}
 	}
 	else
 	{
-		if (var->latchedString)
+		if (var->latchedString_)
 		{
-			Zone::free (var->latchedString);
-			var->latchedString = nullptr;
+			Zone::free (var->latchedString_);
+			var->latchedString_ = nullptr;
 		}
 	}
 
 	if (!strcmp(value, var->string_))
 		return var;		// not changed
 
-	var->modified = true;
-	var->modificationCount++;
+	var->modified_ = true;
+	var->modificationCount_++;
 	
 	Zone::free (var->string_);	// free the old value string
 	
@@ -721,19 +721,19 @@ void CvarSystem::setCheatState()
 	cvar_t	*var;
 
 	// set all default vars to the safe value
-	for(var = vars_; var ; var = var->next)
+	for(var = vars_; var ; var = var->next_)
 	{
-		if(var->flags & CVAR_CHEAT)
+		if(var->flags_ & CVAR_CHEAT)
 		{
 			// the CVAR_LATCHED|CVAR_CHEAT vars might escape the reset here 
 			// because of a different var->latchedString
-			if (var->latchedString)
+			if (var->latchedString_)
 			{
-				Zone::free(var->latchedString);
-				var->latchedString = nullptr;
+				Zone::free(var->latchedString_);
+				var->latchedString_ = nullptr;
 			}
-			if (strcmp(var->resetString,var->string_))
-				CvarSystem::set(var->name, var->resetString);
+			if (strcmp(var->resetString_,var->string_))
+				CvarSystem::set(var->name_, var->resetString_);
 		}
 	}
 }
@@ -761,7 +761,7 @@ bool CvarSystem::command( ) {
 	}
 
 	// set the value if forcing isn't required
-	CvarSystem::set2 (v->name, CommandSystem::args(), false);
+	CvarSystem::set2 (v->name_, CommandSystem::args(), false);
 	return true;
 }
 
@@ -870,20 +870,20 @@ void CvarSystem::set_f( ) {
 	}
 	switch( cmd[3] ) {
 		case 'a':
-			if( !( v->flags & CVAR_ARCHIVE ) ) {
-				v->flags |= CVAR_ARCHIVE;
+			if( !( v->flags_ & CVAR_ARCHIVE ) ) {
+				v->flags_ |= CVAR_ARCHIVE;
 				modifiedFlags_ |= CVAR_ARCHIVE;
 			}
 			break;
 		case 'u':
-			if( !( v->flags & CVAR_USERINFO ) ) {
-				v->flags |= CVAR_USERINFO;
+			if( !( v->flags_ & CVAR_USERINFO ) ) {
+				v->flags_ |= CVAR_USERINFO;
 				modifiedFlags_ |= CVAR_USERINFO;
 			}
 			break;
 		case 's':
-			if( !( v->flags & CVAR_SERVERINFO ) ) {
-				v->flags |= CVAR_SERVERINFO;
+			if( !( v->flags_ & CVAR_SERVERINFO ) ) {
+				v->flags_ |= CVAR_SERVERINFO;
 				modifiedFlags_ |= CVAR_SERVERINFO;
 			}
 			break;
@@ -916,27 +916,27 @@ void CvarSystem::writeVariables(fileHandle_t f)
 	cvar_t	*var;
 	char	buffer[1024];
 
-	for (var = vars_; var; var = var->next)
+	for (var = vars_; var; var = var->next_)
 	{
-		if(!var->name || Q_stricmp( var->name, "cl_cdkey" ) == 0)
+		if(!var->name_ || Q_stricmp( var->name_, "cl_cdkey" ) == 0)
 			continue;
 
-		if( var->flags & CVAR_ARCHIVE ) {
+		if( var->flags_ & CVAR_ARCHIVE ) {
 			// write the latched value, even if it hasn't taken effect yet
-			if ( var->latchedString ) {
-				if( strlen( var->name ) + strlen( var->latchedString ) + 10 > sizeof( buffer ) ) {
+			if ( var->latchedString_ ) {
+				if( strlen( var->name_ ) + strlen( var->latchedString_ ) + 10 > sizeof( buffer ) ) {
 					Common::printf( S_COLOR_YELLOW "WARNING: value of variable "
-							"\"%s\" too long to write to file\n", var->name );
+							"\"%s\" too long to write to file\n", var->name_ );
 					continue;
 				}
-				Com_sprintf (buffer, sizeof(buffer), "seta %s \"%s\"\n", var->name, var->latchedString);
+				Com_sprintf (buffer, sizeof(buffer), "seta %s \"%s\"\n", var->name_, var->latchedString_);
 			} else {
-				if( strlen( var->name ) + strlen( var->string_ ) + 10 > sizeof( buffer ) ) {
+				if( strlen( var->name_ ) + strlen( var->string_ ) + 10 > sizeof( buffer ) ) {
 					Common::printf( S_COLOR_YELLOW "WARNING: value of variable "
-							"\"%s\" too long to write to file\n", var->name );
+							"\"%s\" too long to write to file\n", var->name_ );
 					continue;
 				}
-				Com_sprintf (buffer, sizeof(buffer), "seta %s \"%s\"\n", var->name, var->string_);
+				Com_sprintf (buffer, sizeof(buffer), "seta %s \"%s\"\n", var->name_, var->string_);
 			}
 			FileSystem::write( buffer, strlen( buffer ), f );
 		}
@@ -960,58 +960,58 @@ void CvarSystem::list_f( ) {
 	}
 
 	i = 0;
-	for (var = vars_ ; var ; var = var->next, i++)
+	for (var = vars_ ; var ; var = var->next_, i++)
 	{
-		if(!var->name || (match && !Common::filter(match, var->name, false)))
+		if(!var->name_ || (match && !Common::filter(match, var->name_, false)))
 			continue;
 
-		if (var->flags & CVAR_SERVERINFO) {
+		if (var->flags_ & CVAR_SERVERINFO) {
 			Common::printf("S");
 		} else {
 			Common::printf(" ");
 		}
-		if (var->flags & CVAR_SYSTEMINFO) {
+		if (var->flags_ & CVAR_SYSTEMINFO) {
 			Common::printf("s");
 		} else {
 			Common::printf(" ");
 		}
-		if (var->flags & CVAR_USERINFO) {
+		if (var->flags_ & CVAR_USERINFO) {
 			Common::printf("U");
 		} else {
 			Common::printf(" ");
 		}
-		if (var->flags & CVAR_ROM) {
+		if (var->flags_ & CVAR_ROM) {
 			Common::printf("R");
 		} else {
 			Common::printf(" ");
 		}
-		if (var->flags & CVAR_INIT) {
+		if (var->flags_ & CVAR_INIT) {
 			Common::printf("I");
 		} else {
 			Common::printf(" ");
 		}
-		if (var->flags & CVAR_ARCHIVE) {
+		if (var->flags_ & CVAR_ARCHIVE) {
 			Common::printf("A");
 		} else {
 			Common::printf(" ");
 		}
-		if (var->flags & CVAR_LATCH) {
+		if (var->flags_ & CVAR_LATCH) {
 			Common::printf("L");
 		} else {
 			Common::printf(" ");
 		}
-		if (var->flags & CVAR_CHEAT) {
+		if (var->flags_ & CVAR_CHEAT) {
 			Common::printf("C");
 		} else {
 			Common::printf(" ");
 		}
-		if (var->flags & CVAR_USER_CREATED) {
+		if (var->flags_ & CVAR_USER_CREATED) {
 			Common::printf("?");
 		} else {
 			Common::printf(" ");
 		}
 
-		Common::printf (" %s \"%s\"\n", var->name, var->string_);
+		Common::printf (" %s \"%s\"\n", var->name_, var->string_);
 	}
 
 	Common::printf ("\n%i total cvars\n", i);
@@ -1036,67 +1036,67 @@ void CvarSystem::listModified_f( ) {
 	}
 
 	totalModified = 0;
-	for (var = vars_ ; var ; var = var->next)
+	for (var = vars_ ; var ; var = var->next_)
 	{
-		if ( !var->name || !var->modificationCount )
+		if ( !var->name_ || !var->modificationCount_ )
 			continue;
 
-		value = var->latchedString ? var->latchedString : var->string_;
-		if ( !strcmp( value, var->resetString ) )
+		value = var->latchedString_ ? var->latchedString_ : var->string_;
+		if ( !strcmp( value, var->resetString_ ) )
 			continue;
 
 		totalModified++;
 
-		if (match && !Common::filter(match, var->name, false))
+		if (match && !Common::filter(match, var->name_, false))
 			continue;
 
-		if (var->flags & CVAR_SERVERINFO) {
+		if (var->flags_ & CVAR_SERVERINFO) {
 			Common::printf("S");
 		} else {
 			Common::printf(" ");
 		}
-		if (var->flags & CVAR_SYSTEMINFO) {
+		if (var->flags_ & CVAR_SYSTEMINFO) {
 			Common::printf("s");
 		} else {
 			Common::printf(" ");
 		}
-		if (var->flags & CVAR_USERINFO) {
+		if (var->flags_ & CVAR_USERINFO) {
 			Common::printf("U");
 		} else {
 			Common::printf(" ");
 		}
-		if (var->flags & CVAR_ROM) {
+		if (var->flags_ & CVAR_ROM) {
 			Common::printf("R");
 		} else {
 			Common::printf(" ");
 		}
-		if (var->flags & CVAR_INIT) {
+		if (var->flags_ & CVAR_INIT) {
 			Common::printf("I");
 		} else {
 			Common::printf(" ");
 		}
-		if (var->flags & CVAR_ARCHIVE) {
+		if (var->flags_ & CVAR_ARCHIVE) {
 			Common::printf("A");
 		} else {
 			Common::printf(" ");
 		}
-		if (var->flags & CVAR_LATCH) {
+		if (var->flags_ & CVAR_LATCH) {
 			Common::printf("L");
 		} else {
 			Common::printf(" ");
 		}
-		if (var->flags & CVAR_CHEAT) {
+		if (var->flags_ & CVAR_CHEAT) {
 			Common::printf("C");
 		} else {
 			Common::printf(" ");
 		}
-		if (var->flags & CVAR_USER_CREATED) {
+		if (var->flags_ & CVAR_USER_CREATED) {
 			Common::printf("?");
 		} else {
 			Common::printf(" ");
 		}
 
-		Common::printf (" %s \"%s\", default \"%s\"\n", var->name, value, var->resetString);
+		Common::printf (" %s \"%s\", default \"%s\"\n", var->name_, value, var->resetString_);
 	}
 
 	Common::printf ("\n%i total modified cvars\n", totalModified);
@@ -1112,35 +1112,35 @@ Unsets a cvar
 
 cvar_t *CvarSystem::unset(cvar_t *cv)
 {
-	cvar_t *next = cv->next;
+	cvar_t *next = cv->next_;
 
 	// note what types of cvars have been modified (userinfo, archive, serverinfo, systeminfo)
-	modifiedFlags_ |= cv->flags;
+	modifiedFlags_ |= cv->flags_;
 
-	if(cv->name)
-		Zone::free(cv->name);
+	if(cv->name_)
+		Zone::free(cv->name_);
 	if(cv->string_)
 		Zone::free(cv->string_);
-	if(cv->latchedString)
-		Zone::free(cv->latchedString);
-	if(cv->resetString)
-		Zone::free(cv->resetString);
-	if(cv->description)
-		Zone::free(cv->description);
+	if(cv->latchedString_)
+		Zone::free(cv->latchedString_);
+	if(cv->resetString_)
+		Zone::free(cv->resetString_);
+	if(cv->description_)
+		Zone::free(cv->description_);
 
-	if(cv->prev)
-		cv->prev->next = cv->next;
+	if(cv->prev_)
+		cv->prev_->next_ = cv->next_;
 	else
-		vars_ = cv->next;
-	if(cv->next)
-		cv->next->prev = cv->prev;
+		vars_ = cv->next_;
+	if(cv->next_)
+		cv->next_->prev_ = cv->prev_;
 
-	if(cv->hashPrev)
-		cv->hashPrev->hashNext = cv->hashNext;
+	if(cv->hashPrev_)
+		cv->hashPrev_->hashNext_ = cv->hashNext_;
 	else
-		hashTable_[cv->hashIndex] = cv->hashNext;
-	if(cv->hashNext)
-		cv->hashNext->hashPrev = cv->hashPrev;
+		hashTable_[cv->hashIndex_] = cv->hashNext_;
+	if(cv->hashNext_)
+		cv->hashNext_->hashPrev_ = cv->hashPrev_;
 
 	Com_Memset(cv, '\0', sizeof(*cv));
 	
@@ -1170,10 +1170,10 @@ void CvarSystem::unset_f()
 	if(!cv)
 		return;
 	
-	if(cv->flags & CVAR_USER_CREATED)
+	if(cv->flags_ & CVAR_USER_CREATED)
 		CvarSystem::unset(cv);
 	else
-		Common::printf("Error: %s: Variable %s is not user created.\n", CommandSystem::argv(0), cv->name);
+		Common::printf("Error: %s: Variable %s is not user created.\n", CommandSystem::argv(0), cv->name_);
 }
 
 
@@ -1195,21 +1195,21 @@ void CvarSystem::restart(bool unsetVM)
 
 	while(curvar)
 	{
-		if((curvar->flags & CVAR_USER_CREATED) ||
-			(unsetVM && (curvar->flags & CVAR_VM_CREATED)))
+		if((curvar->flags_ & CVAR_USER_CREATED) ||
+			(unsetVM && (curvar->flags_ & CVAR_VM_CREATED)))
 		{
 			// throw out any variables the user/vm created
 			curvar = CvarSystem::unset(curvar);
 			continue;
 		}
 		
-		if(!(curvar->flags & (CVAR_ROM | CVAR_INIT | CVAR_NORESTART)))
+		if(!(curvar->flags_ & (CVAR_ROM | CVAR_INIT | CVAR_NORESTART)))
 		{
 			// Just reset the rest to their default values.
-			CvarSystem::set2(curvar->name, curvar->resetString, false);
+			CvarSystem::set2(curvar->name_, curvar->resetString_, false);
 		}
 		
-		curvar = curvar->next;
+		curvar = curvar->next_;
 	}
 }
 
@@ -1238,10 +1238,10 @@ char *CvarSystem::infoString(int bit)
 
 	info[0] = 0;
 
-	for(var = vars_; var; var = var->next)
+	for(var = vars_; var; var = var->next_)
 	{
-		if(var->name && (var->flags & bit))
-			Info::setValueForKey (info, var->name, var->string_);
+		if(var->name_ && (var->flags_ & bit))
+			Info::setValueForKey (info, var->name_, var->string_);
 	}
 
 	return info;
@@ -1261,10 +1261,10 @@ char *CvarSystem::infoString_Big(int bit)
 
 	info[0] = 0;
 
-	for (var = vars_; var; var = var->next)
+	for (var = vars_; var; var = var->next_)
 	{
-		if(var->name && (var->flags & bit))
-			Info::setValueForKey_Big (info, var->name, var->string_);
+		if(var->name_ && (var->flags_ & bit))
+			Info::setValueForKey_Big (info, var->name_, var->string_);
 	}
 	return info;
 }
@@ -1287,13 +1287,13 @@ CvarSystem::checkRange
 */
 void CvarSystem::checkRange( cvar_t *var, float min, float max, bool integral )
 {
-	var->validate = true;
-	var->min = min;
-	var->max = max;
-	var->integral = integral;
+	var->validate_ = true;
+	var->min_ = min;
+	var->max_ = max;
+	var->integral_ = integral;
 
 	// Force an initial range check
-	CvarSystem::set( var->name, var->string_ );
+	CvarSystem::set( var->name_, var->string_ );
 }
 
 /*
@@ -1305,11 +1305,11 @@ void CvarSystem::setDescription( cvar_t *var, const char *var_description )
 {
 	if( var_description && var_description[0] != '\0' )
 	{
-		if( var->description != nullptr )
+		if( var->description_ != nullptr )
 		{
-			Zone::free( var->description );
+			Zone::free( var->description_ );
 		}
-		var->description = CopyString( var_description );
+		var->description_ = CopyString( var_description );
 	}
 }
 
@@ -1359,9 +1359,9 @@ void CvarSystem::register_(vmCvar_t *vmCvar, const char *varName, const char *de
 	cv = findVar(varName);
 
 	// Don't modify cvar if it's protected.
-	if ( cv && ( cv->flags & CVAR_PROTECTED ) ) {
+	if ( cv && ( cv->flags_ & CVAR_PROTECTED ) ) {
 		Common::dPrintf( S_COLOR_YELLOW "WARNING: VM tried to register protected cvar '%s' with value '%s'%s\n",
-			varName, defaultValue, ( flags & ~cv->flags ) != 0 ? " and new flags" : "" );
+			varName, defaultValue, ( flags & ~cv->flags_ ) != 0 ? " and new flags" : "" );
 	} else {
 		cv = CvarSystem::get(varName, defaultValue, flags | CVAR_VM_CREATED);
 	}
@@ -1392,13 +1392,13 @@ void	CvarSystem::update( vmCvar_t *vmCvar ) {
 
 	cv = indexes_ + vmCvar->handle;
 
-	if ( cv->modificationCount == vmCvar->modificationCount ) {
+	if ( cv->modificationCount_ == vmCvar->modificationCount ) {
 		return;
 	}
 	if ( !cv->string_ ) {
 		return;		// variable might have been cleared by a cvar_restart
 	}
-	vmCvar->modificationCount = cv->modificationCount;
+	vmCvar->modificationCount = cv->modificationCount_;
 	if ( strlen(cv->string_)+1 > MAX_CVAR_VALUE_STRING ) 
 	  Common::error( ERR_DROP, "CvarSystem::update: src %s length %u exceeds MAX_CVAR_VALUE_STRING",
 		     cv->string_, 

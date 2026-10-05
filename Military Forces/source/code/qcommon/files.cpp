@@ -778,7 +778,7 @@ long FileSystem::baseDir_FOpenFileRead(const char *filename, fileHandle_t *fp)
 
 		if ( fs_debug->asInt() )
 		{
-			Common::printf( "FileSystem::baseDir_FOpenFileRead (%s): %s\n", pathVar->name, ospath );
+			Common::printf( "FileSystem::baseDir_FOpenFileRead (%s): %s\n", pathVar->name(), ospath );
 		}
 
 		fsh[f].handleFiles.file.o = System::fileOpen( ospath, "rb" );
@@ -3353,7 +3353,7 @@ void FileSystem::startup( const char *gameName )
 	// print the current search paths
 	FS_Path_f();
 
-	fs_gamedirvar->modified = false; // We just loaded, it's not modified
+	fs_gamedirvar->setModified( false ); // We just loaded, it's not modified
 
 	Common::printf( "----------------------\n" );
 
@@ -4120,7 +4120,7 @@ Return true if restarting due to game directory changed, false otherwise
 */
 bool FileSystem::conditionalRestart(int checksumFeed, bool disconnect)
 {
-	if(fs_gamedirvar->modified)
+	if(fs_gamedirvar->modified())
 	{
 		if(FileSystem::filenameCompare(lastValidGame, fs_gamedirvar->asString()) &&
 				(*lastValidGame || FileSystem::filenameCompare(fs_gamedirvar->asString(), com_basegame->asString())) &&
@@ -4130,7 +4130,7 @@ bool FileSystem::conditionalRestart(int checksumFeed, bool disconnect)
 			return true;
 		}
 		else
-			fs_gamedirvar->modified = false;
+			fs_gamedirvar->setModified( false );
 	}
 
 	if(checksumFeed != fs_checksumFeed)

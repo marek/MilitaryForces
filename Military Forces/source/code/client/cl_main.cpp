@@ -418,7 +418,7 @@ void Client::captureVoip()
 	//  This might work on rates lower than 25000, but for safety's sake, we'll
 	//  just demand it. Who doesn't have at least a DSL line now, anyhow? If
 	//  you don't, you don't need VoIP.  :)
-	if (cl_voip->modified || cl_rate->modified) {
+	if (cl_voip->modified() || cl_rate->modified()) {
 		if ((cl_voip->asInt()) && (cl_rate->asInt() < 25000)) {
 			Common::printf(S_COLOR_YELLOW "Your network rate is too slow for VoIP.\n");
 			Common::printf("Set 'Data Rate' to 'LAN/Cable/xDSL' in 'Setup/System/Network'.\n");
@@ -426,8 +426,8 @@ void Client::captureVoip()
 			CvarSystem::set("cl_voip", "0");
 		}
 		CvarSystem::set("cl_voipProtocol", cl_voip->asInt() ? "opus" : "");
-		cl_voip->modified = false;
-		cl_rate->modified = false;
+		cl_voip->setModified( false );
+		cl_rate->setModified( false );
 	}
 
 	if (!clc.voipCodecInitialized)
@@ -436,15 +436,15 @@ void Client::captureVoip()
 	if (clc.voipOutgoingDataSize > 0)
 		return;  // packet is pending transmission, don't record more yet.
 
-	if (cl_voipUseVAD->modified) {
+	if (cl_voipUseVAD->modified()) {
 		CvarSystem::set("cl_voipSend", (useVad) ? "1" : "0");
-		cl_voipUseVAD->modified = false;
+		cl_voipUseVAD->setModified( false );
 	}
 
 	if ((useVad) && (!cl_voipSend->asInt()))
 		CvarSystem::set("cl_voipSend", "1");  // lots of things reset this.
 
-	if (cl_voipSend->modified) {
+	if (cl_voipSend->modified()) {
 		bool dontCapture = false;
 		if (clc.state != CA_ACTIVE)
 			dontCapture = true;  // not connected to a server.
@@ -457,7 +457,7 @@ void Client::captureVoip()
 		else if ( audioMult == 0.0f )
 			dontCapture = true;  // basically silenced incoming audio.
 
-		cl_voipSend->modified = false;
+		cl_voipSend->setModified( false );
 
 		if(dontCapture)
 		{
@@ -2922,10 +2922,10 @@ Check whether client has been paused.
 */
 bool Client::checkPaused()
 {
-	// if cl_paused->modified is set, the cvar has only been changed in
+	// if cl_paused->modified() is set, the cvar has only been changed in
 	// this frame. Keep paused in this frame to ensure the server doesn't
 	// lag behind.
-	if(cl_paused->asInt() || cl_paused->modified)
+	if(cl_paused->asInt() || cl_paused->modified())
 		return true;
 	
 	return false;
@@ -3259,12 +3259,12 @@ void ClientLoop::initRenderer( ) {
 
 	Com_sprintf(dllName, sizeof(dllName), "renderer_%s" DLL_EXT, cl_renderer->asString());
 
-	if(!(rendererLib = Sys_LoadDll(dllName, false)) && strcmp(cl_renderer->asString(), cl_renderer->resetString))
+	if(!(rendererLib = Sys_LoadDll(dllName, false)) && strcmp(cl_renderer->asString(), cl_renderer->resetString()))
 	{
 		Common::printf("failed:\n\"%s\"\n", Sys_LibraryError());
 		CvarSystem::forceReset("cl_renderer");
 
-		Com_sprintf(dllName, sizeof(dllName), "renderer_%s" DLL_EXT, cl_renderer->resetString);
+		Com_sprintf(dllName, sizeof(dllName), "renderer_%s" DLL_EXT, cl_renderer->resetString());
 		rendererLib = Sys_LoadDll(dllName, false);
 	}
 

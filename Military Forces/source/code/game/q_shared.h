@@ -972,7 +972,7 @@ inline constexpr int CVAR_MODIFIED = 0x40000000; // Cvar was modified
 inline constexpr unsigned int CVAR_NONEXISTENT = 0x80000000; // Cvar doesn't exist.
 
 // a console variable. Its value is read through asInt(), asFloat(), asBool() and asString(); only the cvar system
-// writes it (the rest of the fields are still plain data).
+// writes it.
 class Cvar;
 using cvar_t = Cvar;
 
@@ -985,29 +985,37 @@ public:
 	// changes the number only, not the string, for code that masks a setting for a moment
 	void		overrideInt( int value ) { integer_ = value; }
 
-	char			*name;
-	char			*resetString;		// cvar_restart will reset to this value
-	char			*latchedString;		// for CVAR_LATCH vars
-	int				flags;
-	bool	modified;			// set each time the cvar is changed
-	int				modificationCount;	// incremented each time the cvar is changed
-	bool	validate;
-	bool	integral;
-	float			min;
-	float			max;
-	char			*description;
-
-	cvar_t *next;
-	cvar_t *prev;
-	cvar_t *hashNext;
-	cvar_t *hashPrev;
-	int			hashIndex;
+	const char	*name() const { return name_; }
+	const char	*resetString() const { return resetString_; }
+	const char	*latchedString() const { return latchedString_; }	// null unless a latched change is waiting
+	int			flags() const { return flags_; }
+	// set each time the value changes; whoever acts on a change clears it
+	bool		modified() const { return modified_; }
+	void		setModified( bool modified ) { modified_ = modified; }
+	int			modificationCount() const { return modificationCount_; }
 
 private:
 	friend class CvarSystem;
+	char			*name_;
 	char			*string_;
+	char			*resetString_;		// cvar_restart will reset to this value
+	char			*latchedString_;		// for CVAR_LATCH vars
+	int				flags_;
+	bool			modified_;			// set each time the cvar is changed
+	int				modificationCount_;	// incremented each time the cvar is changed
 	float			value_;
 	int				integer_;
+	bool			validate_;
+	bool			integral_;
+	float			min_;
+	float			max_;
+	char			*description_;
+
+	cvar_t *next_;
+	cvar_t *prev_;
+	cvar_t *hashNext_;
+	cvar_t *hashPrev_;
+	int			hashIndex_;
 };
 
 inline constexpr int MAX_CVAR_VALUE_STRING = 256;

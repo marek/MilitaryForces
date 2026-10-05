@@ -235,7 +235,7 @@ void SoundSystem::update( )
 		   !(s_muteWhenUnfocused->asInt() && com_unfocused->asInt()))
 		{
 			s_muted->overrideInt( false );
-			s_muted->modified = true;
+			s_muted->setModified( true );
 		}
 	}
 	else
@@ -244,7 +244,7 @@ void SoundSystem::update( )
 		   (s_muteWhenUnfocused->asInt() && com_unfocused->asInt()))
 		{
 			s_muted->overrideInt( true );
-			s_muted->modified = true;
+			s_muted->setModified( true );
 		}
 	}
 	

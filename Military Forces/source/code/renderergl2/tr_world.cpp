@@ -678,7 +678,7 @@ static void R_MarkLeaves () {
 	{
 		// if the areamask or r_showcluster was modified, invalidate all visclusters
 		// this caused doors to open into undrawn areas
-		if (tr.refdef.areamaskModified || r_showcluster->modified)
+		if (tr.refdef.areamaskModified || r_showcluster->modified())
 		{
 			tr.visClusters[i] = -2;
 		}
@@ -697,8 +697,8 @@ static void R_MarkLeaves () {
 	tr.visCounts[tr.visIndex]++;
 	tr.visClusters[tr.visIndex] = cluster;
 
-	if ( r_showcluster->modified || r_showcluster->asInt() ) {
-		r_showcluster->modified = false;
+	if ( r_showcluster->modified() || r_showcluster->asInt() ) {
+		r_showcluster->setModified( false );
 		if ( r_showcluster->asInt() ) {
 			ri.Printf( PRINT_ALL, "cluster:%i  area:%i\n", cluster, leaf->area );
 		}

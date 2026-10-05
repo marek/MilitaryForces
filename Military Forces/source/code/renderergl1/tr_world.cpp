@@ -585,12 +585,12 @@ static void R_MarkLeaves () {
 
 	// if r_showcluster was just turned on, remark everything 
 	if ( tr.viewCluster == cluster && !tr.refdef.areamaskModified 
-		&& !r_showcluster->modified ) {
+		&& !r_showcluster->modified() ) {
 		return;
 	}
 
-	if ( r_showcluster->modified || r_showcluster->asInt() ) {
-		r_showcluster->modified = false;
+	if ( r_showcluster->modified() || r_showcluster->asInt() ) {
+		r_showcluster->setModified( false );
 		if ( r_showcluster->asInt() ) {
 			ri.Printf( PRINT_ALL, "cluster:%i  area:%i\n", cluster, leaf->area );
 		}

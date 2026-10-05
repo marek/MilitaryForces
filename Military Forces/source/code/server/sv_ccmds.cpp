@@ -267,7 +267,7 @@ void ServerMain::mapRestart_f()
 
 	// check for changes in variables that can't just be restarted
 	// check for maxclients change
-	if ( sv_maxclients->modified || sv_gametype->modified ) 
+	if ( sv_maxclients->modified() || sv_gametype->modified() ) 
 	{
 		char	mapname[MAX_QPATH];
 

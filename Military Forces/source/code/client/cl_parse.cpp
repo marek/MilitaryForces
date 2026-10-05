@@ -232,7 +232,7 @@ static void CL_ParseSnapshot( Message *msg ) {
 
 	// if we were just unpaused, we can only *now* really let the
 	// change come into effect or the client hangs.
-	cl_paused->modified = false;
+	cl_paused->setModified( false );
 
 	newSnap.messageNum = clc.serverMessageSequence;
 

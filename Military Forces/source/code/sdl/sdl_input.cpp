@@ -126,11 +126,11 @@ using consoleKey_t = consoleKey_s;
 	int i;
 
 	// Only parse the variable when it changes
-	if( cl_consoleKeys->modified )
+	if( cl_consoleKeys->modified() )
 	{
 		char *text_p, *token;
 
-		cl_consoleKeys->modified = false;
+		cl_consoleKeys->setModified( false );
 		text_p = const_cast<char *>( cl_consoleKeys->asString() );	// the parser takes a non-const cursor but does not write
 		numConsoleKeys = 0;
 
@@ -362,7 +362,7 @@ static void IN_ActivateMouse( bool isFullscreen )
 	// in_nograb makes no sense in fullscreen mode
 	if( !isFullscreen )
 	{
-		if( in_nograb->modified || !mouseActive )
+		if( in_nograb->modified() || !mouseActive )
 		{
 			if( in_nograb->asInt() ) {
 				SDL_SetRelativeMouseMode( SDL_FALSE );
@@ -372,7 +372,7 @@ static void IN_ActivateMouse( bool isFullscreen )
 				SDL_SetWindowGrab( SDL_window, SDL_TRUE );
 			}
 
-			in_nograb->modified = false;
+			in_nograb->setModified( false );
 		}
 	}
 

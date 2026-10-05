@@ -887,7 +887,7 @@ static bool GLimp_StartDriverAndSetMode(int mode, bool fullscreen, bool noborder
 	{
 		ri.Printf( PRINT_ALL, "Fullscreen not allowed with in_nograb 1\n");
 		ri.Cvar_Set( "r_fullscreen", "0" );
-		r_fullscreen->modified = false;
+		r_fullscreen->setModified( false );
 		fullscreen = false;
 	}
 	
@@ -1313,7 +1313,7 @@ void GLimp_EndFrame( )
 		SDL_GL_SwapWindow( SDL_window );
 	}
 
-	if( r_fullscreen->modified )
+	if( r_fullscreen->modified() )
 	{
 		int         fullscreen;
 		bool    needToToggle;
@@ -1326,7 +1326,7 @@ void GLimp_EndFrame( )
 		{
 			ri.Printf( PRINT_ALL, "Fullscreen not allowed with in_nograb 1\n");
 			ri.Cvar_Set( "r_fullscreen", "0" );
-			r_fullscreen->modified = false;
+			r_fullscreen->setModified( false );
 		}
 
 		// Is the state we want different from the current state?
@@ -1343,6 +1343,6 @@ void GLimp_EndFrame( )
 			ri.IN_Restart( );
 		}
 
-		r_fullscreen->modified = false;
+		r_fullscreen->setModified( false );
 	}
 }

@@ -285,9 +285,9 @@ static void SV_MasterHeartbeat(const char *message)
 
 		// see if we haven't already resolved the name or if it's been over 24 hours
 		// resolving usually causes hitches on win95, so only do it when needed
-		if (sv_master[i]->modified || theSVS.time_ > theSVS.masterResolveTime_[i])
+		if (sv_master[i]->modified() || theSVS.time_ > theSVS.masterResolveTime_[i])
 		{
-			sv_master[i]->modified = false;
+			sv_master[i]->setModified( false );
 			theSVS.masterResolveTime_[i] = theSVS.time_ + MASTERDNS_MSEC;
 			
 			if(netenabled & NET_ENABLEV4)

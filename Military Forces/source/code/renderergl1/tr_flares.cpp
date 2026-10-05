@@ -464,10 +464,10 @@ void RB_RenderFlares () {
 		return;
 	}
 
-	if(r_flareCoeff->modified)
+	if(r_flareCoeff->modified())
 	{
 		R_SetFlareCoeff();
-		r_flareCoeff->modified = false;
+		r_flareCoeff->setModified( false );
 	}
 
 	// Reset currentEntity to world so that any previously referenced entities

@@ -2788,7 +2788,7 @@ void Common::init( char *commandLine ) {
 
 	ServerLoop::init();
 
-	com_dedicated->modified = false;
+	com_dedicated->setModified( false );
 #ifndef DEDICATED
 	ClientLoop::init();
 #endif
@@ -2807,7 +2807,7 @@ void Common::init( char *commandLine ) {
 #endif
 #ifdef CINEMATICS_INTRO
 			if( !com_introPlayed->asInt() ) {
-				CvarSystem::set( com_introPlayed->name, "1" );
+				CvarSystem::set( com_introPlayed->name(), "1" );
 				CvarSystem::set( "nextmap", "cinematic " CINEMATICS_INTRO );
 			}
 #endif
@@ -3141,10 +3141,10 @@ void Common::frame( ) {
 
 	CommandBuffer::execute ();
 
-	if (com_altivec->modified)
+	if (com_altivec->modified())
 	{
 		Com_DetectAltivec();
-		com_altivec->modified = false;
+		com_altivec->setModified( false );
 	}
 
 	// mess with msec if needed
@@ -3163,10 +3163,10 @@ void Common::frame( ) {
 	// or shut down the client system.
 	// Do this after the server may have started,
 	// but before the client tries to auto-connect
-	if ( com_dedicated->modified ) {
+	if ( com_dedicated->modified() ) {
 		// get the latched value
 		CvarSystem::get( "dedicated", "0", 0 );
-		com_dedicated->modified = false;
+		com_dedicated->setModified( false );
 		if ( !com_dedicated->asInt() ) {
 			ServerLoop::shutdown( "dedicated set to 0" );
 			ClientLoop::flushMemory();
