@@ -2714,7 +2714,7 @@ void Common::init( char *commandLine ) {
 
 	// if any archived cvars are modified after this, we will trigger a writing
 	// of the config file
-	CvarSystem::modifiedFlags &= ~CVAR_ARCHIVE;
+	CvarSystem::clearModified( CVAR_ARCHIVE );
 
 	//
 	// init commands and vars
@@ -2922,10 +2922,10 @@ static void Com_WriteConfiguration( ) {
 		return;
 	}
 
-	if ( !(CvarSystem::modifiedFlags & CVAR_ARCHIVE ) ) {
+	if ( !(CvarSystem::modified( CVAR_ARCHIVE ) ) ) {
 		return;
 	}
-	CvarSystem::modifiedFlags &= ~CVAR_ARCHIVE;
+	CvarSystem::clearModified( CVAR_ARCHIVE );
 
 	Com_WriteConfigToFile( Q3CONFIG_CFG );
 

@@ -26,7 +26,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 cvar_t		*CvarSystem::vars_ = nullptr;
 cvar_t		*CvarSystem::cheats_;
-int			CvarSystem::modifiedFlags;
+int			CvarSystem::modifiedFlags_;
 
 cvar_t		CvarSystem::indexes_[CvarSystem::MAX_CVARS];
 int			CvarSystem::numIndexes_;
@@ -399,7 +399,7 @@ cvar_t *CvarSystem::get( const char *var_name, const char *var_value, int flags 
 
 		// ZOID--needs to be set so that cvars the game sets as 
 		// SERVERINFO get sent to clients
-		modifiedFlags |= flags;
+		modifiedFlags_ |= flags;
 
 		return var;
 	}
@@ -448,7 +448,7 @@ cvar_t *CvarSystem::get( const char *var_name, const char *var_value, int flags 
 
 	var->flags = flags;
 	// note what types of cvars have been modified (userinfo, archive, serverinfo, systeminfo)
-	modifiedFlags |= var->flags;
+	modifiedFlags_ |= var->flags;
 
 	hash = generateHashValue(var_name);
 	var->hashIndex = hash;
@@ -551,7 +551,7 @@ cvar_t *CvarSystem::set2( const char *var_name, const char *value, bool force ) 
 		return var;
 
 	// note what types of cvars have been modified (userinfo, archive, serverinfo, systeminfo)
-	modifiedFlags |= var->flags;
+	modifiedFlags_ |= var->flags;
 
 	if (!force)
 	{
@@ -872,19 +872,19 @@ void CvarSystem::set_f( ) {
 		case 'a':
 			if( !( v->flags & CVAR_ARCHIVE ) ) {
 				v->flags |= CVAR_ARCHIVE;
-				modifiedFlags |= CVAR_ARCHIVE;
+				modifiedFlags_ |= CVAR_ARCHIVE;
 			}
 			break;
 		case 'u':
 			if( !( v->flags & CVAR_USERINFO ) ) {
 				v->flags |= CVAR_USERINFO;
-				modifiedFlags |= CVAR_USERINFO;
+				modifiedFlags_ |= CVAR_USERINFO;
 			}
 			break;
 		case 's':
 			if( !( v->flags & CVAR_SERVERINFO ) ) {
 				v->flags |= CVAR_SERVERINFO;
-				modifiedFlags |= CVAR_SERVERINFO;
+				modifiedFlags_ |= CVAR_SERVERINFO;
 			}
 			break;
 	}
@@ -1115,7 +1115,7 @@ cvar_t *CvarSystem::unset(cvar_t *cv)
 	cvar_t *next = cv->next;
 
 	// note what types of cvars have been modified (userinfo, archive, serverinfo, systeminfo)
-	modifiedFlags |= cv->flags;
+	modifiedFlags_ |= cv->flags;
 
 	if(cv->name)
 		Zone::free(cv->name);

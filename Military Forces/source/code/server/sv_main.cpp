@@ -1144,15 +1144,15 @@ void ServerLoop::frame( int msec )
 	}
 
 	// update infostrings if anything has been changed
-	if ( CvarSystem::modifiedFlags & CVAR_SERVERINFO ) 
+	if ( CvarSystem::modified( CVAR_SERVERINFO ) ) 
 	{
 		GameHost::setConfigstring( CS_SERVERINFO, CvarSystem::infoString( CVAR_SERVERINFO ) );
-		CvarSystem::modifiedFlags &= ~CVAR_SERVERINFO;
+		CvarSystem::clearModified( CVAR_SERVERINFO );
 	}
-	if ( CvarSystem::modifiedFlags & CVAR_SYSTEMINFO ) 
+	if ( CvarSystem::modified( CVAR_SYSTEMINFO ) ) 
 	{
 		GameHost::setConfigstring( CS_SYSTEMINFO, CvarSystem::infoString_Big( CVAR_SYSTEMINFO ) );
-		CvarSystem::modifiedFlags &= ~CVAR_SYSTEMINFO;
+		CvarSystem::clearModified( CVAR_SYSTEMINFO );
 	}
 
 	if ( com_speeds->integer ) 

@@ -606,11 +606,11 @@ void ServerMain::spawnServer( char *server, bool killBots )
 
 	// save systeminfo and serverinfo strings
 	Q_strncpyz( systemInfo, CvarSystem::infoString_Big( CVAR_SYSTEMINFO ), sizeof( systemInfo ) );
-	CvarSystem::modifiedFlags &= ~CVAR_SYSTEMINFO;
+	CvarSystem::clearModified( CVAR_SYSTEMINFO );
 	GameHost::setConfigstring( CS_SYSTEMINFO, systemInfo );
 
 	GameHost::setConfigstring( CS_SERVERINFO, CvarSystem::infoString( CVAR_SERVERINFO ) );
-	CvarSystem::modifiedFlags &= ~CVAR_SERVERINFO;
+	CvarSystem::clearModified( CVAR_SERVERINFO );
 
 	// any media configstring setting now should issue a warning
 	// and any configstring changes should be reliably transmitted

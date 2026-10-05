@@ -43,9 +43,13 @@ public:
 	static cvar_t *unset(cvar_t *cv);
 	static void unset_f();
 
-	static int modifiedFlags;
+	// which kinds of variable (CVAR_ARCHIVE, CVAR_USERINFO, ...) changed since the flag was last cleared
+	static bool modified( int flags ) { return ( modifiedFlags_ & flags ) != 0; }
+	static void setModified( int flags ) { modifiedFlags_ |= flags; }
+	static void clearModified( int flags ) { modifiedFlags_ &= ~flags; }
 
 private:
+	static int modifiedFlags_;
 	static constexpr int MAX_CVARS = 2048;
 	static constexpr int FILE_HASH_SIZE = 256;
 

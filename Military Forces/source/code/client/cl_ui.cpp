@@ -620,11 +620,11 @@ void Key_GetBindingBuf( int keynum, char *buf, int buflen )
 //		Com_Memcpy( &cl_cdkey[16], buf, 16 );
 //		cl_cdkey[32] = 0;
 //		// set the flag so the fle will be written at the next opportunity
-//		CvarSystem::modifiedFlags |= CVAR_ARCHIVE;
+//		CvarSystem::setModified( CVAR_ARCHIVE );
 //	} else {
 //		Com_Memcpy( cl_cdkey, buf, 16 );
 //		// set the flag so the fle will be written at the next opportunity
-//		CvarSystem::modifiedFlags |= CVAR_ARCHIVE;
+//		CvarSystem::setModified( CVAR_ARCHIVE );
 //	}
 //}
 

@@ -926,7 +926,7 @@ void Keys::setBinding( int keynum, const char *binding ) {
 
 	// consider this like modifying an archived cvar, so the
 	// file write will be triggered at the next opportunity
-	CvarSystem::modifiedFlags |= CVAR_ARCHIVE;
+	CvarSystem::setModified( CVAR_ARCHIVE );
 }
 
 
