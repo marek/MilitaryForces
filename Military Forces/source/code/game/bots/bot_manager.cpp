@@ -40,6 +40,7 @@ int Bots::count()
 	return static_cast<int>( std::count_if( states_.begin(), states_.end(), []( const State& s ) { return s.active; } ) );
 }
 
+// the kind of vehicle, as an index into the per-kind tallies: plane, helicopter, ground, boat, soldier
 int Bots::kindOf( int vehicle )
 {
 	const unsigned int cat = availableVehicles[vehicle].cat;
@@ -50,6 +51,8 @@ int Bots::kindOf( int vehicle )
 	return 4;
 }
 
+// tallies lives per kind of vehicle and, among them, crashes soon after spawning: a kind that keeps
+// crashing on this map is picked less
 void Bots::onDeath( GameEntity* self, GameEntity* attacker, int meansOfDeath )
 {
 	if( !self || !self->client_ || !isBot( self->s.number ) || self->client_->vehicle_ < 0 )
@@ -99,11 +102,13 @@ unsigned int Bots::spawnCategories()
 	return cats ? cats : CAT_ANY;
 }
 
+// how much a character minds failing: cautious ones give a vehicle up sooner, patient ones later
 float Bots::failureSensitivity( const Character& who )
 {
 	return std::clamp( 0.3f + who.caution - 0.5f * who.patience, 0.1f, 1.2f );
 }
 
+// how much this bot wants a different kind of vehicle, from how often its lives in this kind ended badly
 float Bots::switchDesire( const State& bot, int kind )
 {
 	if( bot.ownLives[kind] < 2 )
@@ -124,6 +129,7 @@ bool Bots::teamHasSupplier( int team, GameEntity* except )
 	return false;
 }
 
+// a weighted draw among the vehicles this team may take on this map
 int Bots::pickVehicle( int teamFlag, bool allowInfantry, const Character* who, const State* memory )
 {
 	unsigned int cats = spawnCategories();
@@ -151,6 +157,7 @@ int Bots::pickVehicle( int teamFlag, bool allowInfantry, const Character* who, c
 		const completeVehicleData_t& veh = availableVehicles[i];
 		if( !(veh.gameset & gameset) || !(veh.team & teamFlag) || !(veh.cat & cats) || !VehicleData::selectable( i ) )
 			continue;
+		// bots do not take nuclear weapons
 		bool nuke = false;
 		for( unsigned int weapon : veh.weapons )
 		{
@@ -159,13 +166,15 @@ int Bots::pickVehicle( int teamFlag, bool allowInfantry, const Character* who, c
 		}
 		if( nuke )
 			continue;
+		// base weight per kind evens out how many entries each kind has in the vehicle table
 		int weight = 0;
-		int kind = 0;
-		if( veh.cat & CAT_PLANE ) { weight = 4; kind = 0; }
-		else if( veh.cat & CAT_HELO ) { weight = 8; kind = 1; }
-		else if( veh.cat & CAT_GROUND ) { weight = 6; kind = 2; }
-		else if( veh.cat & CAT_BOAT ) { weight = 12; kind = 3; }
-		else if( (veh.cat & CAT_LQM) && allowInfantry ) { weight = 8; kind = 4; }
+		const int kind = kindOf( i );
+		if( veh.cat & CAT_PLANE ) weight = 4;
+		else if( veh.cat & CAT_HELO ) weight = 8;
+		else if( veh.cat & CAT_GROUND ) weight = 6;
+		else if( veh.cat & CAT_BOAT ) weight = 12;
+		else if( (veh.cat & CAT_LQM) && allowInfantry ) weight = 8;
+		// the character's own taste
 		if( who )
 			weight = static_cast<int>( weight * 10 * std::max( 0.0f, who->prefer[kind] ) );
 		// supplies are for team mates: nobody flies the supply helicopter in a free-for-all
@@ -173,10 +182,13 @@ int Bots::pickVehicle( int teamFlag, bool allowInfantry, const Character* who, c
 			continue;
 		if( who && !teamHasSupplier && carriesSupplies( i ) )
 			weight = static_cast<int>( weight * (2.0f + 8.0f * who->teamwork) );
+		// bombers have little to do on a map with nothing on the ground to bomb
 		if( !groundTargets && (veh.cat & CAT_PLANE) && (veh.cls & CLASS_PLANE_BOMBER) )
 			weight = weight * 12 / 100;
+		// more than half of all bots' lives in this kind ended in an early crash here: the map does not suit it
 		if( kindLives_[kind] >= 12 && kindCrashes_[kind] * 10 > kindLives_[kind] * 5 )
 			weight = std::max( 1, weight / 3 );
+		// and this bot's own record in it
 		if( memory && who && memory->ownLives[kind] > 0 )
 		{
 			const float failureRate = static_cast<float>( memory->ownFailures[kind] ) / memory->ownLives[kind];
@@ -184,8 +196,6 @@ int Bots::pickVehicle( int teamFlag, bool allowInfantry, const Character* who, c
 		}
 
 		if( weight <= 0 )
-			continue;
-		if( !weight )
 			continue;
 		candidates[num] = i;
 		weights[num] = weight;
@@ -248,6 +258,7 @@ void Bots::removeAll()
 		remove( i );
 }
 
+// keeps the number of players at g_botMinPlayers: one bot joins or leaves per check
 void Bots::fill()
 {
 	if( theLevel.time_ < fillTime_ )
@@ -277,6 +288,7 @@ void Bots::fill()
 		remove( lastBot );
 }
 
+// what a person does in the menus: join a team, then choose a vehicle
 void Bots::select( GameEntity* ent, State& bot )
 {
 	GameClient* client = ent->client_;
@@ -316,6 +328,7 @@ void Bots::think( GameEntity* ent, State& bot, usercmd_t& cmd )
 	Vec3 view;
 	VectorCopy( ps.viewangles, view );
 
+	// in the menus: choose, then tap fire to spawn
 	const bool selecting = client->sess_.sessionTeam_ == ClientBase::TEAM_SPECTATOR || client->vehicle_ < 0 || (ps.pm_flags & PMF_VEHICLESELECT);
 	if( selecting )
 	{
@@ -326,6 +339,7 @@ void Bots::think( GameEntity* ent, State& bot, usercmd_t& cmd )
 			cmd.buttons |= BUTTON_ATTACK;
 		return;
 	}
+	// dead: settle the life's record once, then tap fire to respawn
 	if( ent->health_ <= 0 )
 	{
 		if( bot.wasAlive )
@@ -375,6 +389,7 @@ void Bots::think( GameEntity* ent, State& bot, usercmd_t& cmd )
 			cmd.buttons |= BUTTON_ATTACK;
 		return;
 	}
+	// first frame of a new life
 	if( !bot.wasAlive )
 	{
 		bot.wasAlive = true;
@@ -433,6 +448,7 @@ void Bots::think( GameEntity* ent, State& bot, usercmd_t& cmd )
 
 	cmd.weapon = ps.weaponNum;
 
+	// someone has our flag: go where they were last seen, or to their base where they are taking it
 	if( g_gametype.integer == GT_CTF && bot.desire != Goal::Rearm && !(ps.objectives & (OB_REDFLAG|OB_BLUEFLAG)) )
 	{
 		const int own = client->sess_.sessionTeam_;
@@ -456,6 +472,7 @@ void Bots::think( GameEntity* ent, State& bot, usercmd_t& cmd )
 		}
 	}
 
+	// capturing: to their flag, and with it back to ours
 	if( bot.desire == Goal::Capture )
 	{
 		const bool carrying = (ps.objectives & (OB_REDFLAG|OB_BLUEFLAG)) != 0;
@@ -469,6 +486,7 @@ void Bots::think( GameEntity* ent, State& bot, usercmd_t& cmd )
 		}
 	}
 
+	// bots cannot yet be relied on to land for fuel everywhere, so their tank never drops below a quarter
 	if( ps.stats[STAT_FUEL] < ps.stats[STAT_MAX_FUEL] / 4 )
 		ps.stats[STAT_FUEL] = ps.stats[STAT_MAX_FUEL] / 4;
 
@@ -493,6 +511,7 @@ void Bots::think( GameEntity* ent, State& bot, usercmd_t& cmd )
 			thinkInfantry( ent, bot, s, cmd, view );
 	}
 
+	// less skilled characters hold the aim less steadily; not while landing
 	const float wobble = bot.desire == Goal::Rearm ? 0.0f : (1.0f - skill( bot )) * 3.0f;
 	bot.aimPhase += 0.11f;
 	view[YAW] += sin( bot.aimPhase ) * wobble;
