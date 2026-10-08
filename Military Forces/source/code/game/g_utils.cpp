@@ -545,6 +545,8 @@ void Game::killBox( GameEntity *ent )
 	GameEntity	*hit;
 	Vec3		mins, maxs;
 
+	const bool soldier = ent->client_->vehicle_ >= 0 && (availableVehicles[ent->client_->vehicle_].cat & CAT_LQM);
+
 	VectorAdd( ent->client_->ps_.origin, ent->r.mins, mins );
 	VectorAdd( ent->client_->ps_.origin, ent->r.maxs, maxs );
 	num = GameHost::areaEntities( mins, maxs, touch, MAX_GENTITIES );
@@ -553,6 +555,10 @@ void Game::killBox( GameEntity *ent )
 	{
 		hit = theLevel.getEntity(touch[i]);
 		if( !hit || !hit->client_ ) 
+			continue;
+
+		// a soldier arriving over a boat lands on its deck
+		if( soldier && hit->health_ > 0 && hit->client_->vehicle_ >= 0 && availableVehicles[hit->client_->vehicle_].hasDeck )
 			continue;
 
 		// nail it

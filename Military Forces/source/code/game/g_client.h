@@ -141,6 +141,7 @@ struct GameClient : public ClientBase
 	int					ejectedTime_ = 0;		// when this player last bailed out of a vehicle, 0 if on foot from the start
 	int					lastEnemyHitTime_ = 0;	// when an enemy last damaged this player
 	bool				downedByEnemy_ = false;	// bailed out of a vehicle the enemy had been hitting: a lift for them can score
+	bool				wreck_ = false;			// died and not yet respawned: what is left can still be blown up
 	bool				downedUnderFire_ = false;	// ejected while under attack: picking them up is a rescue
 	int					liftPilot_ = -1;		// who last gave this player a lift, until they die or take a vehicle
 	int					liftScoreTime_ = 0;	// no lift score for this rider again before this time

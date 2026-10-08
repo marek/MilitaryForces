@@ -642,6 +642,7 @@ void MF_ClientSpawn( int clientNum, long cs_flags )
 
 	// the respawned flag will be cleared after the attack and jump keys come up
 	client->ps_.pm_flags |= PMF_RESPAWNED;
+	client->wreck_ = false;
 
 	//GameHost::getUsercmd( client - level.clients, &ent->client->pers.cmd );
 	GameHost::getUsercmd( client->ps_.clientNum, &ent->client_->pers_.cmd_ );

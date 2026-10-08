@@ -49,7 +49,7 @@ Explode our vehicle
 void ExplodeVehicle( GameEntity* self )
 {
 	// create the client vehicle explosion event
-	Game::addEvent( self, EV_VEHICLE_GIB, self->client_ && self->client_->vehicle_ >= 0 && self->r.contents != CONTENTS_CORPSE &&
+	Game::addEvent( self, EV_VEHICLE_GIB, self->client_ && self->client_->vehicle_ >= 0 && !self->client_->wreck_ &&
 		(availableVehicles[self->client_->vehicle_].flags & VF_COOKOFF) ? 1 : 0, true );
 
 	self->takedamage_ = false;

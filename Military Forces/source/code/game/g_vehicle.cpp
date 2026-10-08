@@ -66,7 +66,8 @@ VehicleDeathImpl( GameEntity* self, GameEntity* inflictor, GameEntity* attacker,
 		obit = modNames[ meansOfDeath ];
 
 	self->client_->sess_.paintTeam_ = 0;
-	if( self->r.contents != CONTENTS_CORPSE )
+	// not a wreck being blown up: a boat with a deck has a body soldiers walk into, so contents do not tell
+	if( !self->client_->wreck_ )
 	{
 		Bots::onDeath( self, attacker, meansOfDeath );
 		Game::logPrintf( "Kill: %i %i %i: %s killed %s by %s\n", killer, self->s.number, meansOfDeath, killerName, 
@@ -190,6 +191,7 @@ VehicleDeathImpl( GameEntity* self, GameEntity* inflictor, GameEntity* attacker,
 	Rider_KillAll( self, attacker );
 
 	self->takedamage_ = true;	// can still be gibbed
+	self->client_->wreck_ = true;
 	self->r.contents = CONTENTS_CORPSE;
 	self->s.objectives = 0;
 	self->s.loopSound = 0;
