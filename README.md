@@ -53,15 +53,22 @@ This edition is still being worked on. Here is what it brings so far.
 
 ## Building
 
-Requires CMake 3.21+ and SDL2 on Windows, macOS and Linux.
+Needs CMake 3.25 or newer, Ninja and a C++23 compiler. On macOS, `misc/macos/build-deps.sh x86_64` (or `arm64`)
+builds SDL2 and FreeType into `deps/` first.
 
-```
-cmake -S . -B build
-cmake --build build
-./build/MilitaryForces +set fs_basepath /path/to/assets
+```bash
+cmake --preset darwin-arm
+cmake --build --preset darwin-arm
+cpack --preset darwin-arm
 ```
 
-The game data goes in `assets/mfdata`. Add `-DMF_SANITIZE=address,undefined` for a sanitizer build.
+Presets: `darwin-x86`, `darwin-arm`, `linux-x86`, `linux-arm`, `windows`. Each builds into `builds/<preset>`, and
+`cpack` writes `dist/militaryforces-<version>-<preset>.zip` together with `dist/RELEASE_NOTES.md`.
+`darwin-x86-debug`, `-asan` and `-warn` are development builds.
+
+The game data is a separate repository. Packaging takes the built paks from `../assets/build/mfdata`; set
+`-DMF_DATA_DIR=<folder>` if they are somewhere else. To run a build in place:
+`builds/<preset>/MilitaryForcesDed +set fs_basepath <folder holding mfdata>`.
 
 ## Credits
 

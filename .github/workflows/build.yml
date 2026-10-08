@@ -1,0 +1,153 @@
+name: build
+
+# Every push and pull request compiles all platforms. Pushes to this repository also fetch the game data
+# (private repository, read-only deploy key in the ASSETS_DEPLOY_KEY secret) and start a server on a map.
+# Full packages are kept only for tags and manual runs; a v* tag also drafts a release from them.
+
+on:
+  push:
+    branches: [master]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: ${{ matrix.platform }}
+    runs-on: ${{ matrix.os }}
+    continue-on-error: ${{ matrix.experimental }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { platform: darwin-arm, os: macos-15, arch: arm64, shell: bash, experimental: false }
+          - { platform: darwin-x86, os: macos-15-intel, arch: x86_64, shell: bash, experimental: false }
+          # not built anywhere yet: reported, but they do not fail the run
+          - { platform: linux-x86, os: ubuntu-24.04, shell: bash, experimental: true }
+          - { platform: linux-arm, os: ubuntu-24.04-arm, shell: bash, experimental: true }
+          - { platform: windows, os: windows-latest, shell: 'msys2 {0}', experimental: true }
+    env:
+      WITH_ASSETS: ${{ secrets.ASSETS_DEPLOY_KEY != '' && github.event_name != 'pull_request' }}
+      KEEP_PACKAGES: ${{ startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch' }}
+    defaults:
+      run:
+        shell: ${{ matrix.shell }}
+        working-directory: MilitaryForces
+    steps:
+      # same layout as the workspace: MilitaryForces/ and assets/ side by side
+      - uses: actions/checkout@v4
+        with:
+          path: MilitaryForces
+
+      - name: game data
+        if: env.WITH_ASSETS == 'true'
+        uses: actions/checkout@v4
+        with:
+          repository: marek/MilitaryForcesAssets
+          ssh-key: ${{ secrets.ASSETS_DEPLOY_KEY }}
+          path: assets
+
+      - uses: actions/setup-python@v5
+        if: env.WITH_ASSETS == 'true'
+        with:
+          python-version: '3.x'
+
+      - name: build paks
+        if: env.WITH_ASSETS == 'true'
+        shell: bash
+        working-directory: assets
+        run: python build.py
+
+      - name: macOS libraries (cached)
+        if: runner.os == 'macOS'
+        id: deps
+        uses: actions/cache@v4
+        with:
+          path: MilitaryForces/deps
+          key: deps-${{ matrix.platform }}-${{ hashFiles('MilitaryForces/misc/macos/build-deps.sh') }}
+
+      - name: macOS tools
+        if: runner.os == 'macOS'
+        run: brew install ninja
+
+      - name: macOS libraries
+        if: runner.os == 'macOS' && steps.deps.outputs.cache-hit != 'true'
+        run: misc/macos/build-deps.sh ${{ matrix.arch }}
+
+      - name: Linux packages
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ninja-build g++-14 libsdl2-dev libfreetype-dev libcurl4-openssl-dev libopenal-dev libgl1-mesa-dev
+          echo "CC=gcc-14" >> "$GITHUB_ENV"
+          echo "CXX=g++-14" >> "$GITHUB_ENV"
+
+      - name: Windows packages
+        if: runner.os == 'Windows'
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: true
+          install: >-
+            mingw-w64-x86_64-gcc mingw-w64-x86_64-cmake mingw-w64-x86_64-ninja
+            mingw-w64-x86_64-SDL2 mingw-w64-x86_64-freetype
+
+      - name: configure
+        run: cmake --preset ${{ matrix.platform }}
+
+      - name: build
+        run: cmake --build --preset ${{ matrix.platform }}
+
+      - name: server starts a map
+        if: env.WITH_ASSETS == 'true' && runner.os != 'Windows'
+        run: |
+          ./builds/${{ matrix.platform }}/MilitaryForcesDed +set fs_basepath "$PWD/../assets/build" \
+            +set fs_homepath "$RUNNER_TEMP/home" +set sv_pure 0 +map mfq3_atoll +wait 200 +quit > ded.log 2>&1 < /dev/null &
+          PID=$!
+          for i in $(seq 1 90); do kill -0 $PID 2>/dev/null || break; sleep 1; done
+          if kill -0 $PID 2>/dev/null; then kill -KILL $PID; echo "server did not quit"; tail -20 ded.log; exit 1; fi
+          wait $PID || { echo "server failed"; tail -20 ded.log; exit 1; }
+          grep -q "^InitGame" ded.log || { echo "map did not start"; tail -20 ded.log; exit 1; }
+
+      - name: package
+        run: cpack --preset ${{ matrix.platform }}
+
+      - name: keep packages
+        if: env.KEEP_PACKAGES == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: package-${{ matrix.platform }}
+          path: MilitaryForces/dist/militaryforces-*
+          if-no-files-found: error
+
+      - name: keep symbols
+        if: env.KEEP_PACKAGES == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: symbols-${{ matrix.platform }}
+          path: MilitaryForces/builds/${{ matrix.platform }}/symbols
+          if-no-files-found: ignore
+
+  release:
+    name: draft release
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: package-*
+          path: dist
+          merge-multiple: true
+      - name: release notes grouped by operating system
+        run: cmake -DDIST=$PWD/dist -DTAG=${{ github.ref_name }} -P cmake/utils/release_notes.cmake
+      - name: draft the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "${{ github.ref_name }}" dist/militaryforces-* --draft --title "Military Forces ${{ github.ref_name }}" --notes-file dist/RELEASE_NOTES.md

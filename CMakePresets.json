@@ -1,0 +1,201 @@
+{
+    "version": 6,
+    "cmakeMinimumRequired": {
+        "major": 3,
+        "minor": 25,
+        "patch": 0
+    },
+    "configurePresets": [
+        {
+            "name": "base",
+            "hidden": true,
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/builds/${presetName}",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release"
+            }
+        },
+        {
+            "name": "darwin-x86",
+            "inherits": "base",
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Darwin"
+            },
+            "cacheVariables": {
+                "CMAKE_OSX_ARCHITECTURES": "x86_64",
+                "CMAKE_PREFIX_PATH": "${sourceDir}/deps/x86_64",
+                "SDL2_DIR": "${sourceDir}/deps/x86_64/lib/cmake/SDL2",
+                "FREETYPE_LIBRARY": "${sourceDir}/deps/x86_64/lib/libfreetype.dylib",
+                "FREETYPE_INCLUDE_DIRS": "${sourceDir}/deps/x86_64/include/freetype2",
+                "MF_PLATFORM": "darwin-x86"
+            }
+        },
+        {
+            "name": "darwin-arm",
+            "inherits": "base",
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Darwin"
+            },
+            "cacheVariables": {
+                "CMAKE_OSX_ARCHITECTURES": "arm64",
+                "CMAKE_PREFIX_PATH": "${sourceDir}/deps/arm64",
+                "SDL2_DIR": "${sourceDir}/deps/arm64/lib/cmake/SDL2",
+                "FREETYPE_LIBRARY": "${sourceDir}/deps/arm64/lib/libfreetype.dylib",
+                "FREETYPE_INCLUDE_DIRS": "${sourceDir}/deps/arm64/include/freetype2",
+                "MF_PLATFORM": "darwin-arm"
+            }
+        },
+        {
+            "name": "linux-x86",
+            "inherits": "base",
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Linux"
+            },
+            "cacheVariables": {
+                "MF_PLATFORM": "linux-x86"
+            }
+        },
+        {
+            "name": "linux-arm",
+            "inherits": "base",
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Linux"
+            },
+            "cacheVariables": {
+                "MF_PLATFORM": "linux-arm"
+            }
+        },
+        {
+            "name": "windows",
+            "inherits": "base",
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Windows"
+            },
+            "cacheVariables": {
+                "MF_PLATFORM": "windows"
+            }
+        },
+        {
+            "name": "darwin-x86-debug",
+            "inherits": "base",
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Darwin"
+            },
+            "cacheVariables": {
+                "CMAKE_OSX_ARCHITECTURES": "x86_64",
+                "CMAKE_PREFIX_PATH": "${sourceDir}/deps/x86_64",
+                "SDL2_DIR": "${sourceDir}/deps/x86_64/lib/cmake/SDL2",
+                "FREETYPE_LIBRARY": "${sourceDir}/deps/x86_64/lib/libfreetype.dylib",
+                "FREETYPE_INCLUDE_DIRS": "${sourceDir}/deps/x86_64/include/freetype2",
+                "CMAKE_BUILD_TYPE": "Debug",
+                "MF_PLATFORM": "darwin-x86"
+            }
+        },
+        {
+            "name": "darwin-x86-asan",
+            "inherits": "base",
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Darwin"
+            },
+            "cacheVariables": {
+                "CMAKE_OSX_ARCHITECTURES": "x86_64",
+                "CMAKE_PREFIX_PATH": "${sourceDir}/deps/x86_64",
+                "SDL2_DIR": "${sourceDir}/deps/x86_64/lib/cmake/SDL2",
+                "FREETYPE_LIBRARY": "${sourceDir}/deps/x86_64/lib/libfreetype.dylib",
+                "FREETYPE_INCLUDE_DIRS": "${sourceDir}/deps/x86_64/include/freetype2",
+                "CMAKE_BUILD_TYPE": "Debug",
+                "MF_SANITIZE": "address,undefined",
+                "MF_PLATFORM": "darwin-x86"
+            }
+        },
+        {
+            "name": "darwin-x86-warn",
+            "inherits": "base",
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Darwin"
+            },
+            "cacheVariables": {
+                "CMAKE_OSX_ARCHITECTURES": "x86_64",
+                "CMAKE_PREFIX_PATH": "${sourceDir}/deps/x86_64",
+                "SDL2_DIR": "${sourceDir}/deps/x86_64/lib/cmake/SDL2",
+                "FREETYPE_LIBRARY": "${sourceDir}/deps/x86_64/lib/libfreetype.dylib",
+                "FREETYPE_INCLUDE_DIRS": "${sourceDir}/deps/x86_64/include/freetype2",
+                "CMAKE_BUILD_TYPE": "Debug",
+                "MF_WARNINGS": "ON",
+                "MF_PLATFORM": "darwin-x86"
+            }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "darwin-x86",
+            "configurePreset": "darwin-x86"
+        },
+        {
+            "name": "darwin-arm",
+            "configurePreset": "darwin-arm"
+        },
+        {
+            "name": "linux-x86",
+            "configurePreset": "linux-x86"
+        },
+        {
+            "name": "linux-arm",
+            "configurePreset": "linux-arm"
+        },
+        {
+            "name": "windows",
+            "configurePreset": "windows"
+        },
+        {
+            "name": "darwin-x86-debug",
+            "configurePreset": "darwin-x86-debug"
+        },
+        {
+            "name": "darwin-x86-asan",
+            "configurePreset": "darwin-x86-asan"
+        },
+        {
+            "name": "darwin-x86-warn",
+            "configurePreset": "darwin-x86-warn"
+        }
+    ],
+    "packagePresets": [
+        {
+            "name": "darwin-x86",
+            "configurePreset": "darwin-x86"
+        },
+        {
+            "name": "darwin-arm",
+            "configurePreset": "darwin-arm"
+        },
+        {
+            "name": "linux-x86",
+            "configurePreset": "linux-x86"
+        },
+        {
+            "name": "linux-arm",
+            "configurePreset": "linux-arm"
+        },
+        {
+            "name": "windows",
+            "configurePreset": "windows"
+        }
+    ]
+}
