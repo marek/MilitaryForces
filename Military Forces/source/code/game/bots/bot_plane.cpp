@@ -1101,6 +1101,32 @@ void Bots::thinkPlane( GameEntity* ent, State& bot, const Sense& sense, usercmd_
 
 	runTree( tree, mind, "plane" );
 
+	// turrets: look at a nearby enemy aircraft and fire whatever bears, in bursts, holding course meanwhile as a
+	// player does with free look. Not while landing, taking off or low, where steering matters more
+	constexpr float turretRange = 2200.0f;
+	constexpr int turretBurst = 1800, turretPause = 1200;
+	if( (mind.veh.flags & VF_GUNSTATIONS) && sense.enemy && sense.enemyAir && sense.enemyVisible && sense.enemyDist < turretRange &&
+		!(ps.ONOFF & OO_LANDED) && bot.desire != Goal::Rearm && sense.height > mind.minHeight && ps.ammo[WP_MACHINEGUN] > 0 )
+	{
+		if( theLevel.time_ > bot.turretTime + turretBurst + turretPause )
+			bot.turretTime = theLevel.time_;
+		if( theLevel.time_ < bot.turretTime + turretBurst )
+		{
+			// lead the target by the bullets' flight time
+			const float flight = sense.enemyDist / std::max( 1.0f, static_cast<float>( availableWeapons[mind.veh.weapons[WP_MACHINEGUN]].muzzleVelocity ) );
+			Vec3 enemyVelocity;
+			VectorCopy( sense.enemy->s.pos.trDelta, enemyVelocity );
+			const Vec3 aimAt = Vec3( sense.enemy->r.currentOrigin ) + enemyVelocity * flight - Vec3( ent->r.currentOrigin );
+			Vec3 aim;
+			vectoangles( aimAt, aim );
+			if( VehicleData::gunStationsBearing( client->vehicle_, ps.vehicleAngles, aim ) )
+			{
+				VectorCopy( aim, view );
+				cmd.buttons |= BUTTON_FREELOOK | BUTTON_ATTACK;
+			}
+		}
+	}
+
 	// full power is asked for all over the tree; in the air it means military power unless the afterburner is earned
 	constexpr int militaryPower = 10;
 	const float throttle = signedThrottle( ps, client->vehicle_ );
