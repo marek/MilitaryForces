@@ -5820,7 +5820,9 @@ void _UI_Init( bool inGameLoad )
 	uiInfo.characterCount = 0;
 	uiInfo.aliasCount = 0;
 
-	UI_ParseTeamInfo("teaminfo.txt");
+	// a list of named teams is optional data the game does not ship
+	if( OpenFile( "teaminfo.txt", FS_READ ) )
+		UI_ParseTeamInfo("teaminfo.txt");
 	UI_LoadTeams();
 	UI_ParseGameInfo("gameinfo.txt");
 
@@ -6496,13 +6498,13 @@ static cvarTable_t		cvarTable[] = {
 
 	{ &ui_arenasFile, "g_arenasFile", "", CVAR_INIT|CVAR_ROM },
 //	{ &ui_botsFile, "g_botsFile", "", CVAR_INIT|CVAR_ROM },
-	{ &ui_spScores1, "g_spScores1", "", CVAR_ARCHIVE | CVAR_ROM },
-	{ &ui_spScores2, "g_spScores2", "", CVAR_ARCHIVE | CVAR_ROM },
-	{ &ui_spScores3, "g_spScores3", "", CVAR_ARCHIVE | CVAR_ROM },
-	{ &ui_spScores4, "g_spScores4", "", CVAR_ARCHIVE | CVAR_ROM },
-	{ &ui_spScores5, "g_spScores5", "", CVAR_ARCHIVE | CVAR_ROM },
-	{ &ui_spAwards, "g_spAwards", "", CVAR_ARCHIVE | CVAR_ROM },
-	{ &ui_spVideos, "g_spVideos", "", CVAR_ARCHIVE | CVAR_ROM },
+	{ &ui_spScores1, "g_spScores1", "", CVAR_ARCHIVE },
+	{ &ui_spScores2, "g_spScores2", "", CVAR_ARCHIVE },
+	{ &ui_spScores3, "g_spScores3", "", CVAR_ARCHIVE },
+	{ &ui_spScores4, "g_spScores4", "", CVAR_ARCHIVE },
+	{ &ui_spScores5, "g_spScores5", "", CVAR_ARCHIVE },
+	{ &ui_spAwards, "g_spAwards", "", CVAR_ARCHIVE },
+	{ &ui_spVideos, "g_spVideos", "", CVAR_ARCHIVE },
 	{ &ui_spSkill, "g_spSkill", "2", CVAR_ARCHIVE },
 
 	{ &ui_spSelection, "ui_spSelection", "", CVAR_ROM },
@@ -6522,10 +6524,10 @@ static cvarTable_t		cvarTable[] = {
 //	{ &ui_gameset, "ui_gameset", "modern", CVAR_ARCHIVE | CVAR_ROM },
 
 	// (vehicle select dialog)
-	{ &ui_vehicleCat, "ui_vehicleCat", "1", CVAR_ARCHIVE | CVAR_ROM },
-	{ &ui_vehicleClass, "ui_vehicleClass", "1", CVAR_ARCHIVE | CVAR_ROM },
-	{ &ui_vehicleClass, "ui_vehicleLoadout", "1", CVAR_ARCHIVE | CVAR_ROM },
-	{ &ui_vehicle, "ui_vehicle", "0", CVAR_ARCHIVE | CVAR_ROM },
+	{ &ui_vehicleCat, "ui_vehicleCat", "1", CVAR_ARCHIVE },
+	{ &ui_vehicleClass, "ui_vehicleClass", "1", CVAR_ARCHIVE },
+	{ &ui_vehicleClass, "ui_vehicleLoadout", "1", CVAR_ARCHIVE },
+	{ &ui_vehicle, "ui_vehicle", "0", CVAR_ARCHIVE },
 
 	{ &ui_vehicleCat, "ui_vehicleCatTxt", "<Category>", CVAR_ROM },
 	{ &ui_vehicleClass, "ui_vehicleClassTxt", "<Class>", CVAR_ROM },
