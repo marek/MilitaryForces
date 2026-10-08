@@ -898,9 +898,10 @@ void SV_Client::sendClientSnapshot()
 	this->buildClientSnapshot();
 
 	// bots need to have their snapshots build, but
-	// the query them directly without needing to be sent
-	EntityBase* gentity = theSV.getEntityByNum(this->clientNum_);
-	if( gentity && gentity->r.svFlags & SVF_BOT ) 
+	// the query them directly without needing to be sent.
+	// A bot is known by its connection, not by its entity: the entity is made anew at every spawn
+	// and for a moment does not carry the bot flag
+	if( this->netchan_.remoteAddress().type == NA_BOT ) 
 		return;
 
 	msg = Message( msg_buf, sizeof(msg_buf) );

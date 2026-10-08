@@ -102,6 +102,7 @@ int GameHost::botAllocateClient()
 	cl->state_ = SV_Client::CS_ACTIVE;
 	cl->lastPacketTime_ = theSVS.time_;
 	cl->netchan_.setRemoteType( NA_BOT );
+	cl->netchan_end_queue_ = &cl->netchan_start_queue_;
 	cl->rate_ = 16384;
 
 	return i;
