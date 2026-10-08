@@ -35,6 +35,15 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include <emscripten/emscripten.h>
 #endif
 
+#if defined(__APPLE__) || defined(__linux__)
+#include <execinfo.h>
+#include <unistd.h>
+#define MF_STACK_TRACE
+#endif
+#ifdef __APPLE__
+#include <mach-o/dyld.h>
+#endif
+
 #ifndef DEDICATED
 #ifdef USE_INTERNAL_SDL_HEADERS
 #	include "SDL.h"
@@ -692,6 +701,27 @@ Sys_SigHandler
 void Sys_SigHandler( int signal )
 {
 	static bool signalcaught = false;
+
+#ifdef MF_STACK_TRACE
+	// a fault's call stack goes to the log before anything else is tried: with the build's symbol files
+	// each address (less its module's load address) names the function
+	if( !signalcaught && signal != SIGTERM && signal != SIGINT && signal != SIGHUP && signal != SIGQUIT )
+	{
+		void *frames[48];
+		const int count = backtrace( frames, 48 );
+		fprintf( stderr, "Call stack for signal %d:\n", signal );
+#ifdef __APPLE__
+		for( uint32_t i = 0; i < _dyld_image_count(); i++ )
+		{
+			const char *image = _dyld_get_image_name( i );
+			if( strstr( image, "MilitaryForces" ) || strstr( image, "renderer_" ) )
+				fprintf( stderr, "module %s loaded at %p\n", image, static_cast<const void*>( _dyld_get_image_header( i ) ) );
+		}
+#endif
+		fflush( stderr );
+		backtrace_symbols_fd( frames, count, STDERR_FILENO );
+	}
+#endif
 
 	if( signalcaught )
 	{
