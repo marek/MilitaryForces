@@ -21,6 +21,8 @@ void ClientEntity::misc_Plane()
 
 	drawInfo = {};
 	drawInfo.basicInfo.vehicleIndex = this->currentState.modelindex;
+	// an empty vehicle keeps the paint of the team that left it
+	drawInfo.basicInfo.team = cgs.gametype >= GT_TEAM ? this->currentState.generic1 : 0;
 	drawInfo.basicInfo.ONOFF = ONOFF;
 		
 	// get speed
@@ -120,12 +122,6 @@ void ClientEntity::misc_Plane()
 	// loadout
 	this->setDrawLoadout( &drawInfo.basicInfo );
 
-	// smoke
-	if( this->currentState.generic1 ) {
-		AngleVectors( this->lerpAngles, forward, nullptr, nullptr );
-		smokePosition = this->lerpOrigin + forward * ( availableVehicles[this->currentState.modelindex].mins[0] );
-		this->generic_Smoke( smokePosition, 10 );
-	}
 
 	// muzzleflash
 	if( cg.time - this->muzzleFlashTime <= MUZZLE_FLASH_TIME ) {
@@ -179,6 +175,8 @@ void ClientEntity::misc_GV()
 
 	drawInfo = {};
 	drawInfo.basicInfo.vehicleIndex = this->currentState.modelindex;
+	// an empty vehicle keeps the paint of the team that left it
+	drawInfo.basicInfo.team = cgs.gametype >= GT_TEAM ? this->currentState.generic1 : 0;
 	drawInfo.basicInfo.ONOFF = this->currentState.ONOFF;
 
 	// get velocity
@@ -235,25 +233,6 @@ void ClientEntity::misc_GV()
 	// draw plane
 	CGame::drawGV(&drawInfo);
 
-	// smoke 
-	if( this->currentState.generic1 ) {
-		LocalEntity	*smoke;
-		Vec3			up = {0, 0, 20};
-		Vec3			pos;
-		Vec3			forward;
-
-		AngleVectors( this->lerpAngles, forward, nullptr, nullptr );
-		pos = this->lerpOrigin;
-		pos[2] += 12;
-
-		smoke = CGame::smokePuff( pos, up, 
-					  this->currentState.generic1, 
-					  0.5, 0.5, 0.5, 0.66f,
-					  200*this->currentState.generic1, 
-					  cg.time, 0,
-					  LEF_PUFF_DONT_SCALE, 
-					  cgs.media.smokePuffShader );	
-	}
 }
 
 /*
@@ -270,6 +249,8 @@ void ClientEntity::misc_Helo()
 
 	drawInfo = {};
 	drawInfo.basicInfo.vehicleIndex = this->currentState.modelindex;
+	// an empty vehicle keeps the paint of the team that left it
+	drawInfo.basicInfo.team = cgs.gametype >= GT_TEAM ? this->currentState.generic1 : 0;
 	drawInfo.basicInfo.ONOFF = this->currentState.ONOFF;
 
 	// get velocity
@@ -307,25 +288,6 @@ void ClientEntity::misc_Helo()
 	// draw helo
 	CGame::drawHelo(&drawInfo);
 
-	// smoke 
-	if( this->currentState.generic1 ) {
-		LocalEntity	*smoke;
-		Vec3			up = {0, 0, 20};
-		Vec3			pos;
-		Vec3			forward;
-
-		AngleVectors( this->lerpAngles, forward, nullptr, nullptr );
-		pos = this->lerpOrigin;
-		pos[2] += 12;
-
-		smoke = CGame::smokePuff( pos, up, 
-					  this->currentState.generic1, 
-					  0.5, 0.5, 0.5, 0.66f,
-					  200*this->currentState.generic1, 
-					  cg.time, 0,
-					  LEF_PUFF_DONT_SCALE, 
-					  cgs.media.smokePuffShader );	
-	}
 }
 
 /*
@@ -353,6 +315,8 @@ void ClientEntity::misc_Boat()
 
 	drawInfo = {};
 	drawInfo.basicInfo.vehicleIndex = this->currentState.modelindex;
+	// an empty vehicle keeps the paint of the team that left it
+	drawInfo.basicInfo.team = cgs.gametype >= GT_TEAM ? this->currentState.generic1 : 0;
 	drawInfo.basicInfo.ONOFF = this->currentState.ONOFF;
 
 	// get velocity
@@ -389,25 +353,6 @@ void ClientEntity::misc_Boat()
 	// draw boat
 	CGame::drawBoat(&drawInfo);
 
-	// smoke 
-	if( this->currentState.generic1 ) {
-		LocalEntity	*smoke;
-		Vec3			up = {0, 0, 20};
-		Vec3			pos;
-		Vec3			forward;
-
-		AngleVectors( this->lerpAngles, forward, nullptr, nullptr );
-		pos = this->lerpOrigin;
-		pos[2] += 12;
-
-		smoke = CGame::smokePuff( pos, up, 
-					  this->currentState.generic1, 
-					  0.5, 0.5, 0.5, 0.66f,
-					  200*this->currentState.generic1, 
-					  cg.time, 0,
-					  LEF_PUFF_DONT_SCALE, 
-					  cgs.media.smokePuffShader );	
-	}
 }
 
 
@@ -447,25 +392,6 @@ void ClientEntity::misc_GI()
 	// draw plane
 	CGame::drawGI(&drawInfo);
 
-	// smoke 
-	if( this->currentState.generic1 ) {
-		LocalEntity	*smoke;
-		Vec3			up = {0, 0, 20};
-		Vec3			pos;
-		Vec3			forward;
-
-		AngleVectors( this->lerpAngles, forward, nullptr, nullptr );
-		pos = this->lerpOrigin;
-		pos[2] += 12;
-
-		smoke = CGame::smokePuff( pos, up, 
-					  this->currentState.generic1, 
-					  0.5, 0.5, 0.5, 0.66f,
-					  200*this->currentState.generic1, 
-					  cg.time, 0,
-					  LEF_PUFF_DONT_SCALE, 
-					  cgs.media.smokePuffShader );	
-	}
 }
 
 

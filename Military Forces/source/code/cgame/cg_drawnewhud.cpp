@@ -5,6 +5,12 @@
 #include "cg_local.h"
 #include "ui_utils_cg.h"
 
+// a vehicle left standing that anyone may take: it shows on radar as neither friend nor foe
+static bool emptyVehicle( const entityState_t& state )
+{
+	return state.eType == ET_MISC_VEHICLE && (state.seatMask & SEATMASK_ENTERABLE) && !(state.seatMask & SEATMASK_PILOT);
+}
+
 extern UI_UtilsCG cgUtils;
 
 
@@ -536,8 +542,10 @@ void CGame::drawRadarSymbols_AIR_new( int vehicle, float range, int x, int y ) {
 		} else {
 			continue;
 		}
-		// friend or foe
-		if( cgs.gametype >= GT_TEAM ) {
+		// nobody aboard, friend or foe
+		if( emptyVehicle( cg.radarEnts[i]->currentState ) )
+			icon += 2;
+		else if( cgs.gametype >= GT_TEAM ) {
 			if( CGame::apparentTeam( cg.radarEnts[i]->currentState.clientNum, cgs.clientinfo[self->currentState.clientNum].team ) ==
 				cgs.clientinfo[self->currentState.clientNum].team ) 
 				icon++;
@@ -675,8 +683,10 @@ void CGame::drawRadarSymbols_GROUND_new( int vehicle, float range, int x, int y 
 			{
 				continue;
 			}
-			// friend or foe
-			if( cgs.gametype >= GT_TEAM ) 
+			// nobody aboard, friend or foe
+			if( emptyVehicle( cg.radarEnts[i]->currentState ) )
+				icon += 2;
+			else if( cgs.gametype >= GT_TEAM ) 
 			{
 				if( CGame::apparentTeam( cg.radarEnts[i]->currentState.clientNum, cgs.clientinfo[self->currentState.clientNum].team ) ==
 					cgs.clientinfo[self->currentState.clientNum].team ) 
