@@ -64,7 +64,6 @@ cpack --preset darwin-arm
 
 Presets: `darwin-x86`, `darwin-arm`, `linux-x86`, `linux-arm`, `windows`. Each builds into `builds/<preset>`, and
 `cpack` writes `dist/militaryforces-<version>-<preset>.zip` together with `dist/RELEASE_NOTES.md`.
-`darwin-x86-debug`, `-asan` and `-warn` are development builds.
 
 The game data is a separate repository. Packaging takes the built paks from `../assets/build/mfdata`; set
 `-DMF_DATA_DIR=<folder>` if they are somewhere else. To run a build in place:

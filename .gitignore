@@ -2,3 +2,4 @@ build*/
 dist/
 deps/
 .DS_Store
+CMakeUserPresets.json

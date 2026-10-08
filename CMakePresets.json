@@ -84,62 +84,6 @@
             "cacheVariables": {
                 "MF_PLATFORM": "windows"
             }
-        },
-        {
-            "name": "darwin-x86-debug",
-            "inherits": "base",
-            "condition": {
-                "type": "equals",
-                "lhs": "${hostSystemName}",
-                "rhs": "Darwin"
-            },
-            "cacheVariables": {
-                "CMAKE_OSX_ARCHITECTURES": "x86_64",
-                "CMAKE_PREFIX_PATH": "${sourceDir}/deps/x86_64",
-                "SDL2_DIR": "${sourceDir}/deps/x86_64/lib/cmake/SDL2",
-                "FREETYPE_LIBRARY": "${sourceDir}/deps/x86_64/lib/libfreetype.dylib",
-                "FREETYPE_INCLUDE_DIRS": "${sourceDir}/deps/x86_64/include/freetype2",
-                "CMAKE_BUILD_TYPE": "Debug",
-                "MF_PLATFORM": "darwin-x86"
-            }
-        },
-        {
-            "name": "darwin-x86-asan",
-            "inherits": "base",
-            "condition": {
-                "type": "equals",
-                "lhs": "${hostSystemName}",
-                "rhs": "Darwin"
-            },
-            "cacheVariables": {
-                "CMAKE_OSX_ARCHITECTURES": "x86_64",
-                "CMAKE_PREFIX_PATH": "${sourceDir}/deps/x86_64",
-                "SDL2_DIR": "${sourceDir}/deps/x86_64/lib/cmake/SDL2",
-                "FREETYPE_LIBRARY": "${sourceDir}/deps/x86_64/lib/libfreetype.dylib",
-                "FREETYPE_INCLUDE_DIRS": "${sourceDir}/deps/x86_64/include/freetype2",
-                "CMAKE_BUILD_TYPE": "Debug",
-                "MF_SANITIZE": "address,undefined",
-                "MF_PLATFORM": "darwin-x86"
-            }
-        },
-        {
-            "name": "darwin-x86-warn",
-            "inherits": "base",
-            "condition": {
-                "type": "equals",
-                "lhs": "${hostSystemName}",
-                "rhs": "Darwin"
-            },
-            "cacheVariables": {
-                "CMAKE_OSX_ARCHITECTURES": "x86_64",
-                "CMAKE_PREFIX_PATH": "${sourceDir}/deps/x86_64",
-                "SDL2_DIR": "${sourceDir}/deps/x86_64/lib/cmake/SDL2",
-                "FREETYPE_LIBRARY": "${sourceDir}/deps/x86_64/lib/libfreetype.dylib",
-                "FREETYPE_INCLUDE_DIRS": "${sourceDir}/deps/x86_64/include/freetype2",
-                "CMAKE_BUILD_TYPE": "Debug",
-                "MF_WARNINGS": "ON",
-                "MF_PLATFORM": "darwin-x86"
-            }
         }
     ],
     "buildPresets": [
@@ -162,18 +106,6 @@
         {
             "name": "windows",
             "configurePreset": "windows"
-        },
-        {
-            "name": "darwin-x86-debug",
-            "configurePreset": "darwin-x86-debug"
-        },
-        {
-            "name": "darwin-x86-asan",
-            "configurePreset": "darwin-x86-asan"
-        },
-        {
-            "name": "darwin-x86-warn",
-            "configurePreset": "darwin-x86-warn"
         }
     ],
     "packagePresets": [

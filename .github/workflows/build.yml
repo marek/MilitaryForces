@@ -1,14 +1,12 @@
 name: build
 
-# Every push and pull request compiles all platforms. Pushes to this repository also fetch the game data
-# (private repository, read-only deploy key in the ASSETS_DEPLOY_KEY secret) and start a server on a map.
-# Full packages are kept only for tags and manual runs; a v* tag also drafts a release from them.
+# Runs only when a v* tag is pushed or when started by hand from the Actions tab. Builds every platform, fetches
+# the game data (private repository, read-only deploy key in the ASSETS_DEPLOY_KEY secret), starts a server on a
+# map and keeps the packages; a v* tag also drafts a release from them.
 
 on:
   push:
-    branches: [master]
     tags: ['v*']
-  pull_request:
   workflow_dispatch:
 
 permissions:
@@ -30,8 +28,7 @@ jobs:
           - { platform: linux-arm, os: ubuntu-24.04-arm, shell: bash, experimental: true }
           - { platform: windows, os: windows-latest, shell: 'msys2 {0}', experimental: true }
     env:
-      WITH_ASSETS: ${{ secrets.ASSETS_DEPLOY_KEY != '' && github.event_name != 'pull_request' }}
-      KEEP_PACKAGES: ${{ startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch' }}
+      WITH_ASSETS: ${{ secrets.ASSETS_DEPLOY_KEY != '' }}
     defaults:
       run:
         shell: ${{ matrix.shell }}
@@ -116,7 +113,6 @@ jobs:
         run: cpack --preset ${{ matrix.platform }}
 
       - name: keep packages
-        if: env.KEEP_PACKAGES == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: package-${{ matrix.platform }}
@@ -124,7 +120,6 @@ jobs:
           if-no-files-found: error
 
       - name: keep symbols
-        if: env.KEEP_PACKAGES == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: symbols-${{ matrix.platform }}
