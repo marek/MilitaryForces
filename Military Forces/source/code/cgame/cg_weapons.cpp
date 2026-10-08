@@ -590,6 +590,81 @@ WEAPON EVENTS
 ===================================================================================================
 */
 
+// one spent casing thrown clear of a gun: it keeps the vehicle's speed, tumbles and falls
+static void launchCasing( const Vec3& origin, const Vec3& velocity )
+{
+	LocalEntity* le = CGame::allocLocalEntity();
+	refEntity_t* re = &le->refEntity;
+	le->leType = LE_FRAGMENT;
+	le->startTime = cg.time;
+	le->endTime = le->startTime + cg_casingTime.integer * 1000;
+	VectorCopy( origin, re->origin );
+	AxisCopy( axisDefault, re->axis );
+	re->hModel = cgs.media.casingModel;
+	le->pos.trType = TR_GRAVITY;
+	VectorCopy( origin, le->pos.trBase );
+	VectorCopy( velocity, le->pos.trDelta );
+	le->pos.trTime = cg.time;
+	le->angles.trType = TR_LINEAR;
+	le->angles.trTime = cg.time;
+	VectorSet( le->angles.trBase, random() * 360.0f, random() * 360.0f, random() * 360.0f );
+	VectorSet( le->angles.trDelta, crandom() * 600.0f, crandom() * 600.0f, crandom() * 300.0f );
+	le->leFlags = LEF_TUMBLE;
+	le->bounceFactor = 0.3f;
+	le->leBounceSoundType = LEBS_BRASS;
+	le->leMarkType = LEMT_NONE;
+}
+
+// casings leave each gun that fired: the Huey's door guns that bear, a bomber's turrets, or the vehicle's gun
+void ClientEntity::ejectCasings( bool main, int weaponIndex )
+{
+	// how fast a casing is thrown sideways and upwards
+	constexpr float throwSide = 45.0f, throwUp = 25.0f;
+
+	const int clientNum = this->currentState.clientNum;
+	if( cg_casingTime.integer <= 0 || !cgs.media.casingModel || clientNum < 0 || clientNum >= MAX_CLIENTS )
+		return;
+	const int vehicle = cgs.clientinfo[clientNum].vehicle;
+	if( vehicle < 0 || vehicle >= bg_numberOfVehicles )
+		return;
+	const completeVehicleData_t& veh = availableVehicles[vehicle];
+
+	Vec3 forward, right, up, base, speed;
+	AngleVectors( this->lerpAngles, forward, right, up );
+	VectorCopy( this->lerpOrigin, base );
+	VectorCopy( this->currentState.pos.trDelta, speed );
+
+	const auto launch = [&]( float f, float r, float u, float side ) {
+		const Vec3 origin = base + forward * f + right * r + up * u;
+		const Vec3 velocity = speed + right * ( side * throwSide * ( 0.7f + random() * 0.6f ) ) + up * ( throwUp * ( 0.5f + random() ) ) + forward * ( crandom() * 10.0f );
+		launchCasing( origin, velocity );
+	};
+
+	if( main && (veh.flags & VF_DOORGUNS) && availableWeapons[weaponIndex].turret )
+	{
+		float aim = this->lerpAngles2[ROLL];
+		if( aim > 180 ) aim -= 360;
+		if( doorGunBears( false, aim ) ) launch( DOORGUN_FORWARD, DOORGUN_SIDE, DOORGUN_UP, 1.0f );
+		if( doorGunBears( true, aim ) ) launch( DOORGUN_FORWARD, -DOORGUN_SIDE, DOORGUN_UP, -1.0f );
+		return;
+	}
+	if( !main && (veh.flags & VF_GUNSTATIONS) )
+	{
+		// only the crew's own client knows where they look; for other aircraft the look is taken as straight ahead
+		vec3_t aimAngles;
+		VectorCopy( clientNum == cg.snap->ps.clientNum ? cg.snap->ps.viewangles : this->lerpAngles, aimAngles );
+		const unsigned bearing = VehicleData::gunStationsBearing( vehicle, this->lerpAngles, aimAngles );
+		unsigned bit = 1;
+		for( const GunStation& station : VehicleData::gunStations( vehicle ) )
+		{
+			if( bearing & bit ) launch( station.forward, station.right, station.up, crandom() > 0 ? 1.0f : -1.0f );
+			bit <<= 1;
+		}
+		return;
+	}
+	launch( veh.gunoffset[0], veh.gunoffset[1], veh.gunoffset[2], veh.gunoffset[1] < 0 ? -1.0f : 1.0f );
+}
+
 /*
 ================
 CG_FireWeapon
@@ -626,6 +701,8 @@ void ClientEntity::fireMachinegun( bool main )
 	// mark the entity as muzzle flashing, so when it is added it will
 	// append the flash to the weapon model
 	this->muzzleFlashTime = cg.time;
+
+	this->ejectCasings( main, this->muzzleFlashWeapon );
 
 	// play a sound
 

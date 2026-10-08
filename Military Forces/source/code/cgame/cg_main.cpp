@@ -189,6 +189,7 @@ vmCvar_t	m2cp_page5;
 
 vmCvar_t	cg_fxQuality;
 vmCvar_t	cg_debrisTime;
+vmCvar_t	cg_casingTime;
 vmCvar_t	cg_consoleTextStyle;
 
 // MFQ3: development cVars
@@ -312,6 +313,7 @@ cvarTable_t		cvarTable[] = {
 	{ &m2cp_page5, "m2cp_page5", "1", CVAR_ARCHIVE },
 
 	{ &cg_debrisTime, "cg_debrisTime", "120", CVAR_ARCHIVE },
+	{ &cg_casingTime, "cg_casingTime", "6", CVAR_ARCHIVE },	// seconds a spent casing stays; 0 turns casings off
 	{ &cg_fxQuality, "cg_fxQuality", "2", CVAR_ARCHIVE },	// enum: quality_t in cg_local.h
 	{ &cg_consoleTextStyle, "cg_consoleTextStyle", "3", CVAR_ARCHIVE },
 
@@ -1012,6 +1014,7 @@ void CGame::registerGraphics( ) {
 
 	cgs.media.bulletFlashModel = refExport.RegisterModel( "models/weaphits/bullet.md3");
 	cgs.media.dishFlashModel = refExport.RegisterModel( "models/weaphits/boom01.md3");
+	cgs.media.casingModel = refExport.RegisterModel( "models/weapons/casing/casing.md3" );
 
 	memset( cg_items, 0, sizeof( cg_items ) );
 	memset( cg_weapons, 0, sizeof( cg_weapons ) );

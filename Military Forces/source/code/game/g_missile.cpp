@@ -1312,13 +1312,6 @@ void fire_ironbomb( GameEntity *self )
 }
 
 
-namespace
-{
-	// where the Huey's door mounts are, from the model's turret tags
-	constexpr float doorGunForward = 4.1f;
-	constexpr float doorGunSide = 6.6f;
-	constexpr float doorGunUp = -1.7f;
-}
 
 // one bullet of the vehicle's gun leaving a muzzle
 static void spawnBullet( GameEntity *self, int weapIdx, const Vec3& from, const Vec3& dir )
@@ -1426,7 +1419,7 @@ void fire_autocannon( GameEntity *self, bool main )
 				CrossProduct( up, temp, right );
 				RotatePointAroundVector( dir, right, temp, self->client_->ps_.gunAngle );
 				VectorCopy( self->s.pos.trBase, start );
-				start = start + flatForward * doorGunForward + flatRight * ( leftGun ? -doorGunSide : doorGunSide ) + flatUp * doorGunUp;
+				start = start + flatForward * DOORGUN_FORWARD + flatRight * ( leftGun ? -DOORGUN_SIDE : DOORGUN_SIDE ) + flatUp * DOORGUN_UP;
 				spawnBullet( self, weapIdx, start, dir );
 			}
 			return;

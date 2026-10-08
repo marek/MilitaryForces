@@ -244,6 +244,7 @@ public:
 	void setDrawLoadout( BasicDrawInfo_t* info );
 	void vehicle();
 	void fireMachinegun( bool main );
+	void ejectCasings( bool main, int weaponIndex );
 	void fireWeapon();
 
 	entityState_t	currentState;	// from cg.frame
@@ -848,6 +849,7 @@ struct cgMedia_t {
 	// weapon effect models
 	qhandle_t	bulletFlashModel;
 	qhandle_t	dishFlashModel;
+	qhandle_t	casingModel;
 
 	// weapon effect shaders
 	qhandle_t	bulletExplosionShader;
@@ -1253,6 +1255,7 @@ extern	vmCvar_t		m2cp_page5;
 
 extern	vmCvar_t		cg_fxQuality;
 extern	vmCvar_t		cg_debrisTime;
+extern	vmCvar_t		cg_casingTime;
 extern	vmCvar_t		cg_consoleTextStyle;
 
 extern	vmCvar_t		cg_shadowDebug;

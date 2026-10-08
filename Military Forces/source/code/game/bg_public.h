@@ -680,6 +680,10 @@ inline constexpr int VF_DOORGUNS = 8;	// one gun in each door, sharing one weapo
 // door guns stop short of the fuselage line; both fire only when the aim is this close to straight ahead or behind
 inline constexpr float DOORGUN_STOP = 2.0f;
 inline constexpr float DOORGUN_BOTH = 4.0f;
+// where the Huey's door mounts are, from the model's turret tags
+inline constexpr float DOORGUN_FORWARD = 4.1f;
+inline constexpr float DOORGUN_SIDE = 6.6f;
+inline constexpr float DOORGUN_UP = -1.7f;
 
 // the yaw a door gun takes for a wanted aim yaw (-180..180, positive left): its own side, held at the nearer stop otherwise
 inline float doorGunYaw( bool leftGun, float aim )
