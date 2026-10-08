@@ -596,6 +596,16 @@ static bool alSourcesInitialised = false;
 static int lastListenerNumber = -1;
 static vec3_t lastListenerOrigin = { 0.0f, 0.0f, 0.0f };
 
+// what went without a source since the last report (s_alVoiceStats 1 prints it once a second)
+static cvar_t *s_alVoiceStats;
+static struct
+{
+	int loopsDenied;		// loops that found no source
+	int loopsStolen;		// playing loops within earshot that lost their source to another sound
+	int shotsDenied;		// one-shot sounds that found no source
+	int lastReport;
+} voiceStats;
+
 struct sentity_s
 {
 	vec3_t					origin;
@@ -1028,7 +1038,12 @@ S_AL_SrcAlloc
 =================
 */
 static
-static srcHandle_t S_AL_SrcAlloc( alSrcPriority_t priority, int entnum, int channel )
+// a loop asking for a source may take it from a loop of its own kind that is this much farther from the listener;
+// the margin keeps two loops at similar range from trading the source back and forth
+static constexpr float loopTakeover = 1.5f;
+
+// loopDistance: for a looping sound, its distance from the listener; negative for anything else
+static srcHandle_t S_AL_SrcAlloc( alSrcPriority_t priority, int entnum, int channel, float loopDistance = -1.0f )
 {
 	int i;
 	int empty = -1;
@@ -1036,6 +1051,7 @@ static srcHandle_t S_AL_SrcAlloc( alSrcPriority_t priority, int entnum, int chan
 	int weakest_time = System::milliseconds();
 	int weakest_pri = 999;
 	float weakest_gain = 1000.0;
+	float weakest_dist = -1.0f;
 	bool weakest_isplaying = true;
 	int weakest_numloops = 0;
 	src_t *curSource;
@@ -1055,12 +1071,23 @@ static srcHandle_t S_AL_SrcAlloc( alSrcPriority_t priority, int entnum, int chan
 			break;
 		}
 
+		// the loop of the vehicle the listener sits in is never given up: it is the sound the player notices missing
+		if(curSource->isLooping && curSource->local)
+			continue;
+
 		if(curSource->isPlaying)
 		{
-			if(weakest_isplaying && curSource->priority < priority &&
+			const float dist = curSource->isLooping ? Distance(curSource->loopSpeakerPos, lastListenerOrigin) : 0.0f;
+			const bool fartherLoop = loopDistance >= 0.0f && curSource->isLooping && curSource->priority == priority &&
+				dist > loopDistance * loopTakeover;
+
+			if(weakest_isplaying && (curSource->priority < priority || fartherLoop) &&
 			   (curSource->priority < weakest_pri ||
+			   (curSource->isLooping && curSource->priority == weakest_pri && dist > weakest_dist) ||
 			   (!curSource->isLooping && (curSource->scaleGain < weakest_gain || curSource->lastUsedTime < weakest_time))))
 			{
+				// of several loops that could go, the farthest goes
+				weakest_dist = dist;
 				// If it has lower priority, is fainter or older, flag it as weak
 				// the last two values are only compared if it's not a looping sound, because we want to prevent two
 				// loops (loops are added EVERY frame) fighting for a slot
@@ -1106,6 +1133,9 @@ static srcHandle_t S_AL_SrcAlloc( alSrcPriority_t priority, int entnum, int chan
 	
 	if(empty >= 0)
 	{
+		if(srcList[empty].isActive && srcList[empty].isLooping && srcList[empty].isPlaying && srcList[empty].scaleGain > 0.0f)
+			voiceStats.loopsStolen++;
+
 		S_AL_SrcKill(empty);
 		srcList[empty].isActive = true;
 		srcActiveCnt++;
@@ -1267,18 +1297,21 @@ static void S_AL_StartSound( vec3_t origin, int entnum, int entchannel, sfxHandl
 	
 	S_AL_SanitiseVector(sorigin);
 	
-	if((srcActiveCnt > 5 * srcCount / 3) &&
+	if((srcActiveCnt > 2 * srcCount / 3) &&
 		(DistanceSquared(sorigin, lastListenerOrigin) >=
 		(s_alMaxDistance->asFloat() + s_alGraceDistance->asFloat()) * (s_alMaxDistance->asFloat() + s_alGraceDistance->asFloat())))
 	{
-		// We're getting tight on sources and source is not within hearing distance so don't add it
+		// two thirds of the sources are in use and this one is out of hearing: don't add it
 		return;
 	}
 
 	// Try to grab a source
 	src = S_AL_SrcAlloc(SRCPRI_ONESHOT, entnum, entchannel);
 	if(src == -1)
+	{
+		voiceStats.shotsDenied++;
 		return;
+	}
 
 	S_AL_SrcSetup(src, sfx, SRCPRI_ONESHOT, entnum, entchannel, false);
 	
@@ -1331,11 +1364,14 @@ static void S_AL_SrcLoop( alSrcPriority_t priority, sfxHandle_t sfx,
 	if( !sent->srcAllocated )
 	{
 		// Try to get a channel
-		src = S_AL_SrcAlloc( priority, entityNum, -1 );
+		const float loopDistance = S_AL_HearingThroughEntity( entityNum ) ? 0.0f :
+			Distance( origin ? origin : sent->origin, lastListenerOrigin );
+		src = S_AL_SrcAlloc( priority, entityNum, -1, loopDistance );
 		if( src == -1 )
 		{
 			Common::dPrintf( S_COLOR_YELLOW "WARNING: Failed to allocate source "
 					"for loop sfx %d on entity %d\n", sfx, entityNum );
+			voiceStats.loopsDenied++;
 			return;
 		}
 
@@ -2277,6 +2313,26 @@ static void S_AL_Update( )
 {
 	int i;
 
+	if(s_alVoiceStats->asInt() && System::milliseconds() - voiceStats.lastReport >= 1000)
+	{
+		Common::printf( "AL voices: %d of %d sources in use, loops denied %d, audible loops stolen %d, shots denied %d\n",
+			srcActiveCnt, srcCount, voiceStats.loopsDenied, voiceStats.loopsStolen, voiceStats.shotsDenied );
+		// the loop of the entity the listener sits in: the sound a player notices missing first
+		const src_t *own = nullptr;
+		for(i = 0; i < srcCount; i++)
+		{
+			if(srcList[i].isActive && srcList[i].isLooping && srcList[i].entity == lastListenerNumber)
+				own = &srcList[i];
+		}
+		if(own)
+			Common::printf( "AL own loop: sfx %d playing %d gain %.2f at %.0f units\n", own->sfx, own->isPlaying, own->scaleGain,
+				Distance( own->loopSpeakerPos, lastListenerOrigin ) );
+		else
+			Common::printf( "AL own loop: none\n" );
+		voiceStats = {};
+		voiceStats.lastReport = System::milliseconds();
+	}
+
 	if(s_muted->modified())
 	{
 		// muted state changed. Let S_AL_Gain turn up all sources again.
@@ -2545,6 +2601,7 @@ bool S_AL_Init( soundInterface_t *si )
 	s_alPrecache = CvarSystem::get( "s_alPrecache", "1", CVAR_ARCHIVE );
 	s_alGain = CvarSystem::get( "s_alGain", "1.0", CVAR_ARCHIVE );
 	s_alSources = CvarSystem::get( "s_alSources", "96", CVAR_ARCHIVE );
+	s_alVoiceStats = CvarSystem::get( "s_alVoiceStats", "0", 0 );
 	s_alDopplerFactor = CvarSystem::get( "s_alDopplerFactor", "1.0", CVAR_ARCHIVE );
 	s_alDopplerSpeed = CvarSystem::get( "s_alDopplerSpeed", "9000", CVAR_ARCHIVE );
 	s_alMinDistance = CvarSystem::get( "s_alMinDistance", "120", CVAR_CHEAT );
