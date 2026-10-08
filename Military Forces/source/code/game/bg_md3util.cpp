@@ -21,34 +21,28 @@ providing the file and tagname this functions returns the taginfo
 */
 
 
-bool VehicleData::findTag(const char* fileName, const char* tagname, md3Tag_t* tag)
+std::optional<md3Tag_t> VehicleData::findTag(const char* fileName, const char* tagname)
 {
-	fileHandle_t	f;
-	bool		found = false;
-
-	if( const OpenFile file( fileName, FS_READ ); file ) {
-		f = file.handle();
-		md3Header_t head;
-		md3Frame_t	frame;
-		int			i;	
-		FileSystem::read(&head, sizeof(head), f);
-//		CGame::printf("%s has %i tags\n", fileName, head.numTags );
-		for( i = 0; i < head.numFrames; ++i ) {
-			FileSystem::read(&frame, sizeof(frame), f);
-		}
-		for( i = 0; i < head.numTags; ++i ) {
-			FileSystem::read(tag, sizeof(md3Tag_t), f);
-			if( strcmp( tag->name, tagname ) == 0 ) {
-				found = true;
-				break;
-			}
-//			CGame::printf("tag %i: %s\n", i, tag.name );
-//			CGame::printf("tag %i: %.1f %.1f %.1f\n", i, tag.origin[0], tag.origin[1], tag.origin[2] );
-		}
-	} else {
+	const OpenFile file( fileName, FS_READ );
+	if( !file ) {
 		Common::printf( "Unable to read tag from %s\n", fileName );
+		return std::nullopt;
 	}
-	return found;
+	const fileHandle_t f = file.handle();
+	md3Header_t head;
+	md3Frame_t	frame;
+	FileSystem::read(&head, sizeof(head), f);
+	for( int i = 0; i < head.numFrames; ++i ) {
+		FileSystem::read(&frame, sizeof(frame), f);
+	}
+	for( int i = 0; i < head.numTags; ++i ) {
+		md3Tag_t tag;
+		FileSystem::read(&tag, sizeof(tag), f);
+		if( strcmp( tag.name, tagname ) == 0 ) {
+			return tag;
+		}
+	}
+	return std::nullopt;
 }
 
 /*
@@ -123,34 +117,28 @@ providing the file and the framenumber this functions returns the dimensions of 
 =================
 */
 
-bool VehicleData::getDimensions(const char* fileName, int frame, vec3_t* maxs, vec3_t* mins)
+std::optional<ModelBounds> VehicleData::getDimensions(const char* fileName, int frame)
 {
-	fileHandle_t	f;
-	bool		found = false;
-	int				i, number;
-
-	if( const OpenFile file( fileName, FS_READ ); file ) {
-		f = file.handle();
-		md3Header_t head;
-		md3Frame_t frames;
-		
-		FileSystem::read(&head, sizeof(head), f);
-		number = head.numFrames;
-		if( frame >= 0 && frame < number ) {
-			for( i = 0; i <= frame; ++i ) {
-				FileSystem::read(&frames, sizeof(frames), f);
-			}
-			if( mins ) 
-				VectorCopy( frames.bounds[0], *mins );
-			if( maxs ) 
-				VectorCopy( frames.bounds[1], *maxs );
-			found = true;
-		}
-	} else {
+	const OpenFile file( fileName, FS_READ );
+	if( !file ) {
 		Common::printf( "Unable to open file %s\n", fileName );
+		return std::nullopt;
 	}
-	return found;
+	const fileHandle_t f = file.handle();
+	md3Header_t head;
+	md3Frame_t frames;
 
+	FileSystem::read(&head, sizeof(head), f);
+	if( frame < 0 || frame >= head.numFrames ) {
+		return std::nullopt;
+	}
+	for( int i = 0; i <= frame; ++i ) {
+		FileSystem::read(&frames, sizeof(frames), f);
+	}
+	ModelBounds bounds;
+	VectorCopy( frames.bounds[0], bounds.mins );
+	VectorCopy( frames.bounds[1], bounds.maxs );
+	return bounds;
 }
 
 

@@ -1620,7 +1620,8 @@ public:
 	static void zoomUp_f( );
 	static void addBufferedSound( sfxHandle_t sfx);
 	static void drawActiveFrame( int serverTime, stereoFrame_t stereoView, bool demoPlayback );
-	static bool worldToScreenCoords( vec3_t worldPoint, int * pX, int * pY, bool virtualXY );
+	struct ScreenPoint { int x, y; };
+	static std::optional<ScreenPoint> worldToScreenCoords( vec3_t worldPoint, bool virtualXY );
 	static void drawProgressBar( rectDef_t *rect, vec4_t color, vec4_t textcolor, float scale, int textStyle, float progress );
 	static void setScreenPlacement( screenPlacement_e placement );
 	static screenPlacement_e getScreenPlacement( );

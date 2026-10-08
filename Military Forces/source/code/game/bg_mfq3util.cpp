@@ -372,9 +372,6 @@ void VehicleData::loadAllVehicleData()
 	int i, j, num;
 	char* modelbasename = nullptr;
 	char name[128];
-	md3Tag_t tag;
-	float diff;
-	vec3_t max, min;
 
 	// MFQ3 loadouts
 	VehicleData::calculateAllDefaultLoadouts();
@@ -390,8 +387,12 @@ void VehicleData::loadAllVehicleData()
 		modelbasename = VehicleData::createModelPathname( i, "models/vehicles/%s/%s/%s" );	
 		// boundingbox
 		Com_sprintf( name, sizeof(name), "%s.md3", modelbasename );
-		if( !(availableVehicles[i].cat & CAT_LQM) )
-			VehicleData::getDimensions( name, 0, &availableVehicles[i].maxs, &availableVehicles[i].mins );
+		if( !(availableVehicles[i].cat & CAT_LQM) ) {
+			if( const auto bounds = VehicleData::getDimensions( name, 0 ) ) {
+				VectorCopy( bounds->maxs, availableVehicles[i].maxs );
+				VectorCopy( bounds->mins, availableVehicles[i].mins );
+			}
+		}
 		availableVehicles[i].mins[2] += 1;// to look better ?
 		if( availableVehicles[i].cat & CAT_BOAT ) 
 			VehicleData::findDeck( name, &availableVehicles[i] );
@@ -408,11 +409,6 @@ void VehicleData::loadAllVehicleData()
 		// helo/plane specific
 		if(availableVehicles[i].cat & CAT_PLANE) 
 		{
-			// Find gear tag offset from  min
-			VehicleData::findTag(name, "tag_gear", &tag);
-			diff = tag.origin[2] - availableVehicles[i].mins[2];
-			if(diff < 0) diff = 0;
-
 			// gear
 			Com_sprintf( name, sizeof(name), "%s_gear.md3", modelbasename );
 
@@ -420,28 +416,20 @@ void VehicleData::loadAllVehicleData()
 			if( const auto frames = VehicleData::getNumberOfFrames( name ) ) 
 			{
 				num = *frames;
-				vec3_t min1, min2;
 
 				availableVehicles[i].maxGearFrame = num - 1;
 				
 				if(!availableVehicles[i].gearheight)
 				{
-					if( VehicleData::getDimensions( name, 0, nullptr, &min1 ) &&
-						VehicleData::getDimensions( name, num-1, nullptr, &min2 ) ) 
+					const auto up = VehicleData::getDimensions( name, 0 );
+					const auto down = VehicleData::getDimensions( name, num-1 );
+					if( up && down ) 
 					{
-						availableVehicles[i].gearheight = min1[2] - min2[2] - 1.5;// for coll. detection
+						availableVehicles[i].gearheight = up->mins[2] - down->mins[2] - 1.5;// for coll. detection
 						if( availableVehicles[i].gearheight < 0 ) 
 							availableVehicles[i].gearheight = 0;
 					}
 				}
-				/*
-				VehicleData::findTag(name, "tag_gear", &tag);
-				VehicleData::getDimensions(name, num-1, &max,&min);
-				availableVehicles[i].gearheight = (tag.origin[2] - min[2]) - diff;
-				if( availableVehicles[i].gearheight < 0 ) availableVehicles[i].gearheight = 0;
-				*/
-
-				// Don't bother setting the gearheight, its too fucken bugged.
 			} 
 			else 
 				availableVehicles[i].maxGearFrame = GEAR_DOWN_DEFAULT;
@@ -466,27 +454,21 @@ void VehicleData::loadAllVehicleData()
 			}
 		} else if(availableVehicles[i].cat & CAT_HELO) {
 
-			// Find gear tag offset from  min
-			VehicleData::findTag(name, "tag_gear", &tag);
-			diff = tag.origin[2] - availableVehicles[i].mins[2];
-			if(diff < 0) diff = 0;
-
-
 			// gear
 			Com_sprintf( name, sizeof(name), "%s_gear.md3", modelbasename );
 
 			if( const auto frames = VehicleData::getNumberOfFrames( name ) ) {
 				num = *frames;
-				vec3_t min1, min2;
 
 				availableVehicles[i].maxGearFrame = num - 1;
 
 				
 				if(!availableVehicles[i].gearheight){
 
-					if( VehicleData::getDimensions( name, 0, nullptr, &min1 ) &&
-						VehicleData::getDimensions( name, num-1, nullptr, &min2 ) ) {
-						availableVehicles[i].gearheight = min1[2] - min2[2] - 1.5;// for coll. detection
+					const auto up = VehicleData::getDimensions( name, 0 );
+					const auto down = VehicleData::getDimensions( name, num-1 );
+					if( up && down ) {
+						availableVehicles[i].gearheight = up->mins[2] - down->mins[2] - 1.5;// for coll. detection
 						if( availableVehicles[i].gearheight < 0 ) availableVehicles[i].gearheight = 0;
 					}
 				
@@ -522,10 +504,8 @@ void VehicleData::loadAllVehicleData()
 
 			// increaes bounding box by turret height
 			Com_sprintf( name, sizeof(name), "%s_tur.md3", modelbasename );
-			VehicleData::getDimensions( name, 0, &max, &min );
-			diff = max[2] - min[2];
-			availableVehicles[i].maxs[2] += diff;
-		//	availableVehicles[i].mins[2] -= 2;	
+			if( const auto turret = VehicleData::getDimensions( name, 0 ) )
+				availableVehicles[i].maxs[2] += turret->maxs[2] - turret->mins[2];
 
 			// Increase bounding box if it has wheels!
 			// Increase rougly by 1/2 wheel length?
@@ -535,12 +515,12 @@ void VehicleData::loadAllVehicleData()
 			if(availableVehicles[i].wheels)
 			{
 				Com_sprintf( name, sizeof(name), "%s_w1.md3", modelbasename );
-				if( OpenFile( name, FS_READ ) )
+				if( const auto wheel = VehicleData::getDimensions( name, 0 ) )
 				{
-					VehicleData::findTag(name, "tag_wheel", &tag);
-					VehicleData::getDimensions( name, 0, &max, &min );
-					diff = max[2] - min[2];
-					availableVehicles[i].mins[2] = tag.origin[2] - (diff / 2);
+					// the wheel's own mount point, at its centre when the model has none
+					const auto mount = VehicleData::findTag( name, "tag_wheel" );
+					const float centre = mount ? mount->origin[2] : 0.0f;
+					availableVehicles[i].mins[2] = centre - ( wheel->maxs[2] - wheel->mins[2] ) / 2;
 				}
 				
 			}
@@ -561,8 +541,10 @@ void VehicleData::loadAllVehicleData()
 		modelbasename = VehicleData::createGIPathname( i, "models/vehicles/%s/%s/%s" );	
 		// boundingbox
 		Com_sprintf( name, sizeof(name), "%s.md3", modelbasename );
-		VehicleData::getDimensions( name, 0, &availableGroundInstallations[i].maxs, 
-				&availableGroundInstallations[i].mins );
+		if( const auto bounds = VehicleData::getDimensions( name, 0 ) ) {
+			VectorCopy( bounds->maxs, availableGroundInstallations[i].maxs );
+			VectorCopy( bounds->mins, availableGroundInstallations[i].mins );
+		}
 		availableGroundInstallations[i].maxs[2] += (15 + 7 * availableGroundInstallations[i].upgrades);
 	}
 }

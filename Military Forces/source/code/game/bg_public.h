@@ -1143,6 +1143,13 @@ struct mission_vehicle_t {
 
 
 
+// bounding box of one frame of a model file
+struct ModelBounds
+{
+	vec3_t	mins;
+	vec3_t	maxs;
+};
+
 class VehicleData
 {
 public:
@@ -1163,7 +1170,7 @@ public:
 	static void limitFloat( float * value, float min, float max );
 	static void limitInt( int * value, int min, int max );
 	static int extractEnumFromId( int vehicle, unsigned int op );
-	static bool findTag(const char* fileName, const char* tagname, md3Tag_t* tag);
+	static std::optional<md3Tag_t> findTag(const char* fileName, const char* tagname);
 	static bool distributeWeaponsOnPylons( int idx, completeLoadout_t* loadout );
 	static void calculateAllDefaultLoadouts();
 	static void getDefaultLoadoutForVehicle( int idx, completeLoadout_t* loadout, playerState_t* ps );
@@ -1171,7 +1178,7 @@ public:
 	static int addWeaponToLoadout( int weaponIndex, completeLoadout_t* loadout, playerState_t* ps );
 	static std::optional<int> getNumberOfFrames(const char* fileName);
 	static int getTagsContaining(const char* fileName, const char* str, md3Tag_t* tags, int num);
-	static bool getDimensions(const char* fileName, int frame, vec3_t* maxs, vec3_t* mins);
+	static std::optional<ModelBounds> getDimensions(const char* fileName, int frame);
 	static void loadAllVehicleData();
 	static int findWeaponsOfType( int weaponIndex, completeLoadout_t* loadout );
 	static int packagesOfType( int weaponIndex, completeLoadout_t* loadout );

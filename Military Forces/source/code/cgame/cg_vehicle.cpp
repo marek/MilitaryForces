@@ -522,11 +522,9 @@ void CGame::cacheBoat(int index)
 			availableVehicles[index].handle[i] = refExport.RegisterModel(name);
 		} else if( i & 1 ) {
 			static const char *turretTags[] = { "tag_turret", "tag_turret2", "tag_turret3", "tag_turret4" };
-			md3Tag_t tag;
-
 			Com_sprintf( body, sizeof(body), "%s.md3", basename );
 			availableVehicles[index].handle[i] = CGame::registerVehiclePart( name, 
-				availableVehicles[index].handle[BP_BOAT_BODY] && VehicleData::findTag( body, turretTags[i/2], &tag ) );
+				availableVehicles[index].handle[BP_BOAT_BODY] && VehicleData::findTag( body, turretTags[i/2] ).has_value() );
 		} else {
 			availableVehicles[index].handle[i] = CGame::registerVehiclePart( name, availableVehicles[index].handle[i-1] != 0 );
 		}

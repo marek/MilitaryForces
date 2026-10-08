@@ -767,7 +767,7 @@ CGame::worldToScreenCoords
 Converts a world vector point into screen coords
 =================
 */
-bool CGame::worldToScreenCoords( vec3_t worldPoint, int * pX, int * pY, bool virtualXY )
+std::optional<CGame::ScreenPoint> CGame::worldToScreenCoords( vec3_t worldPoint, bool virtualXY )
 {
 	Vec3 v, dp, n, p;
 	float tanthetah, tanthetav;
@@ -787,7 +787,7 @@ bool CGame::worldToScreenCoords( vec3_t worldPoint, int * pX, int * pY, bool vir
 	// don't continue if point is behind out view plane
 	if( dp[1] < 0 )
 	{
-		return false;
+		return std::nullopt;
 	}
 
 	// calc FOV adjustments
@@ -822,14 +822,10 @@ bool CGame::worldToScreenCoords( vec3_t worldPoint, int * pX, int * pY, bool vir
 		   CGame::virtualFromScreen( &p[0], &p[1] );
 	   }
 
-	   // convert 
-	   *pX = static_cast<int>(p[0]);
-	   *pY = static_cast<int>(p[1]);
-
 	   // on-screen
-	   return true;
+	   return ScreenPoint{ static_cast<int>(p[0]), static_cast<int>(p[1]) };
 	}
 
 	// off-screen
-	return false;
+	return std::nullopt;
 }

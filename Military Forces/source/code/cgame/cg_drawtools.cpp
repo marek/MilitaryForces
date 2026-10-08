@@ -1227,11 +1227,11 @@ void CGame::addReticleEntityToScene( refEntity_t * pReticle, ClientEntity * pTar
 		refExport.AddRefEntityToScene( pRecticle );
 #else
 		// if HUD image
-		if( CGame::worldToScreenCoords( pReticle->origin, &cg.HUDReticle[cg.reticleIdx].x, &cg.HUDReticle[cg.reticleIdx].y, true ) )
+		if( const auto point = CGame::worldToScreenCoords( pReticle->origin, true ) )
 		{
 			// set origin
-			cg.HUDReticle[cg.reticleIdx].ox = cg.HUDReticle[cg.reticleIdx].x;
-			cg.HUDReticle[cg.reticleIdx].oy = cg.HUDReticle[cg.reticleIdx].y;
+			cg.HUDReticle[cg.reticleIdx].ox = cg.HUDReticle[cg.reticleIdx].x = point->x;
+			cg.HUDReticle[cg.reticleIdx].oy = cg.HUDReticle[cg.reticleIdx].y = point->y;
 
 			// apply centering offset
 			cg.HUDReticle[cg.reticleIdx].x -= offsetx;
