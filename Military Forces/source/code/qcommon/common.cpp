@@ -36,8 +36,10 @@ int demo_protocols[] =
 
 constexpr int MAX_NUM_ARGVS = 50;
 
-constexpr int MIN_DEDICATED_COMHUNKMEGS = 1;
-#define DEF_COMHUNKMEGS 	128
+// the hunk has to hold a full server (the snapshot store of 63 players is 67 MB), a map and every vehicle's
+// models: a full game measured 127 MB. A smaller value saved in an old config is raised to the minimum
+constexpr int MIN_DEDICATED_COMHUNKMEGS = 256;
+#define DEF_COMHUNKMEGS 	512
 #define MIN_COMHUNKMEGS		DEF_COMHUNKMEGS
 #define DEF_COMZONEMEGS		48
 #define DEF_COMHUNKMEGS_S	XSTRING(DEF_COMHUNKMEGS)
@@ -1537,7 +1539,6 @@ static void Com_InitHunkMemory( ) {
 	cv = CvarSystem::get( "com_hunkMegs", DEF_COMHUNKMEGS_S, CVAR_LATCH | CVAR_ARCHIVE );
 	CvarSystem::setDescription(cv, "The size of the hunk memory segment");
 
-	// if we are not dedicated min allocation is 56, otherwise min is 1
 	if (com_dedicated && com_dedicated->asInt()) {
 		nMinAlloc = MIN_DEDICATED_COMHUNKMEGS;
 		pMsg = "Minimum com_hunkMegs for a dedicated server is %i, allocating %i megs.\n";
