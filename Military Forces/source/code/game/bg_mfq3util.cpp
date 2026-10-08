@@ -1183,6 +1183,44 @@ bool VehicleData::stealthHidden( int vehicle, int revealTime, int time, float di
 	return dist > radarRange * factor;
 }
 
+namespace
+{
+	// the B-17's four twin turrets, from the gun tags of its model: chin, top, ball and tail
+	constexpr GunStation b17Stations[] = {
+		{ 33.4f, 0.0f, -3.7f,   0.94f, 0.0f, -0.34f,  70.0f, 1.0f },
+		{  7.5f, 0.0f,  9.4f,   0.0f,  0.0f,  1.0f,   85.0f, 1.0f },
+		{ -18.0f, 0.0f, -6.3f,  0.0f,  0.0f, -1.0f,   85.0f, 1.7f },
+		{ -65.3f, 0.0f,  3.1f, -1.0f,  0.0f,  0.0f,   40.0f, 0.5f },
+	};
+}
+
+std::span<const GunStation> VehicleData::gunStations( int vehicle )
+{
+	if( vehicle < 0 || vehicle >= bg_numberOfVehicles || !(availableVehicles[vehicle].flags & VF_GUNSTATIONS) )
+		return {};
+	return b17Stations;
+}
+
+// bit n is set when station n can aim along aimAngles with the hull at hullAngles
+unsigned VehicleData::gunStationsBearing( int vehicle, const vec3_t hullAngles, const vec3_t aimAngles )
+{
+	vec3_t hull[3], aim;
+	unsigned mask = 0, bit = 1;
+	AnglesToAxis( hullAngles, hull );
+	AngleVectors( aimAngles, aim, nullptr, nullptr );
+	for( const GunStation& station : gunStations( vehicle ) )
+	{
+		// the hull's second axis points left
+		vec3_t axis;
+		for( int i = 0; i < 3; i++ )
+			axis[i] = hull[0][i] * station.axisForward - hull[1][i] * station.axisRight + hull[2][i] * station.axisUp;
+		if( DotProduct( axis, aim ) >= cos( DEG2RAD( station.arc ) ) * VectorLength( axis ) )
+			mask |= bit;
+		bit <<= 1;
+	}
+	return mask;
+}
+
 bool VehicleData::vehicleHasTurret( int vehicle )
 {
 	if( vehicle < 0 || vehicle >= bg_numberOfVehicles ) 

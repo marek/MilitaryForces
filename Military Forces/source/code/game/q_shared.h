@@ -177,6 +177,7 @@ typedef int intptr_t;
 #include <algorithm>
 #include <iterator>
 #include <optional>
+#include <span>
 #include <source_location>
 #include <numbers>
 #include <stdint.h>

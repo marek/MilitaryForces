@@ -1641,6 +1641,7 @@ completeVehicleData_t availableVehicles[] =
 		.gunoffset = {3.1, -9, -0.2},
 		.maxfuel = 60,
 		.tailangle = -8,
+		.flags = VF_GUNSTATIONS,
 		.weapons = { WI_MG_8XCAL50, WI_MK83, WI_MK83, 0, 0, 0, 0, 0 },
 		.ammo = { 450, 16, 16, 0, 0, 0, 0, 0 },
 		.cockpitview = {-4.9, 0, 7.3},

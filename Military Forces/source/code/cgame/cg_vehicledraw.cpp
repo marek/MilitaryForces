@@ -714,6 +714,10 @@ void CGame::drawLQM(DrawInfo_LQM_t* drawInfo)
 	completeVehicleData_t* veh = &availableVehicles[drawInfo->basicInfo.vehicleIndex];
 	cg_drawTeam = drawInfo->basicInfo.team;
 
+	// a soldier of a vehicle set this game did not load has no animations to draw with
+	if( !veh->animations )
+		return;
+
 	for( i = 0; i < BP_LQM_MAX_PARTS+1; i++ ) 
 	{
 	    memset( &part[i], 0, sizeof(part[0]) );	

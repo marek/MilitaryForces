@@ -674,6 +674,7 @@ inline constexpr int VF_NOTSELECTABLE = 1; // cannot be selected (turrets, etc)
 inline constexpr int VF_STEALTH = 2;
 inline constexpr int VF_COOKOFF = 4;
 inline constexpr int VF_TESTONLY = 16;	// offered only when the server sets g_testVehicles
+inline constexpr int VF_GUNSTATIONS = 32;	// several gun positions share the machine gun: each that bears on the aim fires
 inline constexpr int VF_DOORGUNS = 8;	// one gun in each door, sharing one weapon: each covers its own side
 
 // door guns stop short of the fuselage line; both fire only when the aim is this close to straight ahead or behind
@@ -698,6 +699,22 @@ inline bool doorGunBears( bool leftGun, float aim )
 	else if( off < -180.0f ) off += 360.0f;
 	return off <= DOORGUN_BOTH + DOORGUN_STOP && off >= -(DOORGUN_BOTH + DOORGUN_STOP);
 }
+
+// how many of the Huey's door guns bear on an aim yaw: one, or both along the fuselage
+inline int doorGunsBearing( float aim )
+{
+	return ( doorGunBears( false, aim ) ? 1 : 0 ) + ( doorGunBears( true, aim ) ? 1 : 0 );
+}
+
+// a gun position that shares the vehicle's machine gun with the others, in the hull's own axes:
+// where it sits, the middle of its field of fire, and how many degrees off that line it can aim
+struct GunStation
+{
+	float	forward, right, up;
+	float	axisForward, axisRight, axisUp;
+	float	arc;
+	float	barrelSpacing;	// its two barrels sit this far either side of the mount
+};
 
 inline constexpr int SEATMASK_PILOT = 0x0001;
 inline constexpr int SEATMASK_ENTERABLE = 0x8000;
@@ -1160,6 +1177,8 @@ public:
 	static bool selectable( int vehicle );
 	static bool stealthHidden( int vehicle, int revealTime, int time, float dist, float radarRange );
 	static bool vehicleHasTurret( int vehicle );
+	static std::span<const GunStation> gunStations( int vehicle );
+	static unsigned gunStationsBearing( int vehicle, const vec3_t hullAngles, const vec3_t aimAngles );
 	static void parseMissionScripts( char *buf, mission_overview_t* overview, mission_vehicle_t* vehs, mission_groundInstallation_t* gis);
 	static void checkMissionScriptOverviewValid( mission_overview_t* overview, bool updateFormat );
 	static void setMissionScriptOverviewDefaults( mission_overview_t* overview );

@@ -1320,6 +1320,40 @@ namespace
 	constexpr float doorGunUp = -1.7f;
 }
 
+// one bullet of the vehicle's gun leaving a muzzle
+static void spawnBullet( GameEntity *self, int weapIdx, const Vec3& from, const Vec3& dir )
+{
+	Vec3 start = from;
+	SnapVector( start );
+
+	GameEntity* bolt = theLevel.spawnEntity();
+	bolt->classname_ = "bullet";
+	bolt->nextthink_ = theLevel.time_ + 4000;
+	bolt->setThink( std::make_unique<GameEntity::EntityFunc_Free>());
+	bolt->r.svFlags = SVF_USE_CURRENT_ORIGIN;
+	bolt->s.weaponIndex = weapIdx;
+	bolt->r.ownerNum = self->s.number;
+	bolt->parent_ = self;
+	bolt->damage_ = availableWeapons[weapIdx].damage;
+	bolt->targetcat_ = availableWeapons[weapIdx].category;
+	bolt->catmodifier_ = availableWeapons[weapIdx].noncatmod;
+	bolt->methodOfDeath_ = MOD_AUTOCANNON;
+	bolt->clipmask_ = MASK_SHOT;
+	bolt->target_ent_ = nullptr;
+	bolt->s.pos.trType = TR_LINEAR;
+	bolt->s.pos.trTime = theLevel.time_ - MISSILE_PRESTEP_TIME;		// move a bit on the very first frame
+	//tracer
+	self->tracerindex_--;
+	if( self->tracerindex_ < 0 ) 
+		self->tracerindex_ = 255;
+	bolt->s.eType = ET_BULLET;
+	bolt->s.generic1 = self->tracerindex_;
+	VectorCopy( start, bolt->s.pos.trBase );
+	VectorScale( dir, availableWeapons[weapIdx].muzzleVelocity, bolt->s.pos.trDelta );
+	SnapVector( bolt->s.pos.trDelta );			// save net bandwidth
+	bolt->r.currentOrigin = start;
+}
+
 /*
 =================
 fire_autocannon MFQ3
@@ -1327,21 +1361,46 @@ fire_autocannon MFQ3
 */
 void fire_autocannon( GameEntity *self, bool main )
 {
-	GameEntity	*bolt;
 	Vec3		dir, forward, right, up, temp;
 	Vec3		start, offset;
 	Vec3		spreadangle;
 	int			weapIdx = (main ? self->client_->ps_.weaponIndex : availableVehicles[self->client_->vehicle_].weapons[0]);
 	float		spreadX = availableWeapons[weapIdx].spread; 
 	float		spreadY = spreadX;
+	const int	vehicleFlags = availableVehicles[self->client_->vehicle_].flags;
+
+	spreadX = ((rand() % static_cast<unsigned int>(spreadX)) - spreadX/2)/10;
+	spreadY = ((rand() % static_cast<unsigned int>(spreadY)) - spreadY/2)/10;
+
+	// gun positions sharing the machine gun: each one that bears on where the crew looks fires along that line
+	if( !main && (vehicleFlags & VF_GUNSTATIONS) )
+	{
+		const unsigned bearing = VehicleData::gunStationsBearing( self->client_->vehicle_, self->client_->ps_.vehicleAngles, self->client_->ps_.viewangles );
+		Vec3 aim;
+		VectorCopy( self->client_->ps_.viewangles, aim );
+		aim[0] += spreadX;
+		aim[1] += spreadY;
+		AngleVectors( aim, dir, nullptr, nullptr );
+		AngleVectors( self->client_->ps_.vehicleAngles, forward, right, up );
+		self->bulletpos_ = ( self->bulletpos_ == 0 ? 1 : 0 );
+		unsigned bit = 1;
+		for( const GunStation& station : VehicleData::gunStations( self->client_->vehicle_ ) )
+		{
+			if( bearing & bit )
+			{
+				VectorCopy( self->s.pos.trBase, start );
+				start = start + forward * station.forward + right * ( station.right + ( self->bulletpos_ ? station.barrelSpacing : -station.barrelSpacing ) ) + up * station.up;
+				spawnBullet( self, weapIdx, start, dir );
+			}
+			bit <<= 1;
+		}
+		return;
+	}
 
 	// used for spread
 	VectorCopy( self->client_->ps_.vehicleAngles, spreadangle );
-	spreadX = ((rand() % static_cast<unsigned int>(spreadX)) - spreadX/2)/10;
-	spreadY = ((rand() % static_cast<unsigned int>(spreadY)) - spreadY/2)/10;
 	spreadangle[0] += spreadX;
 	spreadangle[1] += spreadY;
-//	Common::printf( "spread %.1f %.1f\n", spreadX, spreadY );
 
 	VectorCopy( availableVehicles[self->client_->vehicle_].gunoffset, offset );
 	VectorCopy( self->s.pos.trBase, start );
@@ -1350,32 +1409,27 @@ void fire_autocannon( GameEntity *self, bool main )
 		(availableVehicles[self->client_->vehicle_].cat & CAT_BOAT) ||
 		(availableVehicles[self->client_->vehicle_].cat & CAT_HELO)) 
 	{
-		// use this to make it shoot where the player looks
-//		AngleVectors( self->client->ps.viewangles, dir, 0, 0 );
-//		VectorCopy( self->s.pos.trBase, start );
-//		start[2] += availableVehicles[self->client->vehicle].maxs[2];
-		// otherwise use this
 		AngleVectors( spreadangle, forward, right, up );
 		float turretYaw = self->client_->ps_.turretAngle;
-		if( main && (availableVehicles[self->client_->vehicle_].flags & VF_DOORGUNS) )
+		if( main && (vehicleFlags & VF_DOORGUNS) )
 		{
-			// the gun on the side being aimed at fires, from its own door; both only when aiming along the fuselage
-			float aim = turretYaw > 180 ? turretYaw - 360 : turretYaw;
-			const bool rightBears = doorGunBears( false, aim ), leftBears = doorGunBears( true, aim );
-			bool leftGun = leftBears;
-			if( leftBears && rightBears )
-			{
-				self->bulletpos_ = ( self->bulletpos_ == 0 ? 1 : 0 );
-				leftGun = self->bulletpos_ != 0;
-			}
-			turretYaw = doorGunYaw( leftGun, aim );
-			// the door mounts sit either side of the cabin; offset[1] is applied along the turned right vector below
+			// each door gun that bears fires from its own door: one side, or both when aiming along the fuselage
+			const float aim = turretYaw > 180 ? turretYaw - 360 : turretYaw;
 			Vec3 flatForward, flatRight, flatUp;
 			AngleVectors( self->client_->ps_.vehicleAngles, flatForward, flatRight, flatUp );
-			start = start + flatForward * ( doorGunForward );
-			VectorMA( start, leftGun ? -doorGunSide : doorGunSide, flatRight, start );
-			start = start + flatUp * ( doorGunUp );
-			offset = Vec3();
+			for( int gun = 0; gun < 2; gun++ )
+			{
+				const bool leftGun = gun == 1;
+				if( !doorGunBears( leftGun, aim ) )
+					continue;
+				RotatePointAroundVector( temp, up, forward, doorGunYaw( leftGun, aim ) );
+				CrossProduct( up, temp, right );
+				RotatePointAroundVector( dir, right, temp, self->client_->ps_.gunAngle );
+				VectorCopy( self->s.pos.trBase, start );
+				start = start + flatForward * doorGunForward + flatRight * ( leftGun ? -doorGunSide : doorGunSide ) + flatUp * doorGunUp;
+				spawnBullet( self, weapIdx, start, dir );
+			}
+			return;
 		}
 		RotatePointAroundVector( temp, up, forward, turretYaw );
 		CrossProduct( up, temp, right );
@@ -1406,39 +1460,8 @@ void fire_autocannon( GameEntity *self, bool main )
 	start = start + dir * ( offset[0] );
 	start = start + right * ( offset[1] );
 	start = start + up * ( offset[2] );
-	SnapVector( start );
-
-	bolt = theLevel.spawnEntity();
-	bolt->classname_ = "bullet";
-	bolt->nextthink_ = theLevel.time_ + 4000;
-	bolt->setThink( std::make_unique<GameEntity::EntityFunc_Free>());
-	bolt->r.svFlags = SVF_USE_CURRENT_ORIGIN;
-	bolt->s.weaponIndex = weapIdx;
-	//availableVehicles[self->client->vehicle].weapons[WP_MACHINEGUN];
-	bolt->r.ownerNum = self->s.number;
-	bolt->parent_ = self;
-	bolt->damage_ = availableWeapons[weapIdx].damage;
-	//availableWeapons[availableVehicles[self->client->vehicle].weapons[WP_MACHINEGUN]].damage;
-	bolt->targetcat_ = availableWeapons[weapIdx].category;
-	bolt->catmodifier_ = availableWeapons[weapIdx].noncatmod;
-	bolt->methodOfDeath_ = MOD_AUTOCANNON;
-	bolt->clipmask_ = MASK_SHOT;
-	bolt->target_ent_ = nullptr;
-	bolt->s.pos.trType = TR_LINEAR;
-	bolt->s.pos.trTime = theLevel.time_ - MISSILE_PRESTEP_TIME;		// move a bit on the very first frame
-	//tracer
-	self->tracerindex_--;
-	if( self->tracerindex_ < 0 ) 
-		self->tracerindex_ = 255;
-	bolt->s.eType = ET_BULLET;
-	bolt->s.generic1 = self->tracerindex_;
-	VectorCopy( start, bolt->s.pos.trBase );
-//	VectorScale( dir, availableWeapons[availableVehicles[self->client->vehicle].weapons[WP_MACHINEGUN]].muzzleVelocity, bolt->s.pos.trDelta );
-	VectorScale( dir, availableWeapons[weapIdx].muzzleVelocity, bolt->s.pos.trDelta );
-	SnapVector( bolt->s.pos.trDelta );			// save net bandwidth
-	bolt->r.currentOrigin = start;
+	spawnBullet( self, weapIdx, start, dir );
 }
-
 
 /*
 =================

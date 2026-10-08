@@ -7,6 +7,7 @@
 // bg_pmove.c -- both games player movement code
 // takes a playerstate and a usercmd as input and returns a modifed playerstate
 
+#include <bit>
 #include "q_shared.h"
 #include "../qcommon/qfiles.h"
 #include "bg_public.h"
@@ -628,8 +629,14 @@ void PlayerMove::weapon( ) {
 		// check for out of ammo
 		int wpnIndex = availableVehicles[pm->vehicle].weapons[WP_MACHINEGUN];
 		if ( wpnIndex > 0 && pm->ps->ammo[WP_MACHINEGUN] > 0 ) {
-			pm->ps->ammo[WP_MACHINEGUN]--;
-			PlayerMove::addEvent( EV_FIRE_MG );
+			// every gun position that bears fires and takes a round; with none bearing nothing fires
+			int rounds = 1;
+			if( availableVehicles[pm->vehicle].flags & VF_GUNSTATIONS )
+				rounds = std::popcount( VehicleData::gunStationsBearing( pm->vehicle, pm->ps->vehicleAngles, pm->ps->viewangles ) );
+			if( rounds > 0 ) {
+				pm->ps->ammo[WP_MACHINEGUN] = std::max( 0, pm->ps->ammo[WP_MACHINEGUN] - rounds );
+				PlayerMove::addEvent( EV_FIRE_MG );
+			}
 			pm->ps->timers[TIMER_MACHINEGUN] += availableWeapons[wpnIndex].fireInterval;
 		}
 	} 
@@ -655,7 +662,13 @@ void PlayerMove::weapon( ) {
 		}
 		else
 		{
-			pm->ps->ammo[pm->ps->weaponNum]--;
+			// both door guns fire when both bear, and each takes a round
+			int rounds = 1;
+			if( (availableVehicles[pm->vehicle].flags & VF_DOORGUNS) && availableWeapons[pm->ps->weaponIndex].turret ) {
+				const float aim = pm->ps->turretAngle > 180 ? pm->ps->turretAngle - 360 : pm->ps->turretAngle;
+				rounds = doorGunsBearing( aim );
+			}
+			pm->ps->ammo[pm->ps->weaponNum] = std::max( 0, pm->ps->ammo[pm->ps->weaponNum] - rounds );
 			PlayerMove::addEvent( EV_FIRE_WEAPON );
 			pm->ps->timers[TIMER_BAYCLOSE] = pm->cmd.serverTime + 5000;
 		}
