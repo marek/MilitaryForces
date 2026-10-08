@@ -190,23 +190,23 @@ PM_Toggle_Gear
 
 ===================
 */
-void PlayerMove::toggle_HeloGear()
+bool PlayerMove::toggle_HeloGear()
 {
 	if( !(availableVehicles[pm->vehicle].caps & HC_GEAR) ) {
-		return;
+		return false;
 	}
 
 	if( pm->ps->ONOFF & OO_LANDED ) {
-		return;
+		return false;
 	}
 
 	if( pm->cmd.serverTime < pm->ps->timers[TIMER_GEAR] && pm->ps->timers[TIMER_GEARANIM] ) {
-		return;
+		return false;
 	}
 
 	if( pm->ps->speed > availableVehicles[pm->vehicle].stallspeed * 10 * SPEED_GREEN_ARC ) {
 		pm->ps->timers[TIMER_GEAR] = pm->cmd.serverTime + availableVehicles[pm->vehicle].gearTime + 100;
-		return;
+		return false;
 	}
 
 	if( pm->ps->ONOFF & OO_GEAR ) {
@@ -220,6 +220,7 @@ void PlayerMove::toggle_HeloGear()
 //		pm->ps->ONOFF |= OO_GEAR;
 	}
 	pm->ps->timers[TIMER_GEAR] = pm->cmd.serverTime + availableVehicles[pm->vehicle].gearTime + 100;
+	return true;
 }
 
 void PlayerMove::helo_Brakes()
@@ -339,8 +340,8 @@ void PlayerMove::heloMove( )
 
 
 	// gear
-	if( !dead && (pm->cmd.buttons & BUTTON_GEAR) ) {
-		toggle_HeloGear();
+	if( !dead && togglePressed( BUTTON_GEAR, PMF_GEAR_HELD ) && toggle_HeloGear() ) {
+		pm->ps->pm_flags |= PMF_GEAR_HELD;
 	}
 
 	// gearanim
@@ -366,8 +367,8 @@ void PlayerMove::heloMove( )
 
 	// bay
 	if( availableVehicles[pm->vehicle].caps & HC_WEAPONBAY ) {
-		if( !dead && (pm->cmd.buttons & BUTTON_WEAPONBAY) ) {
-			PlayerMove::toggle_Bay();
+		if( !dead && togglePressed( BUTTON_WEAPONBAY, PMF_BAY_HELD ) && toggle_Bay() ) {
+			pm->ps->pm_flags |= PMF_BAY_HELD;
 		}
 
 		// bayanim

@@ -36,29 +36,39 @@ void PlayerMove::plane_Brakes()
 }
 
 
+// a toggle key acts once per press: once it has taken effect, holding it does nothing until it is released
+bool PlayerMove::togglePressed( int button, int heldFlag )
+{
+	if( !(pm->cmd.buttons & button) ) {
+		pm->ps->pm_flags &= ~heldFlag;
+		return false;
+	}
+	return !(pm->ps->pm_flags & heldFlag);
+}
+
 /*
 ===================
 PM_Toggle_Gear
 
 ===================
 */
-void PlayerMove::toggle_PlaneGear()
+bool PlayerMove::toggle_PlaneGear()
 {
 	if( !(availableVehicles[pm->vehicle].caps & HC_GEAR) ) {
-		return;
+		return false;
 	}
 
 	if( pm->ps->ONOFF & OO_LANDED ) {
-		return;
+		return false;
 	}
 
 	if( pm->cmd.serverTime < pm->ps->timers[TIMER_GEAR] && pm->ps->timers[TIMER_GEARANIM] ) {
-		return;
+		return false;
 	}
 
 	if( pm->ps->speed > availableVehicles[pm->vehicle].stallspeed * 10 * SPEED_GREEN_ARC ) {
 		pm->ps->timers[TIMER_GEAR] = pm->cmd.serverTime + availableVehicles[pm->vehicle].gearTime + 100;
-		return;
+		return false;
 	}
 
 	if( pm->ps->ONOFF & OO_GEAR ) {
@@ -72,6 +82,7 @@ void PlayerMove::toggle_PlaneGear()
 //		pm->ps->ONOFF |= OO_GEAR;
 	}
 	pm->ps->timers[TIMER_GEAR] = pm->cmd.serverTime + availableVehicles[pm->vehicle].gearTime + 100;
+	return true;
 }
 
 
@@ -82,14 +93,14 @@ PlayerMove::toggle_Bay
 
 ===================
 */
-void PlayerMove::toggle_Bay()
+bool PlayerMove::toggle_Bay()
 {
 	if( !(availableVehicles[pm->vehicle].caps & HC_WEAPONBAY) ) {
-		return;
+		return false;
 	}
 
 	if( pm->cmd.serverTime < pm->ps->timers[TIMER_BAY] && pm->ps->timers[TIMER_BAYANIM] ) {
-		return;
+		return false;
 	}
 
 	if( pm->ps->ONOFF & OO_WEAPONBAY ) {
@@ -104,6 +115,7 @@ void PlayerMove::toggle_Bay()
 	}
 	pm->ps->timers[TIMER_BAY] = pm->cmd.serverTime + availableVehicles[pm->vehicle].bayTime + 100;
 	pm->ps->timers[TIMER_BAYCLOSE] = 0;
+	return true;
 }
 
 
@@ -234,8 +246,8 @@ void PlayerMove::planeMove( )
 	pm->ps->ONOFF &= ~OO_VAPOR;
 
 	// gear
-	if( !dead && (pm->cmd.buttons & BUTTON_GEAR) ) {
-		toggle_PlaneGear();
+	if( !dead && togglePressed( BUTTON_GEAR, PMF_GEAR_HELD ) && toggle_PlaneGear() ) {
+		pm->ps->pm_flags |= PMF_GEAR_HELD;
 	}
 
 	// gearanim
@@ -260,8 +272,8 @@ void PlayerMove::planeMove( )
 	}
 
 	// bay
-	if( !dead && (pm->cmd.buttons & BUTTON_WEAPONBAY) ) {
-		PlayerMove::toggle_Bay();
+	if( !dead && togglePressed( BUTTON_WEAPONBAY, PMF_BAY_HELD ) && toggle_Bay() ) {
+		pm->ps->pm_flags |= PMF_BAY_HELD;
 	}
 
 	// bayanim
@@ -514,8 +526,8 @@ void PlayerMove::planeMoveAdvanced( )
 	pm->ps->ONOFF &= ~OO_VAPOR;
 
 	// gear
-	if( !dead && (pm->cmd.buttons & BUTTON_GEAR) ) {
-		toggle_PlaneGear();
+	if( !dead && togglePressed( BUTTON_GEAR, PMF_GEAR_HELD ) && toggle_PlaneGear() ) {
+		pm->ps->pm_flags |= PMF_GEAR_HELD;
 	}
 
 	// gearanim
@@ -540,8 +552,8 @@ void PlayerMove::planeMoveAdvanced( )
 	}
 
 	// bay
-	if( !dead && (pm->cmd.buttons & BUTTON_WEAPONBAY) ) {
-		PlayerMove::toggle_Bay();
+	if( !dead && togglePressed( BUTTON_WEAPONBAY, PMF_BAY_HELD ) && toggle_Bay() ) {
+		pm->ps->pm_flags |= PMF_BAY_HELD;
 	}
 
 	// bayanim

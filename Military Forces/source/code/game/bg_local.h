@@ -45,7 +45,8 @@ public:
 	void addEvent( int newEvent );
 	void planeMove( );
 	void planeMoveAdvanced( );
-	void toggle_Bay();
+	bool toggle_Bay();
+	bool togglePressed( int button, int heldFlag );
 	void groundVehicleMove( );
 	void heloMove( );
 	void lQMMove( );
@@ -96,8 +97,8 @@ public:
 	void stepSlideMove_LQM();
 	void throttle_Down();
 	void throttle_Up();
-	void toggle_HeloGear();
-	void toggle_PlaneGear();
+	bool toggle_HeloGear();
+	bool toggle_PlaneGear();
 
 	pmove_t	*pm = nullptr;
 	pml_t	pml = {};
