@@ -3279,6 +3279,11 @@ void FileSystem::startup( const char *gameName )
 	fs_debug = CvarSystem::get( "fs_debug", "0", 0 );
 	fs_basepath = CvarSystem::get ("fs_basepath", System::defaultInstallPath(), CVAR_INIT|CVAR_PROTECTED );
 	fs_basegame = CvarSystem::get ("fs_basegame", "", CVAR_INIT );
+	// a config file beside the game's own data keeps the settings in the game folder
+	if( !*fs_homepath->asString() &&
+		FS_FileInPathExists( FileSystem::buildOSPath( fs_basepath->asString(), gameName[0] ? gameName : BASEGAME, Q3CONFIG_CFG ) ) ) {
+		configPath = fs_basepath->asString();
+	}
 	fs_homeconfigpath = CvarSystem::get ("fs_homeconfigpath", configPath, CVAR_INIT|CVAR_PROTECTED );
 	fs_homedatapath = CvarSystem::get ("fs_homedatapath", dataPath, CVAR_INIT|CVAR_PROTECTED );
 	fs_homestatepath = CvarSystem::get ("fs_homestatepath", statePath, CVAR_INIT|CVAR_PROTECTED );
