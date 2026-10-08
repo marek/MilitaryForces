@@ -36,6 +36,12 @@ void PlayerMove::plane_Brakes()
 }
 
 
+// retractable gear that is down in flight costs speed and agility
+bool PlayerMove::gearInAirflow() const
+{
+	return (availableVehicles[pm->vehicle].caps & HC_GEAR) && (pm->ps->ONOFF & OO_GEAR) && !(pm->ps->ONOFF & OO_LANDED);
+}
+
 // a toggle key acts once per press: once it has taken effect, holding it does nothing until it is released
 bool PlayerMove::togglePressed( int button, int heldFlag )
 {
@@ -164,6 +170,8 @@ void PlayerMove::planeAccelerate()
     float	decel = accel;
 
     float	acceleration;
+
+	if( gearInAirflow() ) topspeed *= GEAR_DOWN_SPEED;
 
 	// check for overriding throttle
 	if( pm->ps->stats[STAT_HEALTH] > 0 && !pm->advancedControls ) {
@@ -365,7 +373,7 @@ void PlayerMove::planeMove( )
     }
 
 	for( i = PITCH; i <= ROLL; i++ ) {
-	    turnspeed[i] = availableVehicles[pm->vehicle].turnspeed[i] * pml.frametime;
+	    turnspeed[i] = availableVehicles[pm->vehicle].turnspeed[i] * pml.frametime * ( gearInAirflow() ? GEAR_DOWN_TURN : 1.0f );
 	}
 
 	// ground movement
@@ -645,7 +653,7 @@ void PlayerMove::planeMoveAdvanced( )
     }
 
 	for( i = PITCH; i <= ROLL; i++ ) {
-	    turnspeed[i] = availableVehicles[pm->vehicle].turnspeed[i] * pml.frametime;
+	    turnspeed[i] = availableVehicles[pm->vehicle].turnspeed[i] * pml.frametime * ( gearInAirflow() ? GEAR_DOWN_TURN : 1.0f );
 	}
 
 	// ground movement

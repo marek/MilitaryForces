@@ -396,13 +396,13 @@ void VehicleData::loadAllVehicleData()
 		availableVehicles[i].mins[2] += 1;// to look better ?
 		if( availableVehicles[i].cat & CAT_BOAT ) 
 			VehicleData::findDeck( name, &availableVehicles[i] );
-		// boats and transport helicopters carry a crew; attack helicopters take nobody aboard
+		// boats, transport helicopters and wheeled vehicles carry a crew; attack helicopters and tanks take nobody aboard
 		if( availableVehicles[i].cat & CAT_HELO ) 
 			availableVehicles[i].seats = (availableVehicles[i].cls & CLASS_HELO_ATTACK) ? 0 : 4;
 		else if( availableVehicles[i].cat & CAT_BOAT ) 
 			availableVehicles[i].seats = 4;
 		else if( availableVehicles[i].cat & CAT_GROUND ) 
-			availableVehicles[i].seats = (availableVehicles[i].caps & HC_WHEELS) ? 3 : 1;
+			availableVehicles[i].seats = (availableVehicles[i].caps & HC_WHEELS) ? 3 : 0;
 		else 
 			availableVehicles[i].seats = 0;
 

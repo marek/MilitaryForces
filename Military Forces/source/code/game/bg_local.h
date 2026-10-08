@@ -47,6 +47,7 @@ public:
 	void planeMoveAdvanced( );
 	bool toggle_Bay();
 	bool togglePressed( int button, int heldFlag );
+	bool gearInAirflow() const;
 	void groundVehicleMove( );
 	void heloMove( );
 	void lQMMove( );

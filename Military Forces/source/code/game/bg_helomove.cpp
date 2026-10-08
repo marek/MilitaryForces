@@ -249,7 +249,7 @@ void PlayerMove::heloAccelerate()
     float	throttle = pm->ps->fixed_throttle;
     int		maxthrottle = availableVehicles[pm->vehicle].maxthrottle;
 //	int		minthrottle = availableVehicles[pm->vehicle].minthrottle;
-	float	maxforwardspeed = availableVehicles[pm->vehicle].maxspeed;
+	float	maxforwardspeed = availableVehicles[pm->vehicle].maxspeed * ( gearInAirflow() ? GEAR_DOWN_SPEED : 1.0f );
 	float	maxrightspeed = availableVehicles[pm->vehicle].turnspeed[YAW];
 	float	maxliftspeed = maxforwardspeed*0.00525;
 	float	maxspeed = sqrt(maxforwardspeed*maxforwardspeed + 
@@ -269,7 +269,7 @@ void PlayerMove::heloAccelerate()
 	VectorCopy( pm->ps->vehicleAngles, vehdir );
 	vehdir[YAW] = AngleMod( vehdir[YAW] );
 
-	curforwardspeed = (vehdir[PITCH]/MAX_HELO_PITCH)*availableVehicles[pm->vehicle].maxspeed;
+	curforwardspeed = (vehdir[PITCH]/MAX_HELO_PITCH)*availableVehicles[pm->vehicle].maxspeed * ( gearInAirflow() ? GEAR_DOWN_SPEED : 1.0f );
 	currightspeed = (vehdir[ROLL]/MAX_HELO_ROLL)*availableVehicles[pm->vehicle].turnspeed[YAW];
 	curliftspeed = throttle > maxthrottle ? -(throttle-maxthrottle)*20 : throttle * 25;	// real vert speed	
 	curliftspeedadjust = throttle > maxthrottle ? 0 : throttle * 25;					// adjusted vert speed, don't want down movement to effect fuel usage "more"
@@ -418,7 +418,7 @@ void PlayerMove::heloMove( )
 	//
 	if((pm->ps->ONOFF & OO_LANDED) && (throttle > maxthrottle))
 		pm->ps->fixed_throttle = throttle = 0;
-	curforwardspeed = (vehdir[PITCH]/MAX_HELO_PITCH)*availableVehicles[pm->vehicle].maxspeed;
+	curforwardspeed = (vehdir[PITCH]/MAX_HELO_PITCH)*availableVehicles[pm->vehicle].maxspeed * ( gearInAirflow() ? GEAR_DOWN_SPEED : 1.0f );
 	currightspeed = (vehdir[ROLL]/MAX_HELO_ROLL)*availableVehicles[pm->vehicle].turnspeed[YAW];
 	curliftspeed = throttle > maxthrottle ? -(throttle-maxthrottle)*20 : throttle * 25;	
 			// Forward speed
@@ -487,7 +487,7 @@ void PlayerMove::heloMove( )
     }
 
 	for( i = PITCH; i <= ROLL; i++ ) {
-	    turnspeed[i] = availableVehicles[pm->vehicle].turnspeed[i] * pml.frametime;
+	    turnspeed[i] = availableVehicles[pm->vehicle].turnspeed[i] * pml.frametime * ( gearInAirflow() ? GEAR_DOWN_TURN : 1.0f );
 	}
 
 	// ground movement
