@@ -59,7 +59,7 @@ inline constexpr int MAX_ITEMACTION = 64;
 inline constexpr int MAX_MENUDEFFILE = 4096;
 inline constexpr int MAX_MENUFILE = 32768;
 inline constexpr int MAX_MENUS = 64;
-#define MAX_MENUITEMS 96
+inline constexpr int MAX_MENUITEMS = 96;
 inline constexpr int MAX_COLOR_RANGES = 10;
 inline constexpr int MAX_OPEN_MENUS = 16;
 

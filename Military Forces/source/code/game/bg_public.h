@@ -278,7 +278,7 @@ inline constexpr int EV_EVENT_BIT1 = 0x00000100;
 inline constexpr int EV_EVENT_BIT2 = 0x00000200;
 #define	EV_EVENT_BITS		(EV_EVENT_BIT1|EV_EVENT_BIT2)
 
-#define	EVENT_VALID_MSEC	300
+inline constexpr int EVENT_VALID_MSEC = 300;
 
 enum entity_event_t {
 	EV_NONE,

@@ -26,7 +26,7 @@ PlayerMove::slideMove
 Returns true if the velocity was clipped in some way
 ==================
 */
-#define	MAX_CLIP_PLANES	5
+inline constexpr int MAX_CLIP_PLANES = 5;
 bool	PlayerMove::slideMove( bool gravity ) {
 	int			bumpcount, numbumps;
 	Vec3		dir;

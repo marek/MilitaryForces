@@ -230,9 +230,9 @@ inline constexpr int MAX_QINT = 0x7fffffff;
 #define STRARRAY_LEN(x)			(ARRAY_LEN(x) - 1)
 
 // angle indexes
-#define	PITCH				0		// up / down
-#define	YAW					1		// left / right
-#define	ROLL				2		// fall over
+inline constexpr int PITCH = 0; // up / down
+inline constexpr int YAW = 1; // left / right
+inline constexpr int ROLL = 2; // fall over
 
 // the game guarantees that no string from the network will ever
 // exceed MAX_STRING_CHARS
@@ -249,7 +249,7 @@ inline constexpr int BIG_INFO_KEY = 8192;
 inline constexpr int BIG_INFO_VALUE = 8192;
 
 
-#define	MAX_QPATH			64		// max length of a quake game pathname
+inline constexpr int MAX_QPATH = 64; // max length of a quake game pathname
 #ifdef PATH_MAX
 #define MAX_OSPATH			PATH_MAX
 #else
@@ -273,7 +273,7 @@ enum cbufExec_t {
 //
 // these aren't needed by any of the VMs.  put in another header?
 //
-#define	MAX_MAP_AREA_BYTES		32		// bit vector of area visibility
+inline constexpr int MAX_MAP_AREA_BYTES = 32; // bit vector of area visibility
 
 
 // print levels from renderer (FIXME: set up for game / cgame?)
@@ -1082,9 +1082,9 @@ COLLISION DETECTION
 
 // plane types are used to speed some tests
 // 0-2 are axial planes
-#define	PLANE_X			0
-#define	PLANE_Y			1
-#define	PLANE_Z			2
+inline constexpr int PLANE_X = 0;
+inline constexpr int PLANE_Y = 1;
+inline constexpr int PLANE_Z = 2;
 inline constexpr int PLANE_NON_AXIAL = 3;
 
 

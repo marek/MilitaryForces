@@ -14,44 +14,44 @@
 #ifndef __SURFACEFLAGS_H__
 #define __SURFACEFLAGS_H__
 
-#define	CONTENTS_SOLID			1		// an eye is never valid in a solid
-#define	CONTENTS_LAVA			8
-#define	CONTENTS_SLIME			16
-#define	CONTENTS_WATER			32
-#define	CONTENTS_FOG			64
+inline constexpr int CONTENTS_SOLID = 1; // an eye is never valid in a solid
+inline constexpr int CONTENTS_LAVA = 8;
+inline constexpr int CONTENTS_SLIME = 16;
+inline constexpr int CONTENTS_WATER = 32;
+inline constexpr int CONTENTS_FOG = 64;
 
-#define	CONTENTS_AREAPORTAL		0x8000
+inline constexpr int CONTENTS_AREAPORTAL = 0x8000;
 
-#define	CONTENTS_PLAYERCLIP		0x10000
-#define	CONTENTS_MONSTERCLIP	0x20000
+inline constexpr int CONTENTS_PLAYERCLIP = 0x10000;
+inline constexpr int CONTENTS_MONSTERCLIP = 0x20000;
 //bot specific contents types
 inline constexpr int CONTENTS_TELEPORTER = 0x40000;
 inline constexpr int CONTENTS_JUMPPAD = 0x80000;
 inline constexpr int CONTENTS_CLUSTERPORTAL = 0x100000;
-#define CONTENTS_DONOTENTER		0x200000
+inline constexpr int CONTENTS_DONOTENTER = 0x200000;
 inline constexpr int CONTENTS_BOTCLIP = 0x400000;
 inline constexpr int CONTENTS_MOVER = 0x800000;
 
-#define	CONTENTS_ORIGIN			0x1000000	// removed before bsping an entity
+inline constexpr int CONTENTS_ORIGIN = 0x1000000; // removed before bsping an entity
 
 inline constexpr int CONTENTS_BODY = 0x2000000; // should never be on a brush, only in game
 inline constexpr int CONTENTS_CORPSE = 0x4000000;
-#define	CONTENTS_DETAIL			0x8000000	// brushes not used for the bsp
-#define	CONTENTS_STRUCTURAL		0x10000000	// brushes used for the bsp
-#define	CONTENTS_TRANSLUCENT	0x20000000	// don't consume surface fragments inside
+inline constexpr int CONTENTS_DETAIL = 0x8000000; // brushes not used for the bsp
+inline constexpr int CONTENTS_STRUCTURAL = 0x10000000; // brushes used for the bsp
+inline constexpr int CONTENTS_TRANSLUCENT = 0x20000000; // don't consume surface fragments inside
 inline constexpr int CONTENTS_TRIGGER = 0x40000000;
 inline constexpr unsigned int CONTENTS_NODROP = 0x80000000; // don't leave bodies or items (death fog, lava)
 
 inline constexpr int SURF_NODAMAGE = 0x1; // never give falling damage
-#define	SURF_SLICK				0x2		// effects game physics
-#define	SURF_SKY				0x4		// lighting from environment map
+inline constexpr int SURF_SLICK = 0x2; // effects game physics
+inline constexpr int SURF_SKY = 0x4; // lighting from environment map
 inline constexpr int SURF_LADDER = 0x8;
-#define	SURF_NOIMPACT			0x10	// don't make missile explosions
+inline constexpr int SURF_NOIMPACT = 0x10; // don't make missile explosions
 inline constexpr int SURF_NOMARKS = 0x20; // don't leave missile marks
 inline constexpr int SURF_FLESH = 0x40; // make flesh sounds and effects
-#define	SURF_NODRAW				0x80	// don't generate a drawsurface at all
-#define	SURF_HINT				0x100	// make a primary bsp splitter
-#define	SURF_SKIP				0x200	// completely ignore, allowing non-closed brushes
+inline constexpr int SURF_NODRAW = 0x80; // don't generate a drawsurface at all
+inline constexpr int SURF_HINT = 0x100; // make a primary bsp splitter
+inline constexpr int SURF_SKIP = 0x200; // completely ignore, allowing non-closed brushes
 inline constexpr int SURF_NOLIGHTMAP = 0x400; // surface doesn't need a lightmap
 inline constexpr int SURF_POINTLIGHT = 0x800; // generate lighting info at vertexes
 inline constexpr int SURF_METALSTEPS = 0x1000; // clanking footsteps

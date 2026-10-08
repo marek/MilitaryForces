@@ -20,10 +20,8 @@
 
 //==================================================================
 
-#define INFINITE			1000000
 
 inline constexpr int FRAMETIME = 100; // msec
-#define	EVENT_VALID_MSEC	300
 
 inline constexpr int INTERMISSION_DELAY_TIME = 1000;
 inline constexpr int SP_INTERMISSION_DELAY_TIME = 5000;

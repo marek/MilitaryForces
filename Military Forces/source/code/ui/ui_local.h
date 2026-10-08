@@ -92,7 +92,6 @@ inline constexpr int SLIDER_RANGE = 10;
 inline constexpr int MAX_EDIT_LINE = 256;
 
 inline constexpr int MAX_MENUDEPTH = 8;
-#define MAX_MENUITEMS			96
 
 inline constexpr int MTYPE_NULL = 0;
 inline constexpr int MTYPE_SLIDER = 1;
