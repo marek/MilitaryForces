@@ -5809,7 +5809,7 @@ void _UI_Init( bool inGameLoad )
 	uiInfo.uiUtils.string_Init();
   
 	uiInfo.uiUtils.dc_->whiteShader_ = refExport.RegisterShaderNoMip( "white" );
-	uiInfo.uiUtils.dc_->cursor_	= refExport.RegisterShaderNoMip( "menu/art/cursor" );
+	uiInfo.uiUtils.dc_->cursor_	= refExport.RegisterShaderNoMip( "ui/assets/cursor" );
 	uiInfo.uiUtils.dc_->cursorEnum_ = CURSOR_NORMAL;
 
 	AssetCache();
