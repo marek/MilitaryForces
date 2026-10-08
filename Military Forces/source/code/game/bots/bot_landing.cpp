@@ -4,22 +4,33 @@
 
 using behavior::Status;
 
+// Landing as a sequence of steps: look the runway over, fly out and line up, come down the slope,
+// roll out, taxi to the parking spot, sit until refuelled and rearmed, then give the runway back.
+
 namespace
 {
 	enum Phase { Survey, Approach, Final, Ground };
 
+	// the touchdown point sits this far inside the runway's end
+	constexpr float thresholdInset = 150.0f;
+	// slower than this on the ground a plane is taxiing, not rolling out
+	constexpr float taxiSpeed = 60.0f;
+	// nose slightly up on the ground keeps the tail down
+	constexpr float groundPitch = 3.0f;
+
+	// where the plane is relative to the runway, in the runway's own terms
 	struct Geometry
 	{
 		const Bots::Pad&	pad;
 		float				stall;
-		float				along;
-		float				side;
-		float				above;
-		float				before;
-		float				lateral;
-		float				pos;
-		float				axisYaw;
-		Vec3				travel;
+		float				along;		// along the runway from its centre, in the pad's own direction
+		float				side;		// off the centre line
+		float				above;		// height over the runway surface
+		float				before;		// distance still to fly to the touchdown point; negative once past it
+		float				lateral;	// off the centre line, positive to the left of the landing direction
+		float				pos;		// along the runway from its centre, in the landing direction
+		float				axisYaw;	// heading of the landing direction
+		Vec3				travel;		// unit vector of the landing direction
 
 		Geometry( const Bots::Pad& runway, const Bots::Mind& c ) : pad( runway ), stall( static_cast<float>( c.veh.stallspeed ) )
 		{
@@ -29,7 +40,7 @@ namespace
 			side = rel[1] * pad.axis[0] - rel[0] * pad.axis[1];
 			above = c.ent->r.currentOrigin[2] - pad.z;
 			pos = along * c.bot.landDir;
-			before = -(pad.halfLength - 150.0f) - pos;
+			before = -(pad.halfLength - thresholdInset) - pos;
 			VectorScale( pad.axis, c.bot.landDir, travel );
 			vectoangles( travel, angles );
 			axisYaw = angles[YAW];
@@ -37,6 +48,7 @@ namespace
 		}
 	};
 
+	// abandon this landing: optionally avoid the pad for a while, and do not try to land again before retryDelay
 	void giveUp( Bots::Mind& c, int padPenalty, int retryDelay )
 	{
 		if( padPenalty )
@@ -52,6 +64,7 @@ namespace
 		c.bot.commitTime = 0;
 	}
 
+	// the brake key toggles, so it is pressed only when the state is not the wanted one
 	void wheelBrakes( Bots::Mind& c, bool on )
 	{
 		if( on != ((c.ps.ONOFF & OO_SPEEDBRAKE) != 0) )
@@ -63,12 +76,14 @@ namespace
 		return (c.ps.ONOFF & OO_LANDED) != 0;
 	}
 
+	// clearly airborne again (a bounce does not count)
 	bool liftedOff( const Bots::Mind& c )
 	{
 		return !landed( c ) && c.sense.height > fabs( c.veh.mins[2] ) + c.veh.gearheight + 40.0f;
 	}
 }
 
+// choose the landing direction: the end with the flatter, clearer approach, or no landing here at all
 Status LandingSteps::survey( Bots::Mind& c )
 {
 	if( c.bot.pad < 0 )
@@ -85,6 +100,7 @@ Status LandingSteps::survey( Bots::Mind& c )
 	if( landed( c ) )
 		return Status::Success;
 
+	// for each end: the steepest slope the terrain forces on the approach, and how far out the path is clear
 	float slope[2], clear[2];
 	for( int k = 0; k < 2; k++ )
 	{
@@ -95,7 +111,7 @@ Status LandingSteps::survey( Bots::Mind& c )
 		for( float d = 75.0f; d <= 2500.0f; d += d < 1000.0f ? 75.0f : 250.0f )
 		{
 			Vec3 to, boxMins = { -60, -60, 0 }, boxMaxs = { 60, 60, 4 };
-			VectorMA( pad.center, -dir * (pad.halfLength - 150.0f + d), pad.axis, from );
+			VectorMA( pad.center, -dir * (pad.halfLength - thresholdInset + d), pad.axis, from );
 			from[2] = pad.z + 600;
 			to = from;
 			to[2] -= 4000;
@@ -103,7 +119,7 @@ Status LandingSteps::survey( Bots::Mind& c )
 			const float rise = tr.startsolid ? 600.0f : tr.endpos[2] - pad.z;
 			slope[k] = std::max( slope[k], (rise + 60.0f) / (d + 300.0f) );
 		}
-		VectorMA( pad.center, -dir * (pad.halfLength - 150.0f), pad.axis, from );
+		VectorMA( pad.center, -dir * (pad.halfLength - thresholdInset), pad.axis, from );
 		from[2] = pad.z + 250;
 		VectorScale( pad.axis, -dir, out );
 		out[2] = slope[k];
@@ -112,6 +128,7 @@ Status LandingSteps::survey( Bots::Mind& c )
 		clear[k] = tr.fraction * 3500.0f;
 	}
 
+	// keep the nearer end unless the other is clearly better; give the pad up when neither will do
 	int chosen = c.bot.landDir > 0 ? 1 : 0;
 	if( slope[1 - chosen] < slope[chosen] * 0.7f || (clear[chosen] < 1500 && clear[1 - chosen] > clear[chosen]) )
 		chosen = 1 - chosen;
@@ -129,13 +146,14 @@ Status LandingSteps::survey( Bots::Mind& c )
 	over[2] = pad.z + 40;
 	c.bot.landCeiling = Bots::ceilingAbove( over, ENTITYNUM_NONE );
 
+	// land on the lane with the longest clear run, a little or well to either side of the centre line
 	float bestLength = -1;
 	for( float offset : { 45.0f, -45.0f, 120.0f, -120.0f } )
 	{
 		Vec3 from, lane;
 		trace_t tr;
 		VectorScale( pad.axis, c.bot.landDir, lane );
-		VectorMA( pad.center, -(pad.halfLength - 150.0f), lane, from );
+		VectorMA( pad.center, -(pad.halfLength - thresholdInset), lane, from );
 		from[0] += -lane[1] * offset;
 		from[1] += lane[0] * offset;
 		from[2] = pad.z + 30;
@@ -149,6 +167,7 @@ Status LandingSteps::survey( Bots::Mind& c )
 	return Status::Success;
 }
 
+// fly away from the runway far enough to turn round, then come back lined up at approach height
 Status LandingSteps::approach( Bots::Mind& c )
 {
 	if( c.bot.pad < 0 )
@@ -164,12 +183,14 @@ Status LandingSteps::approach( Bots::Mind& c )
 		return Status::Failure;
 	}
 
+	// the run-in has to be several turn radii long, and its height follows from the slope the terrain allows
 	const float turnRate = std::max( 10.0f, c.veh.turnspeed[YAW] ) * std::numbers::pi_v<float> / 180.0f;
 	const float radius = std::max( c.speed, g.stall * 1.7f ) / turnRate;
 	const float wantRun = std::clamp( radius * 5.0f + 1200.0f, 1800.0f, c.bot.landRun );
 	c.bot.approachHeight = g.pad.z + std::min( std::clamp( wantRun * c.bot.landSlope * 0.75f, 300.0f, 800.0f ), std::max( 150.0f, c.bot.landCeiling - 250.0f ) );
 	const float headingError = fabs( AngleSubtract( g.axisYaw, c.ps.vehicleAngles[YAW] ) );
 
+	// outbound until far enough out (or something is in the way); turn outbound when too close or badly placed
 	if( c.bot.landOutbound )
 	{
 		Vec3 outDir, wish = { 0, g.axisYaw + 180.0f, 0 };
@@ -181,6 +202,7 @@ Status LandingSteps::approach( Bots::Mind& c )
 	else if( g.before < wantRun * 0.35f || (g.before < wantRun * 0.6f && (headingError > 60 || fabs( g.lateral ) > radius * 2.0f)) )
 		c.bot.landOutbound = true;
 
+	// outbound: fly the reciprocal, angled towards the centre line. Inbound: cut back onto the centre line
 	const float heading = c.bot.landOutbound ? g.axisYaw + 180.0f + (g.lateral >= 0 ? -20.0f : 20.0f) :
 		g.axisYaw - std::clamp( static_cast<float>( atan2( g.lateral, radius * 2.5f ) * 180.0 / std::numbers::pi_v<float> ), -60.0f, 60.0f );
 	Vec3 wish = { 0, heading, 0 }, dir;
@@ -198,6 +220,7 @@ Status LandingSteps::approach( Bots::Mind& c )
 	return Status::Running;
 }
 
+// down the slope to the touchdown point, slowing to just above the stall, gear down
 Status LandingSteps::final( Bots::Mind& c )
 {
 	if( c.bot.pad < 0 )
@@ -208,6 +231,7 @@ Status LandingSteps::final( Bots::Mind& c )
 	const Geometry g( Bots::pads_[c.bot.pad], c );
 	c.bot.landPhase = Final;
 	c.direct = true;
+	// go around: overshot, still high past the threshold, far off to the side, or someone is on the runway
 	if( g.before < -g.pad.halfLength || (g.before < -200 && g.above > 150) || fabs( g.side ) > 900 || (g.before > 300 && Bots::runwayBusy( c.bot.pad, c.ent )) )
 	{
 		c.direct = false;
@@ -224,10 +248,12 @@ Status LandingSteps::final( Bots::Mind& c )
 	under = c.ent->r.currentOrigin;
 	under[2] = g.pad.z;
 	const bool overRunway = Bots::runwayAt( under );
+	// height of the origin when the wheels touch
 	const float touch = fabs( c.veh.mins[2] ) + c.veh.gearheight;
 	const bool shortField = g.pad.halfLength < 500;
 	const float wantAbove = overRunway ? touch : std::clamp( g.before * c.bot.landSlope, shortField ? touch + 22.0f : 120.0f, 800.0f );
 	c.view[PITCH] = std::clamp( (g.above - wantAbove) / 6.0f, -10.0f, 14.0f );
+	// over the runway: sink until just above it, then hold the nose a little up for the flare
 	if( overRunway )
 		c.view[PITCH] = g.above > touch + 30 ? std::clamp( (g.above - touch) / 6.0f, 2.0f, 10.0f ) : 1.5f;
 	else
@@ -235,6 +261,7 @@ Status LandingSteps::final( Bots::Mind& c )
 		Vec3 nose;
 		trace_t tr;
 		AngleVectors( c.ps.vehicleAngles, nose, nullptr, nullptr );
+		// too low before the runway, or terrain ahead of the nose: pull up
 		if( c.sense.height < (shortField ? 14.0f + touch : 60.0f) ||
 			(Bots::pathBlocked( c.ent->r.currentOrigin, nose, shortField ? 250.0f : 500.0f, c.ent->s.number, tr ) && tr.entityNum == ENTITYNUM_WORLD) )
 			c.view[PITCH] = -12.0f;
@@ -245,6 +272,7 @@ Status LandingSteps::final( Bots::Mind& c )
 	const bool wantBrake = c.speed > wantSpeed * 1.25f;
 	if( wantBrake != ((c.ps.ONOFF & OO_SPEEDBRAKE) != 0) )
 		c.cmd.buttons |= BUTTON_BRAKE;
+	// the gear only comes down below the green-arc speed; ask once and wait for it to travel
 	if( !(c.ps.ONOFF & OO_GEAR) && c.speed < g.stall * SPEED_GREEN_ARC * 0.95f && theLevel.time_ > c.bot.gearTime )
 	{
 		c.cmd.buttons |= BUTTON_GEAR;
@@ -253,6 +281,7 @@ Status LandingSteps::final( Bots::Mind& c )
 	return Status::Running;
 }
 
+// straight ahead on the brakes until slow enough to taxi
 Status LandingSteps::rollOut( Bots::Mind& c )
 {
 	if( c.bot.pad < 0 || liftedOff( c ) )
@@ -260,14 +289,15 @@ Status LandingSteps::rollOut( Bots::Mind& c )
 	c.bot.landPhase = Ground;
 	c.direct = true;
 	c.view[YAW] = c.ps.vehicleAngles[YAW];
-	c.view[PITCH] = 3.0f;
-	if( c.speed <= 60 )
+	c.view[PITCH] = groundPitch;
+	if( c.speed <= taxiSpeed )
 		return Status::Success;
 	wheelBrakes( c, true );
 	c.cmd.forwardmove = -moveFull;
 	return Status::Running;
 }
 
+// to the parking spot at walking pace, then stop on it
 Status LandingSteps::taxi( Bots::Mind& c )
 {
 	if( c.bot.pad < 0 || liftedOff( c ) )
@@ -281,9 +311,9 @@ Status LandingSteps::taxi( Bots::Mind& c )
 	toSpot[2] = 0;
 	const float spotDist = VectorLength( toSpot );
 	c.headFor( pad.spot );
-	c.view[PITCH] = 3.0f;
+	c.view[PITCH] = groundPitch;
 	c.cmd.forwardmove = moveNone;
-	if( c.speed > 60 )
+	if( c.speed > taxiSpeed )
 	{
 		wheelBrakes( c, true );
 		c.cmd.forwardmove = -moveFull;
@@ -305,6 +335,7 @@ Status LandingSteps::taxi( Bots::Mind& c )
 	return Status::Running;
 }
 
+// sit still, brakes on, until fuel and weapons are full
 Status LandingSteps::refuel( Bots::Mind& c )
 {
 	if( c.bot.pad < 0 || liftedOff( c ) )
@@ -312,12 +343,13 @@ Status LandingSteps::refuel( Bots::Mind& c )
 	c.bot.landPhase = Ground;
 	c.direct = true;
 	c.view[YAW] = c.ps.vehicleAngles[YAW];
-	c.view[PITCH] = 3.0f;
+	c.view[PITCH] = groundPitch;
 	c.cmd.forwardmove = moveNone;
 	wheelBrakes( c, true );
 	return Bots::replenished( c.ent ) ? Status::Success : Status::Running;
 }
 
+// done: hand the bot back to its goals
 Status LandingSteps::leaveRunway( Bots::Mind& c )
 {
 	c.direct = true;
