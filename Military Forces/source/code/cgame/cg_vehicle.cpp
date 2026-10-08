@@ -598,8 +598,9 @@ void CGame::initShadows( )
 	// cache the vehicle's custom shadow shader (if we can find one - format is <modelName>Shadow, "like f-16Shadow")
 	for( vehicle = 0; vehicle < bg_numberOfVehicles; vehicle++ )
 	{
-		// try to load custom shader
-		customShadowShader = refExport.RegisterShader( va( "%sShadow", availableVehicles[ vehicle ].modelName ) );
+		// try to load custom shader; a soldier is several models and has no shadow picture of its own
+		customShadowShader = (availableVehicles[ vehicle ].cat & CAT_LQM) ? 0 :
+			refExport.RegisterShader( va( "%sShadow", availableVehicles[ vehicle ].modelName ) );
 		
 		// replace SHADOW_x fallback op. with the custom shader handle?
 		if( customShadowShader )
