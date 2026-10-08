@@ -2950,7 +2950,10 @@ bool FileSystem::idPak(char *pak, char *base, int numPaks)
 	if (i < numPaks) {
 		return true;
 	}
-	return false;
+	// paks named q3_* hold files from the player's own Quake III Arena copy: never sent, never asked for
+	const char *name = strrchr( pak, '/' );
+	name = name ? name + 1 : pak;
+	return Q_stricmpn( name, "q3_", 3 ) == 0;
 }
 
 /*

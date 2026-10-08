@@ -18,6 +18,8 @@ support.
 - Marek & Bjoern
 ```
 
+Running a server: [docs/server.md](docs/server.md).
+
 ## What's new in the 25th anniversary edition
 
 This edition is still being worked on. Here is what it brings so far.
