@@ -143,7 +143,7 @@ extern	int			c_pointcontents;
 extern	int			c_traces, c_brush_traces, c_patch_traces;
 extern	cvar_t		*cm_noAreas;
 extern	cvar_t		*cm_noCurves;
-extern	cvar_t		*cm_wideNodeOffset;	// 1: the old flat 2048 box offset at angled split planes, for comparison
+extern	cvar_t		*cm_wideNodeOffset;	// 1: a flat 2048 box offset at angled split planes, for comparison
 extern	cvar_t		*cm_playerCurveClip;
 
 // cm_test.c

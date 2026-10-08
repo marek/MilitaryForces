@@ -136,7 +136,7 @@ static char *Sys_DefaultHomePath()
 				Q_strcat(homePath, sizeof(homePath), com_homepath->asString());
 			else
 			{
-				// settings from before the folder was renamed keep working where they are
+				// a settings folder under the legacy name is used where it exists
 				char legacy[ MAX_OSPATH ];
 				struct stat st;
 				Com_sprintf( legacy, sizeof(legacy), "%s%s", homePath, HOMEPATH_NAME );

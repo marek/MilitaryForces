@@ -359,7 +359,7 @@ void RE_RegisterFont(const char *fontName, int pointSize, fontInfo_t *font) {
 	R_IssuePendingRenderCommands();
 
 	// a font named as a TrueType or OpenType file is rendered with FreeType; the pre-rendered
-	// images are used for the old names, when the file is missing, or with r_fontFiles 0
+	// images are used for any other name, when the file is missing, or with r_fontFiles 0
 	const char *extension = strrchr( fontName, '.' );
 	const bool fontFile = extension && ( !Q_stricmp( extension, ".ttf" ) || !Q_stricmp( extension, ".otf" ) ) &&
 		ri.Cvar_VariableIntegerValue( "r_fontFiles" ) && ri.FS_ReadFile( fontName, nullptr ) > 0;
