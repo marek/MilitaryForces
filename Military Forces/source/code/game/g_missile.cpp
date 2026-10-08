@@ -1368,9 +1368,9 @@ void fire_autocannon( GameEntity *self, bool main )
 	// gun positions sharing the machine gun: each one that bears on where the crew looks fires along that line
 	if( !main && (vehicleFlags & VF_GUNSTATIONS) )
 	{
-		const unsigned bearing = VehicleData::gunStationsBearing( self->client_->vehicle_, self->client_->ps_.vehicleAngles, self->client_->ps_.viewangles );
+		const unsigned bearing = VehicleData::gunStationsBearing( self->client_->vehicle_, self->client_->ps_.vehicleAngles, self->client_->stationAim_ );
 		Vec3 aim;
-		VectorCopy( self->client_->ps_.viewangles, aim );
+		VectorCopy( self->client_->stationAim_, aim );
 		aim[0] += spreadX;
 		aim[1] += spreadY;
 		AngleVectors( aim, dir, nullptr, nullptr );

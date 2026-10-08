@@ -632,7 +632,7 @@ void PlayerMove::weapon( ) {
 			// every gun position that bears fires and takes a round; with none bearing nothing fires
 			int rounds = 1;
 			if( availableVehicles[pm->vehicle].flags & VF_GUNSTATIONS )
-				rounds = std::popcount( VehicleData::gunStationsBearing( pm->vehicle, pm->ps->vehicleAngles, pm->ps->viewangles ) );
+				rounds = std::popcount( VehicleData::gunStationsBearing( pm->vehicle, pm->ps->vehicleAngles, pm->gunnerAngles ? pm->gunnerAngles : pm->ps->viewangles ) );
 			if( rounds > 0 ) {
 				pm->ps->ammo[WP_MACHINEGUN] = std::max( 0, pm->ps->ammo[WP_MACHINEGUN] - rounds );
 				PlayerMove::addEvent( EV_FIRE_MG );

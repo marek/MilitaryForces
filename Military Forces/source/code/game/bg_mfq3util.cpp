@@ -404,7 +404,8 @@ void VehicleData::loadAllVehicleData()
 		else if( availableVehicles[i].cat & CAT_GROUND ) 
 			availableVehicles[i].seats = (availableVehicles[i].caps & HC_WHEELS) ? 3 : 0;
 		else 
-			availableVehicles[i].seats = 0;
+			// a bomber with turrets carries a gunner
+			availableVehicles[i].seats = (availableVehicles[i].flags & VF_GUNSTATIONS) ? 1 : 0;
 
 		// helo/plane specific
 		if(availableVehicles[i].cat & CAT_PLANE) 
@@ -1225,6 +1226,8 @@ bool VehicleData::vehicleHasTurret( int vehicle )
 {
 	if( vehicle < 0 || vehicle >= bg_numberOfVehicles ) 
 		return false;
+	if( availableVehicles[vehicle].flags & VF_GUNSTATIONS )
+		return true;
 	for(unsigned int weapon : availableVehicles[vehicle].weapons) 
 	{
 		if( weapon && availableWeapons[weapon].turret ) 

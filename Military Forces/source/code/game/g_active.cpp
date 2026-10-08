@@ -900,6 +900,8 @@ static void ClientThink_real( GameEntity *ent )
 	pm.updateBay = ent->updateBay_;
 
 	static vec3_t gunnerAngles;
+	const bool gunStations = client->vehicle_ >= 0 && (availableVehicles[client->vehicle_].flags & VF_GUNSTATIONS);
+	VectorCopy( client->ps_.viewangles, client->stationAim_ );
 	if( client->vehicle_ >= 0 && VehicleData::vehicleHasTurret( client->vehicle_ ) ) 
 	{
 		for( int r = 1; r <= theLevel.maxclients_; r++ ) 
@@ -910,7 +912,15 @@ static void ClientThink_real( GameEntity *ent )
 				continue;
 			Game::riderAngles( rider, client, gunnerAngles );
 			pm.gunnerAngles = gunnerAngles;
-			if( availableWeapons[client->ps_.weaponIndex].turret ) 
+			// a gunner aboard has the gun positions: they aim where he looks and fire on his trigger
+			if( gunStations )
+			{
+				VectorCopy( gunnerAngles, client->stationAim_ );
+				pm.cmd.buttons &= ~BUTTON_ATTACK;
+				if( rider->pers_.cmd_.buttons & (BUTTON_ATTACK|BUTTON_ATTACK_MAIN) ) 
+					pm.cmd.buttons |= BUTTON_ATTACK;
+			}
+			else if( availableWeapons[client->ps_.weaponIndex].turret ) 
 			{
 				pm.cmd.buttons &= ~BUTTON_ATTACK_MAIN;
 				if( rider->pers_.cmd_.buttons & (BUTTON_ATTACK|BUTTON_ATTACK_MAIN) ) 
