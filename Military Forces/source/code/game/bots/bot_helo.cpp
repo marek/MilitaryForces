@@ -480,7 +480,7 @@ struct HeloTasks
 		}
 
 		const float maxSpeed = static_cast<float>( c.veh.maxspeed );
-		const float sideSpeed = std::max( 1.0f, c.veh.maxspeed * HELO_SIDE_SPEED );
+		const float sideSpeed = std::max( 1.0f, maxSpeed );
 		float travelYaw = c.view[YAW] + (push < 0 ? 180.0f : 0.0f);
 		if( orbit )
 		{

@@ -1027,22 +1027,59 @@ struct PlaneTasks
 		return Status::Success;
 	}
 
-	// the afterburner drinks fuel: it is for staying alive, for getting off the ground and for trips that cannot wait
+	// The afterburner drinks fuel and makes the aircraft fast where fast is dangerous, so it is a decision, not a
+	// reflex. Getting off the ground always has it; so does a moment's recovery from a stall or a slow pull-up, and
+	// a climb that a fight makes urgent. Beyond that it needs open air and a reason.
 	static bool wantsAfterburner( Mind& c )
 	{
-		if( c.defending || c.sense.missile || c.sense.launched || c.bot.desire == Goal::Evade )
+		const bool stalling = (c.ps.ONOFF & OO_STALLED) || c.speed < c.veh.stallspeed * 1.15f;
+		// Going back to rearm is two things. The landing itself - lining up, the final, the ground - never has it.
+		// The trip to the strip while that is still far off may be hurried like any other, further down
+		constexpr float stripFar = 6000.0f;
+		const bool rearming = c.bot.desire == Goal::Rearm;
+		const bool tripToStrip = rearming && c.bot.pad >= 0 && c.bot.landPhase <= 1 && Distance( Bots::pads_[c.bot.pad].center, c.ent->r.currentOrigin ) > stripFar;
+		if( rearming && !tripToStrip )
+			return false;
+		// the take-off roll and the first seconds of the climb out
+		if( c.landed() || departing( c ) )
 			return true;
-		// coming in to land is slow and low on purpose, and usually short of fuel: the afterburner there only empties the tank
-		if( c.bot.desire == Goal::Rearm && c.bot.landPhase >= 1 )
-			return (c.ps.ONOFF & OO_STALLED) || c.speed < c.veh.stallspeed * 1.1f || theLevel.time_ < c.bot.avoidTime || c.view[PITCH] < -12.0f;
-		if( c.speed < c.veh.stallspeed * 1.7f || (c.ps.ONOFF & OO_STALLED) )
+		// a blip to get flying again, and thrust for a hard pull-up that the speed alone will not carry
+		if( stalling || (c.view[PITCH] < -12.0f && c.speed < c.veh.stallspeed * 1.5f) )
 			return true;
-		// tight ground, a hard pull up or a wall ahead need all the thrust there is
-		if( c.bot.confined || c.bot.desire == Goal::Climb || c.sense.height < c.minHeight * 1.5f || theLevel.time_ < c.bot.avoidTime || c.view[PITCH] < -12.0f )
+		// height wanted quickly, with an enemy about; a climb on the way somewhere is flown at military power
+		if( c.bot.desire == Goal::Climb && c.sense.enemy )
 			return true;
+		// nothing more in a canyon or a corridor, or with a corner or an obstacle to fly round: speed there is a crash
+		const bool tight = c.bot.confined || c.bot.cornerAhead || theLevel.time_ < c.bot.avoidTime || theLevel.time_ < c.bot.brakeTime;
+		if( tight )
+			return false;
+		// shot at, or locked: some pilots light it and some do not, the cautious more often. With ground near enough
+		// to get down behind it is likelier than out in the open sky. Settled once for each incident (each hit, or
+		// each stretch of some seconds under a lock) so it does not flicker
+		constexpr float coverBelow = 1200.0f;
+		if( c.sense.underFire || c.sense.blindsided || c.sense.locked )
+		{
+			const int incident = c.sense.underFire ? c.bot.hitTime : theLevel.time_ / 6000;
+			const int draw = (incident * 7 + c.ent->s.number * 31) % 100;
+			const int chance = 25 + static_cast<int>( 40 * c.who().caution ) + (c.sense.height < coverBelow ? 20 : -10);
+			if( draw < chance )
+				return true;
+		}
+		// the rest needs open air: height in hand and room overhead
+		if( c.sense.height <= c.minHeight * 1.5f || c.ceiling <= 600.0f )
+			return false;
+		// a missile on its way
+		if( c.defending || c.sense.missile || c.sense.launched )
+			return true;
+		// running away from someone near enough to matter
+		constexpr float chased = 4000.0f;
+		if( c.bot.desire == Goal::Evade && c.sense.enemy && c.sense.enemyDist < chased )
+			return true;
+		// the rest is hurrying, which a tank under three tenths cannot afford
 		if( c.ps.stats[STAT_FUEL] < static_cast<int>( c.veh.maxfuel ) * 3 / 10 )
 			return false;
-		if( c.sense.underFire || c.sense.blindsided || c.sense.locked )
+		// a strip that is still far off, with the fuel to hurry there
+		if( tripToStrip )
 			return true;
 		// carrying a flag, going for one or chasing its carrier
 		if( c.ps.objectives || c.bot.desire == Goal::Capture )
@@ -1051,8 +1088,8 @@ struct PlaneTasks
 		constexpr float farBehind = 4000.0f, farFromFight = 5000.0f;
 		if( const GameEntity* leader = Bots::leaderOf( c.bot ); leader && Distance( leader->r.currentOrigin, c.ent->r.currentOrigin ) > farBehind )
 			return true;
-		// back into the fight after a respawn or a long chase
-		return c.sense.enemy && c.sense.enemyDist > farFromFight;
+		// intercepting an enemy that is still far off; once near, the fight is flown at military power
+		return c.sense.enemy && c.bot.desire == Goal::Attack && c.sense.enemyDist > farFromFight;
 	}
 
 	// shoot when attacking or when the enemy crosses the nose; a step that needs one particular weapon keeps it selected
@@ -1192,9 +1229,12 @@ void Bots::thinkPlane( GameEntity* ent, State& bot, const Sense& sense, usercmd_
 		if( cmd.forwardmove != moveFull && throttle > 0 )
 			cmd.buttons |= BUTTON_DECREASE;
 	}
-	else if( mind.veh.maxthrottle > militaryPower && cmd.forwardmove == moveFull && !PlaneTasks::wantsAfterburner( mind ) )
+	else if( mind.veh.maxthrottle > militaryPower && cmd.forwardmove == moveFull )
 	{
-		cmd.forwardmove = moveNone;
+		if( !PlaneTasks::wantsAfterburner( mind ) )
+			cmd.forwardmove = moveNone;
+		// the afterburner key only overrides the set throttle. That is brought to military power underneath, so that
+		// letting the afterburner go leaves the engine there and not at wherever it was set on the ground
 		if( throttle < militaryPower )
 			cmd.buttons |= BUTTON_INCREASE;
 		else if( throttle > militaryPower )

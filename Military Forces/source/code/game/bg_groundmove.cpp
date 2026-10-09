@@ -22,6 +22,12 @@ constexpr int PMAX = 8;
 
 
 
+// a vehicle moves over the ground at twice the speed its table entry and its instruments give; every vehicle has
+// always done so, and the entries are tuned to it
+constexpr float GROUND_SPEED_SCALE = 2.0f;
+// how hard a ground vehicle that has left the ground is pulled down, in units a second each second
+constexpr float AIRBORNE_GRAVITY = 200.0f;
+
 /*
 ===================
 groundVehicle_Brakes
@@ -33,8 +39,9 @@ void PlayerMove::groundVehicle_Brakes()
 {
 	if( pm->cmd.serverTime < pm->ps->timers[TIMER_BRAKE] ) return;
 
-	// can only be engaged when slow enough
-	if( pm->ps->speed > 120 ) return;
+	// can only be engaged when slow enough: up to a quarter of the vehicle's own top speed, so that a fast vehicle
+	// rolling down a slope can still be held
+	if( pm->ps->speed > std::max( 120.0f, availableVehicles[pm->vehicle].maxspeed * 2.5f ) ) return;
 
 	if( pm->ps->ONOFF & OO_SPEEDBRAKE ) {
 		pm->ps->ONOFF &= ~OO_SPEEDBRAKE;
@@ -128,10 +135,8 @@ void PlayerMove::groundVehicleAccelerate()
 			targetspeed += topspeed * (angle / 5);
 		}
 
-		// what a fall or a slope left above the vehicle's own top speed is scrubbed off by the ground much faster than the engine slows it
-		const float drag = fabs( currspeed ) > topspeed * 1.5f ? accel * 4.0f : accel;
-		if( currspeed < targetspeed - accel ) currspeed += std::min( drag, targetspeed - currspeed );
-		else if( currspeed > targetspeed + accel ) currspeed -= std::min( drag, currspeed - targetspeed );
+		if( currspeed < targetspeed - accel ) currspeed += accel;
+		else if( currspeed > targetspeed + accel ) currspeed -= accel;
 		else currspeed = targetspeed;
 
 		// for negative speeds we set the flag OO_STALLED as speed is an unsigned int
@@ -141,16 +146,10 @@ void PlayerMove::groundVehicleAccelerate()
 		} else {
 			pm->ps->ONOFF &= ~OO_STALLED;
 		}
-	} else { // falling
-		// only a nose that points down gains speed, up to a terminal speed. A vehicle hung on an edge counts as
-		// falling too: it is not moving, so it gains nothing and keeps no speed it does not have
-		constexpr float fallGain = 50.0f, terminalFactor = 2.5f;
-		const float dive = sin( DEG2RAD( angle ) ) * ( (pm->ps->ONOFF & OO_STALLED) ? -1.0f : 1.0f );
-		const float moving = VectorLength( pm->ps->velocity ) * 0.5f;
-		if( dive > 0 && currspeed < topspeed * terminalFactor )
-			currspeed = std::min( currspeed + fallGain * dive * pml.frametime, topspeed * terminalFactor );
-		if( moving < currspeed * 0.5f )
-			currspeed = std::max( moving, currspeed - fallGain * 4.0f * pml.frametime );
+	} else {
+		// off the ground the engine does nothing: the vehicle flies on as it was thrown and the speed shown is the
+		// speed it really has over the ground. On landing it carries on from there
+		currspeed = sqrtf( pm->ps->velocity[0] * pm->ps->velocity[0] + pm->ps->velocity[1] * pm->ps->velocity[1] ) / GROUND_SPEED_SCALE;
 	}
 
 	// apply speed modifier
@@ -426,9 +425,14 @@ void PlayerMove::groundVehicleMove( )
 	} else {
 		AngleVectors( pm->ps->vehicleAngles, forward, nullptr, nullptr );
 	}
-	VectorNormalize( pm->ps->velocity );
-	VectorAdd( forward, pm->ps->velocity, forward );
-	VectorScale( forward, speed, pm->ps->velocity );
+	if( pm->ps->ONOFF & OO_LANDED ) {
+		// on the ground a vehicle goes where its hull points, along the ground under it. It keeps nothing of the
+		// direction an edge or a wall knocked it into the frame before
+		VectorScale( forward, speed * GROUND_SPEED_SCALE, pm->ps->velocity );
+	} else {
+		// in the air it is a thrown weight: what it had, and gravity
+		pm->ps->velocity[2] -= AIRBORNE_GRAVITY * pml.frametime;
+	}
 
 	stepSlideMove_GV();
 

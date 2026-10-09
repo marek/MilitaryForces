@@ -250,7 +250,7 @@ void PlayerMove::heloAccelerate()
     int		maxthrottle = availableVehicles[pm->vehicle].maxthrottle;
 //	int		minthrottle = availableVehicles[pm->vehicle].minthrottle;
 	float	maxforwardspeed = availableVehicles[pm->vehicle].maxspeed * ( gearInAirflow() ? GEAR_DOWN_SPEED : 1.0f );
-	float	maxrightspeed = maxforwardspeed * HELO_SIDE_SPEED;
+	float	maxrightspeed = maxforwardspeed;
 	float	maxliftspeed = maxforwardspeed*0.00525;
 	float	maxspeed = sqrt(maxforwardspeed*maxforwardspeed + 
 							maxrightspeed*maxrightspeed + 
@@ -270,10 +270,12 @@ void PlayerMove::heloAccelerate()
 	vehdir[YAW] = AngleMod( vehdir[YAW] );
 
 	curforwardspeed = (vehdir[PITCH]/MAX_HELO_PITCH)*availableVehicles[pm->vehicle].maxspeed * ( gearInAirflow() ? GEAR_DOWN_SPEED : 1.0f );
-	currightspeed = (vehdir[ROLL]/MAX_HELO_ROLL)*availableVehicles[pm->vehicle].maxspeed * HELO_SIDE_SPEED * ( gearInAirflow() ? GEAR_DOWN_SPEED : 1.0f );
+	currightspeed = (vehdir[ROLL]/MAX_HELO_ROLL)*availableVehicles[pm->vehicle].maxspeed * ( gearInAirflow() ? GEAR_DOWN_SPEED : 1.0f );
 	curliftspeed = throttle > maxthrottle ? -(throttle-maxthrottle)*20 : throttle * 25;	// real vert speed	
 	curliftspeedadjust = throttle > maxthrottle ? 0 : throttle * 25;					// adjusted vert speed, don't want down movement to effect fuel usage "more"
-	curspeed = sqrt(curforwardspeed*curforwardspeed + currightspeed*currightspeed + curliftspeed*curliftspeed);						// real total speed
+	// what the instruments show is what the helicopter does: over the ground no more than its top speed, however it is tilted
+	const float overGround = std::min( static_cast<float>( sqrt(curforwardspeed*curforwardspeed + currightspeed*currightspeed) ), maxforwardspeed );
+	curspeed = sqrt(overGround*overGround + curliftspeed*curliftspeed);						// real total speed
 	curspeedadjust = sqrt(curforwardspeed*curforwardspeed + currightspeed*currightspeed + curliftspeedadjust*curliftspeedadjust);	// adjusted total speed, dont want down movement to effect throttle more
 	totalthrottle = (curspeedadjust/maxspeed)*10;
 
@@ -419,7 +421,7 @@ void PlayerMove::heloMove( )
 	if((pm->ps->ONOFF & OO_LANDED) && (throttle > maxthrottle))
 		pm->ps->fixed_throttle = throttle = 0;
 	curforwardspeed = (vehdir[PITCH]/MAX_HELO_PITCH)*availableVehicles[pm->vehicle].maxspeed * ( gearInAirflow() ? GEAR_DOWN_SPEED : 1.0f );
-	currightspeed = (vehdir[ROLL]/MAX_HELO_ROLL)*availableVehicles[pm->vehicle].maxspeed * HELO_SIDE_SPEED * ( gearInAirflow() ? GEAR_DOWN_SPEED : 1.0f );
+	currightspeed = (vehdir[ROLL]/MAX_HELO_ROLL)*availableVehicles[pm->vehicle].maxspeed * ( gearInAirflow() ? GEAR_DOWN_SPEED : 1.0f );
 	curliftspeed = throttle > maxthrottle ? -(throttle-maxthrottle)*20 : throttle * 25;	
 			// Forward speed
 			VectorCopy(vehdir, forwardvel);
@@ -440,7 +442,8 @@ void PlayerMove::heloMove( )
 			liftvel = liftvel * ( curliftspeed );
 
 			// delta vel
-			// over the ground a helicopter is no faster tilted two ways, or pulling collective while rolled, than its top speed
+			// a helicopter is as fast sideways or backwards as forwards: fully tilted any way it does its top speed, and
+			// tilting two ways at once, or pulling collective while rolled, adds nothing to that
 			deltavel = forwardvel + rightvel;
 			deltavel = liftvel + deltavel;
 			if( const float overGround = sqrtf( deltavel[0] * deltavel[0] + deltavel[1] * deltavel[1] ), top = availableVehicles[pm->vehicle].maxspeed * ( gearInAirflow() ? GEAR_DOWN_SPEED : 1.0f ); overGround > top )
