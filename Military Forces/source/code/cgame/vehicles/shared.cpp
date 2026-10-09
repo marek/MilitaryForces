@@ -353,6 +353,44 @@ void CGame::vehicleObituary( entityState_t *ent )
 
 }
 
+// A flash at both barrels of every gun position that fired. Only the crew's own client knows where they aim; on
+// other screens the flash points along the middle of the position's field
+void CGame::stationMuzzleFlashes( int vehicle, int stations, const refEntity_t *parent, const vec3_t aimAngles )
+{
+	unsigned bit = 1;
+	for( const GunStation& station : VehicleData::gunStations( vehicle ) )
+	{
+		if( static_cast<unsigned>( stations ) & bit )
+		{
+			// the hull's second axis points left
+			vec3_t forward, angles;
+			for( int i = 0; i < 3; i++ )
+				forward[i] = parent->axis[0][i] * station.axisForward - parent->axis[1][i] * station.axisRight + parent->axis[2][i] * station.axisUp;
+			VectorNormalize( forward );
+			vectoangles( forward, angles );
+			if( aimAngles ) VectorCopy( aimAngles, angles );
+			for( int barrel = 0; barrel < 2; barrel++ )
+			{
+				refEntity_t flash;
+				memset( &flash, 0, sizeof( flash ) );
+				VectorCopy( parent->lightingOrigin, flash.lightingOrigin );
+				flash.shadowPlane = parent->shadowPlane;
+				flash.renderfx = parent->renderfx;
+				flash.hModel = cgs.media.vehicleMuzzleFlashModel;
+				angles[ROLL] = crandom() * 10;
+				AnglesToAxis( angles, flash.axis );
+				const float right = station.right + ( barrel ? station.barrelSpacing : -station.barrelSpacing );
+				VectorCopy( parent->origin, flash.origin );
+				VectorMA( flash.origin, station.forward, parent->axis[0], flash.origin );
+				VectorMA( flash.origin, -right, parent->axis[1], flash.origin );
+				VectorMA( flash.origin, station.up, parent->axis[2], flash.origin );
+				refExport.AddRefEntityToScene( &flash );
+			}
+		}
+		bit <<= 1;
+	}
+}
+
 /*
 =============
 CGame::vehicleMuzzleFlash

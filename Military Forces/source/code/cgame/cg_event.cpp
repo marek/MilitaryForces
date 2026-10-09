@@ -218,6 +218,8 @@ void ClientEntity::entityEvent( vec3_t position )
 
 	case EV_FIRE_MG:
 		DEBUGNAME("EV_FIRE_WEAPON");
+		if( cg_debugEvents.integer ) CGame::printf( "stations %d\n", es->eventParm );
+		this->stationsFired = es->eventParm;
 		this->fireMachinegun( false );
 		break;
 

@@ -651,10 +651,7 @@ void ClientEntity::ejectCasings( bool main, int weaponIndex )
 	}
 	if( !main && (veh.flags & VF_GUNSTATIONS) )
 	{
-		// only the crew's own client knows where they look; for other aircraft the look is taken as straight ahead
-		vec3_t aimAngles;
-		VectorCopy( clientNum == cg.snap->ps.clientNum ? cg.snap->ps.viewangles : this->lerpAngles, aimAngles );
-		const unsigned bearing = VehicleData::gunStationsBearing( vehicle, this->lerpAngles, aimAngles );
+		const unsigned bearing = static_cast<unsigned>( this->stationsFired );
 		unsigned bit = 1;
 		for( const GunStation& station : VehicleData::gunStations( vehicle ) )
 		{

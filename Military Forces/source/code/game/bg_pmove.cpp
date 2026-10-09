@@ -635,12 +635,16 @@ void PlayerMove::weapon( ) {
 		int wpnIndex = availableVehicles[pm->vehicle].weapons[WP_MACHINEGUN];
 		if ( wpnIndex > 0 && pm->ps->ammo[WP_MACHINEGUN] > 0 ) {
 			// every gun position that bears fires and takes a round; with none bearing nothing fires
+			// the event carries which positions fired, so every client shows their flashes and casings
 			int rounds = 1;
-			if( availableVehicles[pm->vehicle].flags & VF_GUNSTATIONS )
-				rounds = std::popcount( VehicleData::gunStationsBearing( pm->vehicle, pm->ps->vehicleAngles, pm->gunnerAngles ? pm->gunnerAngles : pm->ps->viewangles ) );
+			unsigned stations = 0;
+			if( availableVehicles[pm->vehicle].flags & VF_GUNSTATIONS ) {
+				stations = VehicleData::gunStationsBearing( pm->vehicle, pm->ps->vehicleAngles, pm->gunnerAngles ? pm->gunnerAngles : pm->ps->viewangles ) & 0xff;
+				rounds = std::popcount( stations );
+			}
 			if( rounds > 0 ) {
 				pm->ps->ammo[WP_MACHINEGUN] = std::max( 0, pm->ps->ammo[WP_MACHINEGUN] - rounds );
-				PlayerMove::addEvent( EV_FIRE_MG );
+				GameShared::addPredictableEventToPlayerstate( EV_FIRE_MG, static_cast<int>( stations ), pm->ps );
 			}
 			pm->ps->timers[TIMER_MACHINEGUN] += availableWeapons[wpnIndex].fireInterval;
 		}

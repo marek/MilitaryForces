@@ -191,6 +191,8 @@ void ClientEntity::plane( clientInfo_t *ci )
 	{
 		drawInfo.basicInfo.drawMuzzleFlash = true;
 		drawInfo.basicInfo.flashWeaponIndex = this->muzzleFlashWeapon;
+		drawInfo.basicInfo.flashStations = this->stationsFired;
+		drawInfo.basicInfo.flashOwnAim = this->currentState.clientNum == cg.snap->ps.clientNum;
 	}
 	
 	// draw plane
@@ -833,7 +835,11 @@ void CGame::drawPlane(DrawInfo_Plane_t* drawInfo)
 	// muzzleflash
 	if( drawInfo->basicInfo.drawMuzzleFlash ) 
 	{
-		CGame::vehicleMuzzleFlash( drawInfo->basicInfo.flashWeaponIndex, &part[BP_PLANE_BODY], 
+		if( veh->flags & VF_GUNSTATIONS )
+			CGame::stationMuzzleFlashes( drawInfo->basicInfo.vehicleIndex, drawInfo->basicInfo.flashStations, &part[BP_PLANE_BODY],
+							   drawInfo->basicInfo.flashOwnAim ? cg.snap->ps.viewangles : nullptr );
+		else
+			CGame::vehicleMuzzleFlash( drawInfo->basicInfo.flashWeaponIndex, &part[BP_PLANE_BODY], 
 							   veh->handle[BP_PLANE_BODY], drawInfo->basicInfo.vehicleIndex );
 	}
 	
