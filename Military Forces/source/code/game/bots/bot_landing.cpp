@@ -142,8 +142,10 @@ Status LandingSteps::survey( Bots::Mind& c )
 	int chosen = c.bot.landDir > 0 ? 1 : 0;
 	if( slope[1 - chosen] < slope[chosen] * 0.7f || (clear[chosen] < 1500 && clear[1 - chosen] > clear[chosen]) )
 		chosen = 1 - chosen;
+#ifdef MF_BOT_DEBUG
 	if( g_botDebug.integer >= 2 )
 		Common::printf( "BOTSURVEY t %d bot %d pad %d slope %.2f %.2f clear %.0f %.0f chosen %d\n", theLevel.time_, c.ent->s.number, c.bot.pad, slope[0], slope[1], clear[0], clear[1], chosen );
+#endif
 	if( slope[chosen] > 0.6f || clear[chosen] < 1500 )
 	{
 		giveUp( c, 300000, 3000 );
@@ -232,9 +234,11 @@ Status LandingSteps::approach( Bots::Mind& c )
 		headingError < 15 && fabs( c.ent->r.currentOrigin[2] - c.bot.approachHeight ) < 300 && canDescend;
 	if( linedUp && !Bots::runwayBusy( c.bot.pad, c.ent ) )
 		return Status::Success;
+#ifdef MF_BOT_DEBUG
 	if( g_botDebug.integer >= 2 && theLevel.time_ % 1000 < 25 )
 		Common::printf( "BOTAPPROACH t %d bot %d before %.0f lateral %.0f heading %.0f above %.0f out %d wantRun %.0f height %.0f radius %.0f descend %d busy %d speed %.0f fuel %d\n", theLevel.time_,
 			c.ent->s.number, g.before, g.lateral, headingError, g.above, c.bot.landOutbound, wantRun, c.bot.approachHeight - g.pad.z, radius, canDescend, Bots::runwayBusy( c.bot.pad, c.ent ), c.speed, c.ps.stats[STAT_FUEL] );
+#endif
 
 	c.headFor( c.bot.goal );
 	return Status::Running;
@@ -256,9 +260,11 @@ Status LandingSteps::final( Bots::Mind& c )
 	const float left = g.pad.halfLength - g.pos;
 	if( left < rollOutRoom( c, c.speed ) || (g.before < -200 && g.above > 150) || fabs( g.side ) > 900 || (g.before > 300 && Bots::runwayBusy( c.bot.pad, c.ent )) )
 	{
+#ifdef MF_BOT_DEBUG
 		if( g_botDebug.integer >= 2 )
 			Common::printf( "BOTGOAROUND t %d bot %d veh %d before %.0f above %.0f side %.0f half %.0f busy %d speed %.0f fuel %d\n", theLevel.time_, c.ent->s.number,
 				c.ent->client_->vehicle_, g.before, g.above, g.side, g.pad.halfLength, Bots::runwayBusy( c.bot.pad, c.ent ), c.speed, c.ps.stats[STAT_FUEL] );
+#endif
 		c.direct = false;
 		return Status::Failure;
 	}
