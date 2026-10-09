@@ -1194,6 +1194,7 @@ public:
 	static bool stealthHidden( int vehicle, int revealTime, int time, float dist, float radarRange );
 	static bool vehicleHasTurret( int vehicle );
 	static void registerVehicles();
+	static int firstMainWeapon( int vehicle );
 	static std::span<const GunStation> gunStations( int vehicle );
 	static unsigned gunStationsBearing( int vehicle, const vec3_t hullAngles, const vec3_t aimAngles );
 	static void parseMissionScripts( char *buf, mission_overview_t* overview, mission_vehicle_t* vehs, mission_groundInstallation_t* gis);

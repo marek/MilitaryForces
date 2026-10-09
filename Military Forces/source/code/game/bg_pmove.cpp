@@ -564,7 +564,12 @@ void PlayerMove::weapon( ) {
 	}
 
 	// check for change
-	if( pm->ps->weaponNum != pm->cmd.weapon && availableVehicles[pm->vehicle].weapons[pm->cmd.weapon] != WI_NONE ) {
+	// the selection is among the main weapons: the machine gun is always live on its own trigger
+	if( pm->ps->weaponNum == WP_MACHINEGUN ) {
+		pm->ps->weaponNum = VehicleData::firstMainWeapon( pm->vehicle );
+	}
+	if( pm->cmd.weapon != WP_MACHINEGUN && pm->ps->weaponNum != pm->cmd.weapon &&
+		availableVehicles[pm->vehicle].weapons[pm->cmd.weapon] != WI_NONE ) {
 		pm->ps->weaponNum = pm->cmd.weapon;
 		pm->ps->timers[TIMER_WEAPON] += 100;
 	}

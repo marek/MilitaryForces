@@ -367,6 +367,15 @@ Get the catagory/class enum from the vehicle index (use CAT_ANY & CLASS_ANY to d
 */
 
 
+// says so when a vehicle's pylons took fewer of a store than its table entry asks for (developer output)
+static void reportShortLoad( int vehicle, int slot, int wanted )
+{
+	const int got = availableVehicles[vehicle].ammo[slot];
+	if( got < wanted )
+		Common::dPrintf( "Loadout short: %s carries %d of %d %s\n", availableVehicles[vehicle].descriptiveName, got, wanted,
+			availableWeapons[availableVehicles[vehicle].weapons[slot]].descriptiveName );
+}
+
 void VehicleData::loadAllVehicleData()
 {
 	int i, j, num;
@@ -456,8 +465,10 @@ void VehicleData::loadAllVehicleData()
 			// correct actual loadouts
 			for( int j : secondaryWeaponSlots ) {
 				if( availableVehicles[i].weapons[j] ) {
+					const int wanted = availableVehicles[i].ammo[j];
 					availableVehicles[i].ammo[j] = 
 						VehicleData::packagesOfType( availableVehicles[i].weapons[j], &availableLoadouts[i] );
+					reportShortLoad( i, j, wanted );
 				}
 			}
 		} else if(availableVehicles[i].cat & CAT_HELO) {
@@ -502,8 +513,10 @@ void VehicleData::loadAllVehicleData()
 					if( availableVehicles[i].weapons[j] &&
 						(availableWeapons[availableVehicles[i].weapons[j]].type != WT_MACHINEGUN ||
 						 (availableWeapons[availableVehicles[i].weapons[j]].fitsPylon & PF_GUNPOD)) ) {
+						const int wanted = availableVehicles[i].ammo[j];
 						availableVehicles[i].ammo[j] = 
 							VehicleData::packagesOfType( availableVehicles[i].weapons[j], &availableLoadouts[i] );
+						reportShortLoad( i, j, wanted );
 					}
 				}
 			}
@@ -1252,6 +1265,21 @@ void VehicleData::findClipBoxes( const char *clipModel, completeVehicleData_t *v
 			( veh->mins[2] + veh->deckPos[2] ) * 0.5f );
 		VectorSet( box.half, half, half, ( veh->deckPos[2] - veh->mins[2] ) * 0.5f );
 	}
+}
+
+// The machine gun has its own trigger and is never what the selector points at, unless it is all the vehicle has.
+// Returns the first main weapon slot, or the machine gun's when there is none.
+int VehicleData::firstMainWeapon( int vehicle )
+{
+	if( vehicle >= 0 && vehicle < bg_numberOfVehicles )
+	{
+		for( int slot = WP_WEAPON1; slot <= WP_WEAPON6; slot++ )
+		{
+			if( availableVehicles[vehicle].weapons[slot] != WI_NONE )
+				return slot;
+		}
+	}
+	return WP_MACHINEGUN;
 }
 
 bool VehicleData::selectable( int vehicle )

@@ -521,12 +521,13 @@ void CGame::nextWeapon_f( ) {
 		return;
 	}
 	
-	while( true ) {
+	// round the main weapons only: the machine gun is not a selection
+	for( int tries = WP_WEAPON1; tries <= WP_WEAPON6; tries++ ) {
 		cg.weaponSelect++;
-		if( cg.weaponSelect > WP_WEAPON6 ) cg.weaponSelect = WP_MACHINEGUN;
-		if( cg.snap->ps.ammo[cg.weaponSelect+8] ) break;
-		if( cg.weaponSelect == start ) break;
+		if( cg.weaponSelect > WP_WEAPON6 || cg.weaponSelect < WP_WEAPON1 ) cg.weaponSelect = WP_WEAPON1;
+		if( cg.snap->ps.ammo[cg.weaponSelect+8] ) return;
 	}
+	cg.weaponSelect = start;
 }
 
 /*
@@ -543,12 +544,12 @@ void CGame::prevWeapon_f( ) {
 		return;
 	}
 	
-	while( true ) {
+	for( int tries = WP_WEAPON1; tries <= WP_WEAPON6; tries++ ) {
 		cg.weaponSelect--;
-		if( cg.weaponSelect < WP_MACHINEGUN ) cg.weaponSelect = WP_WEAPON6;
-		if( cg.snap->ps.ammo[cg.weaponSelect+8] ) break;
-		if( cg.weaponSelect == start ) break;
+		if( cg.weaponSelect < WP_WEAPON1 || cg.weaponSelect > WP_WEAPON6 ) cg.weaponSelect = WP_WEAPON6;
+		if( cg.snap->ps.ammo[cg.weaponSelect+8] ) return;
 	}
+	cg.weaponSelect = start;
 }
 
 /*
@@ -568,7 +569,7 @@ void CGame::weapon_f( ) {
 
 	num = atoi( CGame::argv( 1 ) );
 
-	if ( num < WP_MACHINEGUN || num > WP_WEAPON6 ) {
+	if ( num < WP_WEAPON1 || num > WP_WEAPON6 ) {
 		return;
 	}
 

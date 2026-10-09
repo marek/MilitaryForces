@@ -2,6 +2,7 @@
  * $Id: bg_loadouts.c,v 1.6 2005-10-28 13:06:54 thebjoern Exp $
 */
 
+#include <algorithm>
 #include "q_shared.h"
 #include "../qcommon/qfiles.h"
 #include "bg_public.h"
@@ -121,21 +122,51 @@ bool VehicleData::distributeWeaponsOnPylons( int idx, completeLoadout_t* loadout
 	// sort
 	SortArray( &loadout->mounts[0], num, VehicleData::posCompare );
 
-	// fill
-	for( int i : secondaryWeaponSlots ) {
-		if( availableVehicles[idx].weapons[i] &&
-			(availableWeapons[availableVehicles[idx].weapons[i]].type != WT_MACHINEGUN ||
-			 (availableWeapons[availableVehicles[idx].weapons[i]].fitsPylon & PF_GUNPOD)) ) {
-			j = availableVehicles[idx].ammo[i];
-			for( k = 0; k < num; ++k ) {
-				if( !loadout->mounts[k].weapon &&
-					(loadout->mounts[k].flags & availableWeapons[availableVehicles[idx].weapons[i]].fitsPylon) ) {
-					loadout->mounts[k].weapon = availableVehicles[idx].weapons[i];
-					loadout->mounts[k].num = VehicleData::roundsPerMount( availableVehicles[idx].weapons[i] );
-					j--;
-				}
-				if( !j ) break;
+	// fill: the stores that fit the fewest mounts are placed first, so a pod with two possible stations is not
+	// crowded out by bombs that fit twelve
+	const auto carried = [&]( int slot ) {
+		const int weapon = availableVehicles[idx].weapons[slot];
+		return weapon && ( availableWeapons[weapon].type != WT_MACHINEGUN || (availableWeapons[weapon].fitsPylon & PF_GUNPOD) );
+	};
+	const auto fitting = [&]( int slot ) {
+		int count = 0;
+		for( int m = 0; m < num && carried( slot ); ++m ) {
+			if( loadout->mounts[m].flags & availableWeapons[availableVehicles[idx].weapons[slot]].fitsPylon )
+				count++;
+		}
+		return count;
+	};
+	int slots[WP_FLARE], numSlots = 0;
+	for( int slot : secondaryWeaponSlots ) {
+		if( carried( slot ) )
+			slots[numSlots++] = slot;
+	}
+	std::stable_sort( slots, slots + numSlots, [&]( int a, int b ) { return fitting( a ) < fitting( b ); } );
+
+	for( int n = 0; n < numSlots; n++ ) {
+		const int weapon = availableVehicles[idx].weapons[slots[n]];
+		// of the free mounts that take this store, the one that the fewest of this vehicle's stores could use goes
+		// first, which leaves the contested mounts for the stores still to come
+		const auto contenders = [&]( int mount ) {
+			int count = 0;
+			for( int other = 0; other < numSlots; other++ ) {
+				if( loadout->mounts[mount].flags & availableWeapons[availableVehicles[idx].weapons[slots[other]]].fitsPylon )
+					count++;
 			}
+			return count;
+		};
+		for( j = availableVehicles[idx].ammo[slots[n]]; j > 0; j-- ) {
+			int best = -1;
+			for( k = 0; k < num; ++k ) {
+				if( loadout->mounts[k].weapon || !(loadout->mounts[k].flags & availableWeapons[weapon].fitsPylon) )
+					continue;
+				if( best < 0 || contenders( k ) < contenders( best ) )
+					best = k;
+			}
+			if( best < 0 )
+				break;
+			loadout->mounts[best].weapon = weapon;
+			loadout->mounts[best].num = VehicleData::roundsPerMount( weapon );
 		}
 	}
 //#ifdef _DEBUG
