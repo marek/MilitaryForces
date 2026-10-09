@@ -29,6 +29,12 @@ namespace
 	std::vector<unsigned char> edgeOpen;
 	// the steepest rise between neighbouring cells a vehicle drives up, as a share of the cell size
 	constexpr float maxStep = 0.55f;
+	// what stands in a vehicle's way: solid things and the invisible walls mappers put up for players and for bots,
+	// but not other vehicles, which move on
+	constexpr int wayMask = MASK_SOLID|CONTENTS_PLAYERCLIP|CONTENTS_BOTCLIP;
+	// how far above the ground the way between two cells is looked along: over the bumps of rough ground, under
+	// the top of anything a vehicle cannot step onto
+	constexpr float wayClearance = 12.0f;
 	std::vector<std::pair<float, int>> openHeap;
 	std::vector<Vec3> rawPath;
 }
@@ -107,10 +113,18 @@ GroundNav::Kind GroundNav::evaluate( int cell, float referenceHeight )
 
 	const int x = cell % nx_;
 	const int y = cell / nx_;
-	Vec3 top = { mins_.x() + (x + 0.5f) * cellSize_, mins_.y() + (y + 0.5f) * cellSize_, referenceHeight + 260.0f };
+	// first from just above a vehicle's height, so that a roof over the cell (a hangar, a bunker with a flag in it)
+	// is not taken for its floor; where that starts inside rising ground, from higher up
+	constexpr float underRoof = 100.0f, overRise = 260.0f;
+	Vec3 top = { mins_.x() + (x + 0.5f) * cellSize_, mins_.y() + (y + 0.5f) * cellSize_, referenceHeight + underRoof };
 	vec3_t bottom = { top[0], top[1], referenceHeight - 700.0f };
 	trace_t tr;
 	GameHost::trace( &tr, top, nullptr, nullptr, bottom, ENTITYNUM_NONE, MASK_SOLID|MASK_WATER, false );
+	if( tr.startsolid )
+	{
+		top[2] = referenceHeight + overRise;
+		GameHost::trace( &tr, top, nullptr, nullptr, bottom, ENTITYNUM_NONE, MASK_SOLID|MASK_WATER, false );
+	}
 	if( tr.startsolid || tr.fraction >= 1.0f )
 	{
 		kind_[cell] = Blocked;
@@ -134,18 +148,42 @@ bool GroundNav::passable( int from, int to, Kind wanted )
 	const unsigned char bit = static_cast<unsigned char>( 1 << ((dy + 1) * 3 + (dx + 1) - ((dy + 1) * 3 + (dx + 1) > 4 ? 1 : 0)) );
 	if( !(edgeKnown[from] & bit) )
 	{
-		Vec3 a, b, boxMins = { -28, -28, 0 }, boxMaxs = { 28, 28, 30 };
+		// from a little above the ground, so that a low wall a vehicle cannot climb is seen as well as a high one
+		Vec3 a, b, boxMins = { -28, -28, 0 }, boxMaxs = { 28, 28, 48 };
 		centre( from ).copyTo( a );
 		centre( to ).copyTo( b );
-		a[2] += 30;
-		b[2] += 30;
+		a[2] += wayClearance;
+		b[2] += wayClearance;
 		trace_t tr;
-		GameHost::trace( &tr, a, boxMins, boxMaxs, b, ENTITYNUM_NONE, MASK_SOLID, false );
+		GameHost::trace( &tr, a, boxMins, boxMaxs, b, ENTITYNUM_NONE, wayMask, false );
 		edgeKnown[from] |= bit;
 		if( tr.startsolid || tr.fraction >= 1.0f )
 			edgeOpen[from] |= bit;
 	}
 	return (edgeOpen[from] & bit) != 0;
+}
+
+void GroundNav::blockAhead( const Vec3& here, const Vec3& towards )
+{
+	if( !built_ )
+		return;
+	Vec3 dir = towards - here;
+	const float length = sqrtf( dir.x() * dir.x() + dir.y() * dir.y() );
+	if( length < 1.0f )
+		return;
+	const int from = cellAt( here );
+	// the neighbour the vehicle was heading into: one cell on along its line
+	const int to = cellAt( here + dir * (cellSize_ / length) );
+	if( from < 0 || to < 0 || from == to )
+		return;
+	const int dx = to % nx_ - from % nx_, dy = to / nx_ - from / nx_;
+	if( abs( dx ) > 1 || abs( dy ) > 1 )
+		return;
+	const auto bitFor = []( int x, int y ) { return static_cast<unsigned char>( 1 << ((y + 1) * 3 + (x + 1) - ((y + 1) * 3 + (x + 1) > 4 ? 1 : 0)) ); };
+	edgeKnown[from] |= bitFor( dx, dy );
+	edgeOpen[from] &= static_cast<unsigned char>( ~bitFor( dx, dy ) );
+	edgeKnown[to] |= bitFor( -dx, -dy );
+	edgeOpen[to] &= static_cast<unsigned char>( ~bitFor( -dx, -dy ) );
 }
 
 // a straight line that stays on known cells of the right kind, without a step too high and with nothing in the way
@@ -171,13 +209,13 @@ bool GroundNav::lineOpen( const Vec3& a, const Vec3& b, Kind wanted )
 			return false;
 		previous = cell;
 	}
-	Vec3 from, to, boxMins = { -28, -28, 0 }, boxMaxs = { 28, 28, 30 };
+	Vec3 from, to, boxMins = { -28, -28, 0 }, boxMaxs = { 28, 28, 48 };
 	a.copyTo( from );
 	b.copyTo( to );
-	from[2] += 30;
-	to[2] += 30;
+	from[2] += wayClearance;
+	to[2] += wayClearance;
 	trace_t tr;
-	GameHost::trace( &tr, from, boxMins, boxMaxs, to, ENTITYNUM_NONE, MASK_SOLID, false );
+	GameHost::trace( &tr, from, boxMins, boxMaxs, to, ENTITYNUM_NONE, wayMask, false );
 	return tr.startsolid || tr.fraction >= 1.0f;
 }
 

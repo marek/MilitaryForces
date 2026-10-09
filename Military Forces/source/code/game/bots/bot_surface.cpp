@@ -253,7 +253,9 @@ struct SurfaceTasks
 	// turn the wished course into one that follows the ground path round obstacles
 	static Status navigate( Mind& c )
 	{
-		c.followGround( c.boat, 220.0f );
+		// a flag has to be driven right up to, round whatever stands by it: the path is followed to the end. Anything
+		// else is near enough once the last stretch is a straight line
+		c.followGround( c.boat, 220.0f, c.bot.desire == Goal::Capture ? 60.0f : -1.0f );
 		return Status::Success;
 	}
 
@@ -297,10 +299,14 @@ struct SurfaceTasks
 		}
 		if( c.blocked && theLevel.time_ > bot.reverseTime )
 		{
+			// the path led into something the path finder did not see: it learns that this way is shut
+			if( bot.following && bot.pathIndex < bot.path.size() )
+				GroundNav::blockAhead( Vec3( c.ent->r.currentOrigin ), bot.path[bot.pathIndex] );
 			bot.reverseTime = theLevel.time_ + 1800;
 			bot.reverseTurn = (rand() & 1) ? moveFull : -moveFull;
 			bot.pathTime = 0;
-			if( !bot.following )
+			// somewhere else to go, unless it is after a flag: that goal is not given up for an obstacle
+			if( !bot.following && bot.desire != Goal::Capture )
 				Bots::pickGoal( c.ent, bot, c.boat ? 6000 : 4000 );
 		}
 		return Status::Success;

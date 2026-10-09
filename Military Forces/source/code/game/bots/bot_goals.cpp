@@ -163,7 +163,17 @@ struct GoalScoring
 		if( g_gametype.integer != GT_CTF || plane( s ) )
 			return 0.0f;
 		const bool carrying = (s.ps.objectives & (OB_REDFLAG|OB_BLUEFLAG)) != 0;
-		return carrying ? 1.6f : 0.35f + 0.5f * s.who.teamwork;
+		if( carrying )
+			return 1.6f;
+		// the nearer their flag, the less a passing enemy is worth turning aside for: a bot that has fought its way
+		// to the enemy base goes on and takes the flag
+		constexpr float flagNear = 4000.0f;
+		const int own = s.ent->client_->sess_.sessionTeam_;
+		vec3_t flag;
+		float closeness = 0.0f;
+		if( Bots::flagPosition( own == ClientBase::TEAM_RED ? ClientBase::TEAM_BLUE : ClientBase::TEAM_RED, flag ) )
+			closeness = std::clamp( 1.0f - Distance( flag, s.ent->r.currentOrigin ) / flagNear, 0.0f, 1.0f );
+		return (0.35f + 0.5f * s.who.teamwork) * (1.0f + 1.5f * closeness);
 	}
 };
 
@@ -201,7 +211,7 @@ Bots::Goal Bots::chooseGoal( GameEntity* ent, State& bot, const Sense& sense )
 	for( size_t i = 0; i < goalTable.size(); i++ )
 	{
 		float score = goalTable[i].score( situation );
-		if( goalTable[i].goal == bot.desire && goalTable[i].goal != Goal::Rearm && goalTable[i].goal != Goal::Capture )
+		if( goalTable[i].goal == bot.desire && goalTable[i].goal != Goal::Rearm )
 			score *= keep;
 		scores[i] = score;
 		if( score > best )

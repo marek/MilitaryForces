@@ -71,10 +71,12 @@ struct Bots::Mind
 	}
 	// turn the course onto the ground path to the destination, searching again every two seconds; false when
 	// there is no path to follow or none is needed
-	bool followGround( bool water, float reach )
+	// (reach: how near a waypoint counts as reached; finish: how near the destination the path is let go and the rest
+	// driven straight, twice the reach unless given)
+	bool followGround( bool water, float reach, float finish = -1.0f )
 	{
 		const Vec3 here( ent->r.currentOrigin );
-		if( !hasDest || hold || (dest - here).length() < reach * 2.0f )
+		if( !hasDest || hold || (dest - here).length() < (finish >= 0.0f ? finish : reach * 2.0f) )
 		{
 			bot.path.clear();
 			bot.following = false;

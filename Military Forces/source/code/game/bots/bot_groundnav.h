@@ -11,6 +11,9 @@ public:
 	static void reset();
 	// false when the goal is out of reach; out then leads towards the nearest point reached
 	static bool findPath( const Vec3& from, const Vec3& to, bool water, std::vector<Vec3>& out );
+	// a vehicle following a path could not get on from here in this direction: the way between the two cells is closed
+	// for every later search, whatever the trace between their middles said
+	static void blockAhead( const Vec3& here, const Vec3& towards );
 	static int cellCount();
 	static int knownCount();
 
