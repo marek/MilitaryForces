@@ -737,6 +737,9 @@ inline constexpr float STEALTH_RANGE_FACTOR = 0.25f;
 // border speeds
 inline constexpr float SPEED_YELLOW_ARC = 1.3f;
 inline constexpr float SPEED_GREEN_ARC = 2.0f;
+// a helicopter rolled fully over slides sideways at this share of its top speed; nose down and rolled together it
+// still does not exceed that top speed
+inline constexpr float HELO_SIDE_SPEED = 0.35f;
 // gear in the airflow, for vehicles whose gear retracts: share of top speed and of turn rate that is left
 inline constexpr float GEAR_DOWN_SPEED = 0.8f;
 inline constexpr float GEAR_DOWN_TURN = 0.75f;
