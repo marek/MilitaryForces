@@ -3,14 +3,19 @@
 
 using behavior::Status;
 
+// What a helicopter pilot does: the conditions and steps of the helicopter tree. The steps say where to go, at what
+// height and in which manner; steering and the collective at the end turn that into the controls.
 struct HeloTasks
 {
 	using Mind = Bots::Mind;
 	using Goal = Bots::Goal;
 	using Role = Bots::Role;
 
+	// how to move towards the place steered for: at cruising tilt, flat out, slowing onto a pad, into cover, backing
+	// away, or holding still
 	enum Mode { Cruise, Run, ToPad, MoveToCover, BackOff, Hover };
 
+	// within 120 units of the pad's middle, seen from above
 	static bool overPad( const Mind& c )
 	{
 		Vec3 dir;
@@ -55,6 +60,7 @@ struct HeloTasks
 		return Status::Running;
 	}
 
+	// just spawned on the ground with team mates on foot close by: give them a moment to climb in
 	static bool passengersNear( Mind& c )
 	{
 		if( g_gametype.integer < GT_TEAM || !c.landed() || theLevel.time_ >= c.bot.spawnTime + 12000 || !transport( c ) )
@@ -73,6 +79,7 @@ struct HeloTasks
 	}
 	static bool evading( Mind& c ) { return c.bot.desire == Goal::Evade && (c.sense.enemy || c.sense.blindsided); }
 	static bool capturing( Mind& c ) { return c.bot.desire == Goal::Capture; }
+	// near enough to fight from cover
 	static bool fighting( Mind& c ) { return c.sense.enemy && c.bot.desire == Goal::Attack && c.sense.enemyDist < 3000; }
 	static bool inCover( Mind& c ) { return theLevel.time_ < c.bot.hideTime; }
 	static bool hasCover( Mind& c ) { return c.bot.hasHide; }
@@ -86,6 +93,7 @@ struct HeloTasks
 		return crateSlot( c, WT_FUELCRATE ) >= 0 || crateSlot( c, WT_AMMOCRATE ) >= 0 || crateSlot( c, WT_HEALTHCRATE ) >= 0;
 	}
 
+	// nose on the enemy, to stand off at gun range from an aircraft and further from the ground
 	static void faceEnemy( Mind& c )
 	{
 		c.view[YAW] = c.sense.enemyAngles[YAW];
@@ -94,6 +102,7 @@ struct HeloTasks
 		c.mode = Cruise;
 	}
 
+	// head for a point at the present height
 	static void flyTo( Mind& c, const vec3_t point )
 	{
 		Vec3 dir;
@@ -105,6 +114,7 @@ struct HeloTasks
 		c.mode = Cruise;
 	}
 
+	// sit on the pad, collective down, until full
 	static Status rearmOnPad( Mind& c )
 	{
 		c.wait = true;
@@ -119,6 +129,7 @@ struct HeloTasks
 		return Status::Running;
 	}
 
+	// over the pad: gear down and straight down
 	static Status descendToPad( Mind& c )
 	{
 		flyTo( c, Bots::pads_[c.bot.pad].center );
@@ -132,6 +143,7 @@ struct HeloTasks
 		return Status::Running;
 	}
 
+	// to the pad at a moderate height, slowing as it nears
 	static Status flyToPad( Mind& c )
 	{
 		flyTo( c, Bots::pads_[c.bot.pad].center );
@@ -141,6 +153,7 @@ struct HeloTasks
 		return Status::Running;
 	}
 
+	// across the missile's path, low and fast
 	static Status dodgeMissile( Mind& c )
 	{
 		c.view[YAW] = c.sense.missileYaw + 90.0f;
@@ -157,6 +170,7 @@ struct HeloTasks
 		return Status::Running;
 	}
 
+	// away from the enemy, or to the side when hit by someone unseen
 	static Status evade( Mind& c )
 	{
 		c.view[YAW] = c.sense.blindsided ? c.bot.breakYaw : c.sense.enemyAngles[YAW] + 180.0f;
@@ -165,6 +179,7 @@ struct HeloTasks
 		return Status::Running;
 	}
 
+	// to the flag, and down onto it at the end: a flag is touched near the ground
 	static Status goToFlag( Mind& c )
 	{
 		flyTo( c, c.bot.goal );
@@ -173,6 +188,7 @@ struct HeloTasks
 		return Status::Running;
 	}
 
+	// to the hiding place, low, facing the enemy
 	static Status moveToCover( Mind& c )
 	{
 		faceEnemy( c );
@@ -187,6 +203,7 @@ struct HeloTasks
 		return Status::Running;
 	}
 
+	// no hiding place known: back off low
 	static Status sinkIntoCover( Mind& c )
 	{
 		faceEnemy( c );
@@ -196,6 +213,7 @@ struct HeloTasks
 		return Status::Running;
 	}
 
+	// up in view and shooting until the time in the open is used up, then back into cover for a while
 	static Status fireExposed( Mind& c )
 	{
 		faceEnemy( c );
@@ -209,6 +227,7 @@ struct HeloTasks
 		return Status::Running;
 	}
 
+	// the enemy is in sight: start the time in the open, longer for the patient
 	static Status expose( Mind& c )
 	{
 		c.bot.exposed = true;
@@ -216,6 +235,7 @@ struct HeloTasks
 		return fireExposed( c );
 	}
 
+	// rise until the enemy comes into view
 	static Status popUp( Mind& c )
 	{
 		faceEnemy( c );
@@ -223,6 +243,7 @@ struct HeloTasks
 		return Status::Running;
 	}
 
+	// too far to fight: fly to where the enemy is or was last seen
 	static Status closeOnEnemy( Mind& c )
 	{
 		faceEnemy( c );
@@ -231,6 +252,7 @@ struct HeloTasks
 		return Status::Running;
 	}
 
+	// the weapon slot holding crates of that kind, or -1
 	static int crateSlot( const Mind& c, int type )
 	{
 		for( int slot : allWeaponSlots )
@@ -323,6 +345,7 @@ struct HeloTasks
 		return Status::Running;
 	}
 
+	// nothing to do: on to a roaming goal, a new one when it is reached or stale
 	static Status patrol( Mind& c )
 	{
 		if( theLevel.time_ > c.bot.goalTime || Distance( c.ent->r.currentOrigin, c.bot.goal ) < 800 )
@@ -337,6 +360,7 @@ struct HeloTasks
 		return Status::Success;
 	}
 
+	// when the straight line to the destination is blocked, follow the air path round the obstacle instead
 	static Status navigate( Mind& c )
 	{
 		Bots::State& bot = c.bot;
@@ -356,6 +380,7 @@ struct HeloTasks
 			bot.pathIndex = 0;
 			bot.pathTime = theLevel.time_ + 2000;
 		}
+		// on to the next waypoint once this one is reached or the one after can be flown to directly
 		while( bot.pathIndex + 1 < bot.path.size() &&
 			((bot.path[bot.pathIndex] - here).length() < 250.0f || AirNav::clearLine( here, bot.path[bot.pathIndex + 1], 60.0f )) )
 			bot.pathIndex++;
@@ -371,6 +396,7 @@ struct HeloTasks
 		return Status::Success;
 	}
 
+	// climb or sink to the wanted height above the ground
 	static Status collective( Mind& c )
 	{
 		// never climb into the roof, whatever asked for the height
@@ -386,6 +412,7 @@ struct HeloTasks
 			wantThrottle = 0;
 		else if( c.landed() )
 			wantThrottle = std::max( wantThrottle, c.veh.maxthrottle * 0.6f );
+		// setting down: a steady gentle sink for the last stretch
 		if( c.hold && c.sense.height < 150 )
 			wantThrottle = -1.0f;
 		if( throttle < floor( wantThrottle ) )
@@ -539,6 +566,7 @@ struct HeloTasks
 		vec3_t travel = { 0, travelYaw, 0 }, body = { 0, c.ps.vehicleAngles[YAW], 0 }, dir, forward, right;
 		AngleVectors( travel, dir, nullptr, nullptr );
 		AngleVectors( body, forward, right, nullptr );
+		// the wanted motion over the ground as nose-down and bank, each by what that tilt gives in speed
 		const float wantPitch = std::clamp( DotProduct( dir, forward ) * speed / maxSpeed * maxPitch, -maxPitch, maxPitch );
 		const float wantRoll = std::clamp( DotProduct( dir, right ) * speed / sideSpeed * maxRoll, -maxRoll * 0.8f, maxRoll * 0.8f );
 		const float pitchError = wantPitch - c.ps.vehicleAngles[PITCH];
@@ -555,6 +583,7 @@ struct HeloTasks
 		return Status::Success;
 	}
 
+	// shoot unless hiding, dodging or flying a path round something
 	static Status fire( Mind& c )
 	{
 		if( c.sense.enemy && !c.cover && !c.defending && !c.bot.following )
@@ -609,6 +638,7 @@ void Bots::thinkHelo( GameEntity* ent, State& bot, const Sense& sense, usercmd_t
 	const playerState_t& ps = client->ps_;
 	Mind mind{ ent, client, bot, sense, cmd, view, ps, availableVehicles[client->vehicle_], static_cast<float>( ps.speed ) / 10.0f };
 
+	// attack helicopters fly low by default, transports higher; the steps change it as they need
 	mind.wantHeight = sense.role == Role::AttackHelo ? heloLowHeight : heloCruiseHeight * 0.6f;
 	if( !HeloTasks::fighting( mind ) )
 		bot.exposed = false;
