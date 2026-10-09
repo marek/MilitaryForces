@@ -271,8 +271,10 @@ void PlayerMove::heloAccelerate()
 
 	curforwardspeed = (vehdir[PITCH]/MAX_HELO_PITCH)*availableVehicles[pm->vehicle].maxspeed * ( gearInAirflow() ? GEAR_DOWN_SPEED : 1.0f );
 	currightspeed = (vehdir[ROLL]/MAX_HELO_ROLL)*availableVehicles[pm->vehicle].maxspeed * ( gearInAirflow() ? GEAR_DOWN_SPEED : 1.0f );
-	curliftspeed = throttle > maxthrottle ? -(throttle-maxthrottle)*20 : throttle * 25;	// real vert speed	
-	curliftspeedadjust = throttle > maxthrottle ? 0 : throttle * 25;					// adjusted vert speed, don't want down movement to effect fuel usage "more"
+	// each helicopter climbs and sinks at its own rate
+	const float liftRate = availableVehicles[pm->vehicle].liftRate > 0 ? availableVehicles[pm->vehicle].liftRate : 1.0f;
+	curliftspeed = ( throttle > maxthrottle ? -(throttle-maxthrottle)*20 : throttle * 25 ) * liftRate;	// real vert speed	
+	curliftspeedadjust = throttle > maxthrottle ? 0 : throttle * 25 * liftRate;					// adjusted vert speed, don't want down movement to effect fuel usage "more"
 	// what the instruments show is what the helicopter does: over the ground no more than its top speed, however it is tilted
 	const float overGround = std::min( static_cast<float>( sqrt(curforwardspeed*curforwardspeed + currightspeed*currightspeed) ), maxforwardspeed );
 	curspeed = sqrt(overGround*overGround + curliftspeed*curliftspeed);						// real total speed
@@ -422,7 +424,7 @@ void PlayerMove::heloMove( )
 		pm->ps->fixed_throttle = throttle = 0;
 	curforwardspeed = (vehdir[PITCH]/MAX_HELO_PITCH)*availableVehicles[pm->vehicle].maxspeed * ( gearInAirflow() ? GEAR_DOWN_SPEED : 1.0f );
 	currightspeed = (vehdir[ROLL]/MAX_HELO_ROLL)*availableVehicles[pm->vehicle].maxspeed * ( gearInAirflow() ? GEAR_DOWN_SPEED : 1.0f );
-	curliftspeed = throttle > maxthrottle ? -(throttle-maxthrottle)*20 : throttle * 25;	
+	curliftspeed = ( throttle > maxthrottle ? -(throttle-maxthrottle)*20 : throttle * 25 ) * ( availableVehicles[pm->vehicle].liftRate > 0 ? availableVehicles[pm->vehicle].liftRate : 1.0f );
 			// Forward speed
 			VectorCopy(vehdir, forwardvel);
 			forwardvel[PITCH] = 0;				// Don't let vehicle angels effect verticle acceleration

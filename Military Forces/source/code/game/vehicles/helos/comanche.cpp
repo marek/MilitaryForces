@@ -35,6 +35,7 @@ static const VehicleEntry entries[] =
 		.trackCone = -1,
 		.gearTime = 1000,
 		.bayTime = 500,
+		.liftRate = 1.35f,
 	} },
 
 	{ 56,
@@ -69,6 +70,7 @@ static const VehicleEntry entries[] =
 		.trackCone = -1,
 		.gearTime = 1000,
 		.bayTime = 500,
+		.liftRate = 1.35f,
 	} },
 
 	{ 57,
@@ -103,6 +105,7 @@ static const VehicleEntry entries[] =
 		.trackCone = -1,
 		.gearTime = 1000,
 		.bayTime = 500,
+		.liftRate = 1.35f,
 	} },
 };
 

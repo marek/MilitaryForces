@@ -935,6 +935,7 @@ struct completeVehicleData_t
 	int				numClipBoxes;	// solid boxes people stand on and walk into, in the hull's own axes
 	ClipBox			clipBoxes[MAX_CLIP_BOXES];
 	int				seats;
+	float			liftRate;		// helicopters: how fast it climbs and sinks against the usual (0 means the usual, 1)
 };
 
 // room in the vehicle table; the index of an entry is what the network and saved missions carry

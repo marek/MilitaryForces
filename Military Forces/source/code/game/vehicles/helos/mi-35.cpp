@@ -32,6 +32,7 @@ static const VehicleEntry entries[] =
 		.radarRange2 = 5000,
 		.trackCone = -1,
 		.gearTime = 1200,
+		.liftRate = 0.8f,
 	} },
 };
 
