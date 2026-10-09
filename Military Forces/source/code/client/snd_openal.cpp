@@ -34,6 +34,8 @@ static cvar_t *s_alPrecache;
 static cvar_t *s_alGain;
 // levels of the buses under the master volume: each kind of sound has its own
 static cvar_t *s_volEngines, *s_volWeapons, *s_volExplosions, *s_volAmbience, *s_volInterface;
+// what to play on: "auto" (as the device is set up), "stereo", "headphones" (3D positioning for headphones), "5.1", "7.1"
+static cvar_t *s_alOutput;
 static cvar_t *s_alSources;
 static cvar_t *s_alDopplerFactor;
 static cvar_t *s_alDopplerSpeed;
@@ -2719,6 +2721,7 @@ bool S_AL_Init( soundInterface_t *si )
 	s_alDriver = CvarSystem::get( "s_alDriver", ALDRIVER_DEFAULT, CVAR_ARCHIVE | CVAR_LATCH | CVAR_PROTECTED );
 
 	s_alInputDevice = CvarSystem::get( "s_alInputDevice", "", CVAR_ARCHIVE | CVAR_LATCH );
+	s_alOutput = CvarSystem::get( "s_alOutput", "auto", CVAR_ARCHIVE | CVAR_LATCH );
 	s_alDevice = CvarSystem::get("s_alDevice", "", CVAR_ARCHIVE | CVAR_LATCH);
 
 #ifdef ALDRIVER_SYSTEM
@@ -2820,7 +2823,30 @@ bool S_AL_Init( soundInterface_t *si )
 	}
 
 	// Create OpenAL context
-	alContext = qalcCreateContext( alDevice, nullptr );
+	// The output: what the device is set up for unless the player asks for something else. Asking needs OpenAL Soft
+	// (its output mode extension); any other library plays as it always did
+	{
+		// values of the output mode extension, named here so that the build does not depend on which headers it found
+		constexpr ALCint outputModeSoft = 0x19AC, stereoBasicSoft = 0x19AE, stereoHrtfSoft = 0x19B2, surround51Soft = 0x1504, surround71Soft = 0x1506;
+		const char* wanted = s_alOutput->asString();
+		ALCint mode = 0;
+		if( !Q_stricmp( wanted, "stereo" ) ) mode = stereoBasicSoft;
+		else if( !Q_stricmp( wanted, "headphones" ) ) mode = stereoHrtfSoft;
+		else if( !Q_stricmp( wanted, "5.1" ) ) mode = surround51Soft;
+		else if( !Q_stricmp( wanted, "7.1" ) ) mode = surround71Soft;
+		const ALCint attributes[] = { outputModeSoft, mode, 0 };
+		const bool canChoose = qalcIsExtensionPresent( alDevice, "ALC_SOFT_output_mode" );
+		if( mode && !canChoose )
+			Common::printf( "s_alOutput \"%s\" needs OpenAL Soft; playing as the device is set up\n", wanted );
+		alContext = qalcCreateContext( alDevice, mode && canChoose ? attributes : nullptr );
+		if( canChoose && alContext )
+		{
+			ALCint playing = 0;
+			qalcGetIntegerv( alDevice, outputModeSoft, 1, &playing );
+			Common::printf( "Sound output: %s\n", playing == stereoHrtfSoft ? "3D headphones" : playing == surround51Soft ? "5.1 surround" :
+				playing == surround71Soft ? "7.1 surround" : playing == stereoBasicSoft ? "stereo" : "as the device is set up" );
+		}
+	}
 	if( !alContext )
 	{
 		QAL_Shutdown( );
