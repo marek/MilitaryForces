@@ -1345,6 +1345,44 @@ unsigned VehicleData::gunStationsBearing( int vehicle, const vec3_t hullAngles, 
 	return mask;
 }
 
+// Where position n's guns point, as angles in the hull's own space: along the aim when it lies in the position's
+// field, otherwise as near to it as the field allows
+void VehicleData::gunStationAngles( int vehicle, int index, const vec3_t hullAngles, const vec3_t aimAngles, vec3_t out )
+{
+	VectorClear( out );
+	const std::span<const GunStation> stations = gunStations( vehicle );
+	if( index < 0 || index >= static_cast<int>( stations.size() ) )
+		return;
+	const GunStation& station = stations[index];
+	vec3_t hull[3], world, aim, axis, dir;
+	AnglesToAxis( hullAngles, hull );
+	AngleVectors( aimAngles, world, nullptr, nullptr );
+	// the hull's second axis points left, and so does the second coordinate here
+	VectorSet( aim, DotProduct( world, hull[0] ), DotProduct( world, hull[1] ), DotProduct( world, hull[2] ) );
+	VectorSet( axis, station.axisForward, -station.axisRight, station.axisUp );
+	VectorNormalize( axis );
+	const float along = DotProduct( axis, aim );
+	const float edge = DEG2RAD( station.arc );
+	if( along >= cos( edge ) )
+		VectorCopy( aim, dir );
+	else
+	{
+		// turn from the middle of the field towards the aim, as far as the edge
+		vec3_t across;
+		VectorMA( aim, -along, axis, across );
+		if( VectorNormalize( across ) < 0.001f )
+		{
+			// aimed straight away from the field: any side will do
+			VectorSet( across, -axis[2], 0, axis[0] );
+			if( VectorNormalize( across ) < 0.001f ) VectorSet( across, 1, 0, 0 );
+		}
+		for( int i = 0; i < 3; i++ )
+			dir[i] = axis[i] * cos( edge ) + across[i] * sin( edge );
+	}
+	vectoangles( dir, out );
+	out[ROLL] = 0;
+}
+
 bool VehicleData::vehicleHasTurret( int vehicle )
 {
 	if( vehicle < 0 || vehicle >= bg_numberOfVehicles ) 

@@ -1011,7 +1011,6 @@ struct BasicDrawInfo_t {
 	int					team;
 	bool			drawMuzzleFlash;
 	int				flashStations;
-	bool			flashOwnAim;	// the viewer is the one aiming these guns
 };
 
 struct DrawInfo_Plane_t {
@@ -1023,6 +1022,8 @@ struct DrawInfo_Plane_t {
 	int					cockpitFrame;
 	int					bodyFrame;
 	float				swingAngle;
+	bool				stationAimKnown;	// otherwise the gun positions point along the hull
+	vec3_t				stationAim;
 };
 
 struct DrawInfo_GV_t {
@@ -1674,7 +1675,6 @@ public:
 	static void registerVehicle( clientInfo_t *ci );
 	static void vehicleObituary( entityState_t *ent );
 	static void vehicleMuzzleFlash( int weaponIdx, const refEntity_t *parent, qhandle_t parentModel, int idx );
-	static void stationMuzzleFlashes( int vehicle, int stations, const refEntity_t *parent, const vec3_t aimAngles );
 	static void initShadows( );
 	static qhandle_t teamSkin( qhandle_t model, int team );
 	static void drawPlane(DrawInfo_Plane_t* drawInfo);

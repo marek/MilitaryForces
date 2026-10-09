@@ -754,6 +754,8 @@ inline constexpr int BP_PLANE_WINGRIGHT = 7;
 inline constexpr int BP_PLANE_SPECIAL = 8;
 inline constexpr int BP_PLANE_PROP = 9;
 inline constexpr int BP_PLANE_MAX_PARTS = 10;
+// gun positions that turn: for position n the part that only turns, then the part that turns and elevates
+inline constexpr int BP_PLANE_TURRETS = 10;
 
 
 // ground vehicles
@@ -814,7 +816,7 @@ inline constexpr int BP_GI_MAX_PARTS = 6;
 
 
 // total max parts (no cat may exceed this!)
-inline constexpr int BP_MAX_PARTS = 16;
+inline constexpr int BP_MAX_PARTS = 18;
 
 // fallback modes if no custom shader can be found for a vehicle
 inline constexpr int SHADOW_DEFAULT = -1;
@@ -1198,6 +1200,7 @@ public:
 	static int firstMainWeapon( int vehicle );
 	static std::span<const GunStation> gunStations( int vehicle );
 	static unsigned gunStationsBearing( int vehicle, const vec3_t hullAngles, const vec3_t aimAngles );
+	static void gunStationAngles( int vehicle, int index, const vec3_t hullAngles, const vec3_t aimAngles, vec3_t out );
 	static void parseMissionScripts( char *buf, mission_overview_t* overview, mission_vehicle_t* vehs, mission_groundInstallation_t* gis);
 	static void checkMissionScriptOverviewValid( mission_overview_t* overview, bool updateFormat );
 	static void setMissionScriptOverviewDefaults( mission_overview_t* overview );

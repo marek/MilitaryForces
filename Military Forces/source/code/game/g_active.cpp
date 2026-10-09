@@ -1186,6 +1186,12 @@ void ClientEndFrame( GameEntity *ent )
 	}
 
 	ent->s.seatMask = SEATMASK_PILOT;
+	// where the gun positions aim, so every client turns the turrets the same way
+	if( ent->client_->vehicle_ >= 0 && (availableVehicles[ent->client_->vehicle_].flags & VF_GUNSTATIONS) )
+	{
+		ent->s.turretYaw[0] = ent->client_->stationAim_[YAW];
+		ent->s.gunPitch[0] = ent->client_->stationAim_[PITCH];
+	}
 	ent->s.vehicleEnt = ent->r.ownerNum > 0 ? ent->r.ownerNum : 0;
 	ent->s.seat = 0;
 	for( int r = 1; r <= theLevel.maxclients_; r++ ) 

@@ -186,13 +186,22 @@ void ClientEntity::plane( clientInfo_t *ci )
 		this->generic_Smoke( smokePosition, 10 );
 	}
 
+	// where the gun positions aim: the crew's own client knows its look, everyone else is told
+	if( availableVehicles[ci->vehicle].flags & VF_GUNSTATIONS )
+	{
+		drawInfo.stationAimKnown = true;
+		if( this->currentState.clientNum == cg.snap->ps.clientNum )
+			VectorCopy( cg.predictedPlayerState.viewangles, drawInfo.stationAim );
+		else
+			VectorSet( drawInfo.stationAim, this->currentState.gunPitch[0], this->currentState.turretYaw[0], 0 );
+	}
+
 	// muzzleflash
 	if( cg.time - this->muzzleFlashTime <= MUZZLE_FLASH_TIME ) 
 	{
 		drawInfo.basicInfo.drawMuzzleFlash = true;
 		drawInfo.basicInfo.flashWeaponIndex = this->muzzleFlashWeapon;
 		drawInfo.basicInfo.flashStations = this->stationsFired;
-		drawInfo.basicInfo.flashOwnAim = this->currentState.clientNum == cg.snap->ps.clientNum;
 	}
 	
 	// draw plane
@@ -583,6 +592,15 @@ void CGame::cachePlane(int index)
 //		}
 	}
 
+	// gun positions that turn
+	for( i = 0; i < 2 * MAX_VEHICLE_TURRETS; i++ ) {
+		availableVehicles[index].handle[BP_PLANE_TURRETS + i] = 0;
+		if( availableVehicles[index].flags & VF_GUNSTATIONS ) {
+			Com_sprintf( name, sizeof(name), "%s_%s%d.md3", basename, ( i & 1 ) ? "gun" : "tur", i / 2 + 1 );
+			availableVehicles[index].handle[BP_PLANE_TURRETS + i] = CGame::registerVehiclePart( name, false );
+		}
+	}
+
 	// only thing that always has to be there is body
 	if( !availableVehicles[index].handle[BP_PLANE_BODY] ) {
 		Common::printf( S_COLOR_YELLOW "WARNING: MFQ3: missing body %s.md3, model not loaded\n", basename );
@@ -742,6 +760,52 @@ void CGame::drawPlane(DrawInfo_Plane_t* drawInfo)
 		part[i].renderfx = renderfx;
 		CGame::addVehiclePart( &part[i] );
 	}
+
+	// gun positions: each turns to where the crew aims, as far as its field goes, and flashes at its muzzles
+	if( veh->flags & VF_GUNSTATIONS )
+	{
+		const int count = std::min( static_cast<int>( VehicleData::gunStations( drawInfo->basicInfo.vehicleIndex ).size() ), MAX_VEHICLE_TURRETS );
+		for( int n = 0; n < count; n++ )
+		{
+			char tag[16];
+			vec3_t angles;
+			Com_sprintf( tag, sizeof(tag), "tag_tur%d", n + 1 );
+			VehicleData::gunStationAngles( drawInfo->basicInfo.vehicleIndex, n, drawInfo->basicInfo.angles,
+				drawInfo->stationAimKnown ? drawInfo->stationAim : drawInfo->basicInfo.angles, angles );
+			for( int elevates = 0; elevates < 2; elevates++ )
+			{
+				const qhandle_t model = veh->handle[BP_PLANE_TURRETS + 2 * n + elevates];
+				if( !model )
+					continue;
+				refEntity_t turret = {};
+				turret.hModel = model;
+				VectorCopy( drawInfo->basicInfo.origin, turret.lightingOrigin );
+				const vec3_t turned = { elevates ? angles[PITCH] : 0.0f, angles[YAW], 0.0f };
+				AnglesToAxis( turned, turret.axis );
+				CGame::positionRotatedEntityOnTag( &turret, &part[BP_PLANE_BODY], veh->handle[BP_PLANE_BODY], tag );
+				turret.shadowPlane = shadowPlane;
+				turret.renderfx = renderfx;
+				CGame::addVehiclePart( &turret );
+				if( elevates && drawInfo->basicInfo.drawMuzzleFlash && (drawInfo->basicInfo.flashStations & (1 << n)) )
+				{
+					for( int barrel = 0; barrel < 2; barrel++ )
+					{
+						refEntity_t flash = {};
+						flash.hModel = cgs.media.vehicleMuzzleFlashModel;
+						VectorCopy( turret.lightingOrigin, flash.lightingOrigin );
+						flash.shadowPlane = shadowPlane;
+						flash.renderfx = renderfx;
+						const vec3_t spin = { 0.0f, 0.0f, crandom() * 10.0f };
+						AnglesToAxis( spin, flash.axis );
+						char muzzle[16];
+						Q_strncpyz( muzzle, barrel ? "tag_gun2" : "tag_gun", sizeof(muzzle) );
+						CGame::positionRotatedEntityOnTag( &flash, &turret, model, muzzle );
+						refExport.AddRefEntityToScene( &flash );
+					}
+				}
+			}
+		}
+	}
 	// pilot
 	CGame::planePilot( &part[BP_PLANE_BODY], veh->handle[BP_PLANE_BODY], drawInfo->basicInfo.vehicleIndex );
 	
@@ -835,10 +899,8 @@ void CGame::drawPlane(DrawInfo_Plane_t* drawInfo)
 	// muzzleflash
 	if( drawInfo->basicInfo.drawMuzzleFlash ) 
 	{
-		if( veh->flags & VF_GUNSTATIONS )
-			CGame::stationMuzzleFlashes( drawInfo->basicInfo.vehicleIndex, drawInfo->basicInfo.flashStations, &part[BP_PLANE_BODY],
-							   drawInfo->basicInfo.flashOwnAim ? cg.snap->ps.viewangles : nullptr );
-		else
+		// gun positions flash at their own muzzles, drawn with the turrets
+		if( !(veh->flags & VF_GUNSTATIONS) )
 			CGame::vehicleMuzzleFlash( drawInfo->basicInfo.flashWeaponIndex, &part[BP_PLANE_BODY], 
 							   veh->handle[BP_PLANE_BODY], drawInfo->basicInfo.vehicleIndex );
 	}
