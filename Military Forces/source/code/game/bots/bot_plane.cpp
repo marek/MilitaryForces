@@ -64,7 +64,7 @@ struct PlaneTasks
 	static bool bomber( const Mind& c ) { return c.sense.role == Role::Bomber; }
 	static bool hasBombs( const Mind& c )
 	{
-		return Bots::hasWeaponType( c.client->vehicle_, c.ps, WT_IRONBOMB ) || Bots::hasWeaponType( c.client->vehicle_, c.ps, WT_GUIDEDBOMB );
+		return BotWeapons::hasWeaponType( c.client->vehicle_, c.ps, WT_IRONBOMB ) || BotWeapons::hasWeaponType( c.client->vehicle_, c.ps, WT_GUIDEDBOMB );
 	}
 	// how far the nose must turn to point at the enemy, signed
 	static float enemyTurn( const Mind& c ) { return AngleSubtract( c.sense.enemyAngles[YAW], c.ps.vehicleAngles[YAW] ); }
@@ -446,7 +446,7 @@ struct PlaneTasks
 				AngleVectors( c.ps.vehicleAngles, nose, nullptr, nullptr );
 				const float blast = static_cast<float>( availableWeapons[weapon].damageRadius );
 				if( c.ps.weaponNum == slot && DotProduct( nose, c.sense.enemyDir ) > 0.99f && c.sense.enemyDist < 1800 &&
-					!Bots::friendlyNear( c.ent, c.sense.enemy->r.currentOrigin, blast * 1.3f + 150.0f ) )
+					!BotWeapons::friendlyNear( c.ent, c.sense.enemy->r.currentOrigin, blast * 1.3f + 150.0f ) )
 					c.cmd.buttons |= BUTTON_ATTACK_MAIN;
 				break;
 			}
@@ -462,7 +462,7 @@ struct PlaneTasks
 		roam( c );
 		c.hasDest = false;
 		c.bombing = true;
-		Bots::bomb( c.ent, c.bot, c.sense.enemy->r.currentOrigin, c.cmd, c.view );
+		BotWeapons::bomb( c.ent, c.bot, c.sense.enemy->r.currentOrigin, c.cmd, c.view );
 		return Status::Running;
 	}
 
@@ -555,7 +555,7 @@ struct PlaneTasks
 		Vec3 target;
 		for( int k = 0; k < 3; k++ )
 			target[k] = (structure->r.absmin[k] + structure->r.absmax[k]) * 0.5f;
-		Bots::bomb( c.ent, c.bot, target, c.cmd, c.view );
+		BotWeapons::bomb( c.ent, c.bot, target, c.cmd, c.view );
 		return Status::Running;
 	}
 
@@ -586,7 +586,7 @@ struct PlaneTasks
 	// flares against a missile
 	static Status countermeasures( Mind& c )
 	{
-		Bots::flares( c.ent, c.bot, c.sense, c.cmd );
+		BotWeapons::flares( c.ent, c.bot, c.sense, c.cmd );
 		return Status::Success;
 	}
 
@@ -1126,7 +1126,7 @@ struct PlaneTasks
 		Vec3 fwd;
 		AngleVectors( c.ps.vehicleAngles, fwd, nullptr, nullptr );
 		const float aimError = acos( std::clamp( DotProduct( fwd, c.sense.enemyDir ), -1.0f, 1.0f ) ) * 180.0f / std::numbers::pi_v<float>;
-		Bots::fireWeapons( c.ent, c.bot, c.sense, c.cmd, aimError );
+		BotWeapons::fireWeapons( c.ent, c.bot, c.sense, c.cmd, aimError );
 		if( c.forcedWeapon >= 0 )
 			c.cmd.weapon = c.forcedWeapon;
 		return Status::Success;

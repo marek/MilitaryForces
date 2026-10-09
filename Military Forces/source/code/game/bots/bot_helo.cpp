@@ -287,7 +287,7 @@ struct HeloTasks
 			if( flying || (c.bot.structure == i && theLevel.time_ < c.bot.structureTime) )
 				continue;
 			// what they are short of; failing that, someone in a fight will want ammunition soon
-			int need = Bots::supplyNeed( other );
+			int need = BotWeapons::supplyNeed( other );
 			const bool fighting = Bots::isBot( i ) ? Bots::states_[i].enemy >= 0 : other->health_ < other->client_->pers_.maxHealth_;
 			float urgency = 1.0f;
 			if( !need && fighting )
@@ -356,7 +356,7 @@ struct HeloTasks
 
 	static Status countermeasures( Mind& c )
 	{
-		Bots::flares( c.ent, c.bot, c.sense, c.cmd );
+		BotWeapons::flares( c.ent, c.bot, c.sense, c.cmd );
 		return Status::Success;
 	}
 
@@ -587,7 +587,7 @@ struct HeloTasks
 	static Status fire( Mind& c )
 	{
 		if( c.sense.enemy && !c.cover && !c.defending && !c.bot.following )
-			Bots::fireWeapons( c.ent, c.bot, c.sense, c.cmd, c.yawError );
+			BotWeapons::fireWeapons( c.ent, c.bot, c.sense, c.cmd, c.yawError );
 		return Status::Success;
 	}
 

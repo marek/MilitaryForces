@@ -189,6 +189,7 @@ public:
 	friend struct SurfaceTasks;
 	friend struct InfantryTasks;
 	friend struct GoalScoring;
+	friend class BotWeapons;
 
 private:
 	// one bot's frame, and the pilot or driver for the kind of vehicle it is in
@@ -210,30 +211,20 @@ private:
 	static float turnOnAttacker( GameEntity* ent, const State& bot, int attacker );
 	static float skill( const State& bot );
 	static int memoryTime( const State& bot );
-	static bool hasWeaponType( int vehicle, const playerState_t& ps, int type );
 	static bool findHidePoint( GameEntity* ent, State& bot, GameEntity* threat, bool hullDown = false );
-	static void bomb( GameEntity* ent, State& bot, const vec3_t target, usercmd_t& cmd, vec3_t view );
 	static GameEntity* findStructure( GameEntity* ent, State& bot );
-	static void flares( GameEntity* ent, State& bot, const Sense& sense, usercmd_t& cmd );
 	static void loadCharacters();
 	static bool replenished( GameEntity* ent );
 	static void finishRearm( GameEntity* ent, State& bot );
 	static bool runwayBusy( int padIndex, GameEntity* self );
-	static bool friendlyNear( GameEntity* ent, const vec3_t point, float radius );
-	static int supplyNeed( GameEntity* who, bool urgentOnly = false );
 	static GameEntity* walkerNear( GameEntity* ent, State& bot, float range );
 	static int ridersOf( GameEntity* ent );
-	static bool carriesSupplies( int vehicle );
 	static bool teamHasSupplier( int team, GameEntity* except = nullptr );
 	static bool turnClear( GameEntity* ent, float radius, float degrees, float climb = 0 );
 	static void sense( GameEntity* ent, State& bot, Sense& out );
 	static void logDeath( GameEntity* self, GameEntity* attacker, int meansOfDeath );
 	static void logState( GameEntity* ent, State& bot, const usercmd_t& cmd, const vec3_t view );
 	static void pickGoal( GameEntity* ent, State& bot, float radius );
-	static void fireWeapons( GameEntity* ent, State& bot, const Sense& sense, usercmd_t& cmd, float aimError );
-	static int findWeaponSlot( int vehicle, const playerState_t& ps, bool air, float dist, bool& guided );
-	static bool outOfAmmo( int vehicle, const playerState_t& ps );
-	static void setRadar( GameEntity* ent, State& bot, bool air );
 	static int pickVehicle( int teamFlag, bool allowInfantry = true, const Character* who = nullptr, const State* memory = nullptr );
 	static float failureSensitivity( const Character& who );
 	static float switchDesire( const State& bot, int kind );
@@ -290,6 +281,23 @@ public:
 	static std::vector<Pad> pads_;
 	static bool padsBuilt_;
 	static std::vector<Vec3> roamPoints_;
+};
+
+// What a bot does with its weapons: which one for which target, when to fire it, flares, bombs, and what a vehicle
+// is short of. Asks Bots for the bot's character and skill, which decide reaction, aim window and care for team mates.
+class BotWeapons
+{
+public:
+	static bool hasWeaponType( int vehicle, const playerState_t& ps, int type );
+	static void bomb( GameEntity* ent, Bots::State& bot, const vec3_t target, usercmd_t& cmd, vec3_t view );
+	static void flares( GameEntity* ent, Bots::State& bot, const Bots::Sense& sense, usercmd_t& cmd );
+	static bool friendlyNear( GameEntity* ent, const vec3_t point, float radius );
+	static int supplyNeed( GameEntity* who, bool urgentOnly = false );
+	static bool carriesSupplies( int vehicle );
+	static void fireWeapons( GameEntity* ent, Bots::State& bot, const Bots::Sense& sense, usercmd_t& cmd, float aimError );
+	static int findWeaponSlot( int vehicle, const playerState_t& ps, bool air, float dist, bool& guided );
+	static bool outOfAmmo( int vehicle, const playerState_t& ps );
+	static void setRadar( GameEntity* ent, Bots::State& bot, bool air );
 };
 
 #endif

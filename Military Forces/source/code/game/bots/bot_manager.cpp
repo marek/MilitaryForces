@@ -140,7 +140,7 @@ bool Bots::teamHasSupplier( int team, GameEntity* except )
 	{
 		GameEntity* other = theLevel.getEntity( i );
 		if( other && other != except && other->inuse_ && other->client_ && other->client_->sess_.sessionTeam_ == team && other->client_->vehicle_ >= 0 &&
-			carriesSupplies( other->client_->vehicle_ ) )
+			BotWeapons::carriesSupplies( other->client_->vehicle_ ) )
 			return true;
 	}
 	return false;
@@ -195,9 +195,9 @@ int Bots::pickVehicle( int teamFlag, bool allowInfantry, const Character* who, c
 		if( who )
 			weight = static_cast<int>( weight * 10 * std::max( 0.0f, who->prefer[kind] ) );
 		// supplies are for team mates: nobody flies the supply helicopter in a free-for-all
-		if( g_gametype.integer < GT_TEAM && carriesSupplies( i ) )
+		if( g_gametype.integer < GT_TEAM && BotWeapons::carriesSupplies( i ) )
 			continue;
-		if( who && !teamHasSupplier && carriesSupplies( i ) )
+		if( who && !teamHasSupplier && BotWeapons::carriesSupplies( i ) )
 			weight = static_cast<int>( weight * (2.0f + 8.0f * who->teamwork) );
 		// bombers have little to do on a map with nothing on the ground to bomb
 		if( !groundTargets && (veh.cat & CAT_PLANE) && (veh.cls & CLASS_PLANE_BOMBER) )
@@ -367,7 +367,7 @@ void Bots::think( GameEntity* ent, State& bot, usercmd_t& cmd )
 		// a supply pilot whose supplies nobody used in a long life gets bored, the impatient first;
 		// one who scored with them stays (a scoring life is not a failed one)
 		constexpr int longLife = 120000;
-		const bool supplier = carriesSupplies( flown );
+		const bool supplier = BotWeapons::carriesSupplies( flown );
 		if( supplier && failed && theLevel.time_ - bot.spawnTime > longLife && random() < 0.6f * (1.0f - character( bot ).patience) )
 			reconsider = true;
 		// every death is a chance to notice that the team has nobody flying supplies
@@ -380,7 +380,7 @@ void Bots::think( GameEntity* ent, State& bot, usercmd_t& cmd )
 			if( g_gametype.integer >= GT_TEAM )
 				teamFlag = client->sess_.sessionTeam_ == ClientBase::TEAM_RED ? MF_TEAM_1 : MF_TEAM_2;
 			int vehicle = pickVehicle( teamFlag, false, &character( bot ), &bot );
-			if( fillSupply && vehicle >= 0 && !carriesSupplies( vehicle ) )
+			if( fillSupply && vehicle >= 0 && !BotWeapons::carriesSupplies( vehicle ) )
 				vehicle = -1;
 			if( vehicle >= 0 )
 			{

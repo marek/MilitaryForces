@@ -114,7 +114,7 @@ struct SurfaceTasks
 			return false;
 		if( !(availableVehicles[c.sense.enemy->client_->vehicle_].cat & (CAT_PLANE|CAT_HELO)) )
 			return false;
-		return c.sense.enemyDist > nearest && c.sense.enemyDist < farthest && Bots::hasWeaponType( c.client->vehicle_, c.ps, WT_BALLISTICGUN );
+		return c.sense.enemyDist > nearest && c.sense.enemyDist < farthest && BotWeapons::hasWeaponType( c.client->vehicle_, c.ps, WT_BALLISTICGUN );
 	}
 
 	// stop and lob shells at it from where we are, at the place it was last seen if it is out of sight
@@ -198,8 +198,8 @@ struct SurfaceTasks
 	static Status driveToSupplies( Mind& c )
 	{
 		// a real shortage is worth a detour; topping up only when the supplies are close by
-		const int urgent = Bots::supplyNeed( c.ent, true );
-		const int need = urgent ? urgent : Bots::supplyNeed( c.ent );
+		const int urgent = BotWeapons::supplyNeed( c.ent, true );
+		const int need = urgent ? urgent : BotWeapons::supplyNeed( c.ent );
 		if( !need )
 			return Status::Failure;
 		const float range = urgent ? 3000.0f : 1200.0f;
@@ -246,7 +246,7 @@ struct SurfaceTasks
 
 	static Status countermeasures( Mind& c )
 	{
-		Bots::flares( c.ent, c.bot, c.sense, c.cmd );
+		BotWeapons::flares( c.ent, c.bot, c.sense, c.cmd );
 		return Status::Success;
 	}
 
@@ -365,7 +365,7 @@ struct SurfaceTasks
 			c.view[PITCH] = std::clamp( AngleSubtract( aimAngles[PITCH], 0 ) - arc, -60.0f, 20.0f );
 		}
 		const float turretYaw = c.ps.vehicleAngles[YAW] + c.ps.turretAngle;
-		Bots::fireWeapons( c.ent, c.bot, c.sense, c.cmd, fabs( AngleSubtract( c.view[YAW], turretYaw ) ) );
+		BotWeapons::fireWeapons( c.ent, c.bot, c.sense, c.cmd, fabs( AngleSubtract( c.view[YAW], turretYaw ) ) );
 		return Status::Success;
 	}
 

@@ -168,7 +168,7 @@ GameEntity* Bots::findEnemy( GameEntity* ent, State& bot, Role role )
 	const bool flyer = (veh.cat & (CAT_PLANE|CAT_HELO)) != 0;
 	const float maxRange = flyer ? planeEnemyRange : surfaceEnemyRange;
 	const float radarRange = veh.radarRange > 0 ? static_cast<float>( veh.radarRange ) : 8000.0f;
-	const bool antiAir = hasWeaponType( client->vehicle_, client->ps_, WT_ANTIAIRMISSILE );
+	const bool antiAir = BotWeapons::hasWeaponType( client->vehicle_, client->ps_, WT_ANTIAIRMISSILE );
 
 	GameEntity* leader = leaderOf( bot );
 	const int leaderTarget = leader ? targetOf( leader ) : -1;

@@ -28,7 +28,7 @@ struct GoalScoring
 	static float takingFire( const Situation& s ) { return !s.sense.underFire ? 0.0f : s.sense.blindsided ? 1.4f : 0.3f; }
 	static bool plane( const Situation& s ) { return s.sense.role == Role::Fighter || s.sense.role == Role::Bomber; }
 	static bool armour( const Situation& s ) { return s.sense.role == Role::Tank || s.sense.role == Role::AirDefence; }
-	static bool has( const Situation& s, int type ) { return Bots::hasWeaponType( s.vehicle, s.ps, type ); }
+	static bool has( const Situation& s, int type ) { return BotWeapons::hasWeaponType( s.vehicle, s.ps, type ); }
 	static bool hasGroundWeapons( const Situation& s )
 	{
 		return has( s, WT_IRONBOMB ) || has( s, WT_GUIDEDBOMB ) || has( s, WT_ANTIGROUNDMISSILE ) || has( s, WT_ROCKET );
@@ -116,7 +116,7 @@ struct GoalScoring
 	// a supply helicopter with no crates left has nothing to give until it restocks
 	static bool suppliesGone( const Situation& s )
 	{
-		if( !Bots::carriesSupplies( s.vehicle ) )
+		if( !BotWeapons::carriesSupplies( s.vehicle ) )
 			return false;
 		for( int slot : allWeaponSlots )
 		{
@@ -142,7 +142,7 @@ struct GoalScoring
 			need = 1.0f + ( fuelWanted - fuel ) * fuelPull;
 		else if( s.sense.health < 0.45f )
 			need = 0.2f + 0.8f * s.who.caution;
-		else if( Bots::outOfAmmo( s.vehicle, s.ps ) || suppliesGone( s ) )
+		else if( BotWeapons::outOfAmmo( s.vehicle, s.ps ) || suppliesGone( s ) )
 			need = 0.7f;
 		else if( availableVehicles[s.vehicle].ammo[WP_FLARE] > 0 && s.ps.ammo[WP_FLARE] <= 0 && s.sense.role != Role::Tank )
 			need = 0.3f * s.who.caution;
