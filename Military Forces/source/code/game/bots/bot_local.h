@@ -14,6 +14,8 @@ namespace bots
 	constexpr signed char moveNone = 0;
 	constexpr float planeCruiseHeight = 1400.0f;
 	constexpr float planeMinHeight = 450.0f;
+	// the least height over the ground while lining up to land
+	constexpr float approachFloor = 150.0f;
 	constexpr float heloCruiseHeight = 500.0f;
 	constexpr float heloLowHeight = 180.0f;
 	constexpr float bomberMinHeight = 2200.0f;

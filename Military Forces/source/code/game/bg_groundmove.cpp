@@ -3,6 +3,8 @@
 */
 
 #include "q_shared.h"
+#include <algorithm>
+#include <cmath>
 #include "../qcommon/qfiles.h"
 #include "bg_public.h"
 #include "bg_local.h"
@@ -126,8 +128,10 @@ void PlayerMove::groundVehicleAccelerate()
 			targetspeed += topspeed * (angle / 5);
 		}
 
-		if( currspeed < targetspeed - accel ) currspeed += accel;
-		else if( currspeed > targetspeed + accel ) currspeed -= accel;
+		// what a fall or a slope left above the vehicle's own top speed is scrubbed off by the ground much faster than the engine slows it
+		const float drag = fabs( currspeed ) > topspeed * 1.5f ? accel * 4.0f : accel;
+		if( currspeed < targetspeed - accel ) currspeed += std::min( drag, targetspeed - currspeed );
+		else if( currspeed > targetspeed + accel ) currspeed -= std::min( drag, currspeed - targetspeed );
 		else currspeed = targetspeed;
 
 		// for negative speeds we set the flag OO_STALLED as speed is an unsigned int
@@ -138,7 +142,15 @@ void PlayerMove::groundVehicleAccelerate()
 			pm->ps->ONOFF &= ~OO_STALLED;
 		}
 	} else { // falling
-		currspeed += (50 * pml.frametime);
+		// only a nose that points down gains speed, up to a terminal speed. A vehicle hung on an edge counts as
+		// falling too: it is not moving, so it gains nothing and keeps no speed it does not have
+		constexpr float fallGain = 50.0f, terminalFactor = 2.5f;
+		const float dive = sin( DEG2RAD( angle ) ) * ( (pm->ps->ONOFF & OO_STALLED) ? -1.0f : 1.0f );
+		const float moving = VectorLength( pm->ps->velocity ) * 0.5f;
+		if( dive > 0 && currspeed < topspeed * terminalFactor )
+			currspeed = std::min( currspeed + fallGain * dive * pml.frametime, topspeed * terminalFactor );
+		if( moving < currspeed * 0.5f )
+			currspeed = std::max( moving, currspeed - fallGain * 4.0f * pml.frametime );
 	}
 
 	// apply speed modifier

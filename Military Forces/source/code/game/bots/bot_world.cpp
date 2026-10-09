@@ -4,6 +4,8 @@
 #include "bot_local.h"
 #include <algorithm>
 #include <cmath>
+#include <cstring>
+#include <vector>
 
 float Bots::heightAboveGround( const vec3_t origin, int passEntity )
 {
@@ -148,7 +150,7 @@ float Bots::runwayRun( const vec3_t origin, float yaw, float maxDist )
 	Vec3 angles = { 0, yaw, 0 }, dir, point;
 	AngleVectors( angles, dir, nullptr, nullptr );
 	// wheels cannot cross a step between runway pieces, so the run ends where the surface height changes
-	constexpr float maxStep = 1.5f;
+	constexpr float maxStep = 0.5f;
 	float run = 0, previous = 0, surface = 0;
 	if( !runwayAt( origin, &previous ) )
 		return 0;
@@ -161,6 +163,25 @@ float Bots::runwayRun( const vec3_t origin, float yaw, float maxDist )
 		run = dist;
 	}
 	return run;
+}
+
+// the steepest slope the terrain forces on an approach to one end of a runway (dir -1 lands along the axis)
+float Bots::approachSlope( const Pad& pad, float dir )
+{
+	float slope = 0.15f;
+	for( float d = 75.0f; d <= 2500.0f; d += d < 1000.0f ? 75.0f : 250.0f )
+	{
+		Vec3 from, to, boxMins = { -60, -60, 0 }, boxMaxs = { 60, 60, 4 };
+		trace_t tr;
+		VectorMA( pad.center, -dir * (pad.halfLength - thresholdInset( pad ) + d), pad.axis, from );
+		from[2] = pad.z + 600;
+		to = from;
+		to[2] -= 4000;
+		GameHost::trace( &tr, from, boxMins, boxMaxs, to, ENTITYNUM_NONE, MASK_PLAYERSOLID|CONTENTS_BOTCLIP, false );
+		const float rise = tr.startsolid ? 600.0f : tr.endpos[2] - pad.z;
+		slope = std::max( slope, (rise + 60.0f) / (d + 300.0f) );
+	}
+	return slope;
 }
 
 bool Bots::flagPosition( int team, vec3_t out )
@@ -177,10 +198,135 @@ bool Bots::flagPosition( int team, vec3_t out )
 	return false;
 }
 
+namespace
+{
+	// runway pieces that touch are one runway: maps build an airfield from many brushes
+	constexpr int headings = 12;
+	// a jet rolls about 600 units before it stops; the shortest strip the maps have is a little under 1,000
+	constexpr float minRunway = 900.0f;
+	struct Run
+	{
+		Vec3	center = { 0, 0, 0 };
+		Vec3	axis = { 1, 0, 0 };
+		float	length = 0;
+		float	z = 0;
+	};
+	// the longest run found in each heading, and the one planes are sent to
+	struct Airfield
+	{
+		Run	runs[headings];
+		Run	best;
+	};
+
+	bool isRunway( const GameEntity* ent )
+	{
+		return ent && ent->inuse_ && ent->classname_ && strcmp( ent->classname_, "func_runway" ) == 0;
+	}
+
+	bool boxesTouch( const GameEntity* a, const GameEntity* b, float reach )
+	{
+		for( int k = 0; k < 3; k++ )
+			if( a->r.absmin[k] - reach > b->r.absmax[k] || b->r.absmin[k] - reach > a->r.absmax[k] )
+				return false;
+		return true;
+	}
+}
+
 void Bots::buildPads()
 {
 	padsBuilt_ = true;
 	pads_.clear();
+
+	// group the runway pieces
+	constexpr float touching = 16.0f;
+	std::vector<GameEntity*> pieces;
+	for( int i = 0; i < theLevel.num_entities_; i++ )
+		if( isRunway( theLevel.getEntity( i ) ) )
+			pieces.push_back( theLevel.getEntity( i ) );
+	std::vector<int> field( pieces.size() );
+	for( size_t i = 0; i < pieces.size(); i++ )
+		field[i] = static_cast<int>( i );
+	for( bool joined = true; joined; )
+	{
+		joined = false;
+		for( size_t a = 0; a < pieces.size(); a++ )
+			for( size_t b = a + 1; b < pieces.size(); b++ )
+				if( field[a] != field[b] && boxesTouch( pieces[a], pieces[b], touching ) )
+				{
+					const int from = std::max( field[a], field[b] ), to = std::min( field[a], field[b] );
+					std::replace( field.begin(), field.end(), from, to );
+					joined = true;
+				}
+	}
+
+	// the longest straight run on each airfield, looked for from a grid of points over every piece: a piece is
+	// often many brushes in one entity, an apron and a strip together, so its middle says nothing
+	constexpr float grid = 128.0f;
+	std::vector<Airfield> fields( pieces.size() );
+	for( size_t i = 0; i < pieces.size(); i++ )
+	{
+		const GameEntity* piece = pieces[i];
+		Airfield& airfield = fields[field[i]];
+		for( float x = piece->r.absmin[0] + grid * 0.5f; x < piece->r.absmax[0]; x += grid )
+			for( float y = piece->r.absmin[1] + grid * 0.5f; y < piece->r.absmax[1]; y += grid )
+			{
+				Vec3 spot = { x, y, piece->r.absmax[2] };
+				float surface = 0;
+				if( !runwayAt( spot, &surface ) )
+					continue;
+				spot[2] = surface;
+				for( int step = 0; step < headings; step++ )
+				{
+					const float yaw = step * (180.0f / headings);
+					const float ahead = runwayRun( spot, yaw, 8000 );
+					const float behind = runwayRun( spot, yaw + 180.0f, 8000 );
+					Run& run = airfield.runs[step];
+					if( ahead + behind > run.length )
+					{
+						run.length = ahead + behind;
+						Vec3 angles = { 0, yaw, 0 };
+						AngleVectors( angles, run.axis, nullptr, nullptr );
+						VectorMA( spot, (ahead - behind) * 0.5f, run.axis, run.center );
+						run.z = surface;
+					}
+				}
+			}
+	}
+
+	// of the runs long enough to land on, the one with the flattest way in from either end; failing that the longest
+	for( Airfield& airfield : fields )
+	{
+		float bestSlope = 0;
+		for( const Run& run : airfield.runs )
+		{
+			if( run.length > airfield.best.length && airfield.best.length < minRunway )
+				airfield.best = run;
+			if( run.length < minRunway )
+				continue;
+			// nothing may stand on it: aprons have hangars and stores on them that a rolling plane would hit
+			Vec3 from, to, boxMins = { -45, -45, 0 }, boxMaxs = { 45, 45, 40 };
+			trace_t tr;
+			VectorMA( run.center, -(run.length * 0.5f - 50.0f), run.axis, from );
+			VectorMA( run.center, run.length * 0.5f - 50.0f, run.axis, to );
+			from[2] = to[2] = run.z + 12.0f;
+			GameHost::trace( &tr, from, boxMins, boxMaxs, to, ENTITYNUM_NONE, MASK_PLAYERSOLID, false );
+			if( tr.startsolid || tr.fraction < 1.0f )
+				continue;
+			Pad probe;
+			probe.center = run.center;
+			probe.center[2] = run.z;
+			probe.axis = run.axis;
+			probe.halfLength = run.length * 0.5f;
+			probe.z = run.z;
+			const float slope = std::min( approachSlope( probe, 1.0f ), approachSlope( probe, -1.0f ) );
+			if( bestSlope == 0 || slope < bestSlope - 0.03f || (slope < bestSlope + 0.03f && run.length > airfield.best.length) )
+			{
+				bestSlope = slope;
+				airfield.best = run;
+			}
+		}
+	}
+
 	for( int i = 0; i < theLevel.num_entities_; i++ )
 	{
 		GameEntity* ent = theLevel.getEntity( i );
@@ -206,32 +352,23 @@ void Bots::buildPads()
 		trace_t tr;
 		GameHost::trace( &tr, start, nullptr, nullptr, end, ENTITYNUM_NONE, MASK_SOLID, false );
 		if( tr.fraction < 1.0f )
-		{
 			pad.z = tr.endpos[2];
-			GameEntity* ground = tr.entityNum > ENTITYNUM_WORLD ? theLevel.getEntity( tr.entityNum ) : nullptr;
-			if( ground && ground->classname_ && strcmp( ground->classname_, "func_runway" ) == 0 )
-			{
-				Vec3 spot;
-				VectorCopy( pad.center, spot );
-				spot[2] = pad.z;
-				float best = 0;
-				for( int step = 0; step < 12; step++ )
-				{
-					const float yaw = step * 15.0f;
-					const float ahead = runwayRun( spot, yaw, 4000 );
-					const float behind = runwayRun( spot, yaw + 180.0f, 4000 );
-					if( ahead + behind > best )
-					{
-						best = ahead + behind;
-						Vec3 angles = { 0, yaw, 0 };
-						AngleVectors( angles, pad.axis, nullptr, nullptr );
-						VectorMA( spot, (ahead - behind) * 0.5f, pad.axis, pad.center );
-					}
-				}
-				pad.halfLength = best * 0.5f;
-				pad.runway = best >= 1000.0f;
-				pad.center[2] = pad.z;
-			}
+
+		// the airfield this pad stands on or beside: its runway is where a plane lands before it taxis to the pad
+		constexpr float beside = 64.0f;
+		int on = -1;
+		for( size_t p = 0; p < pieces.size(); p++ )
+			if( boxesTouch( ent, pieces[p], beside ) && (on < 0 || fields[field[p]].best.length > fields[on].best.length) )
+				on = field[p];
+		if( on >= 0 && fields[on].best.length > 0 )
+		{
+			const Run& run = fields[on].best;
+			pad.center = run.center;
+			pad.axis = run.axis;
+			pad.z = run.z;
+			pad.center[2] = pad.z;
+			pad.halfLength = run.length * 0.5f;
+			pad.runway = run.length >= minRunway;
 		}
 		pads_.push_back( pad );
 	}

@@ -226,6 +226,9 @@ private:
 	static bool steerAround( GameEntity* ent, float wantYaw, float travel, float& yaw );
 	static bool runwayAt( const vec3_t point, float* surface = nullptr );
 	static float runwayRun( const vec3_t origin, float yaw, float maxDist );
+	// the touchdown point sits this far inside the runway's end: close to it on a short strip, where every unit of roll counts
+	static float thresholdInset( const Pad& pad ) { return pad.halfLength < 600.0f ? 60.0f : 150.0f; }
+	static float approachSlope( const Pad& pad, float dir );
 	static int findPad( GameEntity* ent, int skip = -1 );
 	static bool replenished( GameEntity* ent );
 	static void finishRearm( GameEntity* ent, State& bot );

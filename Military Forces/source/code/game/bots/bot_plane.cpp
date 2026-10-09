@@ -612,9 +612,15 @@ struct PlaneTasks
 
 	static Status approachProfile( Mind& c )
 	{
-		c.view[PITCH] = std::clamp( (c.ent->r.currentOrigin[2] - c.bot.approachHeight) / 30.0f, -25.0f, 20.0f );
-		if( c.speed > c.veh.stallspeed * 2.2f )
+		// firm enough to follow the approach height as it comes down towards the runway
+		c.view[PITCH] = std::clamp( (c.ent->r.currentOrigin[2] - c.bot.approachHeight) / 12.0f, -25.0f, 16.0f );
+		// inbound the plane is already slowing for the final: fast, it can neither come down nor turn onto the centre line
+		const float limit = c.veh.stallspeed * (c.bot.landOutbound ? 2.2f : 1.7f);
+		if( c.speed > limit )
 			c.cmd.forwardmove = -moveFull;
+		const bool wantBrake = !c.bot.landOutbound && c.speed > limit * 1.15f;
+		if( (c.veh.caps & HC_SPEEDBRAKE) && wantBrake != ((c.ps.ONOFF & OO_SPEEDBRAKE) != 0) )
+			c.cmd.buttons |= BUTTON_BRAKE;
 		return Status::Success;
 	}
 
@@ -957,7 +963,9 @@ struct PlaneTasks
 
 	static Status floorAndCeiling( Mind& c )
 	{
-		if( c.sense.height < c.minHeight )
+		// a plane lining up to land flies lower than the cruising floor, or it never gets down to the runway
+		const float floor = onApproach( c ) ? std::min( c.minHeight, approachFloor ) : c.minHeight;
+		if( c.sense.height < floor )
 			c.view[PITCH] = std::min( c.view[PITCH], -35.0f );
 		else if( c.ceiling < 250 )
 			c.view[PITCH] = std::max( c.view[PITCH], c.sense.height > c.minHeight + 150 ? 12.0f : 0.0f );
@@ -980,6 +988,9 @@ struct PlaneTasks
 	{
 		if( c.defending || c.sense.missile || c.sense.launched || c.bot.desire == Goal::Evade )
 			return true;
+		// coming in to land is slow and low on purpose, and usually short of fuel: the afterburner there only empties the tank
+		if( c.bot.desire == Goal::Rearm && c.bot.landPhase >= 1 )
+			return (c.ps.ONOFF & OO_STALLED) || c.speed < c.veh.stallspeed * 1.1f || theLevel.time_ < c.bot.avoidTime || c.view[PITCH] < -12.0f;
 		if( c.speed < c.veh.stallspeed * 1.7f || (c.ps.ONOFF & OO_STALLED) )
 			return true;
 		// tight ground, a hard pull up or a wall ahead need all the thrust there is
