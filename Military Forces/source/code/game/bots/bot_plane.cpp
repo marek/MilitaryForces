@@ -3,6 +3,8 @@
 #include <algorithm>
 #include <cmath>
 
+// can the aircraft fly a turn of that radius through that many degrees, climbing or diving at that slope, without
+// meeting the world? The arc is checked in 30 degree pieces
 bool Bots::turnClear( GameEntity* ent, float radius, float degrees, float climb )
 {
 	const playerState_t& ps = ent->client_->ps_;
@@ -28,6 +30,7 @@ bool Bots::turnClear( GameEntity* ent, float radius, float degrees, float climb 
 	return true;
 }
 
+// someone is on or just over the runway, or a bot with a lower number is already on final for it
 bool Bots::runwayBusy( int padIndex, GameEntity* self )
 {
 	const Pad& pad = pads_[padIndex];
@@ -50,6 +53,8 @@ bool Bots::runwayBusy( int padIndex, GameEntity* self )
 
 using behavior::Status;
 
+// What a plane's pilot does: the conditions and steps of the plane tree. The steps choose where to point the nose;
+// navigation, the manoeuvre planner and the safety steps at the end may overrule them to keep the aircraft flying.
 struct PlaneTasks
 {
 	using Mind = Bots::Mind;
@@ -61,27 +66,34 @@ struct PlaneTasks
 	{
 		return Bots::hasWeaponType( c.client->vehicle_, c.ps, WT_IRONBOMB ) || Bots::hasWeaponType( c.client->vehicle_, c.ps, WT_GUIDEDBOMB );
 	}
+	// how far the nose must turn to point at the enemy, signed
 	static float enemyTurn( const Mind& c ) { return AngleSubtract( c.sense.enemyAngles[YAW], c.ps.vehicleAngles[YAW] ); }
 
+	// free flight: not in a step that works the controls itself (take-off, final, roll-out)
 	static bool flying( Mind& c ) { return !c.direct; }
 	static bool landing( Mind& c ) { return c.bot.desire == Goal::Rearm && c.bot.pad >= 0; }
 	static bool onGround( Mind& c ) { return c.landed(); }
 	static bool onApproach( Mind& c ) { return c.bot.desire == Goal::Rearm && c.bot.landPhase == 1; }
+	// a missile within six seconds; not acted on once committed to a final approach
 	static bool missileInbound( Mind& c )
 	{
 		return c.sense.missile && c.sense.missileTime <= 6.0f && !c.landed() && !(c.bot.desire == Goal::Rearm && c.bot.landPhase >= 2);
 	}
 	static bool evading( Mind& c ) { return c.bot.desire == Goal::Evade && (c.sense.blindsided || c.sense.enemy); }
 	static bool blindsided( Mind& c ) { return c.sense.blindsided; }
+	// attacking, and not just leaving after a pass
 	static bool engaging( Mind& c ) { return c.sense.enemy && c.bot.desire == Goal::Attack && theLevel.time_ > c.bot.egressTime; }
 	static bool canLevelBomb( Mind& c ) { return bomber( c ) && !c.sense.enemyAir && hasBombs( c ); }
+	// bold or cunning bomber pilots dive on a ground target when high and close enough
 	static bool canDiveBomb( Mind& c )
 	{
 		const bool diver = c.who().aggression > 0.8f || c.who().cunning > 0.75f;
 		return canLevelBomb( c ) && diver && c.sense.height > 900 && c.sense.enemyDist < c.sense.height * 2.2f;
 	}
+	// a stealth aircraft not yet seen closes in without showing itself
 	static bool stalking( Mind& c ) { return c.sense.stealth && !c.sense.revealed && c.sense.enemyDist > 2500; }
 	static bool onNose( Mind& c ) { return fabs( enemyTurn( c ) ) < 20.0f; }
+	// in tight terrain, nothing of the world between the nose and the enemy
 	static bool fireLineClear( Mind& c )
 	{
 		if( !c.bot.confined || theLevel.time_ < c.bot.chaseTime )
@@ -92,8 +104,10 @@ struct PlaneTasks
 		return !(Bots::pathBlocked( c.ent->r.currentOrigin, toEnemy, std::min( c.sense.enemyDist, 1500.0f ), c.ent->s.number, line, 60.0f ) &&
 			line.entityNum == ENTITYNUM_WORLD && !line.startsolid);
 	}
+	// a turn chosen a moment ago is flown out before another is chosen
 	static bool arcCommitted( Mind& c ) { return theLevel.time_ < c.bot.chaseTime; }
 	static bool climbing( Mind& c ) { return c.bot.desire == Goal::Climb; }
+	// a bomber with nothing to fight, bombs left and height in hand
 	static bool canBombStructure( Mind& c )
 	{
 		return bomber( c ) && c.bot.desire == Goal::Roam && theLevel.time_ > c.bot.egressTime && c.sense.height > 700.0f && hasBombs( c );
@@ -102,14 +116,17 @@ struct PlaneTasks
 	{
 		return c.bot.leader >= 0 && !c.sense.enemy;
 	}
+	// the nose comes up at this multiple of the stall speed
 	static constexpr float rotateSpeed = 1.12f;
 
+	// the first seconds after the wheels leave the ground
 	static bool departing( Mind& c )
 	{
 		constexpr int departTime = 4000;
 		return !c.landed() && theLevel.time_ < c.bot.groundTime + departTime;
 	}
 
+	// towards the roaming goal at the present height, a new goal when near it or when it is stale
 	static void roam( Mind& c )
 	{
 		if( theLevel.time_ > c.bot.goalTime || Distance( c.ent->r.currentOrigin, c.bot.goal ) < 2000 )
@@ -119,6 +136,7 @@ struct PlaneTasks
 		c.travelTo( Vec3( c.bot.goal[0], c.bot.goal[1], c.ent->r.currentOrigin[2] ) );
 	}
 
+	// nose on the enemy; near the ground only in heading, and gently in tight terrain
 	static void aimAtEnemy( Mind& c )
 	{
 		c.view[YAW] = c.sense.enemyAngles[YAW];
@@ -130,6 +148,7 @@ struct PlaneTasks
 			c.view[PITCH] = std::clamp( c.view[PITCH], -14.0f, 14.0f );
 	}
 
+	// weapons free and closing; after a close pass the plane flies on out before coming round
 	static void engage( Mind& c )
 	{
 		c.attacking = true;
@@ -141,6 +160,7 @@ struct PlaneTasks
 			c.bot.egressTime = theLevel.time_ + 2500;
 	}
 
+	// keep flying the turn and the climb or dive that the arc choice settled on
 	static void flyChosenArc( Mind& c )
 	{
 		aimAtEnemy( c );
@@ -285,6 +305,8 @@ struct PlaneTasks
 			c.bot.takeoffTime = theLevel.time_ + 30000;
 	}
 
+	// On the ground: wait when told to hold, plan a departure, taxi to a spot with enough runway if needed, then roll
+	// and lift off. Slow, it stops for anyone ahead and keeps off the path of an aircraft on its roll
 	static Status takeOff( Mind& c )
 	{
 		c.direct = true;
@@ -369,6 +391,7 @@ struct PlaneTasks
 		return Status::Running;
 	}
 
+	// across the missile's path, then at the last moment a hard pull the other way; the skilled wait longer for it
 	static Status defendMissile( Mind& c )
 	{
 		const float toLeft = fabs( AngleSubtract( c.sense.missileYaw + 90.0f, c.ps.vehicleAngles[YAW] ) );
@@ -390,6 +413,7 @@ struct PlaneTasks
 		return Status::Running;
 	}
 
+	// hit by someone unseen: turn hard to the side chosen when the hit came
 	static Status breakAway( Mind& c )
 	{
 		c.view[YAW] = c.bot.breakYaw;
@@ -397,6 +421,7 @@ struct PlaneTasks
 		return Status::Running;
 	}
 
+	// directly away from the enemy
 	static Status flee( Mind& c )
 	{
 		c.view[YAW] = c.sense.enemyAngles[YAW] + 180.0f;
@@ -404,6 +429,7 @@ struct PlaneTasks
 		return Status::Running;
 	}
 
+	// nose on the target, release when lined up and close with no team mate in the blast, then pull out
 	static Status diveBomb( Mind& c )
 	{
 		c.attacking = true;
@@ -430,6 +456,7 @@ struct PlaneTasks
 		return Status::Running;
 	}
 
+	// fly over the target at height and let the bombing step choose the release
 	static Status levelBomb( Mind& c )
 	{
 		roam( c );
@@ -439,6 +466,7 @@ struct PlaneTasks
 		return Status::Running;
 	}
 
+	// towards the enemy at the present height
 	static Status stalk( Mind& c )
 	{
 		c.view[YAW] = c.sense.enemyAngles[YAW];
@@ -447,6 +475,7 @@ struct PlaneTasks
 		return Status::Running;
 	}
 
+	// the enemy is ahead and the way is clear: straight at it
 	static Status pressAttack( Mind& c )
 	{
 		engage( c );
@@ -454,6 +483,7 @@ struct PlaneTasks
 		return Status::Running;
 	}
 
+	// on with the chosen turn
 	static Status flyArc( Mind& c )
 	{
 		engage( c );
@@ -461,6 +491,8 @@ struct PlaneTasks
 		return Status::Running;
 	}
 
+	// the enemy is off the nose: the short way round, level, climbing or diving, then the long way round, taking the
+	// first that is clear of the ground
 	static Status chooseArc( Mind& c )
 	{
 		const float turn = enemyTurn( c );
@@ -495,6 +527,7 @@ struct PlaneTasks
 		return Status::Failure;
 	}
 
+	// no turn towards the enemy is clear: fly on, shooting only if it crosses the nose
 	static Status holdCourse( Mind& c )
 	{
 		engage( c );
@@ -505,12 +538,14 @@ struct PlaneTasks
 		return Status::Running;
 	}
 
+	// roam; the height itself comes from the wanted altitude
 	static Status gainHeight( Mind& c )
 	{
 		roam( c );
 		return Status::Running;
 	}
 
+	// level-bomb a building
 	static Status bombStructure( Mind& c )
 	{
 		GameEntity* structure = Bots::findStructure( c.ent, c.bot );
@@ -541,18 +576,21 @@ struct PlaneTasks
 		return Status::Running;
 	}
 
+	// nothing to do: roam
 	static Status patrol( Mind& c )
 	{
 		roam( c );
 		return Status::Running;
 	}
 
+	// flares against a missile
 	static Status countermeasures( Mind& c )
 	{
 		Bots::flares( c.ent, c.bot, c.sense, c.cmd );
 		return Status::Success;
 	}
 
+	// when the straight line to the destination is blocked, follow the air path round the obstacle, allowing for the turn radius
 	static Status navigate( Mind& c )
 	{
 		State& bot = c.bot;
@@ -610,6 +648,7 @@ struct PlaneTasks
 		return Status::Success;
 	}
 
+	// lining up to land: hold the approach height and come back to approach speed
 	static Status approachProfile( Mind& c )
 	{
 		// firm enough to follow the approach height as it comes down towards the runway
@@ -624,6 +663,7 @@ struct PlaneTasks
 		return Status::Success;
 	}
 
+	// keep to a height lane where there is little room between floor and ceiling
 	static Status midChannel( Mind& c )
 	{
 		// in a corridor, traffic one way flies above the middle and traffic the other way below it
@@ -781,6 +821,7 @@ struct PlaneTasks
 		return std::min( travelled, horizon );
 	}
 
+	// how far the aircraft gets from where it is now along a turn of that radius and slope before meeting something
 	static float sweep( const Mind& c, float radius, float turnDegrees, float slope, float horizon, float halfWidth, Pose* finish = nullptr )
 	{
 		Pose start;
@@ -944,6 +985,7 @@ struct PlaneTasks
 		return Status::Success;
 	}
 
+	// slow down, with the air brake if need be, where the plane has to turn tighter than its speed allows
 	static Status cornerSpeed( Mind& c )
 	{
 		const bool canBrake = (c.veh.caps & HC_SPEEDBRAKE) != 0;
@@ -961,6 +1003,7 @@ struct PlaneTasks
 		return Status::Success;
 	}
 
+	// pull up below the least height, push down under a low ceiling
 	static Status floorAndCeiling( Mind& c )
 	{
 		// a plane lining up to land flies lower than the cruising floor, or it never gets down to the runway
@@ -972,6 +1015,7 @@ struct PlaneTasks
 		return Status::Success;
 	}
 
+	// too slow: nose down for speed where there is height to spend, no steep climbs, and out of a stall before anything else
 	static Status keepEnergy( Mind& c )
 	{
 		if( c.speed < c.veh.stallspeed * (c.bot.confined ? 1.08f : 1.3f) && c.sense.height > c.minHeight * 2 )
@@ -1011,6 +1055,7 @@ struct PlaneTasks
 		return c.sense.enemy && c.sense.enemyDist > farFromFight;
 	}
 
+	// shoot when attacking or when the enemy crosses the nose; a step that needs one particular weapon keeps it selected
 	static Status fire( Mind& c )
 	{
 		if( !c.attacking && !c.snapShot && !c.weaponsFree )
