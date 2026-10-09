@@ -34,7 +34,7 @@ struct HeloTasks
 	static bool walkerWaiting( Mind& c )
 	{
 		constexpr float pickupRange = 1800.0f;
-		c.target = transport( c ) && !c.sense.enemyVisible ? Bots::walkerNear( c.ent, c.bot, pickupRange ) : nullptr;
+		c.target = transport( c ) && !c.sense.enemyVisible ? BotSenses::walkerNear( c.ent, c.bot, pickupRange ) : nullptr;
 		return c.target != nullptr;
 	}
 
@@ -332,7 +332,7 @@ struct HeloTasks
 	// stay beside the leader, on the side given by the client number
 	static Status escort( Mind& c )
 	{
-		GameEntity* leader = Bots::leaderOf( c.bot );
+		GameEntity* leader = BotSenses::leaderOf( c.bot );
 		if( !leader )
 			return Status::Failure;
 		vec3_t flat = { 0, leader->client_->ps_.vehicleAngles[YAW], 0 }, right, spot;

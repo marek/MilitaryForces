@@ -40,7 +40,7 @@ void Bots::logDeath( GameEntity* self, GameEntity* attacker, int meansOfDeath )
 	Common::printf( "BOTDEATH t %d bot %d mod %d by %d veh %d role %d goal %d age %d health %d org %.0f %.0f %.0f vel %.0f %.0f %.0f speed %d pitch %.0f roll %.0f yaw %.0f "
 		"height %.0f ceiling %.0f water %d onoff %x throttle %d fuel %d enemy %d edist %.0f avoid %d egress %d land %d pad %d ahead %.0f aheadent %d aheadclass %s normalz %.2f "
 		"nearest %d ndist %.0f trail",
-		theLevel.time_, self->s.number, meansOfDeath, attacker ? attacker->s.number : -1, self->client_->vehicle_, static_cast<int>( roleOf( self->client_->vehicle_ ) ),
+		theLevel.time_, self->s.number, meansOfDeath, attacker ? attacker->s.number : -1, self->client_->vehicle_, static_cast<int>( BotSenses::roleOf( self->client_->vehicle_ ) ),
 		static_cast<int>( bot.desire ), theLevel.time_ - bot.spawnTime, self->health_, self->r.currentOrigin[0], self->r.currentOrigin[1], self->r.currentOrigin[2],
 		ps.velocity[0], ps.velocity[1], ps.velocity[2], ps.speed, ps.vehicleAngles[PITCH], ps.vehicleAngles[ROLL], ps.vehicleAngles[YAW],
 		BotWorld::heightAboveGround( self->r.currentOrigin, self->s.number ), BotWorld::ceilingAbove( self->r.currentOrigin, self->s.number ),
@@ -103,9 +103,9 @@ void Bots::listCommand()
 			cl->vehicle_, ent->health_, ent->r.currentOrigin[0], ent->r.currentOrigin[1], ent->r.currentOrigin[2], cl->ps_.speed,
 			states_[i].enemy, cl->sess_.ridingClient_, cl->ps_.persistant[PERS_SCORE], BotWorld::heightAboveGround( ent->r.currentOrigin, i ),
 			cl->ps_.ONOFF, cl->ps_.vehicleAngles[PITCH], cl->ps_.vehicleAngles[YAW], cl->ps_.stats[STAT_FUEL],
-			static_cast<int>( states_[i].desire ), cl->vehicle_ >= 0 ? static_cast<int>( roleOf( cl->vehicle_ ) ) : -1,
+			static_cast<int>( states_[i].desire ), cl->vehicle_ >= 0 ? static_cast<int>( BotSenses::roleOf( cl->vehicle_ ) ) : -1,
 			cl->ps_.ammo[1], cl->ps_.ammo[2], cl->ps_.ammo[3], cl->ps_.ammo[4], states_[i].goalsReached, states_[i].goalsExpired,
-			states_[i].teamPlayer, states_[i].leader, leaderOf( states_[i] ) ? targetOf( leaderOf( states_[i] ) ) : -1 );
+			states_[i].teamPlayer, states_[i].leader, BotSenses::leaderOf( states_[i] ) ? BotSenses::targetOf( BotSenses::leaderOf( states_[i] ) ) : -1 );
 	}
 }
 

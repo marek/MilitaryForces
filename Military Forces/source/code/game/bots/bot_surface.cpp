@@ -149,7 +149,7 @@ struct SurfaceTasks
 		constexpr float pickupRange = 1500.0f;
 		// boats and wheeled vehicles stop for a team mate on foot; tanks do not
 		const bool givesLifts = c.veh.seats > 1 && (c.boat || (c.veh.caps & HC_WHEELS));
-		c.target = givesLifts && !c.sense.enemyVisible ? Bots::walkerNear( c.ent, c.bot, pickupRange ) : nullptr;
+		c.target = givesLifts && !c.sense.enemyVisible ? BotSenses::walkerNear( c.ent, c.bot, pickupRange ) : nullptr;
 		return c.target != nullptr;
 	}
 
@@ -165,7 +165,7 @@ struct SurfaceTasks
 	// an unarmed transport with someone aboard is a taxi
 	static bool carryingPassenger( Mind& c )
 	{
-		return !c.boat && (c.veh.caps & HC_WHEELS) && !VehicleData::vehicleHasTurret( c.client->vehicle_ ) && Bots::ridersOf( c.ent ) > 0;
+		return !c.boat && (c.veh.caps & HC_WHEELS) && !VehicleData::vehicleHasTurret( c.client->vehicle_ ) && BotSenses::ridersOf( c.ent ) > 0;
 	}
 
 	// take the passenger to the nearest free vehicle we know of, otherwise home to base, and stop there
@@ -227,7 +227,7 @@ struct SurfaceTasks
 	// drive with the leader, stopping a little short
 	static Status convoy( Mind& c )
 	{
-		GameEntity* leader = Bots::leaderOf( c.bot );
+		GameEntity* leader = BotSenses::leaderOf( c.bot );
 		if( !leader )
 			return Status::Failure;
 		c.bot.hasHide = false;

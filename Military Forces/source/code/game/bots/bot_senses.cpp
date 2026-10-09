@@ -7,22 +7,22 @@
 #include <cmath>
 
 // what a vehicle is for, which decides whom it fights
-Bots::Role Bots::roleOf( int vehicle )
+Bots::Role BotSenses::roleOf( int vehicle )
 {
 	const completeVehicleData_t& veh = availableVehicles[vehicle];
 	if( veh.cat & CAT_PLANE )
-		return (veh.cls & CLASS_PLANE_BOMBER) ? Role::Bomber : Role::Fighter;
+		return (veh.cls & CLASS_PLANE_BOMBER) ? Bots::Role::Bomber : Bots::Role::Fighter;
 	if( veh.cat & CAT_HELO )
-		return (veh.cls & CLASS_HELO_TRANSPORT) ? Role::TransportHelo : Role::AttackHelo;
+		return (veh.cls & CLASS_HELO_TRANSPORT) ? Bots::Role::TransportHelo : Bots::Role::AttackHelo;
 	if( veh.cat & CAT_GROUND )
-		return (veh.cls & CLASS_GROUND_SAM) ? Role::AirDefence : Role::Tank;
+		return (veh.cls & CLASS_GROUND_SAM) ? Bots::Role::AirDefence : Bots::Role::Tank;
 	if( veh.cat & CAT_BOAT )
-		return Role::Boat;
-	return Role::Infantry;
+		return Bots::Role::Boat;
+	return Bots::Role::Infantry;
 }
 
 // how many players ride in this bot's vehicle
-int Bots::ridersOf( GameEntity* ent )
+int BotSenses::ridersOf( GameEntity* ent )
 {
 	int riders = 0;
 	for( int i = 1; i <= theLevel.maxclients_; i++ )
@@ -37,14 +37,14 @@ int Bots::ridersOf( GameEntity* ent )
 
 // A team mate on foot that this vehicle could take aboard, a real player first. The offer is held for a while and
 // then dropped for a time, so a vehicle does not sit waiting for someone who is not interested.
-GameEntity* Bots::walkerNear( GameEntity* ent, State& bot, float range )
+GameEntity* BotSenses::walkerNear( GameEntity* ent, Bots::State& bot, float range )
 {
 	constexpr int offerTime = 15000;
 	constexpr int restTime = 25000;
 	constexpr float humanPreference = 0.3f;
 	if( g_gametype.integer < GT_TEAM || theLevel.time_ < bot.liftGiveUp )
 		return nullptr;
-	if( ridersOf( ent ) >= availableVehicles[ent->client_->vehicle_].seats )
+	if( BotSenses::ridersOf( ent ) >= availableVehicles[ent->client_->vehicle_].seats )
 		return nullptr;
 	GameEntity* walker = nullptr;
 	float best = 0;
@@ -56,7 +56,7 @@ GameEntity* Bots::walkerNear( GameEntity* ent, State& bot, float range )
 		if( !(availableVehicles[other->client_->vehicle_].cat & CAT_LQM) )
 			continue;
 		const float dist = Distance( ent->r.currentOrigin, other->r.currentOrigin );
-		const float weighted = isBot( i ) ? dist : dist * humanPreference;
+		const float weighted = Bots::isBot( i ) ? dist : dist * humanPreference;
 		if( dist < range && (!walker || weighted < best) )
 		{
 			walker = other;
@@ -80,23 +80,23 @@ GameEntity* Bots::walkerNear( GameEntity* ent, State& bot, float range )
 }
 
 // the leader this bot follows, while that leader lives
-GameEntity* Bots::leaderOf( const State& bot )
+GameEntity* BotSenses::leaderOf( const Bots::State& bot )
 {
 	GameEntity* leader = bot.leader >= 0 ? theLevel.getEntity( bot.leader ) : nullptr;
 	return alive( leader ) ? leader : nullptr;
 }
 
 // who a leader is fighting: a bot's chosen enemy, a real player's locked target
-int Bots::targetOf( GameEntity* leader )
+int BotSenses::targetOf( GameEntity* leader )
 {
-	if( isBot( leader->s.number ) )
-		return states_[leader->s.number].enemy;
+	if( Bots::isBot( leader->s.number ) )
+		return Bots::states_[leader->s.number].enemy;
 	return leader->tracktarget_ && leader->tracktarget_->client_ ? leader->tracktarget_->s.number : -1;
 }
 
 // A team player picks someone to fight alongside: a real player first, otherwise a bot of the same kind that is
 // not following anyone itself. The lower client number leads, so two bots never follow each other.
-void Bots::chooseLeader( GameEntity* ent, State& bot )
+void BotSenses::chooseLeader( GameEntity* ent, Bots::State& bot )
 {
 	constexpr float humanRange = 9000.0f;
 	constexpr float botRange = 9000.0f;
@@ -116,7 +116,7 @@ void Bots::chooseLeader( GameEntity* ent, State& bot )
 		const unsigned int cat = availableVehicles[other->client_->vehicle_].cat;
 		if( cat & CAT_LQM )
 			continue;
-		const bool human = !isBot( i );
+		const bool human = !Bots::isBot( i );
 		const float dist = Distance( ent->r.currentOrigin, other->r.currentOrigin );
 		if( human )
 		{
@@ -124,7 +124,7 @@ void Bots::chooseLeader( GameEntity* ent, State& bot )
 			if( flyer != ((cat & (CAT_PLANE|CAT_HELO)) != 0) || dist > humanRange )
 				continue;
 		}
-		else if( !(cat & ownCat) || i > ent->s.number || states_[i].leader >= 0 || dist > botRange )
+		else if( !(cat & ownCat) || i > ent->s.number || Bots::states_[i].leader >= 0 || dist > botRange )
 			continue;
 		const float weighted = human ? dist * humanPreference : dist;
 		if( bot.leader < 0 || weighted < best )
@@ -137,13 +137,13 @@ void Bots::chooseLeader( GameEntity* ent, State& bot )
 
 // How much being shot by someone favours them as the next target: 0.4 turns on them readily, 1 ignores them.
 // Breaking off costs the work already put into the current target, so that is weighed against how badly the bot is hurt.
-float Bots::turnOnAttacker( GameEntity* ent, const State& bot, int attacker )
+float BotSenses::turnOnAttacker( GameEntity* ent, const Bots::State& bot, int attacker )
 {
 	constexpr float eager = 0.4f, closeFight = 1500.0f, nearlyDead = 0.4f;
 	GameEntity* current = bot.enemy >= 1 && bot.enemy <= theLevel.maxclients_ && bot.enemy != attacker ? theLevel.getEntity( bot.enemy ) : nullptr;
 	if( !current || !current->client_ || current->health_ <= 0 )
 		return eager;
-	const Character& who = character( bot );
+	const Bots::Character& who = Bots::character( bot );
 	const float mine = std::clamp( static_cast<float>( ent->health_ ) / std::max( 1, ent->client_->pers_.maxHealth_ ), 0.0f, 1.0f );
 	const float theirs = std::clamp( static_cast<float>( current->health_ ) / std::max( 1, current->client_->pers_.maxHealth_ ), 0.0f, 1.0f );
 	float invested = 0.0f;
@@ -151,7 +151,7 @@ float Bots::turnOnAttacker( GameEntity* ent, const State& bot, int attacker )
 		invested += 0.45f;
 	if( Distance( ent->r.currentOrigin, current->r.currentOrigin ) < closeFight )
 		invested += 0.25f;
-	if( bot.desire == Goal::Capture || (g_gametype.integer == GT_CTF && current->client_->ps_.objectives) )
+	if( bot.desire == Bots::Goal::Capture || (g_gametype.integer == GT_CTF && current->client_->ps_.objectives) )
 		invested += 0.3f;
 	invested += (who.patience - 0.5f) * 0.3f;
 	// the more hurt, the less it can afford to leave the attacker alone
@@ -161,7 +161,7 @@ float Bots::turnOnAttacker( GameEntity* ent, const State& bot, int attacker )
 
 // The enemy most worth fighting: the nearest, weighted by what this vehicle is good against, by who is shooting at
 // it, by the leader's target and by the flag. An enemy out of sight is fought from memory for a while.
-GameEntity* Bots::findEnemy( GameEntity* ent, State& bot, Role role )
+GameEntity* BotSenses::findEnemy( GameEntity* ent, Bots::State& bot, Bots::Role role )
 {
 	GameClient* client = ent->client_;
 	const completeVehicleData_t& veh = availableVehicles[client->vehicle_];
@@ -170,8 +170,8 @@ GameEntity* Bots::findEnemy( GameEntity* ent, State& bot, Role role )
 	const float radarRange = veh.radarRange > 0 ? static_cast<float>( veh.radarRange ) : 8000.0f;
 	const bool antiAir = BotWeapons::hasWeaponType( client->vehicle_, client->ps_, WT_ANTIAIRMISSILE );
 
-	GameEntity* leader = leaderOf( bot );
-	const int leaderTarget = leader ? targetOf( leader ) : -1;
+	GameEntity* leader = BotSenses::leaderOf( bot );
+	const int leaderTarget = leader ? BotSenses::targetOf( leader ) : -1;
 
 	GameEntity* best = nullptr;
 	float bestScore = 0;
@@ -190,7 +190,7 @@ GameEntity* Bots::findEnemy( GameEntity* ent, State& bot, Role role )
 			continue;
 
 		float dist = Distance( ent->r.currentOrigin, other->r.currentOrigin );
-		Seen& seen = bot.seen[i];
+		Bots::Seen& seen = bot.seen[i];
 		// being shot gives the shooter away: the bot knows roughly where its attacker is, seen or not
 		constexpr int grudgeTime = 8000;
 		const bool attackedBy = client->lasthurt_client_ == i && theLevel.time_ < bot.hitTime + grudgeTime;
@@ -209,7 +209,7 @@ GameEntity* Bots::findEnemy( GameEntity* ent, State& bot, Role role )
 		}
 		else
 		{
-			if( !seen.time || theLevel.time_ > seen.time + memoryTime( bot ) )
+			if( !seen.time || theLevel.time_ > seen.time + Bots::memoryTime( bot ) )
 				continue;
 			// remembered, not seen: counts as further away, and is forgotten once the bot gets there and finds nothing
 			dist = Distance( ent->r.currentOrigin, seen.position ) * 1.5f;
@@ -225,22 +225,22 @@ GameEntity* Bots::findEnemy( GameEntity* ent, State& bot, Role role )
 		float score = dist;
 		switch( role )
 		{
-		case Role::Fighter:
+		case Bots::Role::Fighter:
 			if( !air )
 				score *= 1.6f;
 			else if( (ov.cat & CAT_HELO) || (ov.cls & CLASS_PLANE_BOMBER) )
 				score *= 0.6f;
 			break;
-		case Role::Bomber:
+		case Bots::Role::Bomber:
 			if( air || (ov.cat & CAT_LQM) )
 				continue;
 			break;
-		case Role::AttackHelo:
-		case Role::TransportHelo:
+		case Bots::Role::AttackHelo:
+		case Bots::Role::TransportHelo:
 			if( air )
 				score *= (ov.cat & CAT_HELO) ? 1.2f : 3.0f;
 			break;
-		case Role::Tank:
+		case Bots::Role::Tank:
 			if( air && !antiAir )
 				continue;
 			if( air )
@@ -249,13 +249,13 @@ GameEntity* Bots::findEnemy( GameEntity* ent, State& bot, Role role )
 			else if( ov.cat & (CAT_PLANE|CAT_HELO) )
 				score *= 0.5f;
 			break;
-		case Role::AirDefence:
+		case Bots::Role::AirDefence:
 			if( !air )
 				score *= 2.0f;
 			break;
-		case Role::Boat:
+		case Bots::Role::Boat:
 			break;
-		case Role::Infantry:
+		case Bots::Role::Infantry:
 			if( dist > 1500 || air )
 				continue;
 			break;
@@ -265,7 +265,7 @@ GameEntity* Bots::findEnemy( GameEntity* ent, State& bot, Role role )
 			score *= 0.7f;
 		// whoever is shooting at it pulls hard, unless that means giving up a fight that is nearly won
 		if( attackedBy )
-			score *= turnOnAttacker( ent, bot, i );
+			score *= BotSenses::turnOnAttacker( ent, bot, i );
 		// fight what the leader is fighting
 		if( leaderTarget == i )
 			score *= 0.35f;
@@ -282,15 +282,15 @@ GameEntity* Bots::findEnemy( GameEntity* ent, State& bot, Role role )
 }
 
 // everything a bot knows this frame: its enemy and where to aim, its own state, missiles, aircraft about, and its goal
-void Bots::sense( GameEntity* ent, State& bot, Sense& out )
+void BotSenses::sense( GameEntity* ent, Bots::State& bot, Bots::Sense& out )
 {
 	if( theLevel.time_ >= bot.enemyTime )
 	{
-		GameEntity* enemy = findEnemy( ent, bot, roleOf( ent->client_->vehicle_ ) );
+		GameEntity* enemy = BotSenses::findEnemy( ent, bot, BotSenses::roleOf( ent->client_->vehicle_ ) );
 		bot.enemy = enemy ? enemy->s.number : -1;
 		// with no enemy of its own it takes its leader's
-		if( !enemy && bot.leader >= 1 && isBot( bot.leader ) && states_[bot.leader].enemy >= 0 )
-			bot.enemy = states_[bot.leader].enemy;
+		if( !enemy && bot.leader >= 1 && Bots::isBot( bot.leader ) && Bots::states_[bot.leader].enemy >= 0 )
+			bot.enemy = Bots::states_[bot.leader].enemy;
 		bot.enemyTime = theLevel.time_ + 700 + (rand() % 300);
 	}
 	if( bot.enemy >= 0 )
@@ -303,14 +303,14 @@ void Bots::sense( GameEntity* ent, State& bot, Sense& out )
 	}
 	if( out.enemy )
 	{
-		Seen& seen = bot.seen[out.enemy->s.number];
+		Bots::Seen& seen = bot.seen[out.enemy->s.number];
 		out.enemyVisible = BotWorld::visible( ent, ent->r.currentOrigin, out.enemy );
 		if( out.enemyVisible && seen.time )
 		{
 			VectorCopy( out.enemy->r.currentOrigin, seen.position );
 			seen.time = theLevel.time_;
 		}
-		else if( !seen.time || theLevel.time_ > seen.time + memoryTime( bot ) )
+		else if( !seen.time || theLevel.time_ > seen.time + Bots::memoryTime( bot ) )
 		{
 			out.enemy = nullptr;
 			bot.enemy = -1;
@@ -333,8 +333,8 @@ void Bots::sense( GameEntity* ent, State& bot, Sense& out )
 		// on where the fighter is than on the best side, it flies for that side and holds its fire; once there it
 		// goes in. Pilots with little cunning do not think of it
 		bool flanking = false;
-		if( roleOf( ent->client_->vehicle_ ) == Role::Fighter && (availableVehicles[out.enemy->client_->vehicle_].flags & VF_GUNSTATIONS) &&
-			out.enemyVisible && dist > 500 && character( bot ).cunning > 0.25f )
+		if( BotSenses::roleOf( ent->client_->vehicle_ ) == Bots::Role::Fighter && (availableVehicles[out.enemy->client_->vehicle_].flags & VF_GUNSTATIONS) &&
+			out.enemyVisible && dist > 500 && Bots::character( bot ).cunning > 0.25f )
 		{
 			const int theirs = out.enemy->client_->vehicle_;
 			const float* hull = out.enemy->client_->ps_.vehicleAngles;
@@ -370,13 +370,13 @@ void Bots::sense( GameEntity* ent, State& bot, Sense& out )
 			}
 		}
 		// a cunning fighter goes for the place behind and below an aircraft that is not hunting it
-		if( !flanking && roleOf( ent->client_->vehicle_ ) == Role::Fighter && (enemyCat & (CAT_PLANE|CAT_HELO)) && dist > 1200 && dist < 6000 &&
-			character( bot ).cunning > 0.5f && out.enemy->tracktarget_ != ent )
+		if( !flanking && BotSenses::roleOf( ent->client_->vehicle_ ) == Bots::Role::Fighter && (enemyCat & (CAT_PLANE|CAT_HELO)) && dist > 1200 && dist < 6000 &&
+			Bots::character( bot ).cunning > 0.5f && out.enemy->tracktarget_ != ent )
 		{
 			Vec3 behind;
 			AngleVectors( out.enemy->client_->ps_.vehicleAngles, behind, nullptr, nullptr );
 			target = target + behind * ( -700.0f );
-			target[2] -= 250.0f * character( bot ).cunning;
+			target[2] -= 250.0f * Bots::character( bot ).cunning;
 		}
 		VectorSubtract( target, ent->r.currentOrigin, out.enemyDir );
 		out.enemyDist = VectorNormalize( out.enemyDir );
@@ -397,7 +397,7 @@ void Bots::sense( GameEntity* ent, State& bot, Sense& out )
 
 	GameClient* client = ent->client_;
 	const playerState_t& ps = client->ps_;
-	out.role = roleOf( client->vehicle_ );
+	out.role = BotSenses::roleOf( client->vehicle_ );
 	out.health = std::clamp( static_cast<float>( ent->health_ ) / std::max( 1, client->pers_.maxHealth_ ), 0.0f, 1.0f );
 	out.locked = (ps.stats[STAT_LOCKINFO] & (LI_BEING_LOCKED|LI_BEING_LAUNCHED)) != 0;
 	out.launched = (ps.stats[STAT_LOCKINFO] & LI_BEING_LAUNCHED) != 0;
@@ -480,13 +480,13 @@ void Bots::sense( GameEntity* ent, State& bot, Sense& out )
 		if( Distance( ent->r.currentOrigin, other->r.currentOrigin ) < 5000 )
 			foes++;
 	}
-	out.duel = out.enemy && out.enemyAir && foes == 1 && (out.role == Role::Fighter || out.role == Role::AttackHelo);
+	out.duel = out.enemy && out.enemyAir && foes == 1 && (out.role == Bots::Role::Fighter || out.role == Bots::Role::AttackHelo);
 
 	// the goal is reviewed once a second, but a goal just taken is kept for a few seconds unless something forces the matter
-	if( theLevel.time_ >= bot.goalEvalTime && (theLevel.time_ >= bot.commitTime || out.launched || out.underFire || bot.desire == Goal::Roam) )
+	if( theLevel.time_ >= bot.goalEvalTime && (theLevel.time_ >= bot.commitTime || out.launched || out.underFire || bot.desire == Bots::Goal::Roam) )
 	{
-		const Goal previous = bot.desire;
-		bot.desire = chooseGoal( ent, bot, out );
+		const Bots::Goal previous = bot.desire;
+		bot.desire = Bots::chooseGoal( ent, bot, out );
 #ifdef MF_BOT_DEBUG
 		if( g_botDebug.integer >= 2 && bot.desire != previous )
 			Common::printf( "BOTGOAL t %d bot %d veh %d goal %d -> %d health %.2f enemy %d dist %.0f visible %d locked %d launched %d underfire %d blind %d threat %.0f\n",
@@ -495,6 +495,6 @@ void Bots::sense( GameEntity* ent, State& bot, Sense& out )
 #endif
 		bot.goalEvalTime = theLevel.time_ + 1000;
 		if( bot.desire != previous )
-			bot.commitTime = theLevel.time_ + 3000 + static_cast<int>( 3000 * character( bot ).patience );
+			bot.commitTime = theLevel.time_ + 3000 + static_cast<int>( 3000 * Bots::character( bot ).patience );
 	}
 }

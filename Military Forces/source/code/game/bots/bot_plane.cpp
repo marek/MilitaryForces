@@ -561,7 +561,7 @@ struct PlaneTasks
 
 	static Status wingman( Mind& c )
 	{
-		GameEntity* leader = Bots::leaderOf( c.bot );
+		GameEntity* leader = BotSenses::leaderOf( c.bot );
 		if( !leader )
 			return Status::Failure;
 		// off the leader's wing, on the side given by the client number so two wingmen take different sides
@@ -1112,7 +1112,7 @@ struct PlaneTasks
 			return true;
 		// a wingman left behind catches up with the leader
 		constexpr float farBehind = 4000.0f, farFromFight = 5000.0f;
-		if( const GameEntity* leader = Bots::leaderOf( c.bot ); leader && Distance( leader->r.currentOrigin, c.ent->r.currentOrigin ) > farBehind )
+		if( const GameEntity* leader = BotSenses::leaderOf( c.bot ); leader && Distance( leader->r.currentOrigin, c.ent->r.currentOrigin ) > farBehind )
 			return true;
 		// intercepting an enemy that is still far off; once near, the fight is flown at military power
 		return c.sense.enemy && c.bot.desire == Goal::Attack && c.sense.enemyDist > farFromFight;

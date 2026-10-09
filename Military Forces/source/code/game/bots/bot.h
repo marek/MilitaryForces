@@ -190,6 +190,7 @@ public:
 	friend struct InfantryTasks;
 	friend struct GoalScoring;
 	friend class BotWeapons;
+	friend class BotSenses;
 
 private:
 	// one bot's frame, and the pilot or driver for the kind of vehicle it is in
@@ -201,14 +202,8 @@ private:
 	static void thinkRider( GameEntity* ent, State& bot, usercmd_t& cmd, vec3_t view );
 
 	// senses, weapons, world knowledge and vehicle choice; each is described where it is defined
-	static GameEntity* findEnemy( GameEntity* ent, State& bot, Role role );
-	static void chooseLeader( GameEntity* ent, State& bot );
-	static GameEntity* leaderOf( const State& bot );
-	static int targetOf( GameEntity* leader );
-	static Role roleOf( int vehicle );
 	static Goal chooseGoal( GameEntity* ent, State& bot, const Sense& sense );
 	static const Character& character( const State& bot );
-	static float turnOnAttacker( GameEntity* ent, const State& bot, int attacker );
 	static float skill( const State& bot );
 	static int memoryTime( const State& bot );
 	static bool findHidePoint( GameEntity* ent, State& bot, GameEntity* threat, bool hullDown = false );
@@ -217,11 +212,8 @@ private:
 	static bool replenished( GameEntity* ent );
 	static void finishRearm( GameEntity* ent, State& bot );
 	static bool runwayBusy( int padIndex, GameEntity* self );
-	static GameEntity* walkerNear( GameEntity* ent, State& bot, float range );
-	static int ridersOf( GameEntity* ent );
 	static bool teamHasSupplier( int team, GameEntity* except = nullptr );
 	static bool turnClear( GameEntity* ent, float radius, float degrees, float climb = 0 );
-	static void sense( GameEntity* ent, State& bot, Sense& out );
 	static void logDeath( GameEntity* self, GameEntity* attacker, int meansOfDeath );
 	static void logState( GameEntity* ent, State& bot, const usercmd_t& cmd, const vec3_t view );
 	static void pickGoal( GameEntity* ent, State& bot, float radius );
@@ -298,6 +290,22 @@ public:
 	static int findWeaponSlot( int vehicle, const playerState_t& ps, bool air, float dist, bool& guided );
 	static bool outOfAmmo( int vehicle, const playerState_t& ps );
 	static void setRadar( GameEntity* ent, Bots::State& bot, bool air );
+};
+
+// What a bot perceives: what its vehicle is for, who is worth fighting and where they were last seen, who leads it,
+// who rides with it or wants a lift, and the frame's summary of all that. Keeps what it learns in the bot's state.
+class BotSenses
+{
+public:
+	static GameEntity* findEnemy( GameEntity* ent, Bots::State& bot, Bots::Role role );
+	static void chooseLeader( GameEntity* ent, Bots::State& bot );
+	static GameEntity* leaderOf( const Bots::State& bot );
+	static int targetOf( GameEntity* leader );
+	static Bots::Role roleOf( int vehicle );
+	static float turnOnAttacker( GameEntity* ent, const Bots::State& bot, int attacker );
+	static GameEntity* walkerNear( GameEntity* ent, Bots::State& bot, float range );
+	static int ridersOf( GameEntity* ent );
+	static void sense( GameEntity* ent, Bots::State& bot, Bots::Sense& out );
 };
 
 #endif

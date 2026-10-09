@@ -443,7 +443,7 @@ void Bots::think( GameEntity* ent, State& bot, usercmd_t& cmd )
 				humanOnTeam = true;
 		}
 		// tanks and helicopters hunt in packs for safety: about two lives in five; planes about one in five
-		const Role role = roleOf( client->vehicle_ );
+		const Role role = BotSenses::roleOf( client->vehicle_ );
 		const bool packHunter = role == Role::Tank || role == Role::AirDefence || role == Role::AttackHelo || role == Role::TransportHelo;
 		const float keenness = (packHunter ? 0.68f : 0.35f) + (humanOnTeam ? 0.3f : 0.0f);
 		bot.teamPlayer = random() < keenness * character( bot ).teamwork;
@@ -535,9 +535,9 @@ void Bots::think( GameEntity* ent, State& bot, usercmd_t& cmd )
 	else
 	{
 		if( theLevel.time_ >= bot.leaderTime )
-			chooseLeader( ent, bot );
+			BotSenses::chooseLeader( ent, bot );
 		Sense s;
-		sense( ent, bot, s );
+		BotSenses::sense( ent, bot, s );
 		const unsigned int cat = availableVehicles[client->vehicle_].cat;
 		if( cat & CAT_PLANE )
 			thinkPlane( ent, bot, s, cmd, view );
