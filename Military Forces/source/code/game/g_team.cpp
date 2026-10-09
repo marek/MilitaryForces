@@ -6,6 +6,7 @@
 //
 
 #include "g_local.h"
+#include <algorithm>
 #include "g_entity.h"
 #include "g_level.h"
 
@@ -715,23 +716,33 @@ static GameEntity *SelectRandomTeamSpawnPoint( int teamstate, ClientBase::eTeam 
 	count = 0;
 
 	spot = nullptr;
+	// points of this vehicle's kind that are taken at the moment, for when none is free
+	GameEntity	*taken[MAX_TEAM_SPAWN_POINTS];
+	int			takenCount = 0;
 
 	while ((spot = Game::find (spot, FOFS(classname_), classname)) != nullptr) 
 	{
-		if ( SpotWouldTelefrag( spot ) ) 
-			continue;
-
 		// check for category on this spawn point
 		if( !(spot->ent_category_ & availableVehicles[idx].cat) ) 
 			continue;
+
+		if ( SpotWouldTelefrag( spot ) ) 
+		{
+			if( takenCount < MAX_TEAM_SPAWN_POINTS )
+				taken[ takenCount++ ] = spot;
+			continue;
+		}
 
 		spots[ count ] = spot;
 		if (++count == MAX_TEAM_SPAWN_POINTS)
 			break;
 	}
 
-	if ( !count ) 	// no spots that won't telefrag
-		return Game::find( nullptr, FOFS(classname_), classname);
+	// every point of its kind is taken: still one of its kind, never a point meant for another kind of vehicle
+	// (a plane put on a helicopter pad is not on a runway and does not live). Only a map with no point of the
+	// kind at all falls back to any
+	if ( !count ) 
+		return takenCount ? taken[ rand() % takenCount ] : Game::find( nullptr, FOFS(classname_), classname);
 
 	selection = rand() % count;
 	return spots[ selection ];
@@ -757,6 +768,19 @@ GameEntity *SelectCTFSpawnPoint ( ClientBase::eTeam team, int teamstate, vec3_t 
 	VectorCopy (spot->s.origin, origin);
 	origin[2] += 9;
 	VectorCopy (spot->s.angles, angles);
+
+	// the point is taken (all of this kind were): an aircraft starts in the air above it instead of inside whoever
+	// is parked there, as high as the sky allows up to a comfortable height
+	if( (availableVehicles[idx].cat & (CAT_PLANE|CAT_HELO)) && SpotWouldTelefrag( spot ) )
+	{
+		constexpr float airStart = 1200.0f, headroom = 200.0f;
+		Vec3 top;
+		trace_t tr;
+		VectorCopy( origin, top );
+		top[2] += airStart + headroom;
+		GameHost::trace( &tr, origin, nullptr, nullptr, top, ENTITYNUM_NONE, MASK_SOLID, false );
+		origin[2] += std::max( 0.0f, tr.fraction * (airStart + headroom) - headroom );
+	}
 
 	return spot;
 }
