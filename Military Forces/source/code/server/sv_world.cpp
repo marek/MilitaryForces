@@ -636,8 +636,12 @@ Moves the given mins/maxs volume through the world from start to end.
 passEntityNum and entities owned by passEntityNum are explicitly not checked.
 ==================
 */
+// how many traces the game has asked for since the server started, for the trace benchmark's rate
+long long gameTraceCount = 0;
+
 void GameHost::trace( trace_t *results, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int passEntityNum, int contentmask, bool capsule ) 
 {
+	gameTraceCount++;
 	moveclip_t	clip;
 	int			i;
 

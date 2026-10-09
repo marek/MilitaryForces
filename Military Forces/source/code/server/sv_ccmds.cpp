@@ -449,6 +449,17 @@ void ServerMain::traceBench_f()
 		Common::printf( "No map loaded.\n" );
 		return;
 	}
+	// what the game itself has been asking for, before the benchmark adds its own
+	{
+		extern long long gameTraceCount;
+		static long long lastCount = 0;
+		static int lastTime = 0;
+		const int now = System::milliseconds();
+		if( lastTime && now > lastTime )
+			Common::printf( "TRACEBENCH game traces: %.0f a second over the last %.1f s\n", (gameTraceCount - lastCount) * 1000.0 / (now - lastTime), (now - lastTime) / 1000.0 );
+		lastCount = gameTraceCount;
+		lastTime = now;
+	}
 	const int count = CommandSystem::argc() > 1 ? atoi( CommandSystem::argv( 1 ) ) : 20000;
 	vec3_t worldMins, worldMaxs;
 	CollisionModel::modelBounds( 0, worldMins, worldMaxs );
@@ -456,8 +467,11 @@ void ServerMain::traceBench_f()
 	const auto next = [&seed]() { seed = seed * 1664525u + 1013904223u; return (seed >> 8) / 16777216.0f; };
 	struct Kind { const char* name; float halfWidth; float length; };
 	const Kind kinds[] = { { "point 900", 0.0f, 900.0f }, { "box60 900", 60.0f, 900.0f }, { "box28 160", 28.0f, 160.0f }, { "box60 place", 60.0f, 0.0f } };
+	// each kind twice: against the map alone, and as the game asks for it, against the map and every entity
+	for( const bool withEntities : { false, true } )
 	for( const Kind& kind : kinds )
 	{
+		seed = 12345;
 		double checksum = 0, distances = 0;
 		int solid = 0;
 		int hits = 0;
@@ -474,7 +488,10 @@ void ServerMain::traceBench_f()
 			VectorMA( start, kind.length, dir, end );
 			vec3_t mins = { -kind.halfWidth, -kind.halfWidth, -kind.halfWidth * 0.4f }, maxs = { kind.halfWidth, kind.halfWidth, kind.halfWidth * 0.4f };
 			trace_t tr;
-			CollisionModel::boxTrace( &tr, start, end, mins, maxs, 0, MASK_PLAYERSOLID, false );
+			if( withEntities )
+				GameHost::trace( &tr, start, mins, maxs, end, ENTITYNUM_NONE, MASK_PLAYERSOLID, false );
+			else
+				CollisionModel::boxTrace( &tr, start, end, mins, maxs, 0, MASK_PLAYERSOLID, false );
 			checksum += tr.fraction + (tr.startsolid ? 2.0 : 0.0) + tr.plane.normal[2] * 0.25;
 			distances += tr.fraction;
 			if( tr.startsolid )
@@ -483,7 +500,7 @@ void ServerMain::traceBench_f()
 				hits++;
 		}
 		const int elapsed = System::milliseconds() - startTime;
-		Common::printf( "TRACEBENCH %s: %d traces %d ms (%.2f us each) hits %d startsolid %d fractions %.6f checksum %.6f\n", kind.name, count, elapsed, elapsed * 1000.0 / count, hits, solid, distances, checksum );
+		Common::printf( "TRACEBENCH %s %s: %d traces %d ms (%.2f us each) hits %d startsolid %d fractions %.6f checksum %.6f\n", withEntities ? "with entities" : "map only", kind.name, count, elapsed, elapsed * 1000.0 / count, hits, solid, distances, checksum );
 	}
 }
 
