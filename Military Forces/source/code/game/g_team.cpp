@@ -679,6 +679,21 @@ bool Team_GetLocationMsg(GameEntity *ent, char *loc, int loclen)
 
 /*---------------------------------------------------------------------------*/
 
+// how far up from a spawn point an aircraft can be put for an air start: up to a comfortable height, less under a
+// low sky or a roof, keeping clear of whatever is overhead
+static float SkyAboveSpawn( const vec3_t point )
+{
+	constexpr float airStart = 1200.0f, headroom = 200.0f;
+	Vec3 from, top;
+	trace_t tr;
+	VectorCopy( point, from );
+	from[2] += 9;
+	top = from;
+	top[2] += airStart + headroom;
+	GameHost::trace( &tr, from, nullptr, nullptr, top, ENTITYNUM_NONE, MASK_SOLID, false );
+	return std::max( 0.0f, tr.fraction * (airStart + headroom) - headroom );
+}
+
 /*
 ================
 SelectRandomDeathmatchSpawnPoint
@@ -742,7 +757,28 @@ static GameEntity *SelectRandomTeamSpawnPoint( int teamstate, ClientBase::eTeam 
 	// (a plane put on a helicopter pad is not on a runway and does not live). Only a map with no point of the
 	// kind at all falls back to any
 	if ( !count ) 
-		return takenCount ? taken[ rand() % takenCount ] : Game::find( nullptr, FOFS(classname_), classname);
+	{
+		if( !takenCount )
+			return Game::find( nullptr, FOFS(classname_), classname);
+		// a plane will start in the air above the point: the one with the most open sky over it. A helicopter
+		// hovers and finds its own way out from under a roof, so any of its points will do
+		if( availableVehicles[idx].cat & CAT_PLANE )
+		{
+			GameEntity* best = taken[0];
+			float bestSky = -1.0f;
+			for( int i = 0; i < takenCount; i++ )
+			{
+				const float sky = SkyAboveSpawn( taken[i]->s.origin );
+				if( sky > bestSky )
+				{
+					bestSky = sky;
+					best = taken[i];
+				}
+			}
+			return best;
+		}
+		return taken[ rand() % takenCount ];
+	}
 
 	selection = rand() % count;
 	return spots[ selection ];
@@ -773,13 +809,10 @@ GameEntity *SelectCTFSpawnPoint ( ClientBase::eTeam team, int teamstate, vec3_t 
 	// is parked there, as high as the sky allows up to a comfortable height
 	if( (availableVehicles[idx].cat & (CAT_PLANE|CAT_HELO)) && SpotWouldTelefrag( spot ) )
 	{
-		constexpr float airStart = 1200.0f, headroom = 200.0f;
-		Vec3 top;
-		trace_t tr;
-		VectorCopy( origin, top );
-		top[2] += airStart + headroom;
-		GameHost::trace( &tr, origin, nullptr, nullptr, top, ENTITYNUM_NONE, MASK_SOLID, false );
-		origin[2] += std::max( 0.0f, tr.fraction * (airStart + headroom) - headroom );
+		// a plane needs height to fly away with; a helicopter only has to clear whoever is parked below it
+		constexpr float hoverAbove = 250.0f;
+		const float sky = SkyAboveSpawn( origin );
+		origin[2] += (availableVehicles[idx].cat & CAT_PLANE) ? sky : std::min( sky, hoverAbove );
 	}
 
 	return spot;
