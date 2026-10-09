@@ -1317,7 +1317,7 @@ void fire_ironbomb( GameEntity *self )
 
 
 // one bullet of the vehicle's gun leaving a muzzle
-static void spawnBullet( GameEntity *self, int weapIdx, const Vec3& from, const Vec3& dir )
+static void spawnBullet( GameEntity *self, int weapIdx, const Vec3& from, const Vec3& dir, float damageScale = 1.0f )
 {
 	Vec3 start = from;
 	SnapVector( start );
@@ -1330,7 +1330,7 @@ static void spawnBullet( GameEntity *self, int weapIdx, const Vec3& from, const 
 	bolt->s.weaponIndex = weapIdx;
 	bolt->r.ownerNum = self->s.number;
 	bolt->parent_ = self;
-	bolt->damage_ = availableWeapons[weapIdx].damage;
+	bolt->damage_ = std::max( 1, static_cast<int>( availableWeapons[weapIdx].damage * damageScale + 0.5f ) );
 	bolt->targetcat_ = availableWeapons[weapIdx].category;
 	bolt->catmodifier_ = availableWeapons[weapIdx].noncatmod;
 	bolt->methodOfDeath_ = MOD_AUTOCANNON;
@@ -1386,7 +1386,11 @@ void fire_autocannon( GameEntity *self, bool main )
 			{
 				VectorCopy( self->s.pos.trBase, start );
 				start = start + forward * station.forward + right * ( station.right + ( self->bulletpos_ ? station.barrelSpacing : -station.barrelSpacing ) ) + up * station.up;
-				spawnBullet( self, weapIdx, start, dir );
+				// A turret's rounds do a little less than the weapon's listed damage. Aircraft have one pool of
+				// health, not parts that can be hit or missed, so several turrets on one target add up faster
+				// than they did in life
+				constexpr float turretDamage = 0.8f;
+				spawnBullet( self, weapIdx, start, dir, turretDamage );
 			}
 			bit <<= 1;
 		}
