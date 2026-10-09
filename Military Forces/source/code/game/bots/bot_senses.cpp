@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <cmath>
 
+// what a vehicle is for, which decides whom it fights
 Bots::Role Bots::roleOf( int vehicle )
 {
 	const completeVehicleData_t& veh = availableVehicles[vehicle];
@@ -19,6 +20,7 @@ Bots::Role Bots::roleOf( int vehicle )
 	return Role::Infantry;
 }
 
+// how many players ride in this bot's vehicle
 int Bots::ridersOf( GameEntity* ent )
 {
 	int riders = 0;
@@ -76,6 +78,7 @@ GameEntity* Bots::walkerNear( GameEntity* ent, State& bot, float range )
 	return walker;
 }
 
+// the leader this bot follows, while that leader lives
 GameEntity* Bots::leaderOf( const State& bot )
 {
 	GameEntity* leader = bot.leader >= 0 ? theLevel.getEntity( bot.leader ) : nullptr;
@@ -155,6 +158,8 @@ float Bots::turnOnAttacker( GameEntity* ent, const State& bot, int attacker )
 	return eager + (1.0f - eager) * std::clamp( invested - danger, 0.0f, 1.0f );
 }
 
+// The enemy most worth fighting: the nearest, weighted by what this vehicle is good against, by who is shooting at
+// it, by the leader's target and by the flag. An enemy out of sight is fought from memory for a while.
 GameEntity* Bots::findEnemy( GameEntity* ent, State& bot, Role role )
 {
 	GameClient* client = ent->client_;
@@ -179,6 +184,7 @@ GameEntity* Bots::findEnemy( GameEntity* ent, State& bot, Role role )
 			continue;
 		if( g_gametype.integer >= GT_TEAM && OnSameTeam( ent, other ) )
 			continue;
+		// a stolen vehicle still in our paint passes as one of ours until it gives itself away
 		if( g_gametype.integer >= GT_TEAM && oc->sess_.paintTeam_ == client->sess_.sessionTeam_ && !oc->ruseBlown_ )
 			continue;
 
@@ -204,6 +210,7 @@ GameEntity* Bots::findEnemy( GameEntity* ent, State& bot, Role role )
 		{
 			if( !seen.time || theLevel.time_ > seen.time + memoryTime( bot ) )
 				continue;
+			// remembered, not seen: counts as further away, and is forgotten once the bot gets there and finds nothing
 			dist = Distance( ent->r.currentOrigin, seen.position ) * 1.5f;
 			if( dist < 300 )
 			{
@@ -252,6 +259,7 @@ GameEntity* Bots::findEnemy( GameEntity* ent, State& bot, Role role )
 				continue;
 			break;
 		}
+		// stay with the current target unless another is clearly better
 		if( i == bot.enemy )
 			score *= 0.7f;
 		// whoever is shooting at it pulls hard, unless that means giving up a fight that is nearly won
@@ -260,6 +268,7 @@ GameEntity* Bots::findEnemy( GameEntity* ent, State& bot, Role role )
 		// fight what the leader is fighting
 		if( leaderTarget == i )
 			score *= 0.35f;
+		// whoever carries our flag comes before everyone
 		if( g_gametype.integer == GT_CTF && (oc->ps_.objectives & (client->sess_.sessionTeam_ == ClientBase::TEAM_RED ? OB_REDFLAG : OB_BLUEFLAG)) )
 			score *= 0.15f;
 		if( !best || score < bestScore )
@@ -271,12 +280,14 @@ GameEntity* Bots::findEnemy( GameEntity* ent, State& bot, Role role )
 	return best;
 }
 
+// everything a bot knows this frame: its enemy and where to aim, its own state, missiles, aircraft about, and its goal
 void Bots::sense( GameEntity* ent, State& bot, Sense& out )
 {
 	if( theLevel.time_ >= bot.enemyTime )
 	{
 		GameEntity* enemy = findEnemy( ent, bot, roleOf( ent->client_->vehicle_ ) );
 		bot.enemy = enemy ? enemy->s.number : -1;
+		// with no enemy of its own it takes its leader's
 		if( !enemy && bot.leader >= 1 && isBot( bot.leader ) && states_[bot.leader].enemy >= 0 )
 			bot.enemy = states_[bot.leader].enemy;
 		bot.enemyTime = theLevel.time_ + 700 + (rand() % 300);
@@ -310,11 +321,13 @@ void Bots::sense( GameEntity* ent, State& bot, Sense& out )
 		Vec3 target;
 		VectorCopy( out.enemyVisible ? out.enemy->r.currentOrigin : bot.seen[out.enemy->s.number].position, target );
 		const float dist = Distance( ent->r.currentOrigin, target );
+		// aim ahead of a moving enemy by the flight time of the gun's shot
 		const int weapon = availableVehicles[ent->client_->vehicle_].weapons[0];
 		const float shotSpeed = weapon && availableWeapons[weapon].muzzleVelocity > 0 ? static_cast<float>( availableWeapons[weapon].muzzleVelocity ) : 2500.0f;
 		if( out.enemyVisible )
 			VectorMA( target, std::min( dist / shotSpeed, 1.5f ), out.enemy->client_->ps_.velocity, target );
 		const unsigned int enemyCat = availableVehicles[out.enemy->client_->vehicle_].cat;
+		// a cunning fighter goes for the place behind and below an aircraft that is not hunting it
 		if( roleOf( ent->client_->vehicle_ ) == Role::Fighter && (enemyCat & (CAT_PLANE|CAT_HELO)) && dist > 1200 && dist < 6000 &&
 			character( bot ).cunning > 0.5f && out.enemy->tracktarget_ != ent )
 		{
@@ -331,6 +344,7 @@ void Bots::sense( GameEntity* ent, State& bot, Sense& out )
 			!(out.enemy->client_->ps_.ONOFF & OO_LANDED);
 	}
 	out.height = heightAboveGround( ent->r.currentOrigin, ent->s.number );
+	// where it was over the last six seconds, for the crash record
 	if( theLevel.time_ >= bot.trailTime )
 	{
 		for( int i = 5; i > 0; i-- )
@@ -348,6 +362,7 @@ void Bots::sense( GameEntity* ent, State& bot, Sense& out )
 	out.stealth = (availableVehicles[client->vehicle_].flags & VF_STEALTH) != 0;
 	out.revealed = ps.timers[TIMER_REVEAL] > theLevel.time_;
 
+	// hit: remember when, and which way to break if this is the first hit in a while
 	if( ent->health_ < bot.lastHealth - 2 )
 	{
 		if( theLevel.time_ > bot.hitTime + 4000 )
@@ -358,6 +373,7 @@ void Bots::sense( GameEntity* ent, State& bot, Sense& out )
 	out.underFire = bot.hitTime && theLevel.time_ < bot.hitTime + 2500;
 	if( out.underFire )
 	{
+		// blindsided: shot at by someone it is not looking towards
 		bool seen = false;
 		if( out.enemy && out.enemyVisible )
 		{
@@ -368,6 +384,7 @@ void Bots::sense( GameEntity* ent, State& bot, Sense& out )
 		out.blindsided = !seen;
 	}
 
+	// the missile that will arrive first
 	if( out.launched )
 	{
 		for( int i = MAX_CLIENTS + 1; i < theLevel.num_entities_; i++ )
@@ -391,6 +408,7 @@ void Bots::sense( GameEntity* ent, State& bot, Sense& out )
 		}
 	}
 
+	// the nearest enemy aircraft in the air: what surface vehicles hide from
 	for( int i = 1; i <= theLevel.maxclients_; i++ )
 	{
 		GameEntity* other = theLevel.getEntity( i );
@@ -408,6 +426,7 @@ void Bots::sense( GameEntity* ent, State& bot, Sense& out )
 		}
 	}
 
+	// one enemy aircraft and nobody else near is a duel
 	int foes = 0;
 	for( int i = 1; i <= theLevel.maxclients_; i++ )
 	{
@@ -421,6 +440,7 @@ void Bots::sense( GameEntity* ent, State& bot, Sense& out )
 	}
 	out.duel = out.enemy && out.enemyAir && foes == 1 && (out.role == Role::Fighter || out.role == Role::AttackHelo);
 
+	// the goal is reviewed once a second, but a goal just taken is kept for a few seconds unless something forces the matter
 	if( theLevel.time_ >= bot.goalEvalTime && (theLevel.time_ >= bot.commitTime || out.launched || out.underFire || bot.desire == Goal::Roam) )
 	{
 		const Goal previous = bot.desire;

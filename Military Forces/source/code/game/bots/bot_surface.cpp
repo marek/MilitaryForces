@@ -2,6 +2,7 @@
 
 using behavior::Status;
 
+// What a driver or a boat's helmsman does: the conditions and the steps of the surface behaviour tree
 struct SurfaceTasks
 {
 	using Mind = Bots::Mind;
@@ -10,6 +11,7 @@ struct SurfaceTasks
 	static bool groundEnemy( const Mind& c ) { return c.sense.enemy && !c.sense.enemyAir; }
 
 	static bool hidingFromAircraft( Mind& c ) { return c.bot.desire == Goal::Hide && c.sense.airThreat; }
+	// a cautious gunner at middle range fights from behind a rise instead of in the open
 	static bool wantsHullDown( Mind& c )
 	{
 		return c.bot.desire == Goal::Attack && groundEnemy( c ) && !c.boat && c.sense.enemyDist > 900 && c.sense.enemyDist < 4500 && c.who().caution > 0.5f;
@@ -21,6 +23,8 @@ struct SurfaceTasks
 	static bool hasEnemy( Mind& c ) { return c.sense.enemy != nullptr; }
 	static bool hasLeader( Mind& c ) { return c.bot.leader >= 0 && c.bot.desire != Goal::Capture; }
 
+	// is there water under the point that far along the hull's line (negative: behind)? drop is set when the ground
+	// there is missing or falls away too steeply to drive down
 	static bool waterAt( const Mind& c, const vec3_t forward, float reach, bool& drop )
 	{
 		Vec3 ahead, below;
@@ -34,6 +38,7 @@ struct SurfaceTasks
 		return water.fraction < 1.0f && (water.contents & MASK_WATER);
 	}
 
+	// backing out of trouble must not end in the water
 	static bool waterBehind( Mind& c )
 	{
 		if( c.boat || !reversing( c ) )
@@ -44,11 +49,13 @@ struct SurfaceTasks
 		return waterAt( c, forward, -200.0f, drop );
 	}
 
+	// stop once the place steered for is this close
 	static void holdNear( Mind& c, float radius )
 	{
 		c.hold = fabs( c.course[0] ) + fabs( c.course[1] ) < radius;
 	}
 
+	// a spot out of the aircraft's sight, looked for again every few seconds
 	static Status driveToCover( Mind& c )
 	{
 		if( !c.bot.hasHide || theLevel.time_ > c.bot.hideTime )
@@ -63,12 +70,14 @@ struct SurfaceTasks
 		return Status::Running;
 	}
 
+	// no cover known: straight away from it
 	static Status runFromAircraft( Mind& c )
 	{
 		VectorSubtract( c.ent->r.currentOrigin, c.sense.airThreat->r.currentOrigin, c.course );
 		return Status::Running;
 	}
 
+	// a spot from which only the turret shows to the enemy
 	static Status hullDown( Mind& c )
 	{
 		if( theLevel.time_ > c.bot.hideTime )
@@ -83,6 +92,7 @@ struct SurfaceTasks
 		return Status::Running;
 	}
 
+	// onto the pad and wait there until full
 	static Status driveToPad( Mind& c )
 	{
 		c.courseTo( Bots::pads_[c.bot.pad].spot );
@@ -116,6 +126,7 @@ struct SurfaceTasks
 		return Status::Running;
 	}
 
+	// straight away from the enemy
 	static Status withdraw( Mind& c )
 	{
 		c.bot.hasHide = false;
@@ -123,6 +134,7 @@ struct SurfaceTasks
 		return Status::Running;
 	}
 
+	// close to gun range and stop there to shoot
 	static Status engage( Mind& c )
 	{
 		c.bot.hasHide = false;
@@ -224,6 +236,7 @@ struct SurfaceTasks
 		return Status::Running;
 	}
 
+	// nothing else to do: on to the roaming or capture goal
 	static Status driveToGoal( Mind& c )
 	{
 		c.bot.hasHide = false;
@@ -237,12 +250,14 @@ struct SurfaceTasks
 		return Status::Success;
 	}
 
+	// turn the wished course into one that follows the ground path round obstacles
 	static Status navigate( Mind& c )
 	{
 		c.followGround( c.boat, 220.0f );
 		return Status::Success;
 	}
 
+	// a wall, water, a drop, shore for a boat, or no progress for a while: back out and try another way
 	static Status watchAhead( Mind& c )
 	{
 		Bots::State& bot = c.bot;
@@ -251,6 +266,7 @@ struct SurfaceTasks
 		AngleVectors( flat, forward, nullptr, nullptr );
 		VectorCopy( c.ent->r.currentOrigin, start );
 		start[2] += c.veh.maxs[2] * 0.5f + 8;
+		// a slope gentle enough to drive up is not an obstacle
 		c.blocked = Bots::pathBlocked( start, forward, 260, c.ent->s.number, tr ) && tr.plane.normal[2] < 0.6f;
 		if( !c.boat && !c.blocked )
 		{
@@ -261,6 +277,7 @@ struct SurfaceTasks
 					c.blocked = true;
 			}
 		}
+		// a boat stays where there is water under the bow
 		if( c.boat && !c.blocked )
 		{
 			Vec3 ahead;
@@ -269,6 +286,7 @@ struct SurfaceTasks
 			if( !(GameHost::pointContents( ahead, c.ent->s.number ) & MASK_WATER) )
 				c.blocked = true;
 		}
+		// stuck: meant to be moving and has not covered 40 units since the last check
 		if( theLevel.time_ > bot.stuckCheckTime )
 		{
 			if( !c.hold && theLevel.time_ > bot.spawnTime + 4000 && theLevel.time_ > bot.reverseTime + 2000 &&
@@ -288,6 +306,7 @@ struct SurfaceTasks
 		return Status::Success;
 	}
 
+	// water behind: forward again if the way is open, turning as it was while backing
 	static Status creepForward( Mind& c )
 	{
 		c.cmd.forwardmove = c.blocked ? moveNone : moveFull;
@@ -302,6 +321,7 @@ struct SurfaceTasks
 		return Status::Running;
 	}
 
+	// turn the hull onto the course; drive unless holding
 	static Status steer( Mind& c )
 	{
 		Vec3 angles;
@@ -317,6 +337,7 @@ struct SurfaceTasks
 		return Status::Running;
 	}
 
+	// lay the gun on the enemy; a shell is led by the target's movement and raised for its drop
 	static Status gunnery( Mind& c )
 	{
 		c.view[YAW] = c.sense.enemyAngles[YAW];
@@ -332,6 +353,7 @@ struct SurfaceTasks
 			dirAim = aim - c.ent->r.currentOrigin;
 			const float range = VectorLength( dirAim );
 			vectoangles( dirAim, aimAngles );
+			// the elevation that carries a shell of this speed that far
 			const float arc = 0.5f * asin( std::clamp( DEFAULT_GRAVITY * range / (shell * shell), 0.0f, 1.0f ) ) * 180.0f / std::numbers::pi_v<float>;
 			c.view[YAW] = aimAngles[YAW];
 			c.view[PITCH] = std::clamp( AngleSubtract( aimAngles[PITCH], 0 ) - arc, -60.0f, 20.0f );
@@ -384,6 +406,7 @@ void Bots::thinkSurface( GameEntity* ent, State& bot, const Sense& sense, usercm
 	Mind mind{ ent, client, bot, sense, cmd, view, ps, availableVehicles[client->vehicle_], static_cast<float>( ps.speed ) / 10.0f };
 	mind.boat = (mind.veh.cat & CAT_BOAT) != 0;
 
+	// a new place to roam to when the old one is reached or has gone stale
 	if( bot.desire != Goal::Capture && (theLevel.time_ > bot.goalTime || Distance( ent->r.currentOrigin, bot.goal ) < 400 ) )
 		pickGoal( ent, bot, mind.boat ? 6000 : 4000 );
 	view[YAW] = ps.vehicleAngles[YAW];
