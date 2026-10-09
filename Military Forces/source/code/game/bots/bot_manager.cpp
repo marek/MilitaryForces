@@ -486,8 +486,18 @@ void Bots::think( GameEntity* ent, State& bot, usercmd_t& cmd )
 		}
 	}
 
-	// bots cannot yet be relied on to land for fuel everywhere, so their tank never drops below a quarter
-	if( ps.stats[STAT_FUEL] < ps.stats[STAT_MAX_FUEL] / 4 )
+	// A bot that can reach a pad lands for fuel as a player would. One that cannot refuel on this map at all —
+	// an aircraft with no pad it can use, a ground vehicle or boat with nobody flying supplies — keeps a quarter
+	// tank, since stopping dead for good would only take it out of the game.
+	constexpr int padCheckInterval = 2000;
+	const unsigned int ownCat = availableVehicles[client->vehicle_].cat;
+	if( theLevel.time_ >= bot.padCheckTime )
+	{
+		bot.padCheckTime = theLevel.time_ + padCheckInterval;
+		bot.canLand = (ownCat & (CAT_PLANE|CAT_HELO)) && g_botLanding.integer && theLevel.time_ >= bot.landGiveUp &&
+			findPad( ent, theLevel.time_ < bot.badPadTime ? bot.badPad : -1 ) >= 0;
+	}
+	if( !bot.canLand && bot.pad < 0 && ps.stats[STAT_FUEL] < ps.stats[STAT_MAX_FUEL] / 4 )
 		ps.stats[STAT_FUEL] = ps.stats[STAT_MAX_FUEL] / 4;
 
 	if( client->sess_.ridingClient_ >= 0 )

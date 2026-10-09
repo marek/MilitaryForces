@@ -127,7 +127,9 @@ public:
 		float	landOffset = 45;
 		float	approachHeight = 0;
 		int		gearTime = 0;
-		int		turretTime = 0;		// start of the current turret burst, or of the pause after it
+		int		turretTime = 0;
+		int		padCheckTime = 0;	// when to look again for a pad this bot can land on
+		bool	canLand = false;		// start of the current turret burst, or of the pause after it
 		int		landStart = 0;
 		int		landGiveUp = 0;
 		int		probeTime = 0;

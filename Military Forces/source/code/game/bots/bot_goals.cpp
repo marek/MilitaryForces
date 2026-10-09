@@ -121,16 +121,20 @@ struct GoalScoring
 			return 0.0f;
 		if( plane( s ) && (!g_botLanding.integer || theLevel.time_ < s.bot.landGiveUp) )
 			return 0.0f;
+		// fuel is the need that cannot wait: it grows as the tank empties, and below a fifth no fight outweighs it
+		constexpr float fuelWanted = 0.45f, fuelUrgent = 0.25f, fuelPull = 8.0f;
+		const float fuel = static_cast<float>( s.ps.stats[STAT_FUEL] ) / std::max( 1, s.ps.stats[STAT_MAX_FUEL] );
 		float need = 0.0f;
-		if( s.ps.stats[STAT_FUEL] < s.ps.stats[STAT_MAX_FUEL] * 0.35f )
-			need = 1.0f;
+		if( fuel < fuelWanted )
+			need = 1.0f + ( fuelWanted - fuel ) * fuelPull;
 		else if( s.sense.health < 0.45f )
 			need = 0.2f + 0.8f * s.who.caution;
 		else if( Bots::outOfAmmo( s.vehicle, s.ps ) || suppliesGone( s ) )
 			need = 0.7f;
 		else if( availableVehicles[s.vehicle].ammo[WP_FLARE] > 0 && s.ps.ammo[WP_FLARE] <= 0 && s.sense.role != Role::Tank )
 			need = 0.3f * s.who.caution;
-		need *= duelResolve( s, 1.0f );
+		if( fuel >= fuelUrgent )
+			need *= duelResolve( s, 1.0f );
 		if( s.bot.pad >= 0 )
 			need = std::max( need, 0.9f );
 		if( need > 0 && Bots::findPad( s.ent, theLevel.time_ < s.bot.badPadTime ? s.bot.badPad : -1 ) < 0 )
