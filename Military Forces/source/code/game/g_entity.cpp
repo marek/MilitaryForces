@@ -346,8 +346,14 @@ GameEntity::freeUp()
 	//if( neverFree_ ) 
 	//	return;
 
-	//memset( ed, 0, sizeof(*ed) );
+	// Nothing of this entity may outlive it in the slot: whatever takes the slot next sets only what it needs, and
+	// a bullet in a slot that held a crate would otherwise still be solid, with the crate's box
 	cleanAll();
+	const int number = s.number;
+	s = {};
+	r = {};
+	s.number = number;
+	r.ownerNum = ENTITYNUM_NONE;
 	classname_ = "freed";
 	freetime_ = theLevel.time_;
 	inuse_ = false;	

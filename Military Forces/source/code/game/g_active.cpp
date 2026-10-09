@@ -213,6 +213,12 @@ static void ClientImpacts( GameEntity *ent, pmove_t *pm )
 			continue;
 		}
 
+#ifdef MF_BOT_DEBUG
+		if( g_botDebug.integer >= 2 && (ent->r.svFlags & SVF_BOT) )
+			Common::printf( "BOTTOUCH t %d bot %d touched %d %s contents %x org %.0f %.0f %.0f vel %.0f %.0f %.0f mins %.0f %.0f %.0f maxs %.0f %.0f %.0f\n", theLevel.time_, ent->s.number,
+				pm->touchents[i], other->classname_ ? other->classname_ : "-", other->r.contents, ent->r.currentOrigin[0], ent->r.currentOrigin[1], ent->r.currentOrigin[2],
+				ent->client_->ps_.velocity[0], ent->client_->ps_.velocity[1], ent->client_->ps_.velocity[2], pm->mins[0], pm->mins[1], pm->mins[2], pm->maxs[0], pm->maxs[1], pm->maxs[2] );
+#endif
 		if( (( ent->r.svFlags & SVF_BOT || (ent->client_->vehicle_ >= 0) ) && ( ent->touchFunc_ )) ) 
 			ent->touchFunc_->execute( other, &trace );
 
