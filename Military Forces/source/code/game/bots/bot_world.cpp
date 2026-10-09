@@ -7,6 +7,7 @@
 #include <cstring>
 #include <vector>
 
+// how far it is straight down to ground or water
 float Bots::heightAboveGround( const vec3_t origin, int passEntity )
 {
 	trace_t tr;
@@ -17,6 +18,7 @@ float Bots::heightAboveGround( const vec3_t origin, int passEntity )
 	return tr.fraction * 16000.0f;
 }
 
+// is something in the way within that distance, for a point or for a body of that half width? The trace tells what
 bool Bots::pathBlocked( const vec3_t origin, const vec3_t dir, float dist, int passEntity, trace_t& tr, float halfWidth )
 {
 	Vec3 end;
@@ -31,6 +33,7 @@ bool Bots::pathBlocked( const vec3_t origin, const vec3_t dir, float dist, int p
 	return tr.fraction < 1.0f;
 }
 
+// how much room there is straight up
 float Bots::ceilingAbove( const vec3_t origin, int passEntity )
 {
 	trace_t tr;
@@ -41,6 +44,7 @@ float Bots::ceilingAbove( const vec3_t origin, int passEntity )
 	return tr.fraction * 8000.0f;
 }
 
+// nothing solid between the point and the target
 bool Bots::visible( GameEntity* ent, const vec3_t from, GameEntity* target )
 {
 	trace_t tr;
@@ -48,6 +52,8 @@ bool Bots::visible( GameEntity* ent, const vec3_t from, GameEntity* target )
 	return tr.fraction >= 1.0f || tr.entityNum == target->s.number;
 }
 
+// Places to head for when there is nothing else to do: the pads, the middle of the map as the spawn points and
+// pads place it, and a point out towards each corner as far as the map goes
 void Bots::buildRoamPoints()
 {
 	if( !padsBuilt_ )
@@ -111,6 +117,7 @@ void Bots::buildRoamPoints()
 	}
 }
 
+// the heading nearest the wanted one with no world geometry in the way for that distance
 bool Bots::steerAround( GameEntity* ent, float wantYaw, float travel, float& yaw )
 {
 	constexpr std::array<float, 9> offsets = { 0.0f, 20.0f, -20.0f, 45.0f, -45.0f, 75.0f, -75.0f, 110.0f, -110.0f };
@@ -128,6 +135,7 @@ bool Bots::steerAround( GameEntity* ent, float wantYaw, float travel, float& yaw
 	return false;
 }
 
+// is there runway under this point, and at what height?
 bool Bots::runwayAt( const vec3_t point, float* surface )
 {
 	Vec3 start, end;
@@ -145,6 +153,7 @@ bool Bots::runwayAt( const vec3_t point, float* surface )
 	return ground && ground->classname_ && strcmp( ground->classname_, "func_runway" ) == 0;
 }
 
+// how far the runway goes on from a point in one direction
 float Bots::runwayRun( const vec3_t origin, float yaw, float maxDist )
 {
 	Vec3 angles = { 0, yaw, 0 }, dir, point;
@@ -184,6 +193,7 @@ float Bots::approachSlope( const Pad& pad, float dir )
 	return slope;
 }
 
+// where a team's flag stands
 bool Bots::flagPosition( int team, vec3_t out )
 {
 	const char* name = team == ClientBase::TEAM_RED ? "team_CTF_redflag" : "team_CTF_blueflag";
@@ -232,6 +242,7 @@ namespace
 	}
 }
 
+// Every place a vehicle can refuel, and for those on or beside an airfield the runway a plane lands on to reach it
 void Bots::buildPads()
 {
 	padsBuilt_ = true;
@@ -374,6 +385,7 @@ void Bots::buildPads()
 	}
 }
 
+// the nearest pad this vehicle may use: of its kind, of its team, and for a plane one with a runway
 int Bots::findPad( GameEntity* ent, int skip )
 {
 	if( !padsBuilt_ )
@@ -400,6 +412,8 @@ int Bots::findPad( GameEntity* ent, int skip )
 	return best;
 }
 
+// A spot within about a thousand units that the threat cannot see; hull down means one from which the bot's own
+// gun still can see the threat
 bool Bots::findHidePoint( GameEntity* ent, State& bot, GameEntity* threat, bool hullDown )
 {
 	float bestDist = 0;
@@ -449,6 +463,8 @@ bool Bots::findHidePoint( GameEntity* ent, State& bot, GameEntity* threat, bool 
 	return found;
 }
 
+// a building to bomb: the nearest that can be destroyed, those by the enemy's pads first and never one by the
+// bot's own; the choice is kept for a few seconds
 GameEntity* Bots::findStructure( GameEntity* ent, State& bot )
 {
 	if( theLevel.time_ < bot.structureTime )
@@ -504,6 +520,7 @@ GameEntity* Bots::findStructure( GameEntity* ent, State& bot )
 	return best;
 }
 
+// somewhere to go: towards the nearest opponent it could fight, a roam point, or a random place within the radius
 void Bots::pickGoal( GameEntity* ent, State& bot, float radius )
 {
 	if( !bot.hasHome )
