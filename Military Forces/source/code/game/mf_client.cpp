@@ -637,6 +637,30 @@ void MF_ClientSpawn( int clientNum, long cs_flags )
 	const bool soldier = vehIndex >= 0 && (availableVehicles[vehIndex].cat & CAT_LQM) != 0;
 	ent->health_ = client->ps_.stats[STAT_HEALTH] = client->ps_.stats[STAT_MAX_HEALTH] + (soldier ? 0 : 25);
 
+	// a soldier whose spawn point is under a vehicle with a deck appears on that deck, where its crew would stand
+	if( soldier )
+	{
+		for( int i = 1; i <= theLevel.maxclients_; i++ )
+		{
+			GameEntity* other = theLevel.getEntity( i );
+			if( !other || other == ent || !other->inuse_ || !other->client_ || other->health_ <= 0 || other->client_->vehicle_ < 0 )
+				continue;
+			const completeVehicleData_t& deckOwner = availableVehicles[other->client_->vehicle_];
+			if( !deckOwner.hasDeck || (deckOwner.cat & CAT_LQM) || (other->client_->ps_.pm_flags & PMF_VEHICLESELECT) )
+				continue;
+			const Vec3 away = Vec3( spawn_origin ) - Vec3( other->client_->ps_.origin );
+			if( fabs( away.x() ) > deckOwner.maxs[0] - deckOwner.mins[0] || fabs( away.y() ) > deckOwner.maxs[0] - deckOwner.mins[0] )
+				continue;
+			Vec3 forward, right, yawOnly( 0, other->client_->ps_.vehicleAngles[YAW], 0 );
+			AngleVectors( yawOnly, forward, right, nullptr );
+			const Vec3 spot = Vec3( other->client_->ps_.origin ) + forward * deckOwner.deckPos[0] - right * deckOwner.deckPos[1];
+			spawn_origin[0] = spot.x();
+			spawn_origin[1] = spot.y();
+			spawn_origin[2] = other->client_->ps_.origin[2] + deckOwner.deckPos[2] + fabs( availableVehicles[vehIndex].mins[2] ) + 1.0f;
+			break;
+		}
+	}
+
 	Game::setOrigin( ent, spawn_origin );
 	VectorCopy( spawn_origin, client->ps_.origin );
 

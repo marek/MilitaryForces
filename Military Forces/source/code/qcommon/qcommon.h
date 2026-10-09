@@ -263,7 +263,7 @@ PROTOCOL
 ==============================================================
 */
 
-inline constexpr int PROTOCOL_VERSION = 9;
+inline constexpr int PROTOCOL_VERSION = 10;
 // 1.31 - 67
 
 // maintain a list of compatible protocols for demo playing

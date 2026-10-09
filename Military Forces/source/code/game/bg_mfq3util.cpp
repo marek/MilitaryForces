@@ -395,7 +395,12 @@ void VehicleData::loadAllVehicleData()
 		}
 		availableVehicles[i].mins[2] += 1;// to look better ?
 		if( availableVehicles[i].cat & CAT_BOAT ) 
+		{
 			VehicleData::findDeck( name, &availableVehicles[i] );
+			char clipName[128];
+			Com_sprintf( clipName, sizeof(clipName), "%s_clip.md3", modelbasename );
+			VehicleData::findClipBoxes( clipName, &availableVehicles[i] );
+		}
 		// boats, transport helicopters and wheeled vehicles carry a crew; attack helicopters and tanks take nobody aboard
 		if( availableVehicles[i].cat & CAT_HELO ) 
 			availableVehicles[i].seats = (availableVehicles[i].cls & CLASS_HELO_ATTACK) ? 0 : 4;
@@ -1163,6 +1168,90 @@ void VehicleData::findDeck( const char *name, completeVehicleData_t *veh )
 	veh->hasDeck = true;
 }
 
+// A clip model gives a vehicle its solid shape: every surface in it is one box, its bounds. Without one, a
+// vehicle with a deck gets a row of boxes under the deck height along its length.
+void VehicleData::findClipBoxes( const char *clipModel, completeVehicleData_t *veh )
+{
+	veh->numClipBoxes = 0;
+	if( OpenFile( clipModel, FS_READ ) )
+	{
+		void *buf;
+		if( FileSystem::readFile( clipModel, &buf ) > 0 && buf )
+		{
+			const md3Header_t *header = static_cast<md3Header_t*>(buf);
+			if( header->ident == MD3_IDENT )
+			{
+				const md3Surface_t *surf = reinterpret_cast<const md3Surface_t*>(reinterpret_cast<const byte*>(header) + header->ofsSurfaces);
+				for( int i = 0; i < header->numSurfaces && veh->numClipBoxes < MAX_CLIP_BOXES; i++ )
+				{
+					const md3XyzNormal_t *xyz = reinterpret_cast<const md3XyzNormal_t*>(reinterpret_cast<const byte*>(surf) + surf->ofsXyzNormals);
+					vec3_t lo = { 99999, 99999, 99999 }, hi = { -99999, -99999, -99999 };
+					for( int v = 0; v < surf->numVerts; v++ )
+					{
+						for( int k = 0; k < 3; k++ )
+						{
+							const float c = xyz[v].xyz[k] * MD3_XYZ_SCALE;
+							lo[k] = std::min( lo[k], c );
+							hi[k] = std::max( hi[k], c );
+						}
+					}
+					ClipBox& box = veh->clipBoxes[veh->numClipBoxes++];
+					for( int k = 0; k < 3; k++ )
+					{
+						box.centre[k] = ( lo[k] + hi[k] ) * 0.5f;
+						box.half[k] = std::max( 0.5f, ( hi[k] - lo[k] ) * 0.5f );
+					}
+					surf = reinterpret_cast<const md3Surface_t*>(reinterpret_cast<const byte*>(surf) + surf->ofsEnd);
+				}
+			}
+			FileSystem::freeFile( buf );
+		}
+	}
+	if( veh->numClipBoxes )
+	{
+		// where crew leaving the vehicle stand: on top of the first box, at the spot nearest its middle that is
+		// clear of the other boxes by a soldier's width
+		constexpr float clearance = 3.0f;
+		const ClipBox& floor = veh->clipBoxes[0];
+		float best = -1.0f;
+		for( float along = -floor.half[0] + clearance; along <= floor.half[0] - clearance; along += 1.0f )
+		{
+			const float x = floor.centre[0] + along;
+			bool clear = true;
+			for( int i = 1; i < veh->numClipBoxes; i++ )
+			{
+				const ClipBox& other = veh->clipBoxes[i];
+				if( fabs( x - other.centre[0] ) < other.half[0] + clearance && fabs( floor.centre[1] - other.centre[1] ) < other.half[1] + clearance )
+					clear = false;
+			}
+			if( clear && ( best < 0.0f || fabs( along ) < best ) )
+			{
+				best = fabs( along );
+				VectorSet( veh->deckPos, x, floor.centre[1], floor.centre[2] + floor.half[2] );
+			}
+		}
+		veh->hasDeck = true;
+		return;
+	}
+	if( !veh->hasDeck )
+		return;
+
+	// no clip model: square boxes from the keel up to the deck, side by side along the hull
+	const float halfLength = ( veh->maxs[0] - veh->mins[0] ) * 0.5f;
+	const float centre = ( veh->maxs[0] + veh->mins[0] ) * 0.5f;
+	float half = ( veh->maxs[1] - veh->mins[1] ) * 0.45f;
+	half = std::min( half, 120.0f );
+	half = std::min( half, halfLength );
+	const int count = std::min( MAX_CLIP_BOXES, static_cast<int>( ceil( halfLength / half ) ) );
+	for( int i = 0; i < count; i++ )
+	{
+		ClipBox& box = veh->clipBoxes[veh->numClipBoxes++];
+		VectorSet( box.centre, count > 1 ? centre - (halfLength - half) + i * 2 * (halfLength - half) / (count - 1) : centre, 0,
+			( veh->mins[2] + veh->deckPos[2] ) * 0.5f );
+		VectorSet( box.half, half, half, ( veh->deckPos[2] - veh->mins[2] ) * 0.5f );
+	}
+}
+
 bool VehicleData::selectable( int vehicle )
 {
 	if( vehicle < 0 || vehicle >= bg_numberOfVehicles ) 
@@ -1189,8 +1278,9 @@ namespace
 	// the B-17's four twin turrets, from the gun tags of its model: chin, top, ball and tail
 	constexpr GunStation b17Stations[] = {
 		{ 33.4f, 0.0f, -3.7f,   0.94f, 0.0f, -0.34f,  70.0f, 1.0f },
-		{  7.5f, 0.0f,  9.4f,   0.0f,  0.0f,  1.0f,   85.0f, 1.0f },
-		{ -18.0f, 0.0f, -6.3f,  0.0f,  0.0f, -1.0f,   85.0f, 1.7f },
+		// the top and ball turrets both reach a little past the horizon, so no direction is left uncovered
+		{  7.5f, 0.0f,  9.4f,   0.0f,  0.0f,  1.0f,   92.0f, 1.0f },
+		{ -18.0f, 0.0f, -6.3f,  0.0f,  0.0f, -1.0f,   92.0f, 1.7f },
 		{ -65.3f, 0.0f,  3.1f, -1.0f,  0.0f,  0.0f,   40.0f, 0.5f },
 	};
 }

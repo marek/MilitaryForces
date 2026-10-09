@@ -710,6 +710,14 @@ inline int doorGunsBearing( float aim )
 	return ( doorGunBears( false, aim ) ? 1 : 0 ) + ( doorGunBears( true, aim ) ? 1 : 0 );
 }
 
+// one solid box of a vehicle that people can stand on or walk into: its middle and half its size, in the hull's axes
+inline constexpr int MAX_CLIP_BOXES = 12;
+struct ClipBox
+{
+	vec3_t	centre;
+	vec3_t	half;
+};
+
 // a gun position that shares the vehicle's machine gun with the others, in the hull's own axes:
 // where it sits, the middle of its field of fire, and how many degrees off that line it can aim
 struct GunStation
@@ -924,6 +932,8 @@ struct completeVehicleData_t
 	animation_t		*animations;	// Animation pointer
 	bool			hasDeck;
 	vec3_t			deckPos;
+	int				numClipBoxes;	// solid boxes people stand on and walk into, in the hull's own axes
+	ClipBox			clipBoxes[MAX_CLIP_BOXES];
 	int				seats;
 };
 
@@ -1219,6 +1229,7 @@ private:
 	static void resolveMissionGroundInstallation( mission_groundInstallation_t* gi );
 	static void parseEntities( char **buf, mission_vehicle_t* vehs, mission_groundInstallation_t* gis );
 	static void findDeck( const char *name, completeVehicleData_t *veh );
+	static void findClipBoxes( const char *clipModel, completeVehicleData_t *veh );
 	static int QDECL posCompare( const void* a, const void* b );
 };
 

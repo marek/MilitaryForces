@@ -29,11 +29,10 @@ struct Drone_Think : public GameEntity::EntityFunc_Think
 	float			speed_;
 };
 
-inline constexpr int MAX_VEHICLE_DECKS = 8;
 
 struct Deck_Think : public GameEntity::EntityFunc_Think
 {
-	Deck_Think() : parentNum_(0), parentPtr_(nullptr), along_(0), first_(false), hasLast_(false), lastTime_(0)
+	Deck_Think() : parentNum_(0), parentPtr_(nullptr), first_(false), hasLast_(false), lastTime_(0)
 	{
 		VectorClear( lastOrigin_ );
 		VectorClear( lastAngles_ );
@@ -43,7 +42,7 @@ struct Deck_Think : public GameEntity::EntityFunc_Think
 
 	int				parentNum_;
 	GameEntity*		parentPtr_;
-	float			along_;
+	Vec3			offset_;	// the box's middle in the hull's axes
 	bool			first_;
 	bool			hasLast_;
 	int				lastTime_;

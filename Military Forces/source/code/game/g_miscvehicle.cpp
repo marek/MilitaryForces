@@ -481,8 +481,10 @@ void Deck_Think::execute()
 		}
 	}
 
-	AngleVectors( angles, forward, nullptr, nullptr );
-	pos = origin + forward * ( along_ );
+	Vec3 right, up;
+	AngleVectors( angles, forward, right, up );
+	// the hull's second axis points left
+	pos = origin + forward * offset_.x() - right * offset_.y() + up * offset_.z();
 
 	deck->s.pos.trType = TR_LINEAR;
 	deck->s.pos.trTime = theLevel.time_;
@@ -516,17 +518,11 @@ void Deck_Think::execute()
 
 void MiscVehicle_SpawnDecks( GameEntity *parent, int vehicle )
 {
-	completeVehicleData_t* data = &availableVehicles[vehicle];
-	float halfLength = ( data->maxs[0] - data->mins[0] ) * 0.5f;
-	float half = ( data->maxs[1] - data->mins[1] ) * 0.45f;
-	float centre = ( data->maxs[0] + data->mins[0] ) * 0.5f;
-	if( half > 120 ) half = 120;
-	if( half > halfLength ) half = halfLength;
-	int count = static_cast<int>(ceil( halfLength / half ));
-	if( count > MAX_VEHICLE_DECKS ) count = MAX_VEHICLE_DECKS;
+	const completeVehicleData_t* data = &availableVehicles[vehicle];
 
-	for( int i = 0; i < count; i++ ) 
+	for( int i = 0; i < data->numClipBoxes; i++ ) 
 	{
+		const ClipBox& box = data->clipBoxes[i];
 		GameEntity* deck = theLevel.spawnEntity();
 		deck->classname_ = "vehicle_deck";
 		deck->s.eType = ET_INVISIBLE;
@@ -534,8 +530,10 @@ void MiscVehicle_SpawnDecks( GameEntity *parent, int vehicle )
 		deck->s.otherEntityNum = parent->s.number;
 		deck->r.ownerNum = parent->s.number;
 		deck->r.svFlags = SVF_DECK | SVF_USE_CURRENT_ORIGIN;
-		VectorSet( deck->r.mins, -half, -half, data->mins[2] );
-		VectorSet( deck->r.maxs, half, half, data->deckPos[2] );
+		VectorSet( deck->r.mins, -box.half[0], -box.half[1], -box.half[2] );
+		VectorSet( deck->r.maxs, box.half[0], box.half[1], box.half[2] );
+		// the box turns with the hull, so the client is told its real size instead of the square the engine assumes
+		VectorCopy( box.half, deck->s.origin2 );
 		deck->r.contents = CONTENTS_BODY;
 		deck->takedamage_ = true;
 		deck->health_ = 1;
@@ -543,7 +541,7 @@ void MiscVehicle_SpawnDecks( GameEntity *parent, int vehicle )
 		auto think = std::make_unique<Deck_Think>();
 		think->parentNum_ = parent->s.number;
 		think->parentPtr_ = parent;
-		think->along_ = count > 1 ? centre - (halfLength - half) + i * 2 * (halfLength - half) / (count - 1) : centre;
+		think->offset_ = Vec3( box.centre[0], box.centre[1], box.centre[2] );
 		think->first_ = i == 0;
 		deck->setThink( std::move( think ) );
 		Game::setOrigin( deck, parent->r.currentOrigin );

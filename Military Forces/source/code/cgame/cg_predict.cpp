@@ -105,6 +105,13 @@ void CGame::clipMoveToEntities( const vec3_t start, const vec3_t mins, const vec
 			bmaxs[0] = bmaxs[1] = x;
 			bmins[2] = -zd;
 			bmaxs[2] = zu;
+			// a vehicle's solid box says its own size
+			if ( ent->seatMask & SEATMASK_DECK ) {
+				for ( int k = 0; k < 3; k++ ) {
+					bmins[k] = -ent->origin2[k];
+					bmaxs[k] = ent->origin2[k];
+				}
+			}
 
 			cmodel = CollisionModel::tempBoxModel( bmins, bmaxs, false );
 			if ( ent->seatMask & SEATMASK_DECK ) {
