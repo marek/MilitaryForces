@@ -72,6 +72,22 @@ if(APPLE AND BUILD_MACOS_APP)
     endforeach()
     # SDL2, FreeType and anything else that is not part of macOS is copied beside the executable
     option(MF_BUNDLE_LIBS "Copy the dynamic libraries the game needs into the app" ON)
+    # OpenAL Soft is opened by name at run time, so nothing links to it and the step below would not find it: it is
+    # copied here when the dependency build has made it (misc/macos/build-deps.sh). Without it the game uses Apple's
+    if(MF_BUNDLE_LIBS)
+        set(MF_OPENAL_SOFT "")
+        foreach(PREFIX IN LISTS CMAKE_PREFIX_PATH)
+            if(NOT MF_OPENAL_SOFT AND EXISTS "${PREFIX}/lib/libopenal.1.dylib")
+                set(MF_OPENAL_SOFT "${PREFIX}/lib/libopenal.1.dylib")
+            endif()
+        endforeach()
+        if(MF_OPENAL_SOFT)
+            add_custom_command(TARGET ${CLIENT_NAME} POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy ${MF_OPENAL_SOFT} $<TARGET_FILE_DIR:${CLIENT_NAME}>/libopenal.1.dylib
+                COMMAND codesign --force --sign ${MF_SIGN_IDENTITY} $<TARGET_FILE_DIR:${CLIENT_NAME}>/libopenal.1.dylib
+                VERBATIM)
+        endif()
+    endif()
     if(MF_BUNDLE_LIBS)
         set(MF_BUNDLE_SEARCH "")
         foreach(PREFIX IN LISTS CMAKE_PREFIX_PATH)

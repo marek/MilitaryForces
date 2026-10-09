@@ -613,11 +613,8 @@ struct src_s
 };
 using src_t = src_s;
 
-#ifdef __APPLE__
-	#define MAX_SRC 64
-#else
-	#define MAX_SRC 128
-#endif
+// as many as OpenAL Soft gives by default; a library with fewer (Apple's has 64) stops handing them out sooner
+#define MAX_SRC 256
 static src_t srcList[MAX_SRC];
 static int srcCount = 0;
 static int srcActiveCnt = 0;
@@ -2348,7 +2345,10 @@ static cvar_t *s_alCapture;
 #elif defined(_WIN32)
 #define ALDRIVER_DEFAULT "OpenAL32.dll"
 #elif defined(__APPLE__)
-#define ALDRIVER_DEFAULT "/System/Library/Frameworks/OpenAL.framework/OpenAL"
+// OpenAL Soft, which the game brings along beside its executable; Apple's own library is the fallback (it has 64
+// sources and no 3D headphone or surround rendering)
+#define ALDRIVER_DEFAULT "libopenal.1.dylib"
+#define ALDRIVER_SYSTEM "/System/Library/Frameworks/OpenAL.framework/OpenAL"
 #elif defined(__OpenBSD__)
 #define ALDRIVER_DEFAULT "libopenal.so"
 #else
@@ -2699,7 +2699,10 @@ bool S_AL_Init( soundInterface_t *si )
 	// New console variables
 	s_alPrecache = CvarSystem::get( "s_alPrecache", "1", CVAR_ARCHIVE );
 	s_alGain = CvarSystem::get( "s_alGain", "1.0", CVAR_ARCHIVE );
-	s_alSources = CvarSystem::get( "s_alSources", "96", CVAR_ARCHIVE );
+	s_alSources = CvarSystem::get( "s_alSources", "256", CVAR_ARCHIVE );
+	// 96 was the default while the library offered no more; a configuration that saved it gets the new one
+	if( s_alSources->asInt() == 96 )
+		CvarSystem::forceReset( "s_alSources" );
 	s_alVoiceStats = CvarSystem::get( "s_alVoiceStats", "0", 0 );
 	s_volEngines = CvarSystem::get( "s_volEngines", "1.0", CVAR_ARCHIVE );
 	s_volWeapons = CvarSystem::get( "s_volWeapons", "1.0", CVAR_ARCHIVE );
@@ -2718,13 +2721,23 @@ bool S_AL_Init( soundInterface_t *si )
 	s_alInputDevice = CvarSystem::get( "s_alInputDevice", "", CVAR_ARCHIVE | CVAR_LATCH );
 	s_alDevice = CvarSystem::get("s_alDevice", "", CVAR_ARCHIVE | CVAR_LATCH);
 
+#ifdef ALDRIVER_SYSTEM
+	// a configuration saved when the system library was the default goes on to the bundled one
+	if( !Q_stricmp( s_alDriver->asString(), ALDRIVER_SYSTEM ) )
+		CvarSystem::forceReset( "s_alDriver" );
+#endif
+
 	// Load QAL
 	if( !QAL_Init( s_alDriver->asString() ) )
 	{
 		Common::printf( "Failed to load library: \"%s\".\n", s_alDriver->asString() );
-		if( !Q_stricmp( s_alDriver->asString(), ALDRIVER_DEFAULT ) || !QAL_Init( ALDRIVER_DEFAULT ) ) {
+		bool loaded = Q_stricmp( s_alDriver->asString(), ALDRIVER_DEFAULT ) && QAL_Init( ALDRIVER_DEFAULT );
+#ifdef ALDRIVER_SYSTEM
+		if( !loaded )
+			loaded = QAL_Init( ALDRIVER_SYSTEM );
+#endif
+		if( !loaded )
 			return false;
-		}
 	}
 
 	device = s_alDevice->asString();

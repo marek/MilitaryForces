@@ -56,7 +56,7 @@ This edition is still being worked on. Here is what it brings so far.
 ## Building
 
 Needs CMake 3.25 or newer, Ninja and a C++23 compiler. On macOS, `misc/macos/build-deps.sh x86_64` (or `arm64`)
-builds SDL2 and FreeType into `deps/` first.
+builds SDL2, FreeType and OpenAL Soft into `deps/` first.
 
 ```bash
 cmake --preset darwin-arm
