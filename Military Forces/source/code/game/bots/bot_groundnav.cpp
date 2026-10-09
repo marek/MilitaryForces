@@ -4,6 +4,8 @@
 #include <algorithm>
 #include <cmath>
 
+// Paths over the ground and over water: a flat grid of cells laid over the map, each found out to be land, water
+// or blocked the first time a search touches it, and an A* search across it.
 bool GroundNav::built_ = false;
 Vec3 GroundNav::mins_;
 float GroundNav::cellSize_ = 160.0f;
@@ -18,11 +20,14 @@ int GroundNav::generation_ = 0;
 
 namespace
 {
+	// a large map gets larger cells instead of more of them; a search that has looked at this many cells gives the
+	// way to the nearest point it reached
 	constexpr int maxCells = 500000;
 	constexpr int maxExpansions = 8000;
 	// one bit per neighbour direction: has the edge been traced, and was it open
 	std::vector<unsigned char> edgeKnown;
 	std::vector<unsigned char> edgeOpen;
+	// the steepest rise between neighbouring cells a vehicle drives up, as a share of the cell size
 	constexpr float maxStep = 0.55f;
 	std::vector<std::pair<float, int>> openHeap;
 	std::vector<Vec3> rawPath;
@@ -39,6 +44,7 @@ void GroundNav::reset()
 	nx_ = ny_ = 0;
 }
 
+// size the grid to the map; nothing is traced until a search asks
 void GroundNav::build()
 {
 	built_ = true;
@@ -75,6 +81,7 @@ int GroundNav::knownCount()
 	return static_cast<int>( std::count_if( kind_.begin(), kind_.end(), []( Kind kind ) { return kind != Unknown; } ) );
 }
 
+// the cell a point is over, or -1 outside the map
 int GroundNav::cellAt( const Vec3& point )
 {
 	const int x = static_cast<int>( floor( (point.x() - mins_.x()) / cellSize_ ) );
@@ -91,6 +98,8 @@ Vec3 GroundNav::centre( int cell )
 	return Vec3( mins_.x() + (x + 0.5f) * cellSize_, mins_.y() + (y + 0.5f) * cellSize_, height_[cell] );
 }
 
+// what a cell is, found by looking down at its middle from a little above the height the search comes from (so the
+// floor under a bridge and the bridge deck are told apart by where the search is)
 GroundNav::Kind GroundNav::evaluate( int cell, float referenceHeight )
 {
 	if( kind_[cell] != Unknown )
@@ -112,6 +121,8 @@ GroundNav::Kind GroundNav::evaluate( int cell, float referenceHeight )
 	return kind_[cell];
 }
 
+// can a vehicle go from one cell to its neighbour: the right kind, not too steep, and nothing standing between
+// them. The trace for each pair is made once and remembered
 bool GroundNav::passable( int from, int to, Kind wanted )
 {
 	if( evaluate( to, height_[from] ) != wanted )
@@ -137,6 +148,7 @@ bool GroundNav::passable( int from, int to, Kind wanted )
 	return (edgeOpen[from] & bit) != 0;
 }
 
+// a straight line that stays on known cells of the right kind, without a step too high and with nothing in the way
 bool GroundNav::lineOpen( const Vec3& a, const Vec3& b, Kind wanted )
 {
 	const Vec3 delta = b - a;
@@ -169,6 +181,8 @@ bool GroundNav::lineOpen( const Vec3& a, const Vec3& b, Kind wanted )
 	return tr.startsolid || tr.fraction >= 1.0f;
 }
 
+// A* from one point to another over land or over water. Returns false with a path towards the nearest point
+// reached when the goal itself is out of reach. Corners that a straight line can skip are left out
 bool GroundNav::findPath( const Vec3& from, const Vec3& to, bool water, std::vector<Vec3>& out )
 {
 	out.clear();
@@ -182,6 +196,7 @@ bool GroundNav::findPath( const Vec3& from, const Vec3& to, bool water, std::vec
 		return false;
 	if( kind_[start] == Unknown )
 		evaluate( start, from.z() );
+	// the vehicle is standing there, whatever the sample in the middle of the cell says
 	if( kind_[start] != wanted )
 	{
 		kind_[start] = wanted;
@@ -223,6 +238,7 @@ bool GroundNav::findPath( const Vec3& from, const Vec3& to, bool water, std::vec
 		const float queued = open.back().first;
 		open.pop_back();
 		const float remaining = flatDistance( cell, to );
+		// an entry left over from before a shorter way to this cell was found
 		if( queued > cost_[cell] + remaining + 1.0f )
 			continue;
 		if( cell == goal )
@@ -251,9 +267,11 @@ bool GroundNav::findPath( const Vec3& from, const Vec3& to, bool water, std::vec
 				const int other = oy * nx_ + ox;
 				if( !passable( cell, other, wanted ) )
 					continue;
+				// no cutting a corner past a blocked cell
 				if( dx && dy && (!passable( cell, y * nx_ + ox, wanted ) || !passable( cell, oy * nx_ + x, wanted )) )
 					continue;
 				float step = cellSize_ * ((dx && dy) ? 1.4142f : 1.0f);
+				// climbing and descending cost more than level ground
 				step *= 1.0f + 2.0f * fabs( height_[other] - height_[cell] ) / cellSize_;
 				const float total = cost_[cell] + step;
 				if( stamp_[other] == generation_ && total >= cost_[other] )
@@ -279,6 +297,7 @@ bool GroundNav::findPath( const Vec3& from, const Vec3& to, bool water, std::vec
 		raw.push_back( centre( cell ) );
 	std::reverse( raw.begin(), raw.end() );
 
+	// straighten: from each point keep the furthest of the next few that can be driven to directly
 	Vec3 anchor( from.x(), from.y(), height_[start] );
 	size_t i = 0;
 	while( i < raw.size() )

@@ -4,6 +4,8 @@
 #include <algorithm>
 #include <cmath>
 
+// Paths through the air: the map's space as an octree of cubes, split only where there is something solid, each
+// cube examined the first time a search reaches it; A* from cube to cube through their free neighbours.
 namespace
 {
 	enum Fill : signed char { Unknown, Free, Solid, Mixed };
@@ -23,6 +25,7 @@ namespace
 		Vec3		heading;
 	};
 
+	// the smallest cube is 128 units across; a path enters a cube no nearer its walls than the margin where it has room
 	constexpr float leafHalf = 64.0f;
 	constexpr float entryMargin = 160.0f;
 	constexpr int maxNodes = 400000;
@@ -36,6 +39,7 @@ namespace
 	Vec3 worldMins, worldMaxs;
 	int generation = 0;
 
+	// one cube that holds the whole map; everything else is made on demand
 	void build()
 	{
 		Vec3 boundsMins, boundsMaxs;
@@ -56,6 +60,7 @@ namespace
 		generation = 0;
 	}
 
+	// empty, solid, or split into eight to be looked at when needed
 	void classify( int index )
 	{
 		const Vec3 centre = nodes[index].centre;
@@ -78,6 +83,7 @@ namespace
 		}
 		if( half <= leafHalf )
 		{
+			// a vehicle that happens to be there now does not make the air solid
 			const bool vehicle = tr.entityNum >= 1 && tr.entityNum <= theLevel.maxclients_;
 			nodes[index].fill = vehicle ? Free : Solid;
 			return;
@@ -100,6 +106,7 @@ namespace
 		}
 	}
 
+	// the cube a point is in, splitting on the way down as far as needed
 	int leafAt( const Vec3& point )
 	{
 		if( nodes.empty() )
@@ -122,6 +129,7 @@ namespace
 		}
 	}
 
+	// the empty cubes that touch this one, found by sampling points just outside each of its faces
 	void findLinks( int index )
 	{
 		const Vec3 centre = nodes[index].centre;
@@ -154,6 +162,7 @@ namespace
 		nodes[index].linkCount = static_cast<int>( links.size() ) - start;
 	}
 
+	// the empty cube at a point, or the nearest one within a few cubes of it
 	int nearestFree( const Vec3& point )
 	{
 		const int leaf = leafAt( point );
@@ -190,6 +199,7 @@ namespace
 		return -1;
 	}
 
+	// where a path coming from that point enters the cube: as near as it can stay to where it was, clear of the walls
 	Vec3 entryInto( const Node& node, const Vec3& from )
 	{
 		const float inner = node.half - std::min( node.half, entryMargin );
@@ -233,6 +243,7 @@ int AirNav::freeCount()
 	return static_cast<int>( std::count_if( nodes.begin(), nodes.end(), []( const Node& node ) { return node.fill == Free; } ) );
 }
 
+// a body of that width can fly the straight line: nothing of the world in the way (other vehicles do not count)
 bool AirNav::clearLine( const Vec3& a, const Vec3& b, float halfWidth )
 {
 	Vec3 boxMins = { -halfWidth, -halfWidth, -halfWidth * 0.4f };
@@ -244,6 +255,9 @@ bool AirNav::clearLine( const Vec3& a, const Vec3& b, float halfWidth )
 	return tr.fraction >= 1.0f || tr.entityNum != ENTITYNUM_WORLD;
 }
 
+// A* from one point to another. With a turn radius given, turns cost more, and far more in cubes too small to
+// turn in, so a fast aircraft is routed where it can fly. Returns false with a path towards the nearest point
+// reached when the goal is not
 bool AirNav::findPath( const Vec3& from, const Vec3& to, std::vector<Vec3>& out, const Vec3& heading, float turnRadius )
 {
 	out.clear();
@@ -254,6 +268,7 @@ bool AirNav::findPath( const Vec3& from, const Vec3& to, std::vector<Vec3>& out,
 	int goal = nearestFree( to );
 	const Vec3 back = from - to;
 	const float span = back.length();
+	// a goal inside something solid: the nearest free point on the way back from it
 	for( float along = leafHalf * 4.0f; goal < 0 && along < span; along += leafHalf * 4.0f )
 	{
 		const int leaf = leafAt( to + back * (along / span) );
@@ -320,6 +335,7 @@ bool AirNav::findPath( const Vec3& from, const Vec3& to, std::vector<Vec3>& out,
 			const Vec3 entry = entryInto( next, here );
 			const Vec3 move = entry - here;
 			float step = std::max( move.length(), leafHalf ) + fabs( move.z() ) * 0.3f;
+			// tight places cost more than open air
 			if( next.half <= leafHalf )
 				step *= 1.8f;
 			else if( next.half <= leafHalf * 2.0f )
@@ -354,6 +370,7 @@ bool AirNav::findPath( const Vec3& from, const Vec3& to, std::vector<Vec3>& out,
 		raw.push_back( nodes[cell].entry );
 	std::reverse( raw.begin(), raw.end() );
 
+	// straighten: from each point keep the furthest of the next few that can be flown to directly
 	Vec3 anchor = from;
 	size_t i = 0;
 	while( i < raw.size() )
