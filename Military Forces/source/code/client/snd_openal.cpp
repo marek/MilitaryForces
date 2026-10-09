@@ -581,6 +581,7 @@ struct src_s
 	vec3_t		loopSpeakerPos;		// Origin of the loop speaker
 	
 	bool	local;			// Is this local (relative to the cam)
+	vec3_t		shotPos;		// where a one-shot was started, for the limit on its kind
 };
 using src_t = src_s;
 
@@ -603,8 +604,38 @@ static struct
 	int loopsDenied;		// loops that found no source
 	int loopsStolen;		// playing loops within earshot that lost their source to another sound
 	int shotsDenied;		// one-shot sounds that found no source
+	int shotsOverLimit;		// one-shots not started because their kind had its share and nearer ones were playing
+	int shotsReplaced;		// farther one-shots of a kind stopped for a nearer one of the same kind
+	int localDenied;		// the player's own sounds that found no source: should never happen
 	int lastReport;
 } voiceStats;
+
+// Kinds of one-shot sound that come in bursts. Once three quarters of the sources are in use, each has a share it
+// may hold at once, so that a
+// battery of guns or a string of explosions cannot take every source and leave none for anything else. Within a
+// kind the nearest are kept.
+enum class ShotKind { Gun, Explosion, Other };
+
+static ShotKind S_AL_ShotKind( sfxHandle_t sfx )
+{
+	const char* name = knownSfx[sfx].filename;
+	if( !Q_stricmpn( name, "sound/weapons/", 14 ) )
+		return ShotKind::Gun;
+	if( !Q_stricmpn( name, "sound/explosions/", 17 ) )
+		return ShotKind::Explosion;
+	return ShotKind::Other;
+}
+
+// the share of all sources a kind may hold; anything else is limited only by the sources there are
+static int S_AL_ShotLimit( ShotKind kind, int sources )
+{
+	switch( kind )
+	{
+	case ShotKind::Gun:			return sources * 5 / 16;	// 20 of 64
+	case ShotKind::Explosion:	return sources * 3 / 16;	// 12 of 64
+	default:					return sources;
+	}
+}
 
 struct sentity_s
 {
@@ -1251,7 +1282,10 @@ static void S_AL_StartLocalSound(sfxHandle_t sfx, int channel)
 	src = S_AL_SrcAlloc(SRCPRI_LOCAL, -1, channel);
 	
 	if(src == -1)
+	{
+		voiceStats.localDenied++;
 		return;
+	}
 
 	// Set up the effect
 	S_AL_SrcSetup(src, sfx, SRCPRI_LOCAL, -1, channel, true);
@@ -1305,6 +1339,40 @@ static void S_AL_StartSound( vec3_t origin, int entnum, int entchannel, sfxHandl
 		return;
 	}
 
+	// its kind's share: when that is full, this sound is only worth a source if it is nearer than the farthest
+	// one of its kind now playing, which then gives way
+	const ShotKind kind = S_AL_ShotKind( sfx );
+	const int limit = S_AL_ShotLimit( kind, srcCount );
+	// only once sources are getting scarce: while a quarter of them are free, nothing needs to be refused
+	if( limit < srcCount && srcActiveCnt > srcCount * 3 / 4 )
+	{
+		int playing = 0, farthest = -1;
+		float farthestDist = -1.0f;
+		for( int i = 0; i < srcCount; i++ )
+		{
+			const src_t& other = srcList[i];
+			if( !other.isActive || other.isLooping || other.local || other.isStream || other.priority != SRCPRI_ONESHOT || S_AL_ShotKind( other.sfx ) != kind )
+				continue;
+			playing++;
+			const float dist = DistanceSquared( other.shotPos, lastListenerOrigin );
+			if( dist > farthestDist )
+			{
+				farthestDist = dist;
+				farthest = i;
+			}
+		}
+		if( playing >= limit )
+		{
+			if( farthest < 0 || DistanceSquared( sorigin, lastListenerOrigin ) >= farthestDist )
+			{
+				voiceStats.shotsOverLimit++;
+				return;
+			}
+			S_AL_SrcKill( farthest );
+			voiceStats.shotsReplaced++;
+		}
+	}
+
 	// Try to grab a source
 	src = S_AL_SrcAlloc(SRCPRI_ONESHOT, entnum, entchannel);
 	if(src == -1)
@@ -1316,6 +1384,7 @@ static void S_AL_StartSound( vec3_t origin, int entnum, int entchannel, sfxHandl
 	S_AL_SrcSetup(src, sfx, SRCPRI_ONESHOT, entnum, entchannel, false);
 	
 	curSource = &srcList[src];
+	VectorCopy( sorigin, curSource->shotPos );
 
 	if(!origin)
 		curSource->isTracking = true;
@@ -2315,8 +2384,8 @@ static void S_AL_Update( )
 
 	if(s_alVoiceStats->asInt() && System::milliseconds() - voiceStats.lastReport >= 1000)
 	{
-		Common::printf( "AL voices: %d of %d sources in use, loops denied %d, audible loops stolen %d, shots denied %d\n",
-			srcActiveCnt, srcCount, voiceStats.loopsDenied, voiceStats.loopsStolen, voiceStats.shotsDenied );
+		Common::printf( "AL voices: %d of %d sources in use, loops denied %d, audible loops stolen %d, shots denied %d, over their kind's share %d, replaced by nearer %d, own sounds denied %d\n",
+			srcActiveCnt, srcCount, voiceStats.loopsDenied, voiceStats.loopsStolen, voiceStats.shotsDenied, voiceStats.shotsOverLimit, voiceStats.shotsReplaced, voiceStats.localDenied );
 		// the loop of the entity the listener sits in: the sound a player notices missing first
 		const src_t *own = nullptr;
 		for(i = 0; i < srcCount; i++)
