@@ -189,11 +189,25 @@ void ClientEntity::plane( clientInfo_t *ci )
 	// where the gun positions aim: the crew's own client knows its look, everyone else is told
 	if( availableVehicles[ci->vehicle].flags & VF_GUNSTATIONS )
 	{
-		drawInfo.stationAimKnown = true;
+		drawInfo.stationsKnown = true;
 		if( this->currentState.clientNum == cg.snap->ps.clientNum )
-			VectorCopy( cg.predictedPlayerState.viewangles, drawInfo.stationAim );
+		{
+			cg.stationsLagging = VehicleData::gunStationsTrack( ci->vehicle, this->lerpAngles, cg.predictedPlayerState.viewangles,
+				std::clamp( cg.frametime * 0.001f, 0.0f, 0.2f ), cg.stationPitch, cg.stationYaw );
+			for( int n = 0; n < MAX_VEHICLE_TURRETS; n++ )
+			{
+				drawInfo.stationPitch[n] = cg.stationPitch[n];
+				drawInfo.stationYaw[n] = cg.stationYaw[n];
+			}
+		}
 		else
-			VectorSet( drawInfo.stationAim, this->currentState.gunPitch[0], this->currentState.turretYaw[0], 0 );
+		{
+			for( int n = 0; n < MAX_VEHICLE_TURRETS; n++ )
+			{
+				drawInfo.stationPitch[n] = this->currentState.gunPitch[n];
+				drawInfo.stationYaw[n] = this->currentState.turretYaw[n];
+			}
+		}
 	}
 
 	// muzzleflash
@@ -770,8 +784,10 @@ void CGame::drawPlane(DrawInfo_Plane_t* drawInfo)
 			char tag[16];
 			vec3_t angles;
 			Com_sprintf( tag, sizeof(tag), "tag_tur%d", n + 1 );
-			VehicleData::gunStationAngles( drawInfo->basicInfo.vehicleIndex, n, drawInfo->basicInfo.angles,
-				drawInfo->stationAimKnown ? drawInfo->stationAim : drawInfo->basicInfo.angles, angles );
+			if( drawInfo->stationsKnown )
+				VectorSet( angles, drawInfo->stationPitch[n], drawInfo->stationYaw[n], 0 );
+			else
+				VehicleData::gunStationAngles( drawInfo->basicInfo.vehicleIndex, n, drawInfo->basicInfo.angles, drawInfo->basicInfo.angles, angles );
 			for( int elevates = 0; elevates < 2; elevates++ )
 			{
 				const qhandle_t model = veh->handle[BP_PLANE_TURRETS + 2 * n + elevates];

@@ -549,6 +549,11 @@ struct cg_t {
 
 	int			frametime;		// cg.time - cg.oldTime
 
+	// the gun positions of the player's own vehicle, swung here as the server swings them
+	float		stationPitch[MAX_VEHICLE_TURRETS];
+	float		stationYaw[MAX_VEHICLE_TURRETS];
+	unsigned	stationsLagging;
+
 	int			time;			// this is the time value that the client
 								// is rendering at.
 	int			oldTime;		// time at last frame, used for missile trails and prediction checking
@@ -1022,8 +1027,9 @@ struct DrawInfo_Plane_t {
 	int					cockpitFrame;
 	int					bodyFrame;
 	float				swingAngle;
-	bool				stationAimKnown;	// otherwise the gun positions point along the hull
-	vec3_t				stationAim;
+	bool				stationsKnown;	// otherwise the gun positions rest where the hull points
+	float				stationPitch[MAX_VEHICLE_TURRETS];	// where each points, in the hull's space
+	float				stationYaw[MAX_VEHICLE_TURRETS];
 };
 
 struct DrawInfo_GV_t {

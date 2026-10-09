@@ -141,6 +141,9 @@ struct GameClient : public ClientBase
 	int					ejectedTime_ = 0;		// when this player last bailed out of a vehicle, 0 if on foot from the start
 	int					lastEnemyHitTime_ = 0;	// when an enemy last damaged this player
 	bool				downedByEnemy_ = false;	// bailed out of a vehicle the enemy had been hitting: a lift for them can score
+	float				stationPitch_[MAX_VEHICLE_TURRETS] = {};	// where each gun position points now, in the hull's space
+	float				stationYaw_[MAX_VEHICLE_TURRETS] = {};
+	unsigned			stationsLagging_ = 0;	// positions still swinging round to the aim
 	vec3_t				stationAim_ = { 0, 0, 0 };	// where the vehicle's gun positions are aimed this frame: the gunner's look, or the pilot's
 	bool				wreck_ = false;			// died and not yet respawned: what is left can still be blown up
 	bool				downedUnderFire_ = false;	// ejected while under attack: picking them up is a rescue

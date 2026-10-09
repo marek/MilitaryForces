@@ -826,6 +826,7 @@ void CGame::missileHitWall( int weaponIndex, int clientNum, vec3_t origin, vec3_
 	case WI_ARCHER:
 	case WI_ALAMO:
 	case WI_HELLFIRE:
+	case WI_HELLFIRE_L:
 	case WI_MAVERICK:
 	case WI_HARM:
 	case WI_AASAM:

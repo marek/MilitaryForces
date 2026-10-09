@@ -944,6 +944,14 @@ static void ClientThink_real( GameEntity *ent )
 			break;
 		}
 	}
+	// the gun positions swing round to the aim at their own rate, and one that has not arrived does not fire
+	if( gunStations )
+	{
+		const float seconds = std::clamp( ( pm.cmd.serverTime - client->ps_.commandTime ) * 0.001f, 0.0f, 0.2f );
+		client->stationsLagging_ = VehicleData::gunStationsTrack( client->vehicle_, client->ps_.vehicleAngles, client->stationAim_, seconds,
+			client->stationPitch_, client->stationYaw_ );
+		pm.stationsLagging = client->stationsLagging_;
+	}
 	VectorCopy( ent->s.angles, pm.ps->vehicleAngles );
 	pm.ps->speed = client->ps_.speed;
 	pm.ps->gunAngle = client->ps_.gunAngle;
@@ -1192,11 +1200,14 @@ void ClientEndFrame( GameEntity *ent )
 	}
 
 	ent->s.seatMask = SEATMASK_PILOT;
-	// where the gun positions aim, so every client turns the turrets the same way
+	// where each gun position points, in the hull's space, so every client turns the turrets the same way
 	if( ent->client_->vehicle_ >= 0 && (availableVehicles[ent->client_->vehicle_].flags & VF_GUNSTATIONS) )
 	{
-		ent->s.turretYaw[0] = ent->client_->stationAim_[YAW];
-		ent->s.gunPitch[0] = ent->client_->stationAim_[PITCH];
+		for( int n = 0; n < MAX_VEHICLE_TURRETS; n++ )
+		{
+			ent->s.turretYaw[n] = ent->client_->stationYaw_[n];
+			ent->s.gunPitch[n] = ent->client_->stationPitch_[n];
+		}
 	}
 	ent->s.vehicleEnt = ent->r.ownerNum > 0 ? ent->r.ownerNum : 0;
 	ent->s.seat = 0;

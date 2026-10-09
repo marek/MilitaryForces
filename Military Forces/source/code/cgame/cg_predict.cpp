@@ -570,6 +570,7 @@ void CGame::predictPlayerState( ) {
 		// MFQ3 vehicle
 		cg_pmove.vehicle = cg_vehicle.integer;
 		cg_pmove.advancedControls = cg_advanced.integer;
+		cg_pmove.stationsLagging = cg.stationsLagging;
 
 		Pmove (&cg_pmove);
 

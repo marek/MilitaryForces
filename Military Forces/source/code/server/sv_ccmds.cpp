@@ -178,7 +178,19 @@ void ServerMain::map_f()
 	}
 
 	// force latched values to get set
-	CvarSystem::get ("g_gametype", "0", CVAR_SERVERINFO | CVAR_USERINFO | CVAR_LATCH );
+	// A game type may be given by name (ffa, team, ctf ...); the cvar itself always ends up holding the number,
+	// which is what the server advertises and what menus and old configs use
+	{
+		cvar_t* wanted = CvarSystem::get ("g_gametype", "0", CVAR_SERVERINFO | CVAR_USERINFO | CVAR_LATCH );
+		const int type = gametypeFromString( wanted->asString() );
+		if( type < 0 )
+			Common::printf( "g_gametype %s is not a game type (a number, or ffa, tournament, single, editor, team, ctf): free for all\n", wanted->asString() );
+		if( type < 0 || Q_stricmp( wanted->asString(), va( "%d", type ) ) )
+		{
+			CvarSystem::set( "g_gametype", va( "%d", std::max( type, 0 ) ) );
+			CvarSystem::get ("g_gametype", "0", CVAR_SERVERINFO | CVAR_USERINFO | CVAR_LATCH );
+		}
+	}
 
 	cmd = CommandSystem::argv(0);
 	if( Q_stricmpn( cmd, "sp", 2 ) == 0 ) 

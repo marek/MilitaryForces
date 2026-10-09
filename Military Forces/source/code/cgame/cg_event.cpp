@@ -218,7 +218,14 @@ void ClientEntity::entityEvent( vec3_t position )
 
 	case EV_FIRE_MG:
 		DEBUGNAME("EV_FIRE_WEAPON");
-		if( cg_debugEvents.integer ) CGame::printf( "stations %d aimed %d %d\n", es->eventParm, static_cast<int>( AngleNormalize180( es->gunPitch[0] ) ), static_cast<int>( AngleNormalize360( es->turretYaw[0] ) ) );
+		if( cg_debugEvents.integer )
+		{
+			// the directions of the chin, top and ball positions as this client was told them
+			CGame::printf( "stations %d aimed", es->eventParm );
+			for( int n = 0; n < 3; n++ )
+				CGame::printf( " %d %d", static_cast<int>( roundf( AngleNormalize180( es->gunPitch[n] ) ) ), static_cast<int>( roundf( AngleNormalize180( es->turretYaw[n] ) ) ) );
+			CGame::printf( "\n" );
+		}
 		this->stationsFired = es->eventParm;
 		this->fireMachinegun( false );
 		break;

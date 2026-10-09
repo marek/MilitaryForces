@@ -88,6 +88,28 @@ enum gametype_t {
 	GT_MAX_GAME_TYPE
 };
 
+// the short names a game type can be given by, in the order of the numbers
+inline constexpr const char* gametypeNames[GT_MAX_GAME_TYPE] = { "ffa", "tournament", "single", "editor", "team", "ctf" };
+
+// the game type a number or a name stands for, or -1
+inline int gametypeFromString( const char* text )
+{
+	if( !text || !text[0] )
+		return -1;
+	bool digits = true;
+	for( const char* c = text; *c; c++ )
+		if( *c < '0' || *c > '9' ) digits = false;
+	if( digits )
+	{
+		const int number = atoi( text );
+		return number < GT_MAX_GAME_TYPE ? number : -1;
+	}
+	for( int i = 0; i < GT_MAX_GAME_TYPE; i++ )
+		if( !Q_stricmp( text, gametypeNames[i] ) )
+			return i;
+	return -1;
+}
+
 enum class gender_t { GENDER_MALE, GENDER_FEMALE, GENDER_NEUTER };
 
 using enum gender_t;
@@ -161,6 +183,7 @@ struct pmove_t {
 	bool	updateGear;
 	bool	updateBay;
 	float		*gunnerAngles;
+	unsigned	stationsLagging;	// gun positions still swinging round to the aim: they do not fire yet
 
 	int			advancedControls;	// MFQ3
 
@@ -726,6 +749,7 @@ struct GunStation
 	float	axisForward, axisRight, axisUp;
 	float	arc;
 	float	barrelSpacing;	// its two barrels sit this far either side of the mount
+	float	traverse;		// degrees a second it can swing
 };
 
 inline constexpr int SEATMASK_PILOT = 0x0001;
@@ -1125,6 +1149,7 @@ enum weaponIndex_t
 	WI_MGT_YAKB,
 	WI_STINGER_PAIR,
 	WI_GUNPOD_23MM,
+	WI_HELLFIRE_L,
 	WI_MAX
 };
 
@@ -1201,6 +1226,7 @@ public:
 	static std::span<const GunStation> gunStations( int vehicle );
 	static unsigned gunStationsBearing( int vehicle, const vec3_t hullAngles, const vec3_t aimAngles );
 	static void gunStationAngles( int vehicle, int index, const vec3_t hullAngles, const vec3_t aimAngles, vec3_t out );
+	static unsigned gunStationsTrack( int vehicle, const vec3_t hullAngles, const vec3_t aimAngles, float seconds, float* pitch, float* yaw );
 	static void parseMissionScripts( char *buf, mission_overview_t* overview, mission_vehicle_t* vehs, mission_groundInstallation_t* gis);
 	static void checkMissionScriptOverviewValid( mission_overview_t* overview, bool updateFormat );
 	static void setMissionScriptOverviewDefaults( mission_overview_t* overview );

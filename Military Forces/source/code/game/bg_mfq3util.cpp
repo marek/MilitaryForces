@@ -1311,10 +1311,10 @@ namespace
 		// ahead, tilted a little down. The top and ball turrets cover their hemispheres but stop short of level. The
 		// tail guns cover a narrow cone astern. Level with the bomber, from the beam to the rear quarter, nothing
 		// bears: the real aircraft had only its hand-held waist guns there, and this model has none
-		{ 33.4f, 0.0f, -3.7f,   0.98f, 0.0f, -0.17f,  62.0f, 1.0f },
-		{  7.5f, 0.0f,  9.4f,   0.0f,  0.0f,  1.0f,   84.0f, 1.0f },
-		{ -18.0f, 0.0f, -6.3f,  0.0f,  0.0f, -1.0f,   84.0f, 1.7f },
-		{ -65.3f, 0.0f,  3.1f, -1.0f,  0.0f,  0.0f,   32.0f, 0.5f },
+		{ 33.4f, 0.0f, -3.7f,   0.98f, 0.0f, -0.17f,  62.0f, 1.0f, 45.0f },
+		{  7.5f, 0.0f,  9.4f,   0.0f,  0.0f,  1.0f,   84.0f, 1.0f, 45.0f },
+		{ -18.0f, 0.0f, -6.3f,  0.0f,  0.0f, -1.0f,   84.0f, 1.7f, 45.0f },
+		{ -65.3f, 0.0f,  3.1f, -1.0f,  0.0f,  0.0f,   32.0f, 0.5f, 30.0f },
 	};
 }
 
@@ -1381,6 +1381,32 @@ void VehicleData::gunStationAngles( int vehicle, int index, const vec3_t hullAng
 	}
 	vectoangles( dir, out );
 	out[ROLL] = 0;
+}
+
+// Swings every gun position towards the aim by what its traverse allows in the time given; pitch and yaw hold each
+// position's direction in the hull's own space. Bit n of the result is set while position n has not come round yet
+unsigned VehicleData::gunStationsTrack( int vehicle, const vec3_t hullAngles, const vec3_t aimAngles, float seconds, float* pitch, float* yaw )
+{
+	// close enough to the aim to fire along it
+	constexpr float onAim = 4.0f;
+	unsigned lagging = 0;
+	const std::span<const GunStation> stations = gunStations( vehicle );
+	for( int n = 0; n < static_cast<int>( stations.size() ) && n < MAX_VEHICLE_TURRETS; n++ )
+	{
+		vec3_t wanted;
+		gunStationAngles( vehicle, n, hullAngles, aimAngles, wanted );
+		const float step = stations[n].traverse * seconds;
+		const float turn = AngleSubtract( wanted[YAW], yaw[n] ), lift = AngleSubtract( wanted[PITCH], pitch[n] );
+		yaw[n] = AngleNormalize360( yaw[n] + std::clamp( turn, -step, step ) );
+		pitch[n] = AngleNormalize180( pitch[n] + std::clamp( lift, -step, step ) );
+		const vec3_t now = { pitch[n], yaw[n], 0 };
+		vec3_t pointing, target;
+		AngleVectors( now, pointing, nullptr, nullptr );
+		AngleVectors( wanted, target, nullptr, nullptr );
+		if( DotProduct( pointing, target ) < cos( DEG2RAD( onAim ) ) )
+			lagging |= 1u << n;
+	}
+	return lagging;
 }
 
 bool VehicleData::vehicleHasTurret( int vehicle )

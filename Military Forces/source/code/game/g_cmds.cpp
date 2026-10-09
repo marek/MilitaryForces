@@ -1228,7 +1228,7 @@ static void Cmd_CallVote_f( GameEntity *ent )
 	// special case for g_gametype, check for bad values
 	if( !Q_stricmp( arg1, "g_gametype" ) )
 	{
-		i = atoi( arg2 );
+		i = gametypeFromString( arg2 );
 		if( i == GT_SINGLE_PLAYER || i == GT_MISSION_EDITOR || i < GT_FFA || i >= GT_MAX_GAME_TYPE ) 
 		{
 			GameHost::sendServerCommand( ent->s.number, "print \"Invalid gametype.\n\"" );

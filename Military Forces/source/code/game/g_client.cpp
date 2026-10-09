@@ -874,7 +874,8 @@ GameClient::ClientSession::ClientSession() :
 	losses_(0),
 	teamLeader_(0),
 	ridingClient_(-1),
-	seat_(0)
+	seat_(0),
+	paintTeam_(0)
 {
 }
 

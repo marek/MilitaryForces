@@ -279,6 +279,8 @@ static void G_RegisterCvars()
 		Common::printf( "g_gametype %i is out of range, defaulting to 0\n", g_gametype.integer );
 		CvarSystem::set( "g_gametype", "0" );
 	}
+	else
+		Common::printf( "Game type: %s (%d)\n", gametypeNames[g_gametype.integer], g_gametype.integer );
 	theLevel.warmupModificationCount_ = g_warmup.modificationCount;
 }
 

@@ -639,7 +639,7 @@ void PlayerMove::weapon( ) {
 			int rounds = 1;
 			unsigned stations = 0;
 			if( availableVehicles[pm->vehicle].flags & VF_GUNSTATIONS ) {
-				stations = VehicleData::gunStationsBearing( pm->vehicle, pm->ps->vehicleAngles, pm->gunnerAngles ? pm->gunnerAngles : pm->ps->viewangles ) & 0xff;
+				stations = VehicleData::gunStationsBearing( pm->vehicle, pm->ps->vehicleAngles, pm->gunnerAngles ? pm->gunnerAngles : pm->ps->viewangles ) & ~pm->stationsLagging & 0xff;
 				rounds = std::popcount( stations );
 			}
 			if( rounds > 0 ) {
