@@ -32,6 +32,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // Console variables specific to OpenAL
 static cvar_t *s_alPrecache;
 static cvar_t *s_alGain;
+// levels of the buses under the master volume: each kind of sound has its own
+static cvar_t *s_volEngines, *s_volWeapons, *s_volExplosions, *s_volAmbience, *s_volInterface;
 static cvar_t *s_alSources;
 static cvar_t *s_alDopplerFactor;
 static cvar_t *s_alDopplerSpeed;
@@ -556,6 +558,32 @@ static ALuint S_AL_BufferGet(sfxHandle_t sfx)
 //===========================================================================
 
 
+// The bus a sound belongs to, from where its file lives, and that bus's level (1 leaves the sound as it is).
+// Engines: sound/engines and sound/vehicles. Weapons: sound/weapons. Explosions: sound/explosions. Ambience:
+// sound/world. Interface: sound/feedback, sound/items, sound/misc and menu sounds. Anything else is at the master
+// level only; music and voice chat have their own settings already.
+static float S_AL_BusLevel( sfxHandle_t sfx )
+{
+	const char* name = knownSfx[sfx].filename;
+	const auto under = [name]( const char* folder ) { return !Q_stricmpn( name, folder, static_cast<int>( strlen( folder ) ) ); };
+	if( under( "sound/engines/" ) || under( "sound/vehicles/" ) )
+		return s_volEngines->asFloat();
+	if( under( "sound/weapons/" ) )
+		return s_volWeapons->asFloat();
+	if( under( "sound/explosions/" ) )
+		return s_volExplosions->asFloat();
+	if( under( "sound/world/" ) )
+		return s_volAmbience->asFloat();
+	if( under( "sound/feedback/" ) || under( "sound/items/" ) || under( "sound/misc/" ) || under( "menu/" ) || under( "ui/" ) )
+		return s_volInterface->asFloat();
+	return 1.0f;
+}
+
+static bool S_AL_BusModified()
+{
+	return s_volEngines->modified() || s_volWeapons->modified() || s_volExplosions->modified() || s_volAmbience->modified() || s_volInterface->modified();
+}
+
 struct src_s
 {
 	ALuint		alSource;		// OpenAL source object
@@ -852,7 +880,7 @@ static void S_AL_SrcSetup(srcHandle_t src, sfxHandle_t sfx, alSrcPriority_t prio
 	curSource->isLooping = false;
 	curSource->isTracking = false;
 	curSource->isStream = false;
-	curSource->curGain = s_alGain->asFloat() * s_volume->asFloat();
+	curSource->curGain = s_alGain->asFloat() * s_volume->asFloat() * S_AL_BusLevel( sfx );
 	curSource->scaleGain = curSource->curGain;
 	curSource->local = local;
 
@@ -1567,8 +1595,8 @@ static void S_AL_SrcUpdate( )
 			continue;
 
 		// Update source parameters
-		if((s_alGain->modified()) || (s_volume->modified()))
-			curSource->curGain = s_alGain->asFloat() * s_volume->asFloat();
+		if((s_alGain->modified()) || (s_volume->modified()) || S_AL_BusModified())
+			curSource->curGain = s_alGain->asFloat() * s_volume->asFloat() * S_AL_BusLevel( curSource->sfx );
 		if((s_alRolloff->modified()) && (!curSource->local))
 			qalSourcef(curSource->alSource, AL_ROLLOFF_FACTOR, s_alRolloff->asFloat());
 		if(s_alMinDistance->modified())
@@ -2447,6 +2475,8 @@ static void S_AL_Update( )
 	// Clear the modified flags on the other cvars
 	s_alGain->setModified( false );
 	s_volume->setModified( false );
+	for( cvar_t* bus : { s_volEngines, s_volWeapons, s_volExplosions, s_volAmbience, s_volInterface } )
+		bus->setModified( false );
 	s_musicVolume->setModified( false );
 	s_alMinDistance->setModified( false );
 	s_alRolloff->setModified( false );
@@ -2671,6 +2701,11 @@ bool S_AL_Init( soundInterface_t *si )
 	s_alGain = CvarSystem::get( "s_alGain", "1.0", CVAR_ARCHIVE );
 	s_alSources = CvarSystem::get( "s_alSources", "96", CVAR_ARCHIVE );
 	s_alVoiceStats = CvarSystem::get( "s_alVoiceStats", "0", 0 );
+	s_volEngines = CvarSystem::get( "s_volEngines", "1.0", CVAR_ARCHIVE );
+	s_volWeapons = CvarSystem::get( "s_volWeapons", "1.0", CVAR_ARCHIVE );
+	s_volExplosions = CvarSystem::get( "s_volExplosions", "1.0", CVAR_ARCHIVE );
+	s_volAmbience = CvarSystem::get( "s_volAmbience", "1.0", CVAR_ARCHIVE );
+	s_volInterface = CvarSystem::get( "s_volInterface", "1.0", CVAR_ARCHIVE );
 	s_alDopplerFactor = CvarSystem::get( "s_alDopplerFactor", "1.0", CVAR_ARCHIVE );
 	s_alDopplerSpeed = CvarSystem::get( "s_alDopplerSpeed", "9000", CVAR_ARCHIVE );
 	s_alMinDistance = CvarSystem::get( "s_alMinDistance", "120", CVAR_CHEAT );
