@@ -763,6 +763,10 @@ struct PlaneTasks
 			if( !AirNav::segmentKnownFree( Vec3( from ), Vec3( to ), halfWidth + 8.0f ) )
 			{
 				Bots::pathBlocked( from, dir, length, c.ent->s.number, tr, halfWidth );
+				// already within the corridor's width of a wall: look along a narrower one, and only then along a bare
+				// line, so that hugging the wall does not make every heading look open
+				if( tr.startsolid && travelled <= 0 && start.seconds <= 0 )
+					Bots::pathBlocked( from, dir, length, c.ent->s.number, tr, halfWidth * 0.4f );
 				if( tr.startsolid && travelled <= 0 && start.seconds <= 0 )
 					Bots::pathBlocked( from, dir, length, c.ent->s.number, tr );
 				const bool vehicle = tr.entityNum >= 1 && tr.entityNum <= theLevel.maxclients_;
@@ -872,7 +876,9 @@ struct PlaneTasks
 			const float rightClear = tr.fraction * 1200.0f;
 			bot.confined = leftClear + rightClear < 1500 || c.room < 900;
 
-			constexpr float margin = 60.0f;
+			// the corridor looked along is as wide as the aircraft's own box and a little more: a bomber does not fit
+			// where a fighter does
+			const float margin = std::max( 60.0f, std::max( c.veh.maxs[0], c.veh.maxs[1] ) * 0.5f + 35.0f );
 			const float wantYaw = c.view[YAW];
 			const float wantTurn = AngleSubtract( wantYaw, yaw );
 			// near the stall the nose can only come up a little, so plan the climb that can actually be flown
@@ -1027,6 +1033,25 @@ struct PlaneTasks
 		return Status::Success;
 	}
 
+	// the enemy this plane is after has its team's flag, or is close to a team mate who carries the other one
+	static bool flagEmergency( const Mind& c )
+	{
+		constexpr float carrierThreatened = 3000.0f;
+		if( g_gametype.integer != GT_CTF || !c.sense.enemy || !c.sense.enemy->client_ )
+			return false;
+		if( c.sense.enemy->client_->ps_.objectives & (OB_REDFLAG|OB_BLUEFLAG) )
+			return true;
+		for( int i = 1; i <= theLevel.maxclients_; i++ )
+		{
+			GameEntity* mate = theLevel.getEntity( i );
+			if( mate == c.ent || !alive( mate ) || !OnSameTeam( c.ent, mate ) || !(mate->client_->ps_.objectives & (OB_REDFLAG|OB_BLUEFLAG)) )
+				continue;
+			if( Distance( mate->r.currentOrigin, c.sense.enemy->r.currentOrigin ) < carrierThreatened )
+				return true;
+		}
+		return false;
+	}
+
 	// The afterburner drinks fuel and makes the aircraft fast where fast is dangerous, so it is a decision, not a
 	// reflex. Getting off the ground always has it; so does a moment's recovery from a stall or a slow pull-up, and
 	// a climb that a fight makes urgent. Beyond that it needs open air and a reason.
@@ -1080,6 +1105,10 @@ struct PlaneTasks
 			return false;
 		// a strip that is still far off, with the fuel to hurry there
 		if( tripToStrip )
+			return true;
+		// the flag: a plane carries none, but it hurries after an enemy who has its team's, and to the fight when
+		// its enemy is near a team mate who is carrying one
+		if( flagEmergency( c ) )
 			return true;
 		// a wingman left behind catches up with the leader
 		constexpr float farBehind = 4000.0f, farFromFight = 5000.0f;
