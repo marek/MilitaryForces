@@ -1,8 +1,9 @@
+#include "../cg_local.h"
+
 /*
  * $Id: cg_miscvehicle.c,v 1.5 2005-11-20 11:21:38 thebjoern Exp $
 */
 
-#include "cg_local.h"
 
 
 
@@ -443,4 +444,3 @@ void ClientEntity::misc_Vehicle()
 		Common::error( ERR_DROP, "Error: CG_Misc_Vehicle got wrong CAT!\n" );
 	}
 }
-

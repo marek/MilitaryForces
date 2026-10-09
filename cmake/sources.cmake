@@ -24,11 +24,11 @@ set(GAME_SOURCES
 list(TRANSFORM GAME_SOURCES PREPEND "${SOURCE_DIR}/game/")
 
 set(CGAME_SOURCES
-    cg.cpp cg_boat.cpp cg_consolecmds.cpp cg_draw.cpp cg_drawnewhud.cpp
-    cg_drawtools.cpp cg_effects.cpp cg_ents.cpp cg_event.cpp cg_groundvehicle.cpp cg_helo.cpp cg_info.cpp
-    cg_localents.cpp cg_lqm.cpp cg_main.cpp cg_marks.cpp cg_miscvehicle.cpp cg_missioneditor.cpp
-    cg_particles.cpp cg_plane.cpp cg_players.cpp cg_playerstate.cpp cg_predict.cpp cg_scoreboard.cpp
-    cg_servercmds.cpp cg_snapshot.cpp cg_testmodel.cpp cg_util.cpp cg_vehicle.cpp cg_vehicledraw.cpp
+    cg.cpp vehicles/boat.cpp vehicles/ground.cpp vehicles/helo.cpp vehicles/infantry.cpp vehicles/installation.cpp vehicles/plane.cpp vehicles/shared.cpp vehicles/unmanned.cpp cg_consolecmds.cpp cg_draw.cpp cg_drawnewhud.cpp
+    cg_drawtools.cpp cg_effects.cpp cg_ents.cpp cg_event.cpp cg_info.cpp
+    cg_localents.cpp cg_main.cpp cg_marks.cpp cg_missioneditor.cpp
+    cg_particles.cpp cg_players.cpp cg_playerstate.cpp cg_predict.cpp cg_scoreboard.cpp
+    cg_servercmds.cpp cg_snapshot.cpp cg_testmodel.cpp cg_util.cpp 
     cg_view.cpp cg_weapons.cpp ui_displaycontext_cg.cpp ui_utils_cg.cpp)
 list(TRANSFORM CGAME_SOURCES PREPEND "${SOURCE_DIR}/cgame/")
 

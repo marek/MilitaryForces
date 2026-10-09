@@ -1,9 +1,11 @@
+#include "../cg_local.h"
+#include <algorithm>
+
 /*
  * $Id: cg_plane.c,v 1.6 2007-06-17 17:11:12 minkis Exp $
 */
 
 
-#include "cg_local.h"
 
 /*
 ==========================
@@ -521,3 +523,318 @@ void CGame::planeObituary( entityState_t *ent, clientInfo_t *ci )
     CGame::printf( "%s died.\n", targetName );
 }
 
+void CGame::cachePlane(int index)
+{
+	char name[128];
+	char basename[128];
+	int i;
+	unsigned int caps = availableVehicles[index].caps;
+
+	Com_sprintf( basename, sizeof(basename), "models/vehicles/planes/%s/%s", availableVehicles[index].modelName,
+			availableVehicles[index].modelName );
+
+	for( i = 0; i < BP_PLANE_MAX_PARTS; i++ ) {
+		
+
+		switch(i) {
+		case BP_PLANE_BODY:
+			Com_sprintf( name, sizeof(name), "%s.md3", basename );
+			break;
+		case BP_PLANE_CONTROLS:
+			Com_sprintf( name, sizeof(name), "%s_controls.md3", basename );
+			break;
+		case BP_PLANE_COCKPIT:
+			Com_sprintf( name, sizeof(name), "%s_cockpit.md3", basename );
+			break;
+		case BP_PLANE_GEAR:
+			Com_sprintf( name, sizeof(name), "%s_gear.md3", basename );
+			break;
+		case BP_PLANE_BRAKES:
+			Com_sprintf( name, sizeof(name), "%s_breaks.md3", basename );
+			break;
+		case BP_PLANE_BAY:
+			Com_sprintf( name, sizeof(name), "%s_bay.md3", basename );
+			break;
+		case BP_PLANE_WINGLEFT:
+			Com_sprintf( name, sizeof(name), "%s_wingL.md3", basename );
+			break;
+		case BP_PLANE_WINGRIGHT:
+			Com_sprintf( name, sizeof(name), "%s_wingR.md3", basename );
+			break;
+		case BP_PLANE_SPECIAL:
+			Com_sprintf( name, sizeof(name), "%s_special.md3", basename );
+			break;
+		case BP_PLANE_PROP:
+			Com_sprintf( name, sizeof(name), "%s_prop.md3", basename );
+			break;
+		}
+
+		availableVehicles[index].handle[i] = CGame::registerVehiclePart( name, 
+			( i == BP_PLANE_GEAR && ( caps & HC_GEAR ) ) ||
+			( i == BP_PLANE_BRAKES && ( caps & HC_SPEEDBRAKE ) ) ||
+			( i == BP_PLANE_BAY && ( caps & HC_WEAPONBAY ) ) ||
+			( ( i == BP_PLANE_WINGLEFT || i == BP_PLANE_WINGRIGHT ) && ( caps & HC_SWINGWING ) ) ||
+			( i == BP_PLANE_PROP && ( caps & HC_PROP ) ) );
+
+//		if( !availableVehicles[index].handle[i] ) {
+//			CGame::printf( "MFQ3 Warning: Unable to load model '%s'\n", name );
+//		}
+	}
+
+	// only thing that always has to be there is body
+	if( !availableVehicles[index].handle[BP_PLANE_BODY] ) {
+		Common::printf( S_COLOR_YELLOW "WARNING: MFQ3: missing body %s.md3, model not loaded\n", basename );
+	}
+}
+
+/*
+ * $Id: cg_vehicledraw.c,v 1.6 2005-11-21 17:28:20 thebjoern Exp $
+*/
+
+
+#define VAPORSPEED	(SPEED_GREEN_ARC - (SPEED_GREEN_ARC - SPEED_YELLOW_ARC)/2)
+
+// make sure the tags are named properly!
+char *plane_tags[BP_PLANE_MAX_PARTS] =
+{
+	"<no tag>",		// plane body
+	"tag_controls",	// controls
+	"tag_cockpit",	// cockpit
+	"tag_gear",		// gear
+	"tag_breaks",	// brakes
+	"tag_bay",		// bay
+	"tag_wingL",	// wing left
+	"tag_wingR",	// wing right
+	"tag_special",	// special
+	"tag_prop1"	// prop
+};
+
+char *engine_tags[3] =
+{
+	"tag_prop2",
+	"tag_prop3",
+	"tag_prop4"
+};
+
+void CGame::planePilot( const refEntity_t *parent, qhandle_t parentModel, int idx ) {
+
+	refEntity_t		pilot[MAX_PILOTS*3];	// three parts per pilot
+	unsigned int	i,j,k;
+	unsigned int	pilots = ((availableVehicles[idx].renderFlags & MFR_DUALPILOT) ? 2 : 1);
+	char			tag[12];
+
+	// pilot
+	for( i = 0; i < pilots; i++ ) {
+		for( j = 0; j < 3; j++ ) {
+			k = 3*i+j;
+			memset( &pilot[k], 0, sizeof( pilot[k] ) );
+			VectorCopy( parent->lightingOrigin, pilot[k].lightingOrigin );
+			pilot[k].shadowPlane = parent->shadowPlane;
+			pilot[k].renderfx = parent->renderfx;
+			if( j == 0 ) pilot[k].hModel = (cgs.gameset != MF_GAMESET_MODERN ? cgs.media.pilotWW2 : cgs.media.pilot);
+			else if( j == 1 ) pilot[k].hModel = (cgs.gameset != MF_GAMESET_MODERN ? cgs.media.pilotHeadWW2 : cgs.media.pilotHead);
+			else pilot[k].hModel = (cgs.gameset != MF_GAMESET_MODERN ? cgs.media.pilotSeatWW2 : cgs.media.pilotSeat);
+			AxisCopy( axisDefault, pilot[k].axis );
+			Com_sprintf( tag, 12, "tag_pilot%d", i+1 );
+			CGame::positionRotatedEntityOnTag( &pilot[k], parent, parentModel, tag);
+			CGame::addVehiclePart( &pilot[k] );
+		}
+	}
+}
+
+void CGame::drawPlane(DrawInfo_Plane_t* drawInfo)
+{
+	refEntity_t	    part[BP_PLANE_MAX_PARTS];
+	refEntity_t		vapor;
+	refEntity_t		burner;
+	refEntity_t		burner2;
+	refEntity_t		reticle;
+	float			shadowPlane = 0;
+	int				renderfx = 0;
+	int				i;
+	completeVehicleData_t* veh = &availableVehicles[drawInfo->basicInfo.vehicleIndex];
+	cg_drawTeam = drawInfo->basicInfo.team;
+
+	for( i = 0; i < BP_PLANE_MAX_PARTS; i++ ) 
+	    memset( &part[i], 0, sizeof(part[0]) );	
+    vapor = {};	
+    burner = {};	
+    burner2 = {};	
+	reticle = {};	
+
+   // add the shadow
+	switch( cg_shadows.integer )
+	{
+	case 1:
+		CGame::genericShadow( &drawInfo->basicInfo, &shadowPlane );
+		break;
+	case 3:
+		renderfx |= RF_SHADOW_PLANE;
+		break;
+	}
+	// use the same origin for all
+    renderfx |= RF_LIGHTING_ORIGIN;
+	
+	// control surfaces
+	part[BP_PLANE_CONTROLS].frame = drawInfo->controlFrame;
+	
+	// gear
+	part[BP_PLANE_GEAR].frame = drawInfo->gearFrame;
+	
+	// bay
+	part[BP_PLANE_BAY].frame = drawInfo->bayFrame;
+
+	// speedbrakes
+	part[BP_PLANE_BRAKES].frame = drawInfo->brakeFrame;
+	
+	part[BP_PLANE_COCKPIT].frame = drawInfo->cockpitFrame;
+
+    // plane body
+    part[BP_PLANE_BODY].hModel = veh->handle[BP_PLANE_BODY];
+    VectorCopy( drawInfo->basicInfo.origin, part[BP_PLANE_BODY].origin );
+	AxisCopy( drawInfo->basicInfo.axis, part[BP_PLANE_BODY].axis );
+    VectorCopy( drawInfo->basicInfo.origin, part[BP_PLANE_BODY].lightingOrigin );
+    part[BP_PLANE_BODY].shadowPlane = shadowPlane;
+    part[BP_PLANE_BODY].renderfx = renderfx;
+    VectorCopy (part[BP_PLANE_BODY].origin, part[BP_PLANE_BODY].oldorigin);
+	part[BP_PLANE_BODY].frame = drawInfo->bodyFrame;
+	CGame::addVehiclePart( &part[BP_PLANE_BODY] );
+	
+	// if the model failed, allow the default nullmodel to be displayed, but nothing else
+	if (!part[BP_PLANE_BODY].hModel) 
+		return;
+
+	// other parts
+	for( i = 1; i < BP_PLANE_MAX_PARTS; i++ ) 
+	{
+		part[i].hModel = veh->handle[i];
+		if( !part[i].hModel ) 
+			continue;
+		VectorCopy( drawInfo->basicInfo.origin, part[i].lightingOrigin );
+		AxisCopy( axisDefault, part[i].axis );
+		if( i == BP_PLANE_PROP && (veh->caps & HC_PROP) ) 
+		{
+			int ii;
+			RotateAroundDirection( part[i].axis, cg.time );
+			for( ii = 1; ii < veh->engines; ++ii ) 
+			{
+				refEntity_t engine;
+				engine = part[i];
+				CGame::positionRotatedEntityOnTag( &engine, &part[BP_PLANE_BODY], veh->handle[BP_PLANE_BODY], engine_tags[ii-1] );
+				engine.shadowPlane = shadowPlane;
+				engine.renderfx = renderfx;
+				CGame::addVehiclePart( &engine );
+			}
+		}
+		if( (veh->caps & HC_SWINGWING) && 
+			(i == BP_PLANE_WINGLEFT || i == BP_PLANE_WINGRIGHT)  ) 
+		{
+			//Common::printf( "Swingwing: %f\n", drawInfo->swingAngle );
+			if( i == BP_PLANE_WINGLEFT ) 
+				RotateAroundYaw( part[BP_PLANE_WINGLEFT].axis, drawInfo->swingAngle );
+			else if( i == BP_PLANE_WINGRIGHT )
+				RotateAroundYaw( part[BP_PLANE_WINGRIGHT].axis, -drawInfo->swingAngle );
+		}
+		CGame::positionRotatedEntityOnTag( &part[i], &part[BP_PLANE_BODY], veh->handle[BP_PLANE_BODY], plane_tags[i] );
+		part[i].shadowPlane = shadowPlane;
+		part[i].renderfx = renderfx;
+		CGame::addVehiclePart( &part[i] );
+	}
+	// pilot
+	CGame::planePilot( &part[BP_PLANE_BODY], veh->handle[BP_PLANE_BODY], drawInfo->basicInfo.vehicleIndex );
+	
+	// vwep
+	if( (veh->renderFlags & MFR_VWEP) && drawInfo->basicInfo.usedLoadout ) 
+	{
+		refEntity_t			vwep;
+
+//		for( i = 0; i < drawInfo->basicInfo.loadout->usedMounts; ++i ) 
+		for( i = 0; i < drawInfo->basicInfo.usedLoadout->usedMounts; ++i )
+		{
+			if( drawInfo->basicInfo.usedLoadout->mounts[i].weapon && 
+				drawInfo->basicInfo.numWeaponsOnMount[i] ) 
+			{
+				vwep = {};		
+				vwep.hModel = availableWeapons[drawInfo->basicInfo.usedLoadout->mounts[i].weapon].vwepHandle;
+				VectorCopy( drawInfo->basicInfo.origin, vwep.lightingOrigin );
+				AxisCopy( axisDefault, vwep.axis );
+				CGame::positionEntityOnTag( &vwep, &part[BP_PLANE_BODY], veh->handle[BP_PLANE_BODY], 
+						drawInfo->basicInfo.usedLoadout->mounts[i].tag.name );
+				vwep.shadowPlane = shadowPlane;
+				vwep.renderfx = renderfx;
+				CGame::addVehiclePart( &vwep );
+			}
+		}
+	}
+
+	// vapor
+	if( drawInfo->basicInfo.ONOFF & OO_VAPOR ) 
+	{
+		vapor.hModel = (veh->renderFlags & MFR_BIGVAPOR) ? cgs.media.vaporBig : cgs.media.vapor;
+		vapor.customShader = cgs.media.vaporShader;
+		if( drawInfo->basicInfo.speed < veh->stallspeed * SPEED_GREEN_ARC &&
+			drawInfo->basicInfo.speed > veh->stallspeed * VAPORSPEED ) 
+		{
+			vapor.frame = 1;
+		}
+		VectorCopy( drawInfo->basicInfo.origin, vapor.lightingOrigin );
+		AxisCopy( axisDefault, vapor.axis );
+		CGame::positionEntityOnTag( &vapor, &part[BP_PLANE_BODY], veh->handle[BP_PLANE_BODY], "tag_vapor1" );
+		vapor.shadowPlane = shadowPlane;
+		vapor.renderfx = renderfx;
+		CGame::addVehiclePart( &vapor );
+	}
+	
+	// throttle/afterburner
+	if( drawInfo->basicInfo.throttle > 10 ) 
+	{
+		burner.hModel = cgs.media.afterburner[veh->effectModel];
+		VectorCopy( drawInfo->basicInfo.origin, burner.lightingOrigin );
+		AxisCopy( axisDefault, burner.axis );
+		CGame::positionEntityOnTag( &burner, &part[BP_PLANE_BODY], veh->handle[BP_PLANE_BODY], "tag_ab1" );
+		burner.shadowPlane = shadowPlane;
+		burner.renderfx = renderfx;
+		burner.frame = drawInfo->bodyFrame;
+		CGame::addVehiclePart( &burner );
+		if( veh->engines > 1 ) 
+		{
+			burner2.hModel = cgs.media.afterburner[veh->effectModel];
+			VectorCopy( drawInfo->basicInfo.origin, burner2.lightingOrigin );
+			AxisCopy( axisDefault, burner2.axis );
+			CGame::positionRotatedEntityOnTag( &burner2, &part[BP_PLANE_BODY], veh->handle[BP_PLANE_BODY], "tag_ab2" );
+			burner2.shadowPlane = shadowPlane;
+			burner2.renderfx = renderfx;
+			burner2.frame = drawInfo->bodyFrame;
+			CGame::addVehiclePart( &burner2 );
+		}
+	}
+
+	// sound
+	if( drawInfo->basicInfo.entityNum >= 0 ) 
+	{
+		if ( veh->caps & HC_PROP ) {
+			SoundSystem::addLoopingSound( drawInfo->basicInfo.entityNum, drawInfo->basicInfo.origin, vec3_origin, 
+									cgs.media.engineProp );
+		}
+		else {
+			if( drawInfo->basicInfo.throttle > 10 ) 
+			{
+				SoundSystem::addLoopingSound( drawInfo->basicInfo.entityNum, drawInfo->basicInfo.origin, vec3_origin, 
+										cgs.media.engineJetAB );
+			}
+			else 
+			{
+				SoundSystem::addLoopingSound( drawInfo->basicInfo.entityNum, drawInfo->basicInfo.origin, vec3_origin,
+										cgs.media.engineJet );
+			}
+		}
+	}
+	
+	// muzzleflash
+	if( drawInfo->basicInfo.drawMuzzleFlash ) 
+	{
+		CGame::vehicleMuzzleFlash( drawInfo->basicInfo.flashWeaponIndex, &part[BP_PLANE_BODY], 
+							   veh->handle[BP_PLANE_BODY], drawInfo->basicInfo.vehicleIndex );
+	}
+	
+}

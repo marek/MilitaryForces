@@ -1,72 +1,39 @@
+#include "../cg_local.h"
+#include <algorithm>
+
 /*
- * $Id: cg_groundvehicle.c,v 1.7 2005-11-21 17:28:20 thebjoern Exp $
+ * $Id: cg_boat.c,v 1.5 2005-11-20 11:21:38 thebjoern Exp $
 */
 
-
-#include "cg_local.h"
 
 
 
 /*
 ==========================
-CGame::registerGroundVehicle
+CGame::registerBoat
 ==========================
 */
-void CGame::registerGroundVehicle( clientInfo_t *ci ) 
+void CGame::registerBoat( clientInfo_t *ci ) 
 {
 	int i;
 
-	for( i = 0; i < BP_GV_MAX_PARTS; i++ ) {
+	for( i = 0; i < BP_BOAT_MAX_PARTS; i++ ) {
 		ci->parts[i] = availableVehicles[ci->vehicle].handle[i];
-/*
-		if( !ci->parts[i] )
-		{
-			CGame::printf( "Informational: RegisterGroundVehicle failed register part %d of vehicle %d (id %x)\n", i, 
-				ci->vehicle, availableVehicles[ci->vehicle].id );
-		}
-*/
 	}
 }
 
 
-/*
-===============
-CG_GroundVehicleFlags
-===============
-*/
-void ClientEntity::groundVehicleFlags() {
-	int		powerups;
-	clientInfo_t	*ci;
-
-	powerups = this->currentState.objectives;
-	if ( !powerups ) {
-		return;
-	}
-
-	ci = &cgs.clientinfo[ this->currentState.clientNum ];
-
-	// redflag
-	if ( powerups & OB_REDFLAG ) {
-		this->trailItem( cgs.media.redFlagModel );
-//		refExport.AddLightToScene( this->lerpOrigin, 200 + (rand()&31), 1.0, 0.2f, 0.2f );
-	}
-
-	// blueflag
-	if ( powerups & OB_BLUEFLAG ) {
-		this->trailItem( cgs.media.blueFlagModel );
-//		refExport.AddLightToScene( this->lerpOrigin, 200 + (rand()&31), 0.2f, 0.2f, 1.0 );
-	}
-}
 
 /*
 ===============
-CG_GroundVehicle
+CG_Boat
 ===============
 */
-void ClientEntity::groundVehicle( clientInfo_t *ci ) 
+void ClientEntity::boat( clientInfo_t *ci ) 
 {
 	Vec3			velocity;
-	DrawInfo_GV_t	drawInfo;
+	DrawInfo_Boat_t	drawInfo;
+	int				i;
 
 	drawInfo = {};
 	drawInfo.basicInfo.vehicleIndex = ci->vehicle;
@@ -91,28 +58,35 @@ void ClientEntity::groundVehicle( clientInfo_t *ci )
 	// loadout
 	drawInfo.basicInfo.usedLoadout = nullptr;//&cg_loadouts[this->currentState.number];
 
-	// turret/gun angle
-	drawInfo.gunAngle = this->lerpAngles2[PITCH];
-	drawInfo.turretAngle = this->lerpAngles2[ROLL];
-	drawInfo.turretGone = (availableVehicles[drawInfo.basicInfo.vehicleIndex].flags & VF_COOKOFF) && (this->currentState.eFlags & EF_DEAD);
+    //
+    // turrets
+    //
+	for( i = 0; i < 4; ++i ) {
+		float yaw = this->lerpAngles2[ROLL];
+		float pitch = this->lerpAngles2[PITCH];
+		float max, min;
+		if( yaw > 180 ) yaw -= 360;
+		max = availableWeapons[availableVehicles[ci->vehicle].weapons[i+1]].maxturns[1];
+		min = availableWeapons[availableVehicles[ci->vehicle].weapons[i+1]].minturns[1];
+		if( max > min ) {
+			if( yaw > max ) yaw = max;
+			else if( yaw < min ) yaw = min;
+		} else {
+			if( yaw > 0 && yaw < min ) yaw = min;
+			else if( yaw < 0 && yaw > max ) yaw = max;
+		}
+		if( pitch > 180 ) pitch -= 360;
+		max = availableWeapons[availableVehicles[ci->vehicle].weapons[i+1]].maxturns[0];
+		min = availableWeapons[availableVehicles[ci->vehicle].weapons[i+1]].minturns[0];
+		if( pitch > max ) pitch = max;
+		else if( pitch < min ) pitch = min;
+		drawInfo.turretAngle[i] = yaw;
+		drawInfo.gunAngle[i] = pitch;
+	}
 
-	// wheels
-	if( (availableVehicles[ci->vehicle].caps & HC_WHEELS) ) {
-		int timediff = cg.time - this->gearAnimStartTime;
-		float dist = drawInfo.basicInfo.speed * timediff / 1000;
-		Vec3 v1, v2;
-		float dot;
-		AngleVectors( this->currentState.angles, v1, nullptr, nullptr );
-		VectorCopy( this->currentState.pos.trDelta, v2 );
-		VectorNormalize( v2 );
-		dot = DotProduct( v1, v2 );
-		dist = ( (dist / availableVehicles[ci->vehicle].wheelCF)*360);
-		this->gearAnim += (dot > 0 ? dist : -dist);
-		this->gearAnim = AngleMod( this->gearAnim );
-		this->gearAnimStartTime = cg.time;
-		drawInfo.wheelAngle = static_cast<float>(this->gearAnim);
-	
-		drawInfo.wheelDirection = this->currentState.vehicleAnim;
+	// smoke 
+	if( this->currentState.generic1 ) {
+		this->generic_Smoke( this->lerpOrigin, 100 );
 	}
 
 	// muzzleflash
@@ -121,29 +95,12 @@ void ClientEntity::groundVehicle( clientInfo_t *ci )
 		drawInfo.basicInfo.flashWeaponIndex = this->muzzleFlashWeapon;
 	}
 
-
-	// smoke
-	if( this->currentState.generic1 ) {
-		this->generic_Smoke( this->lerpOrigin, 100 );
-	}
-	
-	// draw plane
-	CGame::drawGV(&drawInfo);
-
-/*
-		AngleVectors( self->client->ps.vehicleAngles, forward, right, up );
-		RotatePointAroundVector( temp, up, forward, self->client->ps.turretAngle );
-		CrossProduct( up, temp, right );
-		RotatePointAroundVector( dir, right, temp, self->client->ps.gunAngle );
-*/
-
-	// CTF
-	this->groundVehicleFlags();
+	CGame::drawBoat(&drawInfo);
 
 	// reticles
 	if( this == &cg.predictedPlayerEntity )
 	{
-		refEntity_t		reticle;
+		refEntity_t	reticle;
 		Vec3	forward, right, up, ang, start, end, temp;
 		trace_t	tr;
 		float len;
@@ -315,7 +272,7 @@ CGame::groundVehicleObituary
 General ugly function, needs to be made prettier some day...
 =============
 */
-void CGame::groundVehicleObituary( entityState_t *ent, clientInfo_t *ci ) 
+void CGame::boatObituary( entityState_t *ent, clientInfo_t *ci ) 
 {
 	// add some cool stuff here :-)
 
@@ -493,3 +450,176 @@ void CGame::groundVehicleObituary( entityState_t *ent, clientInfo_t *ci )
     CGame::printf( "%s died.\n", targetName );
 }
 
+/*
+===============
+CGame::cacheBoat
+
+On startup cache it
+===============
+*/
+
+void CGame::cacheBoat(int index)
+{
+	char name[128];
+	char basename[128];
+	char body[128];
+	int i;
+
+	Com_sprintf( basename, sizeof(basename), "models/vehicles/sea/%s/%s", availableVehicles[index].modelName,
+			availableVehicles[index].modelName );
+// changed mg
+	for( i = 0; i < BP_BOAT_MAX_PARTS; i++ ) {
+		switch(i) {
+		case BP_BOAT_BODY:
+			Com_sprintf( name, sizeof(name), "%s.md3", basename );
+			// temp
+//			{
+//				md3Tag_t tag;
+//				if( VehicleData::findTag(name, "tag_turret", &tag) ) {
+//					CGame::printf( "found tag_turret in %s: %.1f %.1f %.1f\n", name,
+//						tag.origin[0], tag.origin[1], tag.origin[2] );
+//				}
+//			}
+			// end temp
+
+			break;
+		case BP_BOAT_TURRET:
+			Com_sprintf( name, sizeof(name), "%s_tur.md3", basename );
+			break;
+		case BP_BOAT_GUNBARREL:
+			Com_sprintf( name, sizeof(name), "%s_gun.md3", basename );
+			break;
+		case BP_BOAT_TURRET2:
+			Com_sprintf( name, sizeof(name), "%s_tur2.md3", basename );
+			break;
+		case BP_BOAT_GUNBARREL2:
+			Com_sprintf( name, sizeof(name), "%s_gun2.md3", basename );
+			break;
+		case BP_BOAT_TURRET3:
+			Com_sprintf( name, sizeof(name), "%s_tur3.md3", basename );
+			break;
+		case BP_BOAT_GUNBARREL3:
+			Com_sprintf( name, sizeof(name), "%s_gun3.md3", basename );
+			break;
+		case BP_BOAT_TURRET4:
+			Com_sprintf( name, sizeof(name), "%s_tur4.md3", basename );
+			break;
+		case BP_BOAT_GUNBARREL4:
+			Com_sprintf( name, sizeof(name), "%s_gun4.md3", basename );
+			break;
+		}
+		if( i == BP_BOAT_BODY ) {
+			availableVehicles[index].handle[i] = refExport.RegisterModel(name);
+		} else if( i & 1 ) {
+			static const char *turretTags[] = { "tag_turret", "tag_turret2", "tag_turret3", "tag_turret4" };
+			Com_sprintf( body, sizeof(body), "%s.md3", basename );
+			availableVehicles[index].handle[i] = CGame::registerVehiclePart( name, 
+				availableVehicles[index].handle[BP_BOAT_BODY] && VehicleData::findTag( body, turretTags[i/2] ).has_value() );
+		} else {
+			availableVehicles[index].handle[i] = CGame::registerVehiclePart( name, availableVehicles[index].handle[i-1] != 0 );
+		}
+	}
+
+	// only thing that always has to be there is body
+	if( !availableVehicles[index].handle[BP_BOAT_BODY] ) {
+	}
+}
+
+char *boat_tags[BP_BOAT_MAX_PARTS] =
+{
+	"<no tag>",		// vehicle body
+	"tag_turret",	// turret
+	"tag_weap",		// gun
+	"tag_turret2",	// turret
+	"tag_weap2",		// gun
+	"tag_turret3",	// turret
+	"tag_weap",		// gun
+	"tag_turret4",	// turret
+	"tag_weap"		// gun
+};
+
+void CGame::drawBoat(DrawInfo_Boat_t* drawInfo)
+{
+	refEntity_t	    part[BP_BOAT_MAX_PARTS];
+	float			shadowPlane = 0;
+	int				renderfx = 0;
+	int				i, tanksound;
+
+	completeVehicleData_t* veh = &availableVehicles[drawInfo->basicInfo.vehicleIndex];
+	cg_drawTeam = drawInfo->basicInfo.team;
+
+	for( i = 0; i < BP_GV_MAX_PARTS; i++ ) {
+	    memset( &part[i], 0, sizeof(part[0]) );	
+	}
+
+    // add the shadow
+	switch( cg_shadows.integer )
+	{
+	case 1:
+		CGame::genericShadow( &drawInfo->basicInfo, &shadowPlane );
+		break;
+	case 3:
+		renderfx |= RF_SHADOW_PLANE;
+		break;
+	}
+
+	// use the same origin for all
+    renderfx |= RF_LIGHTING_ORIGIN;
+
+    //
+    // add the hull
+    //
+    part[BP_BOAT_BODY].hModel = veh->handle[BP_BOAT_BODY];
+    VectorCopy( drawInfo->basicInfo.origin, part[BP_BOAT_BODY].origin );
+    VectorCopy( drawInfo->basicInfo.origin, part[BP_BOAT_BODY].lightingOrigin );
+	AxisCopy( drawInfo->basicInfo.axis, part[BP_GV_BODY].axis );
+    part[BP_BOAT_BODY].shadowPlane = shadowPlane;
+    part[BP_BOAT_BODY].renderfx = renderfx;
+    VectorCopy (part[BP_BOAT_BODY].origin, part[BP_BOAT_BODY].oldorigin);
+    CGame::addVehiclePart( &part[BP_BOAT_BODY] );
+
+    //
+    // turrets
+    //
+	for( i = 0; i < 2; ++i ) {
+		int j = 2*i;
+		// turret
+		part[BP_BOAT_TURRET+j].hModel = veh->handle[BP_BOAT_TURRET+j];
+		if( !part[BP_BOAT_TURRET+j].hModel ) break;
+		VectorCopy( drawInfo->basicInfo.origin, part[BP_BOAT_TURRET+j].lightingOrigin );
+		AxisCopy( axisDefault, part[BP_BOAT_TURRET+j].axis );
+		RotateAroundYaw( part[BP_BOAT_TURRET+j].axis, drawInfo->turretAngle[i] );
+		CGame::positionRotatedEntityOnTag( &part[BP_BOAT_TURRET+j], &part[BP_BOAT_BODY], veh->handle[BP_BOAT_BODY], boat_tags[BP_BOAT_TURRET+j] );
+		part[BP_BOAT_TURRET+j].shadowPlane = shadowPlane;
+		part[BP_BOAT_TURRET+j].renderfx = renderfx;
+		VectorCopy (part[BP_BOAT_TURRET+j].origin, part[BP_BOAT_TURRET+j].oldorigin);
+		CGame::addVehiclePart( &part[BP_BOAT_TURRET+j] );
+		// gun
+		part[BP_BOAT_GUNBARREL+j].hModel = veh->handle[BP_BOAT_GUNBARREL+j];
+		VectorCopy( drawInfo->basicInfo.origin, part[BP_BOAT_GUNBARREL+j].lightingOrigin );
+		AxisCopy( axisDefault, part[BP_BOAT_GUNBARREL+j].axis );
+		RotateAroundPitch( part[BP_BOAT_GUNBARREL+j].axis, drawInfo->gunAngle[i] );
+		CGame::positionRotatedEntityOnTag( &part[BP_BOAT_GUNBARREL+j], &part[BP_BOAT_TURRET+j], veh->handle[BP_BOAT_TURRET+j], boat_tags[BP_BOAT_GUNBARREL+j] );
+		part[BP_BOAT_GUNBARREL+j].shadowPlane = shadowPlane;
+		part[BP_BOAT_GUNBARREL+j].renderfx = renderfx;
+		VectorCopy (part[BP_BOAT_GUNBARREL+j].origin, part[BP_BOAT_GUNBARREL+j].oldorigin);
+		CGame::addVehiclePart( &part[BP_BOAT_GUNBARREL+j] );
+
+	}
+
+	// sound
+	if( drawInfo->basicInfo.entityNum >= 0 ) {
+		tanksound = drawInfo->basicInfo.speed * NUM_TANKSOUNDS / veh->maxspeed;
+		if( tanksound >= NUM_TANKSOUNDS ) tanksound = NUM_TANKSOUNDS - 1;
+		SoundSystem::addLoopingSound( drawInfo->basicInfo.entityNum, 
+								drawInfo->basicInfo.origin, 
+								vec3_origin, 
+								cgs.media.engineTank[tanksound] );
+	}
+
+	// muzzleflash
+	if( drawInfo->basicInfo.drawMuzzleFlash ) {
+		CGame::vehicleMuzzleFlash( drawInfo->basicInfo.flashWeaponIndex, &part[BP_BOAT_GUNBARREL], 
+							   veh->handle[BP_BOAT_GUNBARREL], drawInfo->basicInfo.vehicleIndex );
+	}
+}

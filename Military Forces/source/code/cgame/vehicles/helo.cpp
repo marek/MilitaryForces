@@ -1,9 +1,11 @@
+#include "../cg_local.h"
+#include <algorithm>
+
 /*
  * $Id: cg_helo.c,v 1.5 2005-11-21 17:28:20 thebjoern Exp $
 */
 
 
-#include "cg_local.h"
 /*
 #define VAPORSPEED	(SPEED_GREEN_ARC - (SPEED_GREEN_ARC - SPEED_YELLOW_ARC)/2)
 
@@ -593,4 +595,224 @@ void CGame::heloObituary( entityState_t *ent, clientInfo_t *ci )
     CGame::printf( "%s died.\n", targetName );
 }
 
+/*
+===============
+CGame::cacheGroundVehicle
 
+On startup cache it
+===============
+*/
+
+void CGame::cacheHelo(int index)
+{
+	char name[128];
+	char basename[128];
+	int i;
+
+	Com_sprintf( basename, sizeof(basename), "models/vehicles/helos/%s/%s", availableVehicles[index].modelName,
+			availableVehicles[index].modelName );
+
+	for( i = 0; i < BP_HELO_MAX_PARTS; i++ ) {
+		switch(i) {
+		case BP_HELO_BODY:
+			Com_sprintf( name, sizeof(name), "%s.md3", basename );
+			break;
+		case BP_HELO_MAINROTOR:
+			Com_sprintf( name, sizeof(name), "%s_mrotor_blur.md3", basename );
+			break;
+		case BP_HELO_TAILROTOR:
+			Com_sprintf( name, sizeof(name), "%s_trotor_blur.md3", basename );
+			break;
+		case BP_HELO_TURRET:
+			Com_sprintf( name, sizeof(name), "%s_tur.md3", basename );
+			break;
+		case BP_HELO_GUNBARREL:
+			Com_sprintf( name, sizeof(name), "%s_gun.md3", basename );
+			break;
+		// door guns are one gun model on two mounts
+		case BP_HELO_TURRET2:
+			Com_sprintf( name, sizeof(name), (availableVehicles[index].flags & VF_DOORGUNS) ? "%s_tur.md3" : "%s_tur2.md3", basename );
+			break;
+		case BP_HELO_GUNBARREL2:
+			Com_sprintf( name, sizeof(name), (availableVehicles[index].flags & VF_DOORGUNS) ? "%s_gun.md3" : "%s_gun2.md3", basename );
+			break;
+		case BP_HELO_GEAR:
+			Com_sprintf( name, sizeof(name), "%s_gear.md3", basename );
+			break;
+		case BP_HELO_BAY:
+			Com_sprintf( name, sizeof(name), "%s_bay.md3", basename );
+			break;
+		case BP_HELO_PARTS:
+			Com_sprintf( name, sizeof(name), "%s_parts.md3", basename );
+			break;
+		}
+		availableVehicles[index].handle[i] = CGame::registerVehiclePart( name, false );
+	}
+
+	// only thing that always has to be there is body
+	if( !availableVehicles[index].handle[BP_HELO_BODY] ) {
+		Common::printf( S_COLOR_YELLOW "WARNING: MFQ3: missing body %s.md3, model not loaded\n", basename );
+	}
+}
+
+char *helo_tags[BP_HELO_MAX_PARTS] =
+{
+	"<no tag>",		// plane body
+	"tag_mrotor",	// prop
+	"tag_trotor",	// prop
+	"tag_turret",	// turret
+	"tag_weap",		// gun
+	"tag_turret2",	// turret
+	"tag_weap2",	// gun
+	"tag_gear",		// gear
+	"tag_bay",		// bay
+	"tag_parts",	// variant parts
+};
+
+void CGame::drawHelo(DrawInfo_Helo_t* drawInfo)
+{
+refEntity_t	    part[BP_HELO_MAX_PARTS];
+	float			shadowPlane = 0;
+	int				renderfx = 0;
+	int				i;
+
+	completeVehicleData_t* veh = &availableVehicles[drawInfo->basicInfo.vehicleIndex];
+	cg_drawTeam = drawInfo->basicInfo.team;
+
+	for( i = 0; i < BP_HELO_MAX_PARTS; i++ ) {
+	    memset( &part[i], 0, sizeof(part[0]) );	
+	}
+
+	// use the same origin for all
+    renderfx |= RF_LIGHTING_ORIGIN;
+
+    //
+    // add the hull
+    //
+    part[BP_HELO_BODY].hModel = veh->handle[BP_HELO_BODY];
+    VectorCopy( drawInfo->basicInfo.origin, part[BP_HELO_BODY].origin );
+    VectorCopy( drawInfo->basicInfo.origin, part[BP_HELO_BODY].lightingOrigin );
+	AxisCopy( drawInfo->basicInfo.axis, part[BP_HELO_BODY].axis );
+    part[BP_HELO_BODY].shadowPlane = shadowPlane;
+    part[BP_HELO_BODY].renderfx = renderfx;
+    VectorCopy (part[BP_HELO_BODY].origin, part[BP_HELO_BODY].oldorigin);
+    CGame::addVehiclePart( &part[BP_HELO_BODY] );
+
+	// a helicopter with pilot seats in its model gets its crew drawn, like the planes
+	orientation_t seat;
+	if( refExport.LerpTag( &seat, veh->handle[BP_HELO_BODY], 0, 0, 1.0f, "tag_pilot1" ) )
+		CGame::planePilot( &part[BP_HELO_BODY], veh->handle[BP_HELO_BODY], drawInfo->basicInfo.vehicleIndex );
+
+	// rotors
+	for( i = BP_HELO_MAINROTOR; i <= BP_HELO_TAILROTOR; i++ ) {
+		part[i].hModel = veh->handle[i];
+		if( !part[i].hModel ) {
+			continue;
+		}
+		VectorCopy( drawInfo->basicInfo.origin, part[i].lightingOrigin );
+		AxisCopy( axisDefault, part[i].axis );
+		if( i == BP_HELO_MAINROTOR ) 
+			RotateAroundYaw( part[i].axis, cg.time*1.25+drawInfo->basicInfo.entityNum*100 );	// make rotors more random by entitynum so it doesnt look stupid in a screenshot when everyone has the same rotor position
+		if( i == BP_HELO_TAILROTOR )
+			RotateAroundPitch( part[i].axis, cg.time*1.25+drawInfo->basicInfo.entityNum*100);
+
+		CGame::positionRotatedEntityOnTag( &part[i], &part[BP_HELO_BODY], veh->handle[BP_HELO_BODY], helo_tags[i] );
+		part[i].shadowPlane = shadowPlane;
+		part[i].renderfx = renderfx;
+		CGame::addVehiclePart( &part[i] );
+	}
+
+
+	// gear, bay, variant parts
+	for( i = BP_HELO_GEAR; i <= BP_HELO_PARTS; i++ ) {
+		part[i].hModel = veh->handle[i];
+		if( !part[i].hModel ) {
+			continue;
+		}
+		if( i == BP_HELO_GEAR ) part[i].frame = drawInfo->gearFrame;
+		else if( i == BP_HELO_BAY ) part[i].frame = drawInfo->bayFrame;
+		VectorCopy( drawInfo->basicInfo.origin, part[i].lightingOrigin );
+		AxisCopy( axisDefault, part[i].axis );
+		CGame::positionEntityOnTag( &part[i], &part[BP_HELO_BODY], veh->handle[BP_HELO_BODY], helo_tags[i] );
+		part[i].shadowPlane = shadowPlane;
+		part[i].renderfx = renderfx;
+		CGame::addVehiclePart( &part[i] );
+	}
+
+	// vwep
+	if( (veh->renderFlags & MFR_VWEP) && drawInfo->basicInfo.usedLoadout ) 
+	{
+		refEntity_t			vwep;
+		int					parent = drawInfo->basicInfo.usedLoadout->mountsOnBay ? BP_HELO_BAY : BP_HELO_BODY;
+
+		for( i = 0; i < drawInfo->basicInfo.usedLoadout->usedMounts; ++i )
+		{
+			if( drawInfo->basicInfo.usedLoadout->mounts[i].weapon && 
+				drawInfo->basicInfo.numWeaponsOnMount[i] ) 
+			{
+				vwep = {};		
+				vwep.hModel = availableWeapons[drawInfo->basicInfo.usedLoadout->mounts[i].weapon].vwepHandle;
+				VectorCopy( drawInfo->basicInfo.origin, vwep.lightingOrigin );
+				AxisCopy( axisDefault, vwep.axis );
+				CGame::positionEntityOnTag( &vwep, &part[parent], veh->handle[parent], 
+						drawInfo->basicInfo.usedLoadout->mounts[i].tag.name );
+				vwep.shadowPlane = shadowPlane;
+				vwep.renderfx = renderfx;
+				CGame::addVehiclePart( &vwep );
+			}
+		}
+	}
+
+//
+    // turrets
+    //
+	for( i = 0; i < 2; ++i ) {
+		int j = 2*i;
+		// turret
+		part[BP_HELO_TURRET+j].hModel = veh->handle[BP_HELO_TURRET+j];
+		if( !part[BP_HELO_TURRET+j].hModel ) break;
+		VectorCopy( drawInfo->basicInfo.origin, part[BP_HELO_TURRET+j].lightingOrigin );
+		AxisCopy( axisDefault, part[BP_HELO_TURRET+j].axis );
+		RotateAroundYaw( part[BP_HELO_TURRET+j].axis, drawInfo->turretAngle[i] );
+		CGame::positionRotatedEntityOnTag( &part[BP_HELO_TURRET+j], &part[BP_HELO_BODY], veh->handle[BP_HELO_BODY], helo_tags[BP_HELO_TURRET+j] );
+		part[BP_HELO_TURRET+j].shadowPlane = shadowPlane;
+		part[BP_HELO_TURRET+j].renderfx = renderfx;
+		VectorCopy (part[BP_HELO_TURRET+j].origin, part[BP_HELO_TURRET+j].oldorigin);
+		CGame::addVehiclePart( &part[BP_HELO_TURRET+j] );
+		// gun
+		part[BP_HELO_GUNBARREL+j].hModel = veh->handle[BP_HELO_GUNBARREL+j];
+		VectorCopy( drawInfo->basicInfo.origin, part[BP_HELO_GUNBARREL+j].lightingOrigin );
+		AxisCopy( axisDefault, part[BP_HELO_GUNBARREL+j].axis );
+		RotateAroundPitch( part[BP_HELO_GUNBARREL+j].axis, drawInfo->gunAngle[i] );
+		// door guns are the same gun model on both mounts, so the second barrel sits on the same tag as the first
+		CGame::positionRotatedEntityOnTag( &part[BP_HELO_GUNBARREL+j], &part[BP_HELO_TURRET+j], veh->handle[BP_HELO_TURRET+j],
+			helo_tags[BP_HELO_GUNBARREL + ( (veh->flags & VF_DOORGUNS) ? 0 : j )] );
+		part[BP_HELO_GUNBARREL+j].shadowPlane = shadowPlane;
+		part[BP_HELO_GUNBARREL+j].renderfx = renderfx;
+		VectorCopy (part[BP_HELO_GUNBARREL+j].origin, part[BP_HELO_GUNBARREL+j].oldorigin);
+		CGame::addVehiclePart( &part[BP_HELO_GUNBARREL+j] );
+
+	}
+
+	// sound
+	if( drawInfo->basicInfo.entityNum >= 0 ) {
+			SoundSystem::addLoopingSound( drawInfo->basicInfo.entityNum, drawInfo->basicInfo.origin, vec3_origin, 
+									cgs.media.engineHelo );
+	}
+
+	// muzzleflash
+	if( drawInfo->basicInfo.drawMuzzleFlash ) {
+		if( veh->flags & VF_DOORGUNS ) {
+			// only the door gun that bears on the aim is firing
+			for( int gun = 0; gun < 2; ++gun ) {
+				if( doorGunBears( gun == 1, drawInfo->doorGunAim ) && part[BP_HELO_GUNBARREL + 2 * gun].hModel )
+					CGame::vehicleMuzzleFlash( drawInfo->basicInfo.flashWeaponIndex, &part[BP_HELO_GUNBARREL + 2 * gun],
+										   veh->handle[BP_HELO_GUNBARREL + 2 * gun], drawInfo->basicInfo.vehicleIndex );
+			}
+		} else {
+			CGame::vehicleMuzzleFlash( drawInfo->basicInfo.flashWeaponIndex, &part[BP_HELO_GUNBARREL], 
+								   veh->handle[BP_HELO_GUNBARREL], drawInfo->basicInfo.vehicleIndex );
+		}
+	}
+
+}
