@@ -12,8 +12,6 @@ namespace
 {
 	enum Phase { Survey, Approach, Final, Ground };
 
-	// the touchdown point sits this far inside the runway's end (the same figures the pad finder uses)
-	float thresholdInset( const Bots::Pad& pad ) { return pad.halfLength < 600.0f ? 60.0f : 150.0f; }
 	// slower than this on the ground a plane is taxiing, not rolling out
 	constexpr float taxiSpeed = 60.0f;
 	// the steepest path a plane holds on final while it is still slowing down (about 11 degrees)
@@ -24,7 +22,7 @@ namespace
 	// where the plane is relative to the runway, in the runway's own terms
 	struct Geometry
 	{
-		const Bots::Pad&	pad;
+		const BotWorld::Pad&	pad;
 		float				stall;
 		float				along;		// along the runway from its centre, in the pad's own direction
 		float				side;		// off the centre line
@@ -35,7 +33,7 @@ namespace
 		float				axisYaw;	// heading of the landing direction
 		Vec3				travel;		// unit vector of the landing direction
 
-		Geometry( const Bots::Pad& runway, const Bots::Mind& c ) : pad( runway ), stall( static_cast<float>( c.veh.stallspeed ) )
+		Geometry( const BotWorld::Pad& runway, const Bots::Mind& c ) : pad( runway ), stall( static_cast<float>( c.veh.stallspeed ) )
 		{
 			Vec3 rel, angles;
 			VectorSubtract( c.ent->r.currentOrigin, pad.center, rel );
@@ -43,7 +41,7 @@ namespace
 			side = rel[1] * pad.axis[0] - rel[0] * pad.axis[1];
 			above = c.ent->r.currentOrigin[2] - pad.z;
 			pos = along * c.bot.landDir;
-			before = -(pad.halfLength - thresholdInset( pad )) - pos;
+			before = -(pad.halfLength - BotWorld::thresholdInset( pad )) - pos;
 			VectorScale( pad.axis, c.bot.landDir, travel );
 			vectoangles( travel, angles );
 			axisYaw = angles[YAW];
@@ -109,7 +107,7 @@ Status LandingSteps::survey( Bots::Mind& c )
 {
 	if( c.bot.pad < 0 )
 		return Status::Failure;
-	const Bots::Pad& pad = Bots::pads_[c.bot.pad];
+	const BotWorld::Pad& pad = BotWorld::pads_[c.bot.pad];
 	c.bot.landPhase = Survey;
 	c.bot.landStart = theLevel.time_;
 	c.bot.landOutbound = false;
@@ -128,13 +126,13 @@ Status LandingSteps::survey( Bots::Mind& c )
 		const float dir = k ? 1.0f : -1.0f;
 		Vec3 from, out;
 		trace_t tr;
-		slope[k] = Bots::approachSlope( pad, dir );
-		VectorMA( pad.center, -dir * (pad.halfLength - thresholdInset( pad )), pad.axis, from );
+		slope[k] = BotWorld::approachSlope( pad, dir );
+		VectorMA( pad.center, -dir * (pad.halfLength - BotWorld::thresholdInset( pad )), pad.axis, from );
 		from[2] = pad.z + 250;
 		VectorScale( pad.axis, -dir, out );
 		out[2] = slope[k];
 		VectorNormalize( out );
-		Bots::pathBlocked( from, out, 3500, ENTITYNUM_NONE, tr );
+		BotWorld::pathBlocked( from, out, 3500, ENTITYNUM_NONE, tr );
 		clear[k] = tr.fraction * 3500.0f;
 	}
 
@@ -158,7 +156,7 @@ Status LandingSteps::survey( Bots::Mind& c )
 	Vec3 over;
 	VectorCopy( pad.center, over );
 	over[2] = pad.z + 40;
-	c.bot.landCeiling = Bots::ceilingAbove( over, ENTITYNUM_NONE );
+	c.bot.landCeiling = BotWorld::ceilingAbove( over, ENTITYNUM_NONE );
 
 	// land on the lane with the longest clear run, a little or well to either side of the centre line
 	float bestLength = -1;
@@ -167,11 +165,11 @@ Status LandingSteps::survey( Bots::Mind& c )
 		Vec3 from, lane;
 		trace_t tr;
 		VectorScale( pad.axis, c.bot.landDir, lane );
-		VectorMA( pad.center, -(pad.halfLength - thresholdInset( pad )), lane, from );
+		VectorMA( pad.center, -(pad.halfLength - BotWorld::thresholdInset( pad )), lane, from );
 		from[0] += -lane[1] * offset;
 		from[1] += lane[0] * offset;
 		from[2] = pad.z + 30;
-		Bots::pathBlocked( from, lane, pad.halfLength * 2.0f - 300.0f, ENTITYNUM_NONE, tr );
+		BotWorld::pathBlocked( from, lane, pad.halfLength * 2.0f - 300.0f, ENTITYNUM_NONE, tr );
 		if( tr.fraction > bestLength )
 		{
 			bestLength = tr.fraction;
@@ -189,7 +187,7 @@ Status LandingSteps::approach( Bots::Mind& c )
 	if( landed( c ) )
 		return Status::Success;
 
-	const Geometry g( Bots::pads_[c.bot.pad], c );
+	const Geometry g( BotWorld::pads_[c.bot.pad], c );
 	c.bot.landPhase = Approach;
 	if( theLevel.time_ > c.bot.landStart + 120000 )
 	{
@@ -213,7 +211,7 @@ Status LandingSteps::approach( Bots::Mind& c )
 		Vec3 outDir, wish = { 0, g.axisYaw + 180.0f, 0 };
 		trace_t tr;
 		AngleVectors( wish, outDir, nullptr, nullptr );
-		if( g.before > wantRun * 0.95f || Bots::pathBlocked( c.ent->r.currentOrigin, outDir, radius * 2.5f, c.ent->s.number, tr ) )
+		if( g.before > wantRun * 0.95f || BotWorld::pathBlocked( c.ent->r.currentOrigin, outDir, radius * 2.5f, c.ent->s.number, tr ) )
 			c.bot.landOutbound = false;
 	}
 	else if( g.before < wantRun * 0.35f || (g.before < wantRun * 0.6f && (headingError > 60 || fabs( g.lateral ) > radius * 2.0f)) )
@@ -252,7 +250,7 @@ Status LandingSteps::final( Bots::Mind& c )
 	if( landed( c ) )
 		return Status::Success;
 
-	const Geometry g( Bots::pads_[c.bot.pad], c );
+	const Geometry g( BotWorld::pads_[c.bot.pad], c );
 	c.bot.landPhase = Final;
 	c.direct = true;
 	// go around: still high past the threshold, far off to the side, or someone is on the runway
@@ -278,7 +276,7 @@ Status LandingSteps::final( Bots::Mind& c )
 	Vec3 under;
 	under = c.ent->r.currentOrigin;
 	under[2] = g.pad.z;
-	const bool overRunway = Bots::runwayAt( under );
+	const bool overRunway = BotWorld::runwayAt( under );
 	// height of the origin when the wheels touch
 	const float touch = fabs( c.veh.mins[2] ) + c.veh.gearheight;
 	const bool shortField = g.pad.halfLength < 500;
@@ -300,7 +298,7 @@ Status LandingSteps::final( Bots::Mind& c )
 		// too low before the runway, or terrain ahead of the nose: pull up
 		const bool near = shortField || g.before < 500;
 		if( c.sense.height < (near ? 14.0f + touch : 60.0f) ||
-			(Bots::pathBlocked( c.ent->r.currentOrigin, nose, near ? 250.0f : 500.0f, c.ent->s.number, tr ) && tr.entityNum == ENTITYNUM_WORLD) )
+			(BotWorld::pathBlocked( c.ent->r.currentOrigin, nose, near ? 250.0f : 500.0f, c.ent->s.number, tr ) && tr.entityNum == ENTITYNUM_WORLD) )
 			c.view[PITCH] = -12.0f;
 	}
 
@@ -340,7 +338,7 @@ Status LandingSteps::taxi( Bots::Mind& c )
 {
 	if( c.bot.pad < 0 || liftedOff( c ) )
 		return Status::Failure;
-	const Bots::Pad& pad = Bots::pads_[c.bot.pad];
+	const BotWorld::Pad& pad = BotWorld::pads_[c.bot.pad];
 	c.bot.landPhase = Ground;
 	c.direct = true;
 

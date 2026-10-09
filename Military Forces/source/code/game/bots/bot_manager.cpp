@@ -9,22 +9,22 @@
 
 std::array<Bots::State, MAX_CLIENTS + 1> Bots::states_;
 int Bots::fillTime_ = 0;
-std::vector<Bots::Pad> Bots::pads_;
-bool Bots::padsBuilt_ = false;
+std::vector<BotWorld::Pad> BotWorld::pads_;
+bool BotWorld::padsBuilt_ = false;
 std::array<int, 5> Bots::kindLives_ = {};
 std::array<int, 5> Bots::kindCrashes_ = {};
 std::array<int, MAX_VEHICLE_TYPES> Bots::typeLives_ = {};
 std::array<int, MAX_VEHICLE_TYPES> Bots::typeCrashes_ = {};
-std::vector<Vec3> Bots::roamPoints_;
+std::vector<Vec3> BotWorld::roamPoints_;
 std::vector<Bots::Character> Bots::characters_;
 
 void Bots::reset()
 {
 	states_.fill( State{} );
 	fillTime_ = 0;
-	pads_.clear();
-	padsBuilt_ = false;
-	roamPoints_.clear();
+	BotWorld::pads_.clear();
+	BotWorld::padsBuilt_ = false;
+	BotWorld::roamPoints_.clear();
 	characters_.clear();
 	kindLives_.fill( 0 );
 	kindCrashes_.fill( 0 );
@@ -488,7 +488,7 @@ void Bots::think( GameEntity* ent, State& bot, usercmd_t& cmd )
 			const Seen& seen = bot.seen[i];
 			if( seen.time && theLevel.time_ < seen.time + memoryTime( bot ) )
 				VectorCopy( seen.position, intercept );
-			else if( !flagPosition( own == ClientBase::TEAM_RED ? ClientBase::TEAM_BLUE : ClientBase::TEAM_RED, intercept ) )
+			else if( !BotWorld::flagPosition( own == ClientBase::TEAM_RED ? ClientBase::TEAM_BLUE : ClientBase::TEAM_RED, intercept ) )
 				break;
 			VectorCopy( intercept, bot.goal );
 			bot.goalTime = theLevel.time_ + 3000;
@@ -505,7 +505,7 @@ void Bots::think( GameEntity* ent, State& bot, usercmd_t& cmd )
 		const int own = client->sess_.sessionTeam_;
 		const int other = own == ClientBase::TEAM_RED ? ClientBase::TEAM_BLUE : ClientBase::TEAM_RED;
 		Vec3 flag;
-		if( flagPosition( carrying ? own : other, flag ) )
+		if( BotWorld::flagPosition( carrying ? own : other, flag ) )
 		{
 			VectorCopy( flag, bot.goal );
 			bot.goalTime = theLevel.time_ + 3000;
@@ -522,7 +522,7 @@ void Bots::think( GameEntity* ent, State& bot, usercmd_t& cmd )
 		{
 			bot.padCheckTime = theLevel.time_ + padCheckInterval;
 			bot.canLand = g_botLanding.integer && theLevel.time_ >= bot.landGiveUp &&
-				findPad( ent, theLevel.time_ < bot.badPadTime ? bot.badPad : -1 ) >= 0;
+				BotWorld::findPad( ent, theLevel.time_ < bot.badPadTime ? bot.badPad : -1 ) >= 0;
 		}
 		if( !bot.canLand && bot.pad < 0 && ps.stats[STAT_FUEL] < ps.stats[STAT_MAX_FUEL] / 4 )
 			ps.stats[STAT_FUEL] = ps.stats[STAT_MAX_FUEL] / 4;

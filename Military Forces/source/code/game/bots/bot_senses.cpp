@@ -201,7 +201,7 @@ GameEntity* Bots::findEnemy( GameEntity* ent, State& bot, Role role )
 		}
 		const bool sees = dist <= maxRange &&
 			!VehicleData::stealthHidden( oc->vehicle_, oc->ps_.timers[TIMER_REVEAL], theLevel.time_, dist, radarRange ) &&
-			visible( ent, ent->r.currentOrigin, other );
+			BotWorld::visible( ent, ent->r.currentOrigin, other );
 		if( sees )
 		{
 			VectorCopy( other->r.currentOrigin, seen.position );
@@ -304,7 +304,7 @@ void Bots::sense( GameEntity* ent, State& bot, Sense& out )
 	if( out.enemy )
 	{
 		Seen& seen = bot.seen[out.enemy->s.number];
-		out.enemyVisible = visible( ent, ent->r.currentOrigin, out.enemy );
+		out.enemyVisible = BotWorld::visible( ent, ent->r.currentOrigin, out.enemy );
 		if( out.enemyVisible && seen.time )
 		{
 			VectorCopy( out.enemy->r.currentOrigin, seen.position );
@@ -385,7 +385,7 @@ void Bots::sense( GameEntity* ent, State& bot, Sense& out )
 		out.enemyAir = (availableVehicles[out.enemy->client_->vehicle_].cat & (CAT_PLANE|CAT_HELO)) != 0 &&
 			!(out.enemy->client_->ps_.ONOFF & OO_LANDED);
 	}
-	out.height = heightAboveGround( ent->r.currentOrigin, ent->s.number );
+	out.height = BotWorld::heightAboveGround( ent->r.currentOrigin, ent->s.number );
 	// where it was over the last six seconds, for the crash record
 	if( theLevel.time_ >= bot.trailTime )
 	{

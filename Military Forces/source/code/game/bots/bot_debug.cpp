@@ -16,7 +16,7 @@ void Bots::logDeath( GameEntity* self, GameEntity* attacker, int meansOfDeath )
 	trace_t ahead;
 	AngleVectors( ps.vehicleAngles, forward, nullptr, nullptr );
 	start = self->r.currentOrigin + forward * ( -100.0f );
-	pathBlocked( start, forward, 600, self->s.number, ahead );
+	BotWorld::pathBlocked( start, forward, 600, self->s.number, ahead );
 	GameEntity* hit = ahead.fraction < 1.0f && ahead.entityNum > ENTITYNUM_WORLD ? theLevel.getEntity( ahead.entityNum ) : nullptr;
 	GameEntity* enemy = bot.enemy >= 0 ? theLevel.getEntity( bot.enemy ) : nullptr;
 	float nearest = -1;
@@ -35,7 +35,7 @@ void Bots::logDeath( GameEntity* self, GameEntity* attacker, int meansOfDeath )
 	}
 	Vec3 below;
 	below = self->r.currentOrigin;
-	below[2] -= heightAboveGround( self->r.currentOrigin, self->s.number ) + 4;
+	below[2] -= BotWorld::heightAboveGround( self->r.currentOrigin, self->s.number ) + 4;
 
 	Common::printf( "BOTDEATH t %d bot %d mod %d by %d veh %d role %d goal %d age %d health %d org %.0f %.0f %.0f vel %.0f %.0f %.0f speed %d pitch %.0f roll %.0f yaw %.0f "
 		"height %.0f ceiling %.0f water %d onoff %x throttle %d fuel %d enemy %d edist %.0f avoid %d egress %d land %d pad %d ahead %.0f aheadent %d aheadclass %s normalz %.2f "
@@ -43,7 +43,7 @@ void Bots::logDeath( GameEntity* self, GameEntity* attacker, int meansOfDeath )
 		theLevel.time_, self->s.number, meansOfDeath, attacker ? attacker->s.number : -1, self->client_->vehicle_, static_cast<int>( roleOf( self->client_->vehicle_ ) ),
 		static_cast<int>( bot.desire ), theLevel.time_ - bot.spawnTime, self->health_, self->r.currentOrigin[0], self->r.currentOrigin[1], self->r.currentOrigin[2],
 		ps.velocity[0], ps.velocity[1], ps.velocity[2], ps.speed, ps.vehicleAngles[PITCH], ps.vehicleAngles[ROLL], ps.vehicleAngles[YAW],
-		heightAboveGround( self->r.currentOrigin, self->s.number ), ceilingAbove( self->r.currentOrigin, self->s.number ),
+		BotWorld::heightAboveGround( self->r.currentOrigin, self->s.number ), BotWorld::ceilingAbove( self->r.currentOrigin, self->s.number ),
 		(GameHost::pointContents( below, self->s.number ) & MASK_WATER) != 0, ps.ONOFF, ps.fixed_throttle, ps.stats[STAT_FUEL],
 		bot.enemy, enemy ? Distance( enemy->r.currentOrigin, self->r.currentOrigin ) : -1.0f, theLevel.time_ < bot.avoidTime, theLevel.time_ < bot.egressTime,
 		bot.landPhase, bot.pad, ahead.fraction * 600.0f - 100.0f, ahead.fraction < 1.0f ? ahead.entityNum : -1, hit && hit->classname_ ? hit->classname_ : "-",
@@ -68,7 +68,7 @@ void Bots::logState( GameEntity* ent, State& bot, const usercmd_t& cmd, const ve
 	for( int i = 0; i < 7; i++ )
 	{
 		trace_t tr;
-		pathBlocked( ent->r.currentOrigin, dirs[i], 4000, ent->s.number, tr );
+		BotWorld::pathBlocked( ent->r.currentOrigin, dirs[i], 4000, ent->s.number, tr );
 		reach[i] = tr.fraction * 4000.0f;
 	}
 	Common::printf( "BOTSTATE t %d bot %d veh %d goal %d org %.0f %.0f %.0f vel %.0f %.0f %.0f speed %d ang %.0f %.0f %.0f view %.0f %.0f move %d %d buttons %x "
@@ -86,9 +86,9 @@ void Bots::listCommand()
 	Common::printf( "BOTTIME %d\n", theLevel.time_ );
 	Common::printf( "AIRNAV nodes %d free %d\n", AirNav::cellCount(), AirNav::freeCount() );
 	Common::printf( "GROUNDNAV cells %d known %d\n", GroundNav::cellCount(), GroundNav::knownCount() );
-	if( !padsBuilt_ )
-		buildPads();
-	for( const Pad& pad : pads_ )
+	if( !BotWorld::padsBuilt_ )
+		BotWorld::buildPads();
+	for( const BotWorld::Pad& pad : BotWorld::pads_ )
 		Common::printf( "PAD spot %.0f %.0f %.0f centre %.0f %.0f axis %.2f %.2f half %.0f runway %d cat %x team %d\n", pad.spot[0], pad.spot[1], pad.spot[2],
 			pad.center[0], pad.center[1], pad.axis[0], pad.axis[1], pad.halfLength, pad.runway, pad.category, pad.team );
 	for( int i = 1; i <= theLevel.maxclients_ && i <= MAX_CLIENTS; i++ )
@@ -101,7 +101,7 @@ void Bots::listCommand()
 		GameClient* cl = ent->client_;
 		Common::printf( "BOT %d %s vehicle %d health %d org %.0f %.0f %.0f speed %d enemy %d riding %d score %d height %.0f onoff %x angles %.0f %.0f fuel %d goal %d role %d ammo %d %d %d %d goals %d %d teamplayer %d leader %d leadertarget %d\n", i, cl->pers_.netname_,
 			cl->vehicle_, ent->health_, ent->r.currentOrigin[0], ent->r.currentOrigin[1], ent->r.currentOrigin[2], cl->ps_.speed,
-			states_[i].enemy, cl->sess_.ridingClient_, cl->ps_.persistant[PERS_SCORE], heightAboveGround( ent->r.currentOrigin, i ),
+			states_[i].enemy, cl->sess_.ridingClient_, cl->ps_.persistant[PERS_SCORE], BotWorld::heightAboveGround( ent->r.currentOrigin, i ),
 			cl->ps_.ONOFF, cl->ps_.vehicleAngles[PITCH], cl->ps_.vehicleAngles[YAW], cl->ps_.stats[STAT_FUEL],
 			static_cast<int>( states_[i].desire ), cl->vehicle_ >= 0 ? static_cast<int>( roleOf( cl->vehicle_ ) ) : -1,
 			cl->ps_.ammo[1], cl->ps_.ammo[2], cl->ps_.ammo[3], cl->ps_.ammo[4], states_[i].goalsReached, states_[i].goalsExpired,

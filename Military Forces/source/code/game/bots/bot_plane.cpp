@@ -23,7 +23,7 @@ bool Bots::turnClear( GameEntity* ent, float radius, float degrees, float climb 
 		VectorSubtract( point, from, dir );
 		const float length = VectorNormalize( dir );
 		trace_t tr;
-		if( length > 1 && pathBlocked( from, dir, length, ent->s.number, tr, 50.0f ) && tr.entityNum == ENTITYNUM_WORLD && !tr.startsolid )
+		if( length > 1 && BotWorld::pathBlocked( from, dir, length, ent->s.number, tr, 50.0f ) && tr.entityNum == ENTITYNUM_WORLD && !tr.startsolid )
 			return false;
 		VectorCopy( point, from );
 	}
@@ -33,7 +33,7 @@ bool Bots::turnClear( GameEntity* ent, float radius, float degrees, float climb 
 // someone is on or just over the runway, or a bot with a lower number is already on final for it
 bool Bots::runwayBusy( int padIndex, GameEntity* self )
 {
-	const Pad& pad = pads_[padIndex];
+	const BotWorld::Pad& pad = BotWorld::pads_[padIndex];
 	for( int i = 1; i <= theLevel.maxclients_; i++ )
 	{
 		GameEntity* other = theLevel.getEntity( i );
@@ -45,7 +45,7 @@ bool Bots::runwayBusy( int padIndex, GameEntity* self )
 		const float side = rel[1] * pad.axis[0] - rel[0] * pad.axis[1];
 		if( fabs( along ) < pad.halfLength + 150 && fabs( side ) < 220 && fabs( rel[2] ) < 160 )
 			return true;
-		if( isBot( i ) && i < self->s.number && states_[i].landPhase == 2 && states_[i].pad >= 0 && Distance( pads_[states_[i].pad].center, pad.center ) < 400 )
+		if( isBot( i ) && i < self->s.number && states_[i].landPhase == 2 && states_[i].pad >= 0 && Distance( BotWorld::pads_[states_[i].pad].center, pad.center ) < 400 )
 			return true;
 	}
 	return false;
@@ -101,7 +101,7 @@ struct PlaneTasks
 		trace_t line;
 		Vec3 toEnemy;
 		VectorCopy( c.sense.enemyDir, toEnemy );
-		return !(Bots::pathBlocked( c.ent->r.currentOrigin, toEnemy, std::min( c.sense.enemyDist, 1500.0f ), c.ent->s.number, line, 60.0f ) &&
+		return !(BotWorld::pathBlocked( c.ent->r.currentOrigin, toEnemy, std::min( c.sense.enemyDist, 1500.0f ), c.ent->s.number, line, 60.0f ) &&
 			line.entityNum == ENTITYNUM_WORLD && !line.startsolid);
 	}
 	// a turn chosen a moment ago is flown out before another is chosen
@@ -181,7 +181,7 @@ struct PlaneTasks
 			for( int step = 0; step < 24; step++ )
 			{
 				const float yaw = step * 15.0f;
-				if( Bots::runwayRun( origin, yaw, dist ) < dist )
+				if( BotWorld::runwayRun( origin, yaw, dist ) < dist )
 					continue;
 				Vec3 level = { 0, yaw, 0 }, dir, spot;
 				AngleVectors( level, dir, nullptr, nullptr );
@@ -189,12 +189,12 @@ struct PlaneTasks
 				// not a spot on the very edge: the aircraft has to stop and turn there
 				bool room = true;
 				for( int side = 0; side < 4 && room; side++ )
-					room = Bots::runwayRun( spot, side * 90.0f, edgeRoom ) >= edgeRoom;
+					room = BotWorld::runwayRun( spot, side * 90.0f, edgeRoom ) >= edgeRoom;
 				if( !room )
 					continue;
 				for( int turn = 0; turn < 12; turn++ )
 				{
-					const float run = Bots::runwayRun( spot, turn * 30.0f, wanted + 25.0f );
+					const float run = BotWorld::runwayRun( spot, turn * 30.0f, wanted + 25.0f );
 					if( run >= wanted && run > best )
 					{
 						best = run;
@@ -226,7 +226,7 @@ struct PlaneTasks
 		Vec3 origin;
 		VectorCopy( c.ent->r.currentOrigin, origin );
 		origin[2] -= c.sense.height;
-		if( !Bots::runwayAt( origin ) )
+		if( !BotWorld::runwayAt( origin ) )
 		{
 #ifdef MF_BOT_DEBUG
 			if( g_botDebug.integer >= 2 )
@@ -243,7 +243,7 @@ struct PlaneTasks
 		for( int step = 0; step < 24; step++ )
 		{
 			const float yaw = step * 15.0f;
-			const float run = Bots::runwayRun( origin, yaw, 4000 );
+			const float run = BotWorld::runwayRun( origin, yaw, 4000 );
 			longest = std::max( longest, run );
 			if( run < 150 )
 				continue;
@@ -253,7 +253,7 @@ struct PlaneTasks
 			VectorCopy( origin, start );
 			start[2] += 14;
 			const float roll = std::min( run, groundRun + 100.0f );
-			Bots::pathBlocked( start, dir, roll, c.ent->s.number, ground, 30.0f );
+			BotWorld::pathBlocked( start, dir, roll, c.ent->s.number, ground, 30.0f );
 			const bool rollClear = ground.startsolid || ground.fraction >= 1.0f;
 
 			Pose liftOff;
@@ -762,13 +762,13 @@ struct PlaneTasks
 			// no trace needed while the leg stays inside one empty cell of the air navigation tree
 			if( !AirNav::segmentKnownFree( Vec3( from ), Vec3( to ), halfWidth + 8.0f ) )
 			{
-				Bots::pathBlocked( from, dir, length, c.ent->s.number, tr, halfWidth );
+				BotWorld::pathBlocked( from, dir, length, c.ent->s.number, tr, halfWidth );
 				// already within the corridor's width of a wall: look along a narrower one, and only then along a bare
 				// line, so that hugging the wall does not make every heading look open
 				if( tr.startsolid && travelled <= 0 && start.seconds <= 0 )
-					Bots::pathBlocked( from, dir, length, c.ent->s.number, tr, halfWidth * 0.4f );
+					BotWorld::pathBlocked( from, dir, length, c.ent->s.number, tr, halfWidth * 0.4f );
 				if( tr.startsolid && travelled <= 0 && start.seconds <= 0 )
-					Bots::pathBlocked( from, dir, length, c.ent->s.number, tr );
+					BotWorld::pathBlocked( from, dir, length, c.ent->s.number, tr );
 				const bool vehicle = tr.entityNum >= 1 && tr.entityNum <= theLevel.maxclients_;
 				if( tr.startsolid )
 					tr.fraction = 0;
@@ -870,9 +870,9 @@ struct PlaneTasks
 			trace_t tr;
 			AngleVectors( flat, nullptr, right, nullptr );
 			VectorNegate( right, left );
-			Bots::pathBlocked( ent->r.currentOrigin, left, 1200, ent->s.number, tr );
+			BotWorld::pathBlocked( ent->r.currentOrigin, left, 1200, ent->s.number, tr );
 			const float leftClear = tr.fraction * 1200.0f;
-			Bots::pathBlocked( ent->r.currentOrigin, right, 1200, ent->s.number, tr );
+			BotWorld::pathBlocked( ent->r.currentOrigin, right, 1200, ent->s.number, tr );
 			const float rightClear = tr.fraction * 1200.0f;
 			bot.confined = leftClear + rightClear < 1500 || c.room < 900;
 
@@ -1062,7 +1062,7 @@ struct PlaneTasks
 		// The trip to the strip while that is still far off may be hurried like any other, further down
 		constexpr float stripFar = 6000.0f;
 		const bool rearming = c.bot.desire == Goal::Rearm;
-		const bool tripToStrip = rearming && c.bot.pad >= 0 && c.bot.landPhase <= 1 && Distance( Bots::pads_[c.bot.pad].center, c.ent->r.currentOrigin ) > stripFar;
+		const bool tripToStrip = rearming && c.bot.pad >= 0 && c.bot.landPhase <= 1 && Distance( BotWorld::pads_[c.bot.pad].center, c.ent->r.currentOrigin ) > stripFar;
 		if( rearming && !tripToStrip )
 			return false;
 		// the take-off roll and the first seconds of the climb out
@@ -1204,13 +1204,13 @@ void Bots::thinkPlane( GameEntity* ent, State& bot, const Sense& sense, usercmd_
 
 	mind.cruise = planeCruiseHeight;
 	if( sense.role == Role::Bomber )
-		mind.cruise = std::clamp( sense.height + ceilingAbove( ent->r.currentOrigin, ent->s.number ) - 700.0f, 800.0f, 3500.0f );
+		mind.cruise = std::clamp( sense.height + BotWorld::ceilingAbove( ent->r.currentOrigin, ent->s.number ) - 700.0f, 800.0f, 3500.0f );
 	else if( bot.desire == Goal::Climb )
 		mind.cruise = sense.height + 500.0f;
 	else if( !sense.enemy || !sense.enemyAir )
 		mind.cruise = planeCruiseHeight - 800.0f * character( bot ).cunning;
 	mind.airspeed = VectorLength( ps.velocity );
-	mind.ceiling = ceilingAbove( ent->r.currentOrigin, ent->s.number );
+	mind.ceiling = BotWorld::ceilingAbove( ent->r.currentOrigin, ent->s.number );
 	mind.room = sense.height + mind.ceiling;
 	mind.minHeight = std::min( planeMinHeight, mind.room * 0.3f );
 
@@ -1227,7 +1227,7 @@ void Bots::thinkPlane( GameEntity* ent, State& bot, const Sense& sense, usercmd_
 	// the target is the nearest enemy aircraft, whatever the bomber itself is after: a bomber's own enemy is on the ground
 	GameEntity* raider = sense.airThreat && sense.airThreatDist < turretRange ? sense.airThreat : nullptr;
 	if( (mind.veh.flags & VF_GUNSTATIONS) && raider && !(ps.ONOFF & OO_LANDED) && bot.desire != Goal::Rearm &&
-		sense.height > mind.minHeight && ps.ammo[WP_MACHINEGUN] > 0 && visible( ent, ent->r.currentOrigin, raider ) )
+		sense.height > mind.minHeight && ps.ammo[WP_MACHINEGUN] > 0 && BotWorld::visible( ent, ent->r.currentOrigin, raider ) )
 	{
 		if( theLevel.time_ > bot.turretTime + turretBurst + turretPause )
 			bot.turretTime = theLevel.time_;

@@ -36,7 +36,7 @@ struct GoalScoring
 	// how far a bomber is below the height it wants for a bomb run, with extra weight when well below
 	static float bomberAltitudeNeed( const Situation& s )
 	{
-		const float want = std::clamp( s.sense.height + Bots::ceilingAbove( s.ent->r.currentOrigin, s.ent->s.number ) - 700.0f, 800.0f, 3500.0f );
+		const float want = std::clamp( s.sense.height + BotWorld::ceilingAbove( s.ent->r.currentOrigin, s.ent->s.number ) - 700.0f, 800.0f, 3500.0f );
 		return std::clamp( 1.0f - s.sense.height / want, 0.0f, 1.0f ) + (s.sense.height < want * 0.6f ? 0.5f : 0.0f);
 	}
 	// an enemy aircraft: 1 when close, fading to nothing a little beyond the range
@@ -152,7 +152,7 @@ struct GoalScoring
 		if( s.bot.pad >= 0 )
 			need = std::max( need, 0.9f );
 		// no pad this vehicle can use: nothing to go back to
-		if( need > 0 && Bots::findPad( s.ent, theLevel.time_ < s.bot.badPadTime ? s.bot.badPad : -1 ) < 0 )
+		if( need > 0 && BotWorld::findPad( s.ent, theLevel.time_ < s.bot.badPadTime ? s.bot.badPad : -1 ) < 0 )
 			return 0.0f;
 		return need;
 	}
@@ -171,7 +171,7 @@ struct GoalScoring
 		const int own = s.ent->client_->sess_.sessionTeam_;
 		vec3_t flag;
 		float closeness = 0.0f;
-		if( Bots::flagPosition( own == ClientBase::TEAM_RED ? ClientBase::TEAM_BLUE : ClientBase::TEAM_RED, flag ) )
+		if( BotWorld::flagPosition( own == ClientBase::TEAM_RED ? ClientBase::TEAM_BLUE : ClientBase::TEAM_RED, flag ) )
 			closeness = std::clamp( 1.0f - Distance( flag, s.ent->r.currentOrigin ) / flagNear, 0.0f, 1.0f );
 		return (0.35f + 0.5f * s.who.teamwork) * (1.0f + 1.5f * closeness);
 	}
@@ -236,7 +236,7 @@ Bots::Goal Bots::chooseGoal( GameEntity* ent, State& bot, const Sense& sense )
 	{
 		if( bot.pad < 0 )
 		{
-			bot.pad = findPad( ent, theLevel.time_ < bot.badPadTime ? bot.badPad : -1 );
+			bot.pad = BotWorld::findPad( ent, theLevel.time_ < bot.badPadTime ? bot.badPad : -1 );
 			bot.landPhase = 0;
 		}
 	}

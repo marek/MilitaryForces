@@ -39,13 +39,13 @@ struct InfantryTasks
 	}
 
 	// the nearest pad, where vehicles appear
-	static void findPad( Mind& c )
+	static void nearestPad( Mind& c )
 	{
-		if( !Bots::padsBuilt_ )
-			Bots::buildPads();
-		for( size_t i = 0; i < Bots::pads_.size(); i++ )
+		if( !BotWorld::padsBuilt_ )
+			BotWorld::buildPads();
+		for( size_t i = 0; i < BotWorld::pads_.size(); i++ )
 		{
-			const float dist = Distance( c.ent->r.currentOrigin, Bots::pads_[i].spot );
+			const float dist = Distance( c.ent->r.currentOrigin, BotWorld::pads_[i].spot );
 			if( c.nearPad < 0 || dist < c.nearPadDist )
 			{
 				c.nearPad = static_cast<int>( i );
@@ -120,7 +120,7 @@ struct InfantryTasks
 
 	static Status walkToPad( Mind& c )
 	{
-		c.courseTo( Bots::pads_[c.nearPad].spot );
+		c.courseTo( BotWorld::pads_[c.nearPad].spot );
 		return Status::Running;
 	}
 
@@ -192,7 +192,7 @@ void Bots::thinkInfantry( GameEntity* ent, State& bot, const Sense& sense, userc
 	Mind mind{ ent, client, bot, sense, cmd, view, ps, availableVehicles[client->vehicle_], static_cast<float>( ps.speed ) / 10.0f };
 	InfantryTasks::findRide( mind );
 	if( !mind.target )
-		InfantryTasks::findPad( mind );
+		InfantryTasks::nearestPad( mind );
 	view[YAW] = ps.viewangles[YAW];
 	view[PITCH] = 0;
 
@@ -264,7 +264,7 @@ void Bots::thinkRider( GameEntity* ent, State& bot, usercmd_t& cmd, vec3_t view 
 	vectoangles( dir, angles );
 	view[YAW] = angles[YAW];
 	view[PITCH] = std::clamp( AngleSubtract( angles[PITCH], 0 ), -60.0f, 60.0f );
-	if( !visible( pilot, pilot->r.currentOrigin, enemy ) )
+	if( !BotWorld::visible( pilot, pilot->r.currentOrigin, enemy ) )
 		return;
 	cmd.buttons |= gunner ? BUTTON_ATTACK_MAIN : BUTTON_ATTACK;
 }

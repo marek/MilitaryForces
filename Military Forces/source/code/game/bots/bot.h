@@ -154,18 +154,6 @@ public:
 		vec3_t	taxiSpot = { 0, 0, 0 };	// where it taxis to before rolling
 	};
 
-	// a place to refuel and rearm, with the runway that leads to it when it has one
-	struct Pad
-	{
-		Vec3			center;	// middle of the runway; of the pad itself when there is none
-		Vec3			spot;	// where to stop to be refuelled
-		Vec3			axis;	// direction of the runway
-		float			halfLength;	// half the runway's length, 0 without one
-		float			z;	// height of the surface
-		bool			runway;	// long enough for a plane to land on
-		unsigned int	category;	// the kinds of vehicle it serves
-		int				team;	// whose it is in a team game
-	};
 
 	// what a bot perceives in one frame; worked out afresh each time
 	struct Sense
@@ -222,24 +210,12 @@ private:
 	static float turnOnAttacker( GameEntity* ent, const State& bot, int attacker );
 	static float skill( const State& bot );
 	static int memoryTime( const State& bot );
-	static bool visible( GameEntity* ent, const vec3_t from, GameEntity* target );
 	static bool hasWeaponType( int vehicle, const playerState_t& ps, int type );
 	static bool findHidePoint( GameEntity* ent, State& bot, GameEntity* threat, bool hullDown = false );
 	static void bomb( GameEntity* ent, State& bot, const vec3_t target, usercmd_t& cmd, vec3_t view );
 	static GameEntity* findStructure( GameEntity* ent, State& bot );
 	static void flares( GameEntity* ent, State& bot, const Sense& sense, usercmd_t& cmd );
-	static float ceilingAbove( const vec3_t origin, int passEntity );
-	static void buildPads();
-	static bool flagPosition( int team, vec3_t out );
 	static void loadCharacters();
-	static void buildRoamPoints();
-	static bool steerAround( GameEntity* ent, float wantYaw, float travel, float& yaw );
-	static bool runwayAt( const vec3_t point, float* surface = nullptr );
-	static float runwayRun( const vec3_t origin, float yaw, float maxDist );
-	// the touchdown point sits this far inside the runway's end: close to it on a short strip, where every unit of roll counts
-	static float thresholdInset( const Pad& pad ) { return pad.halfLength < 600.0f ? 60.0f : 150.0f; }
-	static float approachSlope( const Pad& pad, float dir );
-	static int findPad( GameEntity* ent, int skip = -1 );
 	static bool replenished( GameEntity* ent );
 	static void finishRearm( GameEntity* ent, State& bot );
 	static bool runwayBusy( int padIndex, GameEntity* self );
@@ -258,8 +234,6 @@ private:
 	static int findWeaponSlot( int vehicle, const playerState_t& ps, bool air, float dist, bool& guided );
 	static bool outOfAmmo( int vehicle, const playerState_t& ps );
 	static void setRadar( GameEntity* ent, State& bot, bool air );
-	static float heightAboveGround( const vec3_t origin, int passEntity );
-	static bool pathBlocked( const vec3_t origin, const vec3_t dir, float dist, int passEntity, trace_t& tr, float halfWidth = 0 );
 	static int pickVehicle( int teamFlag, bool allowInfantry = true, const Character* who = nullptr, const State* memory = nullptr );
 	static float failureSensitivity( const Character& who );
 	static float switchDesire( const State& bot, int kind );
@@ -270,8 +244,6 @@ private:
 	// one state per client slot; the map's pads, roam points and characters; lives and early crashes per kind of vehicle
 	static std::array<State, MAX_CLIENTS + 1> states_;
 	static int fillTime_;
-	static std::vector<Pad> pads_;
-	static bool padsBuilt_;
 	static std::array<int, 5> kindLives_;
 	static std::array<int, 5> kindCrashes_;
 	// the same per vehicle type: one aircraft may not fit a map its kind otherwise copes with
@@ -279,8 +251,45 @@ private:
 	static std::array<int, MAX_VEHICLE_TYPES> typeCrashes_;
 	static bool unfitHere( int type );
 	static int kindOf( int vehicle );
-	static std::vector<Vec3> roamPoints_;
 	static std::vector<Character> characters_;
+};
+
+// What bots know of the map, the same for all of them: where vehicles refuel and which runway leads there, what is
+// runway, what blocks a line or a body, how much room there is above and below, where the flags stand, and places
+// worth roaming to. Nothing here depends on which bot asks.
+class BotWorld
+{
+public:
+	// a place to refuel and rearm, with the runway that leads to it when it has one
+	struct Pad
+	{
+		Vec3			center;	// middle of the runway; of the pad itself when there is none
+		Vec3			spot;	// where to stop to be refuelled
+		Vec3			axis;	// direction of the runway
+		float			halfLength;	// half the runway's length, 0 without one
+		float			z;	// height of the surface
+		bool			runway;	// long enough for a plane to land on
+		unsigned int	category;	// the kinds of vehicle it serves
+		int				team;	// whose it is in a team game
+	};
+
+	static bool visible( GameEntity* ent, const vec3_t from, GameEntity* target );
+	static float ceilingAbove( const vec3_t origin, int passEntity );
+	static void buildPads();
+	static bool flagPosition( int team, vec3_t out );
+	static void buildRoamPoints();
+	static bool steerAround( GameEntity* ent, float wantYaw, float travel, float& yaw );
+	static bool runwayAt( const vec3_t point, float* surface = nullptr );
+	static float runwayRun( const vec3_t origin, float yaw, float maxDist );
+	// the touchdown point sits this far inside the runway's end: close to it on a short strip, where every unit of roll counts
+	static float thresholdInset( const Pad& pad ) { return pad.halfLength < 600.0f ? 60.0f : 150.0f; }
+	static float approachSlope( const Pad& pad, float dir );
+	static int findPad( GameEntity* ent, int skip = -1 );
+	static float heightAboveGround( const vec3_t origin, int passEntity );
+	static bool pathBlocked( const vec3_t origin, const vec3_t dir, float dist, int passEntity, trace_t& tr, float halfWidth = 0 );
+	static std::vector<Pad> pads_;
+	static bool padsBuilt_;
+	static std::vector<Vec3> roamPoints_;
 };
 
 #endif

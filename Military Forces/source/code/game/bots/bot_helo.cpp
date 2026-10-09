@@ -19,7 +19,7 @@ struct HeloTasks
 	static bool overPad( const Mind& c )
 	{
 		Vec3 dir;
-		VectorSubtract( Bots::pads_[c.bot.pad].center, c.ent->r.currentOrigin, dir );
+		VectorSubtract( BotWorld::pads_[c.bot.pad].center, c.ent->r.currentOrigin, dir );
 		dir[2] = 0;
 		return VectorLength( dir ) < 120;
 	}
@@ -132,7 +132,7 @@ struct HeloTasks
 	// over the pad: gear down and straight down
 	static Status descendToPad( Mind& c )
 	{
-		flyTo( c, Bots::pads_[c.bot.pad].center );
+		flyTo( c, BotWorld::pads_[c.bot.pad].center );
 		c.hasDest = false;
 		c.cover = true;
 		c.hold = true;
@@ -146,7 +146,7 @@ struct HeloTasks
 	// to the pad at a moderate height, slowing as it nears
 	static Status flyToPad( Mind& c )
 	{
-		flyTo( c, Bots::pads_[c.bot.pad].center );
+		flyTo( c, BotWorld::pads_[c.bot.pad].center );
 		c.cover = true;
 		c.mode = ToPad;
 		c.wantHeight = heloCruiseHeight * 0.6f;
@@ -403,7 +403,7 @@ struct HeloTasks
 		constexpr float headroom = 150.0f;
 		if( !c.landed() )
 		{
-			const float highest = c.sense.height + Bots::ceilingAbove( c.ent->r.currentOrigin, c.ent->s.number ) - headroom;
+			const float highest = c.sense.height + BotWorld::ceilingAbove( c.ent->r.currentOrigin, c.ent->s.number ) - headroom;
 			c.wantHeight = std::min( c.wantHeight, std::max( highest, 40.0f ) );
 		}
 		const float throttle = signedThrottle( c.ps, c.client->vehicle_ );

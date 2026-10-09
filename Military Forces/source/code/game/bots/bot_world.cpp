@@ -8,7 +8,7 @@
 #include <vector>
 
 // how far it is straight down to ground or water
-float Bots::heightAboveGround( const vec3_t origin, int passEntity )
+float BotWorld::heightAboveGround( const vec3_t origin, int passEntity )
 {
 	trace_t tr;
 	Vec3 end;
@@ -19,7 +19,7 @@ float Bots::heightAboveGround( const vec3_t origin, int passEntity )
 }
 
 // is something in the way within that distance, for a point or for a body of that half width? The trace tells what
-bool Bots::pathBlocked( const vec3_t origin, const vec3_t dir, float dist, int passEntity, trace_t& tr, float halfWidth )
+bool BotWorld::pathBlocked( const vec3_t origin, const vec3_t dir, float dist, int passEntity, trace_t& tr, float halfWidth )
 {
 	Vec3 end;
 	VectorMA( origin, dist, dir, end );
@@ -34,7 +34,7 @@ bool Bots::pathBlocked( const vec3_t origin, const vec3_t dir, float dist, int p
 }
 
 // how much room there is straight up
-float Bots::ceilingAbove( const vec3_t origin, int passEntity )
+float BotWorld::ceilingAbove( const vec3_t origin, int passEntity )
 {
 	trace_t tr;
 	Vec3 end;
@@ -45,7 +45,7 @@ float Bots::ceilingAbove( const vec3_t origin, int passEntity )
 }
 
 // nothing solid between the point and the target
-bool Bots::visible( GameEntity* ent, const vec3_t from, GameEntity* target )
+bool BotWorld::visible( GameEntity* ent, const vec3_t from, GameEntity* target )
 {
 	trace_t tr;
 	GameHost::trace( &tr, from, nullptr, nullptr, target->r.currentOrigin, ent->s.number, MASK_SOLID, false );
@@ -54,11 +54,11 @@ bool Bots::visible( GameEntity* ent, const vec3_t from, GameEntity* target )
 
 // Places to head for when there is nothing else to do: the pads, the middle of the map as the spawn points and
 // pads place it, and a point out towards each corner as far as the map goes
-void Bots::buildRoamPoints()
+void BotWorld::buildRoamPoints()
 {
-	if( !padsBuilt_ )
-		buildPads();
-	roamPoints_.clear();
+	if( !BotWorld::padsBuilt_ )
+		BotWorld::buildPads();
+	BotWorld::roamPoints_.clear();
 
 	Vec3 sum( 0, 0, 0 );
 	int count = 0;
@@ -74,10 +74,10 @@ void Bots::buildRoamPoints()
 		top = std::max( top, ent->s.origin[2] );
 		count++;
 	}
-	for( const Pad& pad : pads_ )
+	for( const BotWorld::Pad& pad : BotWorld::pads_ )
 	{
 		bool near = false;
-		for( const Vec3& point : roamPoints_ )
+		for( const Vec3& point : BotWorld::roamPoints_ )
 		{
 			Vec3 p;
 			point.copyTo( p );
@@ -85,7 +85,7 @@ void Bots::buildRoamPoints()
 				near = true;
 		}
 		if( !near )
-			roamPoints_.push_back( Vec3( pad.spot ) );
+			BotWorld::roamPoints_.push_back( Vec3( pad.spot ) );
 		sum += Vec3( pad.spot );
 		top = std::max( top, pad.spot[2] );
 		count++;
@@ -102,23 +102,23 @@ void Bots::buildRoamPoints()
 	{
 		Vec3 dir = { k == 0 ? 1.0f : k == 1 ? -1.0f : 0.0f, k == 2 ? 1.0f : k == 3 ? -1.0f : 0.0f, 0 };
 		trace_t tr;
-		pathBlocked( origin, dir, 40000, ENTITYNUM_NONE, tr );
+		BotWorld::pathBlocked( origin, dir, 40000, ENTITYNUM_NONE, tr );
 		reach[k] = tr.fraction * 40000.0f;
 	}
-	roamPoints_.push_back( centre );
+	BotWorld::roamPoints_.push_back( centre );
 	for( int qx = 0; qx < 2; qx++ )
 	{
 		for( int qy = 0; qy < 2; qy++ )
 		{
 			Vec3 point = centre;
 			point += Vec3( (qx ? 0.55f : -0.55f) * reach[qx ? 0 : 1], (qy ? 0.55f : -0.55f) * reach[qy ? 2 : 3], 0 );
-			roamPoints_.push_back( point );
+			BotWorld::roamPoints_.push_back( point );
 		}
 	}
 }
 
 // the heading nearest the wanted one with no world geometry in the way for that distance
-bool Bots::steerAround( GameEntity* ent, float wantYaw, float travel, float& yaw )
+bool BotWorld::steerAround( GameEntity* ent, float wantYaw, float travel, float& yaw )
 {
 	constexpr std::array<float, 9> offsets = { 0.0f, 20.0f, -20.0f, 45.0f, -45.0f, 75.0f, -75.0f, 110.0f, -110.0f };
 	for( float offset : offsets )
@@ -126,7 +126,7 @@ bool Bots::steerAround( GameEntity* ent, float wantYaw, float travel, float& yaw
 		Vec3 angles = { 0, wantYaw + offset, 0 }, dir;
 		AngleVectors( angles, dir, nullptr, nullptr );
 		trace_t tr;
-		if( !pathBlocked( ent->r.currentOrigin, dir, travel, ent->s.number, tr ) || tr.entityNum != ENTITYNUM_WORLD )
+		if( !BotWorld::pathBlocked( ent->r.currentOrigin, dir, travel, ent->s.number, tr ) || tr.entityNum != ENTITYNUM_WORLD )
 		{
 			yaw = wantYaw + offset;
 			return true;
@@ -136,7 +136,7 @@ bool Bots::steerAround( GameEntity* ent, float wantYaw, float travel, float& yaw
 }
 
 // is there runway under this point, and at what height?
-bool Bots::runwayAt( const vec3_t point, float* surface )
+bool BotWorld::runwayAt( const vec3_t point, float* surface )
 {
 	Vec3 start, end;
 	VectorCopy( point, start );
@@ -154,19 +154,19 @@ bool Bots::runwayAt( const vec3_t point, float* surface )
 }
 
 // how far the runway goes on from a point in one direction
-float Bots::runwayRun( const vec3_t origin, float yaw, float maxDist )
+float BotWorld::runwayRun( const vec3_t origin, float yaw, float maxDist )
 {
 	Vec3 angles = { 0, yaw, 0 }, dir, point;
 	AngleVectors( angles, dir, nullptr, nullptr );
 	// wheels cannot cross a step between runway pieces, so the run ends where the surface height changes
 	constexpr float maxStep = 0.5f;
 	float run = 0, previous = 0, surface = 0;
-	if( !runwayAt( origin, &previous ) )
+	if( !BotWorld::runwayAt( origin, &previous ) )
 		return 0;
 	for( float dist = 25.0f; dist <= maxDist; dist += 25.0f )
 	{
 		VectorMA( origin, dist, dir, point );
-		if( !runwayAt( point, &surface ) || fabs( surface - previous ) > maxStep )
+		if( !BotWorld::runwayAt( point, &surface ) || fabs( surface - previous ) > maxStep )
 			break;
 		previous = surface;
 		run = dist;
@@ -175,14 +175,14 @@ float Bots::runwayRun( const vec3_t origin, float yaw, float maxDist )
 }
 
 // the steepest slope the terrain forces on an approach to one end of a runway (dir -1 lands along the axis)
-float Bots::approachSlope( const Pad& pad, float dir )
+float BotWorld::approachSlope( const BotWorld::Pad& pad, float dir )
 {
 	float slope = 0.15f;
 	for( float d = 75.0f; d <= 2500.0f; d += d < 1000.0f ? 75.0f : 250.0f )
 	{
 		Vec3 from, to, boxMins = { -60, -60, 0 }, boxMaxs = { 60, 60, 4 };
 		trace_t tr;
-		VectorMA( pad.center, -dir * (pad.halfLength - thresholdInset( pad ) + d), pad.axis, from );
+		VectorMA( pad.center, -dir * (pad.halfLength - BotWorld::thresholdInset( pad ) + d), pad.axis, from );
 		from[2] = pad.z + 600;
 		to = from;
 		to[2] -= 4000;
@@ -194,7 +194,7 @@ float Bots::approachSlope( const Pad& pad, float dir )
 }
 
 // where a team's flag stands
-bool Bots::flagPosition( int team, vec3_t out )
+bool BotWorld::flagPosition( int team, vec3_t out )
 {
 	const char* name = team == ClientBase::TEAM_RED ? "team_CTF_redflag" : "team_CTF_blueflag";
 	for( int i = MAX_CLIENTS + 1; i < theLevel.num_entities_; i++ )
@@ -243,10 +243,10 @@ namespace
 }
 
 // Every place a vehicle can refuel, and for those on or beside an airfield the runway a plane lands on to reach it
-void Bots::buildPads()
+void BotWorld::buildPads()
 {
-	padsBuilt_ = true;
-	pads_.clear();
+	BotWorld::padsBuilt_ = true;
+	BotWorld::pads_.clear();
 
 	// group the runway pieces
 	constexpr float touching = 16.0f;
@@ -283,14 +283,14 @@ void Bots::buildPads()
 			{
 				Vec3 spot = { x, y, piece->r.absmax[2] };
 				float surface = 0;
-				if( !runwayAt( spot, &surface ) )
+				if( !BotWorld::runwayAt( spot, &surface ) )
 					continue;
 				spot[2] = surface;
 				for( int step = 0; step < headings; step++ )
 				{
 					const float yaw = step * (180.0f / headings);
-					const float ahead = runwayRun( spot, yaw, 8000 );
-					const float behind = runwayRun( spot, yaw + 180.0f, 8000 );
+					const float ahead = BotWorld::runwayRun( spot, yaw, 8000 );
+					const float behind = BotWorld::runwayRun( spot, yaw + 180.0f, 8000 );
 					Run& run = airfield.runs[step];
 					if( ahead + behind > run.length )
 					{
@@ -323,13 +323,13 @@ void Bots::buildPads()
 			GameHost::trace( &tr, from, boxMins, boxMaxs, to, ENTITYNUM_NONE, MASK_PLAYERSOLID, false );
 			if( tr.startsolid || tr.fraction < 1.0f )
 				continue;
-			Pad probe;
+			BotWorld::Pad probe;
 			probe.center = run.center;
 			probe.center[2] = run.z;
 			probe.axis = run.axis;
 			probe.halfLength = run.length * 0.5f;
 			probe.z = run.z;
-			const float slope = std::min( approachSlope( probe, 1.0f ), approachSlope( probe, -1.0f ) );
+			const float slope = std::min( BotWorld::approachSlope( probe, 1.0f ), BotWorld::approachSlope( probe, -1.0f ) );
 			if( bestSlope == 0 || slope < bestSlope - 0.03f || (slope < bestSlope + 0.03f && run.length > airfield.best.length) )
 			{
 				bestSlope = slope;
@@ -344,7 +344,7 @@ void Bots::buildPads()
 		if( !ent || !ent->inuse_ || !ent->classname_ || strcmp( ent->classname_, "trigger_recharge" ) != 0 )
 			continue;
 
-		Pad pad;
+		BotWorld::Pad pad;
 		for( int k = 0; k < 3; k++ )
 			pad.center[k] = (ent->r.absmin[k] + ent->r.absmax[k]) * 0.5f;
 		VectorCopy( pad.center, pad.spot );
@@ -381,23 +381,23 @@ void Bots::buildPads()
 			pad.halfLength = run.length * 0.5f;
 			pad.runway = run.length >= minRunway;
 		}
-		pads_.push_back( pad );
+		BotWorld::pads_.push_back( pad );
 	}
 }
 
 // the nearest pad this vehicle may use: of its kind, of its team, and for a plane one with a runway
-int Bots::findPad( GameEntity* ent, int skip )
+int BotWorld::findPad( GameEntity* ent, int skip )
 {
-	if( !padsBuilt_ )
-		buildPads();
+	if( !BotWorld::padsBuilt_ )
+		BotWorld::buildPads();
 
 	const GameClient* client = ent->client_;
 	const unsigned int cat = availableVehicles[client->vehicle_].cat;
 	int best = -1;
 	float bestDist = 0;
-	for( size_t i = 0; i < pads_.size(); i++ )
+	for( size_t i = 0; i < BotWorld::pads_.size(); i++ )
 	{
-		const Pad& pad = pads_[i];
+		const BotWorld::Pad& pad = BotWorld::pads_[i];
 		if( !(pad.category & cat) || ((cat & CAT_PLANE) && !pad.runway) || static_cast<int>( i ) == skip )
 			continue;
 		if( g_gametype.integer >= GT_TEAM && pad.team != ClientBase::TEAM_FREE && pad.team != client->sess_.sessionTeam_ )
@@ -439,14 +439,14 @@ bool Bots::findHidePoint( GameEntity* ent, State& bot, GameEntity* threat, bool 
 			point[2] += 20;
 			if( fabs( point[2] - ent->r.currentOrigin[2] ) > radius * 0.5f )
 				continue;
-			if( visible( ent, point, threat ) )
+			if( BotWorld::visible( ent, point, threat ) )
 				continue;
 			if( hullDown )
 			{
 				Vec3 top;
 				top = point;
 				top[2] += availableVehicles[ent->client_->vehicle_].maxs[2] + 12;
-				if( !visible( ent, top, threat ) )
+				if( !BotWorld::visible( ent, top, threat ) )
 					continue;
 			}
 			const float dist = Distance( ent->r.currentOrigin, point );
@@ -477,8 +477,8 @@ GameEntity* Bots::findStructure( GameEntity* ent, State& bot )
 	}
 	bot.structureTime = theLevel.time_ + 6000;
 	bot.structure = -1;
-	if( !padsBuilt_ )
-		buildPads();
+	if( !BotWorld::padsBuilt_ )
+		BotWorld::buildPads();
 
 	const int team = ent->client_->sess_.sessionTeam_;
 	GameEntity* best = nullptr;
@@ -495,7 +495,7 @@ GameEntity* Bots::findStructure( GameEntity* ent, State& bot )
 		if( g_gametype.integer >= GT_TEAM )
 		{
 			bool own = false, enemy = false;
-			for( const Pad& pad : pads_ )
+			for( const BotWorld::Pad& pad : BotWorld::pads_ )
 			{
 				if( pad.team == ClientBase::TEAM_FREE || Distance( pad.spot, centre ) > 2500 )
 					continue;
@@ -535,8 +535,8 @@ void Bots::pickGoal( GameEntity* ent, State& bot, float radius )
 		else
 			bot.goalsReached++;
 	}
-	if( roamPoints_.empty() )
-		buildRoamPoints();
+	if( BotWorld::roamPoints_.empty() )
+		BotWorld::buildRoamPoints();
 	const unsigned int cat = ent->client_->vehicle_ >= 0 ? availableVehicles[ent->client_->vehicle_].cat : 0;
 
 	// Everyone has a rough idea where the enemy is. Part of the time a bot goes looking for the nearest opponent
@@ -574,9 +574,9 @@ void Bots::pickGoal( GameEntity* ent, State& bot, float radius )
 		if( !(cat & (CAT_PLANE|CAT_HELO)) )
 			bot.goal[2] = ent->r.currentOrigin[2];
 	}
-	else if( (cat & (CAT_PLANE|CAT_HELO)) && !roamPoints_.empty() && radius > 3500 )
+	else if( (cat & (CAT_PLANE|CAT_HELO)) && !BotWorld::roamPoints_.empty() && radius > 3500 )
 	{
-		const Vec3& point = roamPoints_[rand() % roamPoints_.size()];
+		const Vec3& point = BotWorld::roamPoints_[rand() % BotWorld::roamPoints_.size()];
 		point.copyTo( bot.goal );
 		bot.goal[0] += crandom() * 800.0f;
 		bot.goal[1] += crandom() * 800.0f;

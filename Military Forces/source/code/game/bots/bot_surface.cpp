@@ -95,7 +95,7 @@ struct SurfaceTasks
 	// onto the pad and wait there until full
 	static Status driveToPad( Mind& c )
 	{
-		c.courseTo( Bots::pads_[c.bot.pad].spot );
+		c.courseTo( BotWorld::pads_[c.bot.pad].spot );
 		holdNear( c, 80 );
 		if( c.hold && Bots::replenished( c.ent ) )
 		{
@@ -269,7 +269,7 @@ struct SurfaceTasks
 		VectorCopy( c.ent->r.currentOrigin, start );
 		start[2] += c.veh.maxs[2] * 0.5f + 8;
 		// a slope gentle enough to drive up is not an obstacle
-		c.blocked = Bots::pathBlocked( start, forward, 260, c.ent->s.number, tr ) && tr.plane.normal[2] < 0.6f;
+		c.blocked = BotWorld::pathBlocked( start, forward, 260, c.ent->s.number, tr ) && tr.plane.normal[2] < 0.6f;
 		if( !c.boat && !c.blocked )
 		{
 			for( float reach : { 160.0f, 380.0f } )
