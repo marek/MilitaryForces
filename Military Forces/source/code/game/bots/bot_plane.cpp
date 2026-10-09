@@ -1081,9 +1081,6 @@ struct PlaneTasks
 		// a strip that is still far off, with the fuel to hurry there
 		if( tripToStrip )
 			return true;
-		// carrying a flag, going for one or chasing its carrier
-		if( c.ps.objectives || c.bot.desire == Goal::Capture )
-			return true;
 		// a wingman left behind catches up with the leader
 		constexpr float farBehind = 4000.0f, farFromFight = 5000.0f;
 		if( const GameEntity* leader = Bots::leaderOf( c.bot ); leader && Distance( leader->r.currentOrigin, c.ent->r.currentOrigin ) > farBehind )
