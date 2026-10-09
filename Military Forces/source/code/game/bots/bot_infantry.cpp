@@ -2,10 +2,12 @@
 
 using behavior::Status;
 
+// A soldier on foot wants a vehicle: the conditions and steps of the infantry tree, and what a bot does as a rider
 struct InfantryTasks
 {
 	using Mind = Bots::Mind;
 
+	// the nearest thing with a seat: an empty vehicle, or a team mate's stopped vehicle. A free gunner's seat is worth a longer walk
 	static void findRide( Mind& c )
 	{
 		for( int i = 0; i < theLevel.num_entities_; i++ )
@@ -36,6 +38,7 @@ struct InfantryTasks
 		}
 	}
 
+	// the nearest pad, where vehicles appear
 	static void findPad( Mind& c )
 	{
 		if( !Bots::padsBuilt_ )
@@ -51,12 +54,14 @@ struct InfantryTasks
 		}
 	}
 
+	// close enough to climb in, and not just after the last try
 	static bool rideInReach( Mind& c )
 	{
 		return c.target && Distance( c.ent->r.currentOrigin, c.target->r.currentOrigin ) < g_enterRange.value * 0.9f && theLevel.time_ > c.bot.commandTime;
 	}
 	static bool enemyClose( Mind& c ) { return c.sense.enemy && c.sense.enemyDist < 900 && !c.sense.enemyAir; }
 	static bool seesRide( Mind& c ) { return c.target != nullptr; }
+	// on foot too long, or with no pad anywhere near: start again in a vehicle. The patient wait longer
 	static bool stranded( Mind& c )
 	{
 		const int patience = 20000 + static_cast<int>( 30000 * c.who().patience );
@@ -65,6 +70,7 @@ struct InfantryTasks
 	static bool padAway( Mind& c ) { return c.nearPad >= 0 && c.nearPadDist > 150; }
 	static bool moving( Mind& c ) { return !c.direct; }
 
+	// the enter key
 	static Status board( Mind& c )
 	{
 		c.bot.commandTime = theLevel.time_ + 1500;
@@ -89,6 +95,7 @@ struct InfantryTasks
 		return Status::Running;
 	}
 
+	// choose a vehicle and give up this life for it
 	static Status respawnInVehicle( Mind& c )
 	{
 		if( theLevel.time_ <= c.bot.commandTime )
@@ -117,6 +124,7 @@ struct InfantryTasks
 		return Status::Running;
 	}
 
+	// nothing to walk to: short walks around
 	static Status wander( Mind& c )
 	{
 		if( theLevel.time_ > c.bot.goalTime || Distance( c.ent->r.currentOrigin, c.bot.goal ) < 60 )
@@ -131,6 +139,7 @@ struct InfantryTasks
 		return Status::Success;
 	}
 
+	// face the course and walk; when not getting anywhere, sidestep for a moment and plan the path again
 	static Status walk( Mind& c )
 	{
 		Bots::State& bot = c.bot;
@@ -190,6 +199,8 @@ void Bots::thinkInfantry( GameEntity* ent, State& bot, const Sense& sense, userc
 	runTree( tree, mind, "infantry" );
 }
 
+// A bot riding in someone's vehicle: a gunner works the turret, a passenger in a helicopter or a boat shoots at what
+// comes near, and a passenger in a wheeled transport gets out when it has stopped for a while
 void Bots::thinkRider( GameEntity* ent, State& bot, usercmd_t& cmd, vec3_t view )
 {
 	GameClient* client = ent->client_;
@@ -217,10 +228,12 @@ void Bots::thinkRider( GameEntity* ent, State& bot, usercmd_t& cmd, vec3_t view 
 	}
 	else
 		bot.liftTime = 0;
+	// passengers shoot only from open vehicles
 	if( !gunner && !(availableVehicles[pilot->client_->vehicle_].cat & (CAT_HELO|CAT_BOAT)) )
 		return;
 	const float reach = gunner ? 3500.0f : 1500.0f;
 
+	// the nearest enemy within reach of the seat's weapon
 	if( theLevel.time_ >= bot.enemyTime )
 	{
 		GameEntity* enemy = nullptr;

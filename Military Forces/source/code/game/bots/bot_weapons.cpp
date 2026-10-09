@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <cmath>
 
+// does it carry a main weapon of this type with rounds left?
 bool Bots::hasWeaponType( int vehicle, const playerState_t& ps, int type )
 {
 	for( int slot : secondaryWeaponSlots )
@@ -16,6 +17,8 @@ bool Bots::hasWeaponType( int vehicle, const playerState_t& ps, int type )
 	return false;
 }
 
+// The main weapon to use on a target of that kind at that distance, or -1: missiles inside their range come first,
+// then the gun or rockets that suit the distance. guided is set when the weapon needs a lock before it is fired.
 int Bots::findWeaponSlot( int vehicle, const playerState_t& ps, bool air, float dist, bool& guided )
 {
 	const completeVehicleData_t& veh = availableVehicles[vehicle];
@@ -38,6 +41,7 @@ int Bots::findWeaponSlot( int vehicle, const playerState_t& ps, bool air, float 
 				continue;
 			lock = true;
 			score = dist <= range ? 10000.0f - range : 2000.0f + range * 0.01f;
+			// too close for a missile to arm and turn
 			if( dist < 500 )
 				score = 500.0f;
 			break;
@@ -59,6 +63,7 @@ int Bots::findWeaponSlot( int vehicle, const playerState_t& ps, bool air, float 
 			score = dist < 5000 ? 9500.0f : 7000.0f;
 			break;
 		case WT_MACHINEGUN:
+			// only guns that are main weapons: a turret or a gun pod. The fixed gun has its own trigger
 			if( !data.turret && !(data.fitsPylon & PF_GUNPOD) )
 				continue;
 			score = dist < 2500 ? 3000.0f : 800.0f;
@@ -76,6 +81,7 @@ int Bots::findWeaponSlot( int vehicle, const playerState_t& ps, bool air, float 
 	return best;
 }
 
+// every weapon it carries is down to a fifth or less
 bool Bots::outOfAmmo( int vehicle, const playerState_t& ps )
 {
 	const completeVehicleData_t& veh = availableVehicles[vehicle];
@@ -91,6 +97,7 @@ bool Bots::outOfAmmo( int vehicle, const playerState_t& ps )
 	return any;
 }
 
+// switch the radar to the mode that sees this kind of target, if the vehicle has it
 void Bots::setRadar( GameEntity* ent, State& bot, bool air )
 {
 	const playerState_t& ps = ent->client_->ps_;
@@ -104,6 +111,8 @@ void Bots::setRadar( GameEntity* ent, State& bot, bool air )
 	Cmd_Radar_f( ent );
 }
 
+// Select and fire at the sensed enemy: nothing before the bot's reaction time to a new enemy has passed, nothing
+// through a wall; the fixed gun when the aim is close, a guided weapon once it has its lock, the rest when lined up
 void Bots::fireWeapons( GameEntity* ent, State& bot, const Sense& sense, usercmd_t& cmd, float aimError )
 {
 	GameClient* client = ent->client_;
@@ -140,6 +149,7 @@ void Bots::fireWeapons( GameEntity* ent, State& bot, const Sense& sense, usercmd
 	if( gun && ps.ammo[WP_MACHINEGUN] > 0 && aimError < 3.0f && sense.enemyDist < 2500 )
 		cmd.buttons |= BUTTON_ATTACK;
 
+	// the selection takes a moment to change: nothing is fired from the old one
 	if( slot < 0 || ps.weaponNum != slot )
 		return;
 
@@ -160,6 +170,7 @@ void Bots::fireWeapons( GameEntity* ent, State& bot, const Sense& sense, usercmd
 		cmd.buttons |= BUTTON_ATTACK_MAIN;
 }
 
+// a flare when a missile is launched and near; the less skilled a bot, the more often it is late
 void Bots::flares( GameEntity* ent, State& bot, const Sense& sense, usercmd_t& cmd )
 {
 	if( !sense.launched || ent->client_->ps_.ammo[WP_FLARE] <= 0 || theLevel.time_ < bot.flareTime )
@@ -195,6 +206,7 @@ int Bots::supplyNeed( GameEntity* who, bool urgentOnly )
 	return 0;
 }
 
+// a vehicle that drops crates for others
 bool Bots::carriesSupplies( int vehicle )
 {
 	for( unsigned int weapon : availableVehicles[vehicle].weapons )
@@ -222,6 +234,8 @@ bool Bots::friendlyNear( GameEntity* ent, const vec3_t point, float radius )
 	return false;
 }
 
+// Level bombing: steer over the target and release when the bomb's fall carries it there, then leave. The
+// release window widens for the less skilled.
 void Bots::bomb( GameEntity* ent, State& bot, const vec3_t target, usercmd_t& cmd, vec3_t view )
 {
 	GameClient* client = ent->client_;
@@ -250,6 +264,7 @@ void Bots::bomb( GameEntity* ent, State& bot, const vec3_t target, usercmd_t& cm
 
 	if( drop <= 0 || ps.weaponNum != slot )
 		return;
+	// how far ahead the bomb lands: its time to fall the height, at the plane's speed over the ground
 	const float fall = sqrt( 2.0f * drop / DEFAULT_GRAVITY );
 	const float speed = sqrt( ps.velocity[0] * ps.velocity[0] + ps.velocity[1] * ps.velocity[1] );
 	const float lead = speed * fall;
@@ -262,6 +277,7 @@ void Bots::bomb( GameEntity* ent, State& bot, const vec3_t target, usercmd_t& cm
 		cmd.buttons |= BUTTON_ATTACK_MAIN;
 		bot.bombTime = theLevel.time_;
 	}
+	// past the release point: fly on out before coming round again
 	if( dist < lead - 400 && theLevel.time_ > bot.bombTime + 500 )
 		bot.egressTime = theLevel.time_ + 8000;
 }

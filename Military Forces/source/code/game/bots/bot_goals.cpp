@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <cmath>
 
+// what a goal's score is worked out from
 struct Situation
 {
 	GameEntity*				ent;
@@ -15,12 +16,15 @@ struct Situation
 	int						vehicle;
 };
 
+// One score per goal, from the bot's situation and its character; the highest wins. The small helpers are the
+// needs and threats the scores are built from, each from 0 (none) upwards.
 struct GoalScoring
 {
 	using Role = Bots::Role;
 
 	static float hurt( const Situation& s ) { return 1.0f - s.sense.health; }
 	static float missileThreat( const Situation& s ) { return s.sense.launched ? 0.5f : s.sense.locked ? 0.15f : 0.0f; }
+	// being hit by someone unseen frightens far more than a fight it can see
 	static float takingFire( const Situation& s ) { return !s.sense.underFire ? 0.0f : s.sense.blindsided ? 1.4f : 0.3f; }
 	static bool plane( const Situation& s ) { return s.sense.role == Role::Fighter || s.sense.role == Role::Bomber; }
 	static bool armour( const Situation& s ) { return s.sense.role == Role::Tank || s.sense.role == Role::AirDefence; }
@@ -29,15 +33,18 @@ struct GoalScoring
 	{
 		return has( s, WT_IRONBOMB ) || has( s, WT_GUIDEDBOMB ) || has( s, WT_ANTIGROUNDMISSILE ) || has( s, WT_ROCKET );
 	}
+	// how far a bomber is below the height it wants for a bomb run, with extra weight when well below
 	static float bomberAltitudeNeed( const Situation& s )
 	{
 		const float want = std::clamp( s.sense.height + Bots::ceilingAbove( s.ent->r.currentOrigin, s.ent->s.number ) - 700.0f, 800.0f, 3500.0f );
 		return std::clamp( 1.0f - s.sense.height / want, 0.0f, 1.0f ) + (s.sense.height < want * 0.6f ? 0.5f : 0.0f);
 	}
+	// an enemy aircraft: 1 when close, fading to nothing a little beyond the range
 	static float airThreatNear( const Situation& s, float range )
 	{
 		return s.sense.airThreat ? std::clamp( 1.3f - s.sense.airThreatDist / range, 0.0f, 1.0f ) : 0.0f;
 	}
+	// how well a bomber can look after itself with its own guns: the old heavy bombers can, modern ones cannot
 	static float selfDefence( const Situation& s )
 	{
 		const completeVehicleData_t& veh = availableVehicles[s.vehicle];
@@ -45,8 +52,10 @@ struct GoalScoring
 			return 0.0f;
 		return std::clamp( veh.maxhealth / 1000.0f, 0.0f, 1.0f );
 	}
+	// one against one, an honourable character does not run or leave to rearm
 	static float duelResolve( const Situation& s, float weight ) { return s.sense.duel ? 1.0f - weight * s.who.honour : 1.0f; }
 
+	// fight: by aggression, less when hurt; a bomber without bombs has little to fight with
 	static float attack( const Situation& s )
 	{
 		if( !s.sense.enemy )
@@ -64,6 +73,7 @@ struct GoalScoring
 		return score;
 	}
 
+	// get away: by caution, from damage while pressed, missiles and incoming fire; armour shrugs most of it off
 	static float evade( const Situation& s )
 	{
 		// damage alone is no reason to keep running once nobody is near
@@ -79,6 +89,7 @@ struct GoalScoring
 		return score * duelResolve( s, 0.7f );
 	}
 
+	// gain height: a bomber for its run, a fighter to come down on a distant enemy, a stealth aircraft while unseen
 	static float climb( const Situation& s )
 	{
 		float score = 0.0f;
@@ -91,6 +102,7 @@ struct GoalScoring
 		return score;
 	}
 
+	// a tank takes cover from fire it cannot place and from aircraft it cannot shoot at
 	static float hide( const Situation& s )
 	{
 		if( s.sense.role != Role::Tank )
@@ -115,13 +127,14 @@ struct GoalScoring
 		return true;
 	}
 
+	// go back to a pad for fuel, repairs, ammunition or flares
 	static float rearm( const Situation& s )
 	{
 		if( s.sense.role == Role::Infantry )
 			return 0.0f;
 		if( plane( s ) && (!g_botLanding.integer || theLevel.time_ < s.bot.landGiveUp) )
 			return 0.0f;
-		// fuel is the need that cannot wait: it grows as the tank empties, and below a fifth no fight outweighs it
+		// fuel is the need that cannot wait: it grows as the tank empties, and below a quarter not even a duel outweighs it
 		constexpr float fuelWanted = 0.45f, fuelUrgent = 0.25f, fuelPull = 8.0f;
 		const float fuel = static_cast<float>( s.ps.stats[STAT_FUEL] ) / std::max( 1, s.ps.stats[STAT_MAX_FUEL] );
 		float need = 0.0f;
@@ -135,13 +148,16 @@ struct GoalScoring
 			need = 0.3f * s.who.caution;
 		if( fuel >= fuelUrgent )
 			need *= duelResolve( s, 1.0f );
+		// once on the way to a pad, see it through
 		if( s.bot.pad >= 0 )
 			need = std::max( need, 0.9f );
+		// no pad this vehicle can use: nothing to go back to
 		if( need > 0 && Bots::findPad( s.ent, theLevel.time_ < s.bot.badPadTime ? s.bot.badPad : -1 ) < 0 )
 			return 0.0f;
 		return need;
 	}
 
+	// the flag: surface vehicles and helicopters only, and nothing matters more than bringing it home
 	static float capture( const Situation& s )
 	{
 		if( g_gametype.integer != GT_CTF || plane( s ) )
@@ -172,6 +188,7 @@ namespace
 	constexpr float roamScore = 0.2f;
 }
 
+// the goal with the highest score; the one already held gets a bonus so that close scores do not flip it back and forth
 Bots::Goal Bots::chooseGoal( GameEntity* ent, State& bot, const Sense& sense )
 {
 	const Character& who = character( bot );
@@ -204,6 +221,7 @@ Bots::Goal Bots::chooseGoal( GameEntity* ent, State& bot, const Sense& sense )
 	}
 #endif
 
+	// rearming needs a pad chosen; any other goal lets it go
 	if( goal == Goal::Rearm )
 	{
 		if( bot.pad < 0 )
@@ -220,6 +238,7 @@ Bots::Goal Bots::chooseGoal( GameEntity* ent, State& bot, const Sense& sense )
 	return goal;
 }
 
+// full again: fuel, health and every weapon
 bool Bots::replenished( GameEntity* ent )
 {
 	const GameClient* client = ent->client_;
@@ -233,6 +252,7 @@ bool Bots::replenished( GameEntity* ent )
 	return true;
 }
 
+// done at the pad: clear the landing and take-off state and look for something to do
 void Bots::finishRearm( GameEntity* ent, State& bot )
 {
 	bot.takeoffTime = 0;
