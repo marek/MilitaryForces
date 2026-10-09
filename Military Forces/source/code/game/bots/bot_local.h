@@ -1,6 +1,7 @@
 #ifndef __BOT_LOCAL_H__
 #define __BOT_LOCAL_H__
 
+// client commands a bot gives as a player would
 void SetTeam( GameEntity *ent, char *s );
 void Cmd_Radar_f( GameEntity *ent );
 void Cmd_Eject_f( GameEntity *ent );
@@ -10,24 +11,26 @@ void MF_ClientBegin( int clientNum );
 
 namespace bots
 {
-	constexpr signed char moveFull = 127;
+	constexpr signed char moveFull = 127;	// a movement key held fully
 	constexpr signed char moveNone = 0;
-	constexpr float planeCruiseHeight = 1400.0f;
+	constexpr float planeCruiseHeight = 1400.0f;	// heights above ground that pilots keep to
 	constexpr float planeMinHeight = 450.0f;
 	// the least height over the ground while lining up to land
 	constexpr float approachFloor = 150.0f;
 	constexpr float heloCruiseHeight = 500.0f;
 	constexpr float heloLowHeight = 180.0f;
 	constexpr float bomberMinHeight = 2200.0f;
-	constexpr float planeEnemyRange = 14000.0f;
+	constexpr float planeEnemyRange = 14000.0f;	// how far away an enemy is noticed, from the air and from the surface
 	constexpr float surfaceEnemyRange = 7000.0f;
 
+	// the throttle setting with reverse (or a helicopter's sink) as a negative number
 	inline float signedThrottle( const playerState_t& ps, int vehicle )
 	{
 		const int maxThrottle = availableVehicles[vehicle].maxthrottle;
 		return ps.fixed_throttle > maxThrottle ? -static_cast<float>( ps.fixed_throttle - maxThrottle ) : static_cast<float>( ps.fixed_throttle );
 	}
 
+	// a player in a vehicle or on foot, in the game and not dead or choosing
 	inline bool alive( GameEntity* ent )
 	{
 		return ent && ent->inuse_ && ent->client_ && ent->health_ > 0 && ent->client_->vehicle_ >= 0 &&

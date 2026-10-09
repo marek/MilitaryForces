@@ -4,10 +4,12 @@
 #include "../q_shared.h"
 #include <vector>
 
+// paths over land and over water on a grid of cells (see the .cpp)
 class GroundNav
 {
 public:
 	static void reset();
+	// false when the goal is out of reach; out then leads towards the nearest point reached
 	static bool findPath( const Vec3& from, const Vec3& to, bool water, std::vector<Vec3>& out );
 	static int cellCount();
 	static int knownCount();
@@ -23,12 +25,12 @@ private:
 	static bool lineOpen( const Vec3& a, const Vec3& b, Kind wanted );
 
 	static bool built_;
-	static Vec3 mins_;
+	static Vec3 mins_;	// the map's corner the grid starts from
 	static float cellSize_;
 	static int nx_, ny_;
-	static std::vector<Kind> kind_;
+	static std::vector<Kind> kind_;	// per cell: what it is and how high its surface lies
 	static std::vector<float> height_;
-	static std::vector<float> cost_;
+	static std::vector<float> cost_;	// per cell, for the search in progress: cost so far, where it came from, and which search wrote them
 	static std::vector<int> parent_;
 	static std::vector<int> stamp_;
 	static int generation_;
