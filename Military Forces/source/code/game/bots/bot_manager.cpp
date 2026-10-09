@@ -486,19 +486,21 @@ void Bots::think( GameEntity* ent, State& bot, usercmd_t& cmd )
 		}
 	}
 
-	// A bot that can reach a pad lands for fuel as a player would. One that cannot refuel on this map at all —
-	// an aircraft with no pad it can use, a ground vehicle or boat with nobody flying supplies — keeps a quarter
-	// tank, since stopping dead for good would only take it out of the game.
+	// Fuel (Marek, 2026-10-08): a plane with no pad it can land on on this map keeps a quarter tank, since it
+	// cannot refuel there and no plane can pick up a supply drop. Nothing else gets free fuel: a plane that can
+	// land does, ground vehicles and helicopters go back to a pad or are supplied by helicopter, boats are supplied.
 	constexpr int padCheckInterval = 2000;
-	const unsigned int ownCat = availableVehicles[client->vehicle_].cat;
-	if( theLevel.time_ >= bot.padCheckTime )
+	if( availableVehicles[client->vehicle_].cat & CAT_PLANE )
 	{
-		bot.padCheckTime = theLevel.time_ + padCheckInterval;
-		bot.canLand = (ownCat & (CAT_PLANE|CAT_HELO)) && g_botLanding.integer && theLevel.time_ >= bot.landGiveUp &&
-			findPad( ent, theLevel.time_ < bot.badPadTime ? bot.badPad : -1 ) >= 0;
+		if( theLevel.time_ >= bot.padCheckTime )
+		{
+			bot.padCheckTime = theLevel.time_ + padCheckInterval;
+			bot.canLand = g_botLanding.integer && theLevel.time_ >= bot.landGiveUp &&
+				findPad( ent, theLevel.time_ < bot.badPadTime ? bot.badPad : -1 ) >= 0;
+		}
+		if( !bot.canLand && bot.pad < 0 && ps.stats[STAT_FUEL] < ps.stats[STAT_MAX_FUEL] / 4 )
+			ps.stats[STAT_FUEL] = ps.stats[STAT_MAX_FUEL] / 4;
 	}
-	if( !bot.canLand && bot.pad < 0 && ps.stats[STAT_FUEL] < ps.stats[STAT_MAX_FUEL] / 4 )
-		ps.stats[STAT_FUEL] = ps.stats[STAT_MAX_FUEL] / 4;
 
 	if( client->sess_.ridingClient_ >= 0 )
 	{
