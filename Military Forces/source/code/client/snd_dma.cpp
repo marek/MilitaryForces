@@ -30,6 +30,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *****************************************************************************/
 
 #include "snd_local.h"
+#include <algorithm>
 #include "snd_codec.h"
 #include "client.h"
 
@@ -636,7 +637,8 @@ static void S_Base_StartSoundEx( vec3_t origin, int entityNum, int entchannel, s
 		ch->fixed_origin = false;
 	}
 
-	ch->master_vol = 127;
+	// the level of the sound's bus is part of its own volume here; a change shows on the next sound started
+	ch->master_vol = static_cast<int>( 127 * std::min( 2.0f, S_BusLevel( sfx->soundName ) ) );
 	ch->entnum = entityNum;
 	ch->thesfx = sfx;
 	ch->startSample = START_SAMPLE_IMMEDIATE;
@@ -919,6 +921,9 @@ static void S_AddLoopSounds () {
 		// allocate a channel
 		ch = &loop_channels[numLoopChannels];
 		
+		// the loop's bus level
+		left_total = static_cast<int>( left_total * S_BusLevel( loop->sfx->soundName ) );
+		right_total = static_cast<int>( right_total * S_BusLevel( loop->sfx->soundName ) );
 		if (left_total > 255) {
 			left_total = 255;
 		}

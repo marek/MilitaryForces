@@ -27,6 +27,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "snd_public.h"
 
 cvar_t *s_volume;
+cvar_t *s_volEngines, *s_volWeapons, *s_volExplosions, *s_volAmbience, *s_volInterface;
 cvar_t *s_muted;
 cvar_t *s_musicVolume;
 cvar_t *s_doppler;
@@ -477,6 +478,11 @@ void SoundSystem::init( )
 	Common::printf( "------ Initializing Sound ------\n" );
 
 	s_volume = CvarSystem::get( "s_volume", "0.8", CVAR_ARCHIVE );
+	s_volEngines = CvarSystem::get( "s_volEngines", "1.0", CVAR_ARCHIVE );
+	s_volWeapons = CvarSystem::get( "s_volWeapons", "1.0", CVAR_ARCHIVE );
+	s_volExplosions = CvarSystem::get( "s_volExplosions", "1.0", CVAR_ARCHIVE );
+	s_volAmbience = CvarSystem::get( "s_volAmbience", "1.0", CVAR_ARCHIVE );
+	s_volInterface = CvarSystem::get( "s_volInterface", "1.0", CVAR_ARCHIVE );
 	s_musicVolume = CvarSystem::get( "s_musicvolume", "0.25", CVAR_ARCHIVE );
 	s_muted = CvarSystem::get("s_muted", "0", CVAR_ROM);
 	s_doppler = CvarSystem::get( "s_doppler", "1", CVAR_ARCHIVE );
@@ -548,3 +554,34 @@ void SoundSystem::shutdown( )
 	S_CodecShutdown( );
 }
 
+
+// The bus a sound belongs to, from where its file lives, and that bus's level (1 leaves the sound as it is).
+// Engines: sound/engines and sound/vehicles. Weapons: sound/weapons. Explosions: sound/explosions. Ambience:
+// sound/world. Interface: sound/feedback, sound/items, sound/misc and menu sounds. Anything else is at the master
+// level only; music and voice chat have their own settings already.
+float S_BusLevel( const char* name )
+{
+	const auto under = [name]( const char* folder ) { return !Q_stricmpn( name, folder, static_cast<int>( strlen( folder ) ) ); };
+	if( under( "sound/engines/" ) || under( "sound/vehicles/" ) )
+		return s_volEngines->asFloat();
+	if( under( "sound/weapons/" ) )
+		return s_volWeapons->asFloat();
+	if( under( "sound/explosions/" ) )
+		return s_volExplosions->asFloat();
+	if( under( "sound/world/" ) )
+		return s_volAmbience->asFloat();
+	if( under( "sound/feedback/" ) || under( "sound/items/" ) || under( "sound/misc/" ) || under( "menu/" ) || under( "ui/" ) )
+		return s_volInterface->asFloat();
+	return 1.0f;
+}
+
+bool S_BusModified()
+{
+	return s_volEngines->modified() || s_volWeapons->modified() || s_volExplosions->modified() || s_volAmbience->modified() || s_volInterface->modified();
+}
+
+void S_BusClearModified()
+{
+	for( cvar_t* bus : { s_volEngines, s_volWeapons, s_volExplosions, s_volAmbience, s_volInterface } )
+		bus->setModified( false );
+}

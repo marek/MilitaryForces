@@ -219,6 +219,11 @@ extern	portable_samplepair_t s_rawsamples[MAX_RAW_STREAMS][MAX_RAW_SAMPLES];
 extern	int		s_rawend[MAX_RAW_STREAMS];
 
 extern cvar_t *s_volume;
+// levels of the buses under the master volume; a sound's bus follows from the folder its file lives in
+extern cvar_t *s_volEngines, *s_volWeapons, *s_volExplosions, *s_volAmbience, *s_volInterface;
+float S_BusLevel( const char* soundName );
+bool S_BusModified();
+void S_BusClearModified();
 extern cvar_t *s_musicVolume;
 extern cvar_t *s_muted;
 extern cvar_t *s_doppler;
