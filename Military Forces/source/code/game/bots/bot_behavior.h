@@ -290,7 +290,6 @@ namespace behavior
 		}
 
 		void setRoot( const Node<Context>* root ) { root_ = root; }
-		bool built() const { return root_ != nullptr; }
 		std::size_t size() const { return nodes_.size(); }
 		const char* nameOf( int id ) const { return id >= 0 && static_cast<std::size_t>( id ) < nodes_.size() ? nodes_[id]->name_ : "-"; }
 
