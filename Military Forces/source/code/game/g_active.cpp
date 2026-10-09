@@ -204,6 +204,15 @@ static void ClientImpacts( GameEntity *ent, pmove_t *pm )
 			continue;
 		GameEntity* other = theLevel.getEntity(pm->touchents[i]);
 
+		// The move can only have run into something solid to it. A number that leads to anything else (seen: a
+		// spent bullet, which nothing collides with) is not what was hit, and nobody dies of touching it
+		if( !other || (pm->touchents[i] != ENTITYNUM_WORLD && (!other->inuse_ || !(other->r.contents & pm->tracemask))) )
+		{
+			Common::dPrintf( "touch of entity %d by %d ignored: %s is not solid to it\n", pm->touchents[i], ent->s.number,
+				other && other->classname_ ? other->classname_ : "nothing" );
+			continue;
+		}
+
 		if( (( ent->r.svFlags & SVF_BOT || (ent->client_->vehicle_ >= 0) ) && ( ent->touchFunc_ )) ) 
 			ent->touchFunc_->execute( other, &trace );
 
