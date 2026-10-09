@@ -13,6 +13,8 @@ std::vector<Bots::Pad> Bots::pads_;
 bool Bots::padsBuilt_ = false;
 std::array<int, 5> Bots::kindLives_ = {};
 std::array<int, 5> Bots::kindCrashes_ = {};
+std::array<int, MAX_VEHICLE_TYPES> Bots::typeLives_ = {};
+std::array<int, MAX_VEHICLE_TYPES> Bots::typeCrashes_ = {};
 std::vector<Vec3> Bots::roamPoints_;
 std::vector<Bots::Character> Bots::characters_;
 
@@ -26,6 +28,8 @@ void Bots::reset()
 	characters_.clear();
 	kindLives_.fill( 0 );
 	kindCrashes_.fill( 0 );
+	typeLives_.fill( 0 );
+	typeCrashes_.fill( 0 );
 	AirNav::reset();
 	GroundNav::reset();
 }
@@ -51,6 +55,12 @@ int Bots::kindOf( int vehicle )
 	return 4;
 }
 
+// at least three lives in this vehicle type on this map, and two in three of them ended in an early crash
+bool Bots::unfitHere( int type )
+{
+	return type >= 0 && type < MAX_VEHICLE_TYPES && typeLives_[type] >= 3 && typeCrashes_[type] * 3 >= typeLives_[type] * 2;
+}
+
 // tallies lives per kind of vehicle and, among them, crashes soon after spawning: a kind that keeps
 // crashing on this map is picked less
 void Bots::onDeath( GameEntity* self, GameEntity* attacker, int meansOfDeath )
@@ -60,9 +70,16 @@ void Bots::onDeath( GameEntity* self, GameEntity* attacker, int meansOfDeath )
 
 	const State& bot = states_[self->s.number];
 	const int kind = kindOf( self->client_->vehicle_ );
+	const int type = self->client_->vehicle_;
 	kindLives_[kind]++;
+	if( type < MAX_VEHICLE_TYPES )
+		typeLives_[type]++;
 	if( (meansOfDeath == MOD_CRASH || meansOfDeath == MOD_WATER) && theLevel.time_ - bot.spawnTime < 20000 )
+	{
 		kindCrashes_[kind]++;
+		if( type < MAX_VEHICLE_TYPES )
+			typeCrashes_[type]++;
+	}
 #ifdef MF_BOT_DEBUG
 	if( g_botDebug.integer )
 		logDeath( self, attacker, meansOfDeath );
@@ -188,6 +205,10 @@ int Bots::pickVehicle( int teamFlag, bool allowInfantry, const Character* who, c
 		// more than half of all bots' lives in this kind ended in an early crash here: the map does not suit it
 		if( kindLives_[kind] >= 12 && kindCrashes_[kind] * 10 > kindLives_[kind] * 5 )
 			weight = std::max( 1, weight / 3 );
+		// this very aircraft has flown into the map nearly every time it was tried: it does not fit here (a wide-turning
+		// bomber in a canyon), and nobody takes it again this map
+		if( unfitHere( i ) )
+			continue;
 		// and this bot's own record in it
 		if( memory && who && memory->ownLives[kind] > 0 )
 		{
@@ -328,8 +349,55 @@ void Bots::think( GameEntity* ent, State& bot, usercmd_t& cmd )
 	Vec3 view;
 	VectorCopy( ps.viewangles, view );
 
-	// in the menus: choose, then tap fire to spawn
+	// a life has ended: settle its record once. A crash goes straight to the vehicle menu without a frame spent dead,
+	// so this comes before both
 	const bool selecting = client->sess_.sessionTeam_ == ClientBase::TEAM_SPECTATOR || client->vehicle_ < 0 || (ps.pm_flags & PMF_VEHICLESELECT);
+	if( bot.wasAlive && (selecting || ent->health_ <= 0) && client->sess_.sessionTeam_ != ClientBase::TEAM_SPECTATOR && (client->vehicle_ >= 0 || bot.vehicle >= 0) )
+	{
+		const int score = ps.persistant[PERS_SCORE];
+		const int flown = client->vehicle_ >= 0 ? client->vehicle_ : bot.vehicle;
+		const int kind = kindOf( flown );
+		const bool failed = score <= bot.lifeScore;
+		bot.badLives = failed ? bot.badLives + 1 : 0;
+		bot.ownLives[kind]++;
+		if( failed )
+			bot.ownFailures[kind]++;
+		// nobody sits out life after life in an aircraft the map keeps killing
+		bool reconsider = random() < switchDesire( bot, kind ) || unfitHere( flown );
+		// a supply pilot whose supplies nobody used in a long life gets bored, the impatient first;
+		// one who scored with them stays (a scoring life is not a failed one)
+		constexpr int longLife = 120000;
+		const bool supplier = carriesSupplies( flown );
+		if( supplier && failed && theLevel.time_ - bot.spawnTime > longLife && random() < 0.6f * (1.0f - character( bot ).patience) )
+			reconsider = true;
+		// every death is a chance to notice that the team has nobody flying supplies
+		const bool teamGame = g_gametype.integer >= GT_TEAM;
+		const bool fillSupply = teamGame && !supplier && !reconsider && !teamHasSupplier( client->sess_.sessionTeam_, ent ) &&
+			random() < 0.35f * character( bot ).teamwork;
+		if( reconsider || fillSupply )
+		{
+			int teamFlag = MF_TEAM_ANY;
+			if( g_gametype.integer >= GT_TEAM )
+				teamFlag = client->sess_.sessionTeam_ == ClientBase::TEAM_RED ? MF_TEAM_1 : MF_TEAM_2;
+			int vehicle = pickVehicle( teamFlag, false, &character( bot ), &bot );
+			if( fillSupply && vehicle >= 0 && !carriesSupplies( vehicle ) )
+				vehicle = -1;
+			if( vehicle >= 0 )
+			{
+				bot.vehicle = vehicle;
+				bot.badLives = 0;
+				char userinfo[MAX_INFO_STRING];
+				GameHost::getUserinfo( ent->s.number, userinfo, sizeof( userinfo ) );
+				Info::setValueForKey( userinfo, "cg_nextVehicle", va( "%d", vehicle ) );
+				GameHost::setUserinfo( ent->s.number, userinfo );
+				bot.wasAlive = false;
+				ClientUserinfoChanged( ent->s.number );
+				return;
+			}
+		}
+	}
+
+	// in the menus: choose, then tap fire to spawn
 	if( selecting )
 	{
 		bot.wasAlive = false;
@@ -339,51 +407,9 @@ void Bots::think( GameEntity* ent, State& bot, usercmd_t& cmd )
 			cmd.buttons |= BUTTON_ATTACK;
 		return;
 	}
-	// dead: settle the life's record once, then tap fire to respawn
+	// dead: tap fire to respawn
 	if( ent->health_ <= 0 )
 	{
-		if( bot.wasAlive )
-		{
-			const int score = ps.persistant[PERS_SCORE];
-			const int kind = kindOf( client->vehicle_ );
-			const bool failed = score <= bot.lifeScore;
-			bot.badLives = failed ? bot.badLives + 1 : 0;
-			bot.ownLives[kind]++;
-			if( failed )
-				bot.ownFailures[kind]++;
-			bool reconsider = random() < switchDesire( bot, kind );
-			// a supply pilot whose supplies nobody used in a long life gets bored, the impatient first;
-			// one who scored with them stays (a scoring life is not a failed one)
-			constexpr int longLife = 120000;
-			const bool supplier = carriesSupplies( client->vehicle_ );
-			if( supplier && failed && theLevel.time_ - bot.spawnTime > longLife && random() < 0.6f * (1.0f - character( bot ).patience) )
-				reconsider = true;
-			// every death is a chance to notice that the team has nobody flying supplies
-			const bool teamGame = g_gametype.integer >= GT_TEAM;
-			const bool fillSupply = teamGame && !supplier && !reconsider && !teamHasSupplier( client->sess_.sessionTeam_, ent ) &&
-				random() < 0.35f * character( bot ).teamwork;
-			if( reconsider || fillSupply )
-			{
-				int teamFlag = MF_TEAM_ANY;
-				if( g_gametype.integer >= GT_TEAM )
-					teamFlag = client->sess_.sessionTeam_ == ClientBase::TEAM_RED ? MF_TEAM_1 : MF_TEAM_2;
-				int vehicle = pickVehicle( teamFlag, false, &character( bot ), &bot );
-				if( fillSupply && vehicle >= 0 && !carriesSupplies( vehicle ) )
-					vehicle = -1;
-				if( vehicle >= 0 )
-				{
-					bot.vehicle = vehicle;
-					bot.badLives = 0;
-					char userinfo[MAX_INFO_STRING];
-					GameHost::getUserinfo( ent->s.number, userinfo, sizeof( userinfo ) );
-					Info::setValueForKey( userinfo, "cg_nextVehicle", va( "%d", vehicle ) );
-					GameHost::setUserinfo( ent->s.number, userinfo );
-					bot.wasAlive = false;
-					ClientUserinfoChanged( ent->s.number );
-					return;
-				}
-			}
-		}
 		bot.wasAlive = false;
 		if( (theLevel.time_ / 200) & 1 )
 			cmd.buttons |= BUTTON_ATTACK;

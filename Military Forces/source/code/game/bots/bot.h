@@ -263,6 +263,10 @@ private:
 	static bool padsBuilt_;
 	static std::array<int, 5> kindLives_;
 	static std::array<int, 5> kindCrashes_;
+	// the same per vehicle type: one aircraft may not fit a map its kind otherwise copes with
+	static std::array<int, MAX_VEHICLE_TYPES> typeLives_;
+	static std::array<int, MAX_VEHICLE_TYPES> typeCrashes_;
+	static bool unfitHere( int type );
 	static int kindOf( int vehicle );
 	static std::vector<Vec3> roamPoints_;
 	static std::vector<Character> characters_;
