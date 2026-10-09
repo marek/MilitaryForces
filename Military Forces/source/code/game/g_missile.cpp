@@ -677,7 +677,7 @@ static void G_MissileImpact( GameEntity *ent, trace_t *trace )
 			 availableWeapons[ent->s.weaponIndex].type == WT_AMMOCRATE || 
 			 availableWeapons[ent->s.weaponIndex].type == WT_HEALTHCRATE )
 	{
-		const char * classname = theLevel.getEntity(trace->entityNum)->classname_;// g_entities[trace->entityNum].classname;
+		const char * classname = other->classname_;
 		if( strcmp( classname, "func_runway" ) == 0 ||
 			strcmp( classname, "func_plat" ) == 0 ||
 			strcmp( classname, "func_train" ) == 0 ||
@@ -731,6 +731,9 @@ void Game::runMissile( GameEntity *ent )
 		// make sure the tr.entityNum is set to the entity we're stuck in
 		GameHost::trace( &tr, ent->r.currentOrigin, ent->r.mins, ent->r.maxs, ent->r.currentOrigin, passent, ent->clipmask_, false );
 		tr.fraction = 0;
+		// what it was stuck in may be gone by the second look: it still goes off, against the world
+		if( tr.entityNum == ENTITYNUM_NONE )
+			tr.entityNum = ENTITYNUM_WORLD;
 	}
 	else 
 		VectorCopy( tr.endpos, ent->r.currentOrigin );

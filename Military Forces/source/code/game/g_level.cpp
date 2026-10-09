@@ -156,7 +156,10 @@ LevelLocals::removeEntity(GameEntity* entToRemove)
 GameEntity*
 LevelLocals::getEntity(int entNum)
 {
-	return static_cast<GameEntity*>(gameEntities_.at(entNum).get());
+	// "no entity" from a trace and anything else out of range is nobody, not a reason to stop the server
+	if( entNum < 0 || static_cast<size_t>(entNum) >= gameEntities_.size() )
+		return nullptr;
+	return static_cast<GameEntity*>(gameEntities_[entNum].get());
 }
 
 GameClient*
