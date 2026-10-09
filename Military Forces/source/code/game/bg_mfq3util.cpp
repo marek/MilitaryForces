@@ -1307,11 +1307,14 @@ namespace
 {
 	// the B-17's four twin turrets, from the gun tags of its model: chin, top, ball and tail
 	constexpr GunStation b17Stations[] = {
-		{ 33.4f, 0.0f, -3.7f,   0.94f, 0.0f, -0.34f,  70.0f, 1.0f },
-		// the top and ball turrets both reach a little past the horizon, so no direction is left uncovered
-		{  7.5f, 0.0f,  9.4f,   0.0f,  0.0f,  1.0f,   92.0f, 1.0f },
-		{ -18.0f, 0.0f, -6.3f,  0.0f,  0.0f, -1.0f,   92.0f, 1.7f },
-		{ -65.3f, 0.0f,  3.1f, -1.0f,  0.0f,  0.0f,   40.0f, 0.5f },
+		// Fields like the real turrets, which is what gives the bomber its weak sides. The chin turret covers a cone
+		// ahead, tilted a little down. The top and ball turrets cover their hemispheres but stop short of level. The
+		// tail guns cover a narrow cone astern. Level with the bomber, from the beam to the rear quarter, nothing
+		// bears: the real aircraft had only its hand-held waist guns there, and this model has none
+		{ 33.4f, 0.0f, -3.7f,   0.98f, 0.0f, -0.17f,  62.0f, 1.0f },
+		{  7.5f, 0.0f,  9.4f,   0.0f,  0.0f,  1.0f,   84.0f, 1.0f },
+		{ -18.0f, 0.0f, -6.3f,  0.0f,  0.0f, -1.0f,   84.0f, 1.7f },
+		{ -65.3f, 0.0f,  3.1f, -1.0f,  0.0f,  0.0f,   32.0f, 0.5f },
 	};
 }
 

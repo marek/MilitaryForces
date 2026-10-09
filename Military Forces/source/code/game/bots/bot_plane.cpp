@@ -1224,20 +1224,29 @@ void Bots::thinkPlane( GameEntity* ent, State& bot, const Sense& sense, usercmd_
 	// player does with free look. Not while landing, taking off or low, where steering matters more
 	constexpr float turretRange = 2200.0f;
 	constexpr int turretBurst = 1800, turretPause = 1200;
-	if( (mind.veh.flags & VF_GUNSTATIONS) && sense.enemy && sense.enemyAir && sense.enemyVisible && sense.enemyDist < turretRange &&
-		!(ps.ONOFF & OO_LANDED) && bot.desire != Goal::Rearm && sense.height > mind.minHeight && ps.ammo[WP_MACHINEGUN] > 0 )
+	// the target is the nearest enemy aircraft, whatever the bomber itself is after: a bomber's own enemy is on the ground
+	GameEntity* raider = sense.airThreat && sense.airThreatDist < turretRange ? sense.airThreat : nullptr;
+	if( (mind.veh.flags & VF_GUNSTATIONS) && raider && !(ps.ONOFF & OO_LANDED) && bot.desire != Goal::Rearm &&
+		sense.height > mind.minHeight && ps.ammo[WP_MACHINEGUN] > 0 && visible( ent, ent->r.currentOrigin, raider ) )
 	{
 		if( theLevel.time_ > bot.turretTime + turretBurst + turretPause )
 			bot.turretTime = theLevel.time_;
 		if( theLevel.time_ < bot.turretTime + turretBurst )
 		{
 			// lead the target by the bullets' flight time
-			const float flight = sense.enemyDist / std::max( 1.0f, static_cast<float>( availableWeapons[mind.veh.weapons[WP_MACHINEGUN]].muzzleVelocity ) );
-			Vec3 enemyVelocity;
-			VectorCopy( sense.enemy->s.pos.trDelta, enemyVelocity );
-			const Vec3 aimAt = Vec3( sense.enemy->r.currentOrigin ) + enemyVelocity * flight - Vec3( ent->r.currentOrigin );
+			const float flight = sense.airThreatDist / std::max( 1.0f, static_cast<float>( availableWeapons[mind.veh.weapons[WP_MACHINEGUN]].muzzleVelocity ) );
+			Vec3 raiderVelocity;
+			VectorCopy( raider->s.pos.trDelta, raiderVelocity );
+			const Vec3 aimAt = Vec3( raider->r.currentOrigin ) + raiderVelocity * flight - Vec3( ent->r.currentOrigin );
 			Vec3 aim;
 			vectoangles( aimAt, aim );
+			// a gunner in a bucking bomber is no marksman: each burst is laid off by an error of its own, a few
+			// degrees for a poor gunner and under one for the best, so some bursts hit and many pass by
+			constexpr float poorGunner = 5.0f, bestGunner = 0.8f;
+			const float spread = bestGunner + (poorGunner - bestGunner) * (1.0f - std::clamp( skill( bot ), 0.0f, 1.0f ));
+			const int burst = bot.turretTime / 97 + ent->s.number * 13;
+			aim[YAW] += spread * (((burst * 37) % 200) / 100.0f - 1.0f);
+			aim[PITCH] += spread * (((burst * 91) % 200) / 100.0f - 1.0f);
 			if( VehicleData::gunStationsBearing( client->vehicle_, ps.vehicleAngles, aim ) )
 			{
 				VectorCopy( aim, view );

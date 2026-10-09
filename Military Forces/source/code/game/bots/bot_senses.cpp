@@ -3,6 +3,7 @@
 #include "bot.h"
 #include "bot_local.h"
 #include <algorithm>
+#include <bit>
 #include <cmath>
 
 // what a vehicle is for, which decides whom it fights
@@ -327,8 +328,49 @@ void Bots::sense( GameEntity* ent, State& bot, Sense& out )
 		if( out.enemyVisible )
 			VectorMA( target, std::min( dist / shotSpeed, 1.5f ), out.enemy->client_->ps_.velocity, target );
 		const unsigned int enemyCat = availableVehicles[out.enemy->client_->vehicle_].cat;
+		// An aircraft with gun turrets is approached from where the fewest of them can bear: each turret only covers
+		// its own field, and a fighter that flies into four of them at once does not live. While more turrets bear
+		// on where the fighter is than on the best side, it flies for that side and holds its fire; once there it
+		// goes in. Pilots with little cunning do not think of it
+		bool flanking = false;
+		if( roleOf( ent->client_->vehicle_ ) == Role::Fighter && (availableVehicles[out.enemy->client_->vehicle_].flags & VF_GUNSTATIONS) &&
+			out.enemyVisible && dist > 500 && character( bot ).cunning > 0.25f )
+		{
+			const int theirs = out.enemy->client_->vehicle_;
+			const float* hull = out.enemy->client_->ps_.vehicleAngles;
+			Vec3 toMe = Vec3( ent->r.currentOrigin ) - Vec3( out.enemy->r.currentOrigin ), myBearing;
+			vectoangles( toMe, myBearing );
+			const int onMe = std::popcount( VehicleData::gunStationsBearing( theirs, hull, myBearing ) );
+			int fewest = onMe;
+			float nearest = 0;
+			Vec3 side;
+			// (vectoangles pitch: positive is below the bomber). Level first: a turreted bomber's blind side is level
+			for( float pitch : { 0.0f, -20.0f, 20.0f, -50.0f, 50.0f } )
+			{
+				for( float yaw = 0.0f; yaw < 360.0f; yaw += 30.0f )
+				{
+					Vec3 angles = { pitch, hull[YAW] + yaw, 0 }, dir;
+					const int bearing = std::popcount( VehicleData::gunStationsBearing( theirs, hull, angles ) );
+					AngleVectors( angles, dir, nullptr, nullptr );
+					// of the sides equally thinly covered, the one nearest to where the fighter already is
+					const float along = DotProduct( dir, toMe );
+					if( bearing < fewest || (bearing == fewest && bearing < onMe && along > nearest) )
+					{
+						fewest = bearing;
+						nearest = along;
+						side = dir;
+					}
+				}
+			}
+			if( fewest < onMe )
+			{
+				constexpr float standOff = 900.0f;
+				target = Vec3( out.enemy->r.currentOrigin ) + side * standOff;
+				flanking = true;
+			}
+		}
 		// a cunning fighter goes for the place behind and below an aircraft that is not hunting it
-		if( roleOf( ent->client_->vehicle_ ) == Role::Fighter && (enemyCat & (CAT_PLANE|CAT_HELO)) && dist > 1200 && dist < 6000 &&
+		if( !flanking && roleOf( ent->client_->vehicle_ ) == Role::Fighter && (enemyCat & (CAT_PLANE|CAT_HELO)) && dist > 1200 && dist < 6000 &&
 			character( bot ).cunning > 0.5f && out.enemy->tracktarget_ != ent )
 		{
 			Vec3 behind;
