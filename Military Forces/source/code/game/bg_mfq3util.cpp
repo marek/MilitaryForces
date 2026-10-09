@@ -373,6 +373,8 @@ void VehicleData::loadAllVehicleData()
 	char* modelbasename = nullptr;
 	char name[128];
 
+	VehicleData::registerVehicles();
+
 	// MFQ3 loadouts
 	VehicleData::calculateAllDefaultLoadouts();
 

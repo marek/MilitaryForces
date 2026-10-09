@@ -9,6 +9,12 @@ list(TRANSFORM VEHICLELIB_SOURCES PREPEND "${SOURCE_DIR}/vehiclelib/")
 set(GAME_SOURCES
     bg_boatmove.cpp bg_groundmove.cpp bg_helomove.cpp bg_loadouts.cpp bg_lqmmove.cpp bg_md3util.cpp
     bg_mfq3util.cpp bg_misc.cpp bg_planemove.cpp bg_pmove.cpp bg_slidemove.cpp bg_vehicledata.cpp
+    vehicles/boats/pbr31mk2.cpp vehicles/ground/brdm2.cpp vehicles/ground/fav.cpp vehicles/ground/humvee_50cal.cpp vehicles/ground/humvee_avng.cpp vehicles/ground/m1.cpp
+    vehicles/ground/m4.cpp vehicles/ground/mlrs.cpp vehicles/ground/panzeriii.cpp vehicles/ground/t-90.cpp vehicles/ground/zsu-23.cpp vehicles/helos/comanche.cpp
+    vehicles/helos/helo.cpp vehicles/helos/mi-24.cpp vehicles/helos/mi-35.cpp vehicles/helos/uh-1.cpp vehicles/infantry/major.cpp vehicles/infantry/sarge.cpp
+    vehicles/planes/a10.cpp vehicles/planes/b-2.cpp vehicles/planes/b17g.cpp vehicles/planes/bf-109g.cpp vehicles/planes/camel.cpp vehicles/planes/dr1.cpp
+    vehicles/planes/f-14.cpp vehicles/planes/f-15.cpp vehicles/planes/f-16.cpp vehicles/planes/f-18.cpp vehicles/planes/f-5.cpp vehicles/planes/fw190a8.cpp
+    vehicles/planes/jas-39.cpp vehicles/planes/p-51d.cpp vehicles/planes/spitfire_mk5b.cpp vehicles/registry.cpp
     bg_weapondata.cpp g_active.cpp g_arenas.cpp g_boat.cpp bots/bot_manager.cpp bots/bot_characters.cpp bots/bot_world.cpp bots/bot_airnav.cpp bots/bot_groundnav.cpp bots/bot_senses.cpp bots/bot_goals.cpp bots/bot_weapons.cpp bots/bot_plane.cpp bots/bot_debug.cpp bots/bot_landing.cpp bots/bot_helo.cpp bots/bot_surface.cpp bots/bot_infantry.cpp g_client.cpp g_cmds.cpp
     g_combat.cpp g_entity.cpp g_groundinstallation.cpp g_groundvehicle.cpp g_helo.cpp g_items.cpp
     g_level.cpp g_lqm.cpp g_main.cpp g_mem.cpp g_mfq3ents.cpp g_mfq3util.cpp g_misc.cpp

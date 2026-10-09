@@ -937,6 +937,8 @@ struct completeVehicleData_t
 	int				seats;
 };
 
+// room in the vehicle table; the index of an entry is what the network and saved missions carry
+inline constexpr int MAX_VEHICLE_TYPES = 128;
 extern completeVehicleData_t availableVehicles[];
 
 
@@ -1191,6 +1193,7 @@ public:
 	static bool selectable( int vehicle );
 	static bool stealthHidden( int vehicle, int revealTime, int time, float dist, float radarRange );
 	static bool vehicleHasTurret( int vehicle );
+	static void registerVehicles();
 	static std::span<const GunStation> gunStations( int vehicle );
 	static unsigned gunStationsBearing( int vehicle, const vec3_t hullAngles, const vec3_t aimAngles );
 	static void parseMissionScripts( char *buf, mission_overview_t* overview, mission_vehicle_t* vehs, mission_groundInstallation_t* gis);
