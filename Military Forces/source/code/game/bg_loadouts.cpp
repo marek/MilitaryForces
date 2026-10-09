@@ -26,6 +26,40 @@ int QDECL VehicleData::posCompare( const void* a, const void* b )
 	} else return p1-p2;
 }
 
+// The newer pylon tags (PY...) carry six flag digits in a numbering of their own, written down by the model's
+// author in "f-16 pylons new.txt" beside the model. This turns them into the classes the weapon table uses.
+static int pylonClassesFromWideFlags( int wide )
+{
+	static constexpr struct { int wide; int classes; } table[] = {
+		{ 0x000001, PF_AA_LT },					// Stinger
+		{ 0x000002, PF_AA_LT },					// Sidewinder
+		{ 0x000004, PF_AA_MED | PF_AA_HVY },	// AMRAAM
+		{ 0x000008, PF_AA_PHX },				// Phoenix
+		{ 0x000010, PF_AG_LT },					// Mk82
+		{ 0x000020, PF_AG_MED },				// Mk83
+		{ 0x000040, PF_AG_HVY },				// Mk84
+		{ 0x000080, PF_AG_GDA },				// guided bomb
+		{ 0x000100, PF_AG_MED },				// Hellfire
+		{ 0x000200, PF_AG_MED },				// Maverick
+		{ 0x000400, PF_HARM },					// HARM
+		{ 0x000800, PF_AG_MED },				// Durandal
+		{ 0x001000, PF_FFAR },					// rocket pod, light
+		{ 0x002000, PF_FFAR },					// rocket pod, heavy
+		{ 0x010000, PF_FLAREPOD },				// flare pod
+		{ 0x020000, PF_JAMMER },				// ECM pod
+		{ 0x040000, PF_TANK_LT },				// drop tank, light
+		{ 0x080000, PF_TANK_HVY },				// drop tank, heavy
+		{ 0x100000, PF_DONT_DROP },				// stays on the rail (wingtip)
+	};
+	int classes = 0;
+	for( const auto& entry : table )
+	{
+		if( wide & entry.wide )
+			classes |= entry.classes;
+	}
+	return classes;
+}
+
 bool VehicleData::distributeWeaponsOnPylons( int idx, completeLoadout_t* loadout )
 {
 	char* modelname;
@@ -72,9 +106,7 @@ bool VehicleData::distributeWeaponsOnPylons( int idx, completeLoadout_t* loadout
 				tags[i].name[7], tags[i].name[8], tags[i].name[9]) );
 		loadout->mounts[i].pos = ahextoi( va("0x%c", tags[i].name[2]) );
 		loadout->mounts[i].group = ahextoi( va("0x%c", tags[i].name[3]) );
-		loadout->mounts[i].flags = flags & 0xBFFF;
-		if( flags & PF_AA_MED ) loadout->mounts[i].flags |= PF_AA_LT;
-		if( flags & 0x100000 ) loadout->mounts[i].flags |= PF_DONT_DROP;
+		loadout->mounts[i].flags = pylonClassesFromWideFlags( flags );
 		loadout->mounts[i].left = tags[i].name[10] == 'L' ? true : false;
 	}
 	for( i = 0; !wideFlags && i < num; ++i ) {
