@@ -38,7 +38,11 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #if defined(__APPLE__) || defined(__linux__)
 #include <execinfo.h>
 #include <unistd.h>
+#include <fcntl.h>
+#include <ctime>
 #define MF_STACK_TRACE
+// where a fault's call stack is also written, so it survives when nobody was watching the terminal
+static char crashLogPath[PATH_MAX];
 #endif
 #ifdef __APPLE__
 #include <mach-o/dyld.h>
@@ -267,6 +271,10 @@ System::initPIDFile
 =================
 */
 void System::initPIDFile( const char *gamedir ) {
+#ifdef MF_STACK_TRACE
+	if( *CvarSystem::variableString( "fs_homestatepath" ) )
+		Com_sprintf( crashLogPath, sizeof( crashLogPath ), "%s/%s/crash.log", CvarSystem::variableString( "fs_homestatepath" ), gamedir );
+#endif
 	if( Sys_WritePIDFile( gamedir ) ) {
 #ifndef DEDICATED
 		char message[1024];
@@ -720,6 +728,22 @@ void Sys_SigHandler( int signal )
 #endif
 		fflush( stderr );
 		backtrace_symbols_fd( frames, count, STDERR_FILENO );
+
+		const int crashLog = crashLogPath[0] ? open( crashLogPath, O_WRONLY | O_CREAT | O_APPEND, 0644 ) : -1;
+		if( crashLog >= 0 )
+		{
+			dprintf( crashLog, "\n%s signal %d at unix time %ld\n", PRODUCT_VERSION, signal, static_cast<long>( time( nullptr ) ) );
+#ifdef __APPLE__
+			for( uint32_t i = 0; i < _dyld_image_count(); i++ )
+			{
+				const char *image = _dyld_get_image_name( i );
+				if( strstr( image, "MilitaryForces" ) || strstr( image, "renderer_" ) )
+					dprintf( crashLog, "module %s loaded at %p\n", image, static_cast<const void*>( _dyld_get_image_header( i ) ) );
+			}
+#endif
+			backtrace_symbols_fd( frames, count, crashLog );
+			close( crashLog );
+		}
 	}
 #endif
 

@@ -75,6 +75,11 @@ void MF_Spawn_Helo(GameEntity *ent, int idx, bool landed)
 	// set flags
 	ent->client_->ps_.ONOFF = OO_NOTHING_ON;
 
+	// the collective of the last life must not carry over: a helicopter that was descending when it died would
+	// drop out of the sky in the next one. An air spawn starts in a hover
+	ent->client_->ps_.fixed_throttle = 0;
+	ent->client_->ps_.throttle = 0;
+
 	// speed, throttle depend on landed/airborne 
 	if( landed ) 
 	{

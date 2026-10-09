@@ -79,7 +79,8 @@ void FireWeapon( GameEntity *ent )
 {
 	ent->client_->accuracy_shots_++;
 
-	if( availableVehicles[ent->client_->vehicle_].flags & VF_STEALTH ) 
+	// a stealth aircraft gives itself away with what leaves its bay, not with its gun
+	if( (availableVehicles[ent->client_->vehicle_].flags & VF_STEALTH) && availableWeapons[ent->s.weaponIndex].type != WT_MACHINEGUN ) 
 		ent->client_->ps_.timers[TIMER_REVEAL] = std::max( ent->client_->ps_.timers[TIMER_REVEAL], theLevel.time_ + stealthPenalty( ent->client_->vehicle_ ) );
 
 	// fire the specific weapon

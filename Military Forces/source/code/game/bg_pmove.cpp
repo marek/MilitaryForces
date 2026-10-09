@@ -600,8 +600,8 @@ void PlayerMove::weapon( ) {
 		pm->cmd.buttons |= BUTTON_ATTACK_MAIN;
 	}
 
-	// weaponbays
-	if( availableVehicles[pm->vehicle].caps & HC_WEAPONBAY ) {
+	// weaponbays: only what is carried in the bay needs it open; a gun on the nose or in a turret fires with it shut
+	if( (availableVehicles[pm->vehicle].caps & HC_WEAPONBAY) && availableWeapons[pm->ps->weaponIndex].type != WT_MACHINEGUN ) {
 		if( !(pm->ps->ONOFF & OO_WEAPONBAY) ) {
 			if( pm->cmd.buttons & BUTTON_ATTACK_MAIN ) PlayerMove::toggle_Bay();
 			canShoot = false;
