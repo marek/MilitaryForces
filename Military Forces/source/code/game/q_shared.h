@@ -1276,6 +1276,7 @@ struct playerState_s {
 	int			fixed_throttle;	// MFQ3 for throttle settings by increase/decrease
 
 	vec3_t		vehicleAngles;	// used for vehicles in MFQ3
+	vec3_t		vehicleSpin;	// how fast the vehicle's hull is turning about each axis, degrees a second
 
 	int			eFlags;			// copied to entityState_t->eFlags
 

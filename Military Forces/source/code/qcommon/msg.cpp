@@ -1228,6 +1228,9 @@ netField_t	playerStateFields[] =
 { PSF(vehicleAngles[0]), 0 },	
 { PSF(vehicleAngles[1]), 0 },	
 { PSF(vehicleAngles[2]), 0 },	
+{ PSF(vehicleSpin[0]), 0 },	
+{ PSF(vehicleSpin[1]), 0 },	
+{ PSF(vehicleSpin[2]), 0 },	
 { PSF(jumppad_ent), 10 },	
 { PSF(loopSound), 16 },
 { PSF(weaponNum), 16 }	

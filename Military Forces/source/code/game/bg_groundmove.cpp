@@ -488,8 +488,6 @@ Lays the hull on the ground it stands on. With nothing under one end it tips tha
 */
 void PlayerMove::adjustToTerrain( ) 
 {
-	// how fast a hull with one end over an edge tips, degrees a second
-	constexpr float tipRate = 60.0f;
 	const completeVehicleData_t& veh = availableVehicles[pm->vehicle];
 	if( pm->waterlevel && (veh.caps & HC_AMPHIBIOUS) )
 		return;
@@ -497,25 +495,56 @@ void PlayerMove::adjustToTerrain( )
 	const Handling handling = handlingOf( pm->vehicle );
 	const Footing footing = PM_GroundFooting( pm, pm->vehicle, handling );
 	float pitch = AngleNormalize180( pm->ps->vehicleAngles[PITCH] ), roll = AngleNormalize180( pm->ps->vehicleAngles[ROLL] );
-	if( !footing.touching )
+	// The hull lies on the ground only while its wheels or tracks reach it. Ground that is merely near underneath
+	// - the far side of a crest it has just flown off - does not turn it
+	constexpr float droop = 1.0f;
+	const float above = pm->ps->origin[2] - ( footing.height - veh.mins[2] + 1.0f + handling.sag );
+	// The hull has a spin of its own, about its pitch and its roll, that it keeps: what it was turning at when its
+	// wheels left the ground it goes on turning at in the air
+	float& pitchSpin = pm->ps->vehicleSpin[PITCH];
+	float& rollSpin = pm->ps->vehicleSpin[ROLL];
+	const float dt = pml.frametime;
+	if( !footing.touching || above > droop )
 	{
-		// thrown clear of the ground: the nose drops slowly
-		pitch = std::min( pitch + veh.turnspeed[0] * pml.frametime * 0.5f, 60.0f );
+		// in the air nothing turns it but the spin it has, which the air takes away slowly
+		constexpr float airDrag = 0.25f;
+		pitch += pitchSpin * dt;
+		roll += rollSpin * dt;
+		pitchSpin *= expf( -airDrag * dt );
+		rollSpin *= expf( -airDrag * dt );
 	}
 	else
 	{
-		// The hull eases round to the ground: most of what is left of the way in each settling time, so it rolls
-		// over an edge with its weight instead of snapping onto the next face, and never swings past
-		const float share = 1.0f - expf( -pml.frametime / handling.settleTime );
+		// On the ground the hull eases round to it: most of what is left of the way in each settling time, so it
+		// rolls over an edge with its weight instead of snapping onto the next face. With one end out over
+		// nothing its weight turns it that way, faster and faster. Either way the turning becomes its spin
+		constexpr float tipping = 420.0f;		// degrees a second each second
+		const float share = 1.0f - expf( -dt / handling.settleTime );
+		const float pitchBefore = pitch, rollBefore = roll;
 		if( footing.front && footing.back )
+		{
 			pitch += AngleSubtract( -RAD2DEG( atanf( footing.slopeForward ) ), pitch ) * share;
+			pitchSpin = dt > 0 ? ( pitch - pitchBefore ) / dt : 0.0f;
+		}
 		else
-			pitch += ( footing.back ? tipRate : -tipRate ) * pml.frametime;
+		{
+			pitchSpin += ( footing.back ? tipping : -tipping ) * dt;
+			pitch += pitchSpin * dt;
+		}
 		if( footing.left && footing.right )
+		{
 			roll += AngleSubtract( -RAD2DEG( atanf( footing.slopeRight ) ), roll ) * share;
+			rollSpin = dt > 0 ? ( roll - rollBefore ) / dt : 0.0f;
+		}
 		else
-			roll += ( footing.left ? tipRate : -tipRate ) * pml.frametime;
+		{
+			rollSpin += ( footing.left ? tipping : -tipping ) * dt;
+			roll += rollSpin * dt;
+		}
 	}
+	constexpr float fastest = 360.0f;
+	pitchSpin = std::clamp( pitchSpin, -fastest, fastest );
+	rollSpin = std::clamp( rollSpin, -fastest, fastest );
 	pm->ps->vehicleAngles[PITCH] = std::clamp( pitch, -80.0f, 80.0f );
 	pm->ps->vehicleAngles[ROLL] = std::clamp( roll, -80.0f, 80.0f );
 }
@@ -640,18 +669,19 @@ void PlayerMove::groundVehicleMove( )
 		const completeVehicleData_t& veh = availableVehicles[pm->vehicle];
 		float along[MAX_CONTACTS], across[MAX_CONTACTS];
 		const int points = PM_ContactPoints( pm->vehicle, handling.tracked, along, across );
-		const vec3_t yawOnly = { 0, pm->ps->vehicleAngles[YAW], 0 };
-		vec3_t ahead, right;
-		AngleVectors( yawOnly, ahead, right, nullptr );
+		// the points are where the tilted hull has them: on the side of a hill a point placed level would be
+		// inside the hill
+		vec3_t hull[3];
+		AnglesToAxis( pm->ps->vehicleAngles, hull );
 		const float axle = veh.mins[2] + std::max( veh.wheelRadius, 2.0f );
 		float allowed = 1.0f;
 		vec3_t faceNormal = { 0, 0, 0 };
 		for( int i = 0; i < points; i++ )
 		{
 			vec3_t from, to;
-			VectorMA( pm->ps->origin, along[i], ahead, from );
-			VectorMA( from, across[i], right, from );
-			from[2] += axle;
+			VectorMA( pm->ps->origin, along[i], hull[0], from );
+			VectorMA( from, -across[i], hull[1], from );
+			VectorMA( from, axle, hull[2], from );
 			VectorMA( from, pml.frametime, pm->ps->velocity, to );
 			// a little further than the move, so it stops clear of the face and not on it
 			vec3_t step;
@@ -663,7 +693,9 @@ void PlayerMove::groundVehicleMove( )
 			VectorMA( to, clear, step, to );
 			trace_t face;
 			pm->trace( &face, from, vec3_origin, vec3_origin, to, pm->ps->clientNum, MASK_SOLID | CONTENTS_PLAYERCLIP, false );
-			if( face.fraction >= 1.0f || face.startsolid || face.plane.normal[2] >= handling.standNormal )
+			// a face is in the way only if it faces the point coming at it, and is no overhang seen from underneath
+			if( face.fraction >= 1.0f || face.startsolid || face.plane.normal[2] >= handling.standNormal || face.plane.normal[2] < -0.1f ||
+				DotProduct( step, face.plane.normal ) >= 0 )
 				continue;
 			const float share = std::max( 0.0f, ( face.fraction * ( length + clear ) - clear ) / length );
 			if( share < allowed )
@@ -729,7 +761,10 @@ void PlayerMove::groundVehicleMove( )
 			VectorMA( from, end.reach, axis[end.along], to );
 			trace_t wall;
 			pm->trace( &wall, from, vec3_origin, vec3_origin, to, pm->ps->clientNum, MASK_SOLID | CONTENTS_PLAYERCLIP, false );
-			if( wall.fraction >= 1.0f || wall.startsolid || wall.plane.normal[2] >= handling.standNormal )
+			vec3_t probing;
+			VectorSubtract( to, from, probing );
+			if( wall.fraction >= 1.0f || wall.startsolid || wall.plane.normal[2] >= handling.standNormal || wall.plane.normal[2] < -0.1f ||
+				DotProduct( probing, wall.plane.normal ) >= 0 )
 				continue;
 			// back off, level, by as far as that end is into it
 			vec3_t out = { wall.plane.normal[0], wall.plane.normal[1], 0 };

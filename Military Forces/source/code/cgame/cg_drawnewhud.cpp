@@ -1866,7 +1866,9 @@ void CGame::drawStatusBar_MFQ3_new( ) {
 		// stallwarning
 		if( (ps->speed/10 <= availableVehicles[vehicle].stallspeed*1.5 || (cent->currentState.ONOFF & OO_STALLED)) &&
 			!(cent->currentState.ONOFF & OO_LANDED) && ps->stats[STAT_HEALTH] > 0 && 
-			availableVehicles[vehicle].cat != CAT_HELO) {
+			// only an aeroplane stalls: a ground vehicle uses the same flag for going backwards, and is "not
+			// landed" whenever its wheels leave the ground
+			(availableVehicles[vehicle].cat & CAT_PLANE) ) {
 			float stallscale = 1.0f;
 			if( speed >= stallspeed && !(cent->currentState.ONOFF & OO_STALLED) ) stallscale = 2.0f - (static_cast<float>(speed)/static_cast<float>(stallspeed));
 			cgUtils.drawStringNew( 320, 360, stallscale, HUDColors[stallcolor], "STALL!", 0, 0, 3, CENTRE_JUSTIFY );
