@@ -691,6 +691,10 @@ void CGame::drawGV(DrawInfo_GV_t* drawInfo)
 				trace_t ground;
 				CGame::trace( &ground, top, nullptr, nullptr, bottom, drawInfo->basicInfo.entityNum, MASK_SOLID );
 				float wanted = -wheelDown;		// nothing under it: it hangs
+				// in the water a wheel does not hang: the air in its tyre holds it up in its arch
+				constexpr float buoyed = 0.3f;
+				if( CGame::pointContents( part[BP_GV_WHEEL+ii].origin, drawInfo->basicInfo.entityNum ) & MASK_WATER )
+					wanted = buoyed;
 				if( ground.startsolid )
 					wanted = wheelUp;
 				else if( ground.fraction < 1.0f )
