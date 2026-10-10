@@ -1281,9 +1281,11 @@ void Bots::thinkPlane( GameEntity* ent, State& bot, const Sense& sense, usercmd_
 
 	runTree( tree, mind, "plane" );
 
-	// turrets: look at a nearby enemy aircraft and fire whatever bears, in bursts, holding course meanwhile as a
-	// player does with free look. Not while landing, taking off or low, where steering matters more
-	constexpr int turretBurst = 1800, turretPause = 1200;
+	// turrets: look at a nearby enemy aircraft and hold the trigger, as a player does with free look held, flying
+	// straight meanwhile. The positions swing round at their own rate and one that has not arrived does not fire,
+	// so the look has to last: four seconds is the longest any position needs to come right round. Then a second
+	// to steer in. Never while there is something to fly round, nor while landing, taking off or low
+	constexpr int turretBurst = 4000, turretPause = 1000;
 	// the target is the nearest enemy aircraft, whatever the bomber itself is after: a bomber's own enemy is on the ground
 	GameEntity* raider = sense.airThreat && sense.airThreatDist < turretRange ? sense.airThreat : nullptr;
 	if( (mind.veh.flags & VF_GUNSTATIONS) && raider && !(ps.ONOFF & OO_LANDED) && bot.desire != Goal::Rearm &&
@@ -1291,7 +1293,7 @@ void Bots::thinkPlane( GameEntity* ent, State& bot, const Sense& sense, usercmd_
 	{
 		if( theLevel.time_ > bot.turretTime + turretBurst + turretPause )
 			bot.turretTime = theLevel.time_;
-		if( theLevel.time_ < bot.turretTime + turretBurst )
+		if( theLevel.time_ < bot.turretTime + turretBurst && theLevel.time_ >= bot.avoidTime )
 		{
 			// lead the target by the bullets' flight time
 			const float flight = sense.airThreatDist / std::max( 1.0f, static_cast<float>( availableWeapons[mind.veh.weapons[WP_MACHINEGUN]].muzzleVelocity ) );
@@ -1300,13 +1302,15 @@ void Bots::thinkPlane( GameEntity* ent, State& bot, const Sense& sense, usercmd_
 			const Vec3 aimAt = Vec3( raider->r.currentOrigin ) + raiderVelocity * flight - Vec3( ent->r.currentOrigin );
 			Vec3 aim;
 			vectoangles( aimAt, aim );
-			// a gunner in a bucking bomber is no marksman: each burst is laid off by an error of its own, a few
-			// degrees for a poor gunner and under one for the best, so some bursts hit and many pass by
-			constexpr float poorGunner = 5.0f, bestGunner = 0.8f;
+			// a gunner in a bucking bomber is no marksman: his aim wanders about the target, a few degrees for a
+			// poor gunner and under one for the best, so that the fire walks across the target and off it again
+			// rather than a whole burst going wide
+			constexpr float poorGunner = 4.0f, bestGunner = 0.6f;
+			constexpr float wanderYawMsec = 230.0f, wanderPitchMsec = 310.0f;
 			const float spread = bestGunner + (poorGunner - bestGunner) * (1.0f - std::clamp( skill( bot ), 0.0f, 1.0f ));
-			const int burst = bot.turretTime / 97 + ent->s.number * 13;
-			aim[YAW] += spread * (((burst * 37) % 200) / 100.0f - 1.0f);
-			aim[PITCH] += spread * (((burst * 91) % 200) / 100.0f - 1.0f);
+			const float phase = static_cast<float>( ent->s.number ) * 1.7f;
+			aim[YAW] += spread * sin( theLevel.time_ / wanderYawMsec + phase );
+			aim[PITCH] += spread * sin( theLevel.time_ / wanderPitchMsec + phase * 2.0f );
 			if( VehicleData::gunStationsBearing( client->vehicle_, ps.vehicleAngles, aim ) )
 			{
 				VectorCopy( aim, view );
