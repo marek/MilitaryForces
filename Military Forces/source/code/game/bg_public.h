@@ -943,6 +943,8 @@ struct completeVehicleData_t
 	int				engines;		// how many engines does it actually have
 	int				wheels;			// how many wheels does it have 
 	float			wheelCF;		// circumference
+	vec3_t			wheelPos[6];	// where the body model mounts each wheel (forward, left, up), read from the model
+	float			wheelRadius;	// of the wheel model
     unsigned int    accel;			// vehicle dependent acceleration
     unsigned int    maxhealth;	    // health
 	vec3_t			gunoffset;		// guntag

@@ -533,17 +533,37 @@ void VehicleData::loadAllVehicleData()
 
 			// Make sure its actualy listed in the vehicle data that it does (Although not needed)
 			// Then chick if file exists.. read value and divide by half.
+			// A wheeled vehicle stands on the wheels its model has: where the body mounts each one, and how big the
+			// wheel is. Its underside is the bottom of its wheels
 			if(availableVehicles[i].wheels)
 			{
+				completeVehicleData_t& veh = availableVehicles[i];
+				veh.wheels = std::min( veh.wheels, 6 );
+				veh.wheelRadius = veh.wheelCF > 0 ? veh.wheelCF / ( 2.0f * static_cast<float>( M_PI ) ) : 1.5f;
 				Com_sprintf( name, sizeof(name), "%s_w1.md3", modelbasename );
 				if( const auto wheel = VehicleData::getDimensions( name, 0 ) )
+					veh.wheelRadius = ( wheel->maxs[2] - wheel->mins[2] ) / 2;
+				char body[128];
+				Com_sprintf( body, sizeof(body), "%s.md3", modelbasename );
+				int found = 0;
+				float lowest = 0;
+				for( int w = 0; w < veh.wheels; w++ )
 				{
-					// the wheel's own mount point, at its centre when the model has none
-					const auto mount = VehicleData::findTag( name, "tag_wheel" );
-					const float centre = mount ? mount->origin[2] : 0.0f;
-					availableVehicles[i].mins[2] = centre - ( wheel->maxs[2] - wheel->mins[2] ) / 2;
+					char tagName[16];
+					if( w ) Com_sprintf( tagName, sizeof(tagName), "tag_wheel%d", w + 1 );
+					else Q_strncpyz( tagName, "tag_wheel", sizeof(tagName) );
+					const auto mount = VehicleData::findTag( body, tagName );
+					if( !mount )
+						break;
+					VectorCopy( mount->origin, veh.wheelPos[w] );
+					lowest = found ? std::min( lowest, mount->origin[2] ) : mount->origin[2];
+					found++;
 				}
-				
+				// a model without wheel mounts stands on the corners of its box
+				if( found < veh.wheels )
+					veh.wheelRadius = 0;
+				else
+					veh.mins[2] = lowest - veh.wheelRadius;
 			}
 
 		} else if( (availableVehicles[i].cat & CAT_BOAT) ) {

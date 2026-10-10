@@ -676,6 +676,24 @@ void CGame::drawGV(DrawInfo_GV_t* drawInfo)
 
 			
 			CGame::positionRotatedEntityOnTag( &part[BP_GV_WHEEL+ii], &part[BP_GV_BODY], veh->handle[BP_GV_BODY], gv_tags[BP_GV_WHEEL+ii] );
+
+			// The wheel stays on the ground while the body rides up and down on its springs: pushed up into its
+			// arch when the body sinks, hanging down after the ground when the body rises, as far as it can go
+			if( veh->wheelRadius > 0 )
+			{
+				constexpr float wheelUp = 3.0f, wheelDown = 4.0f;
+				const float* up = part[BP_GV_BODY].axis[2];
+				vec3_t top, bottom;
+				VectorMA( part[BP_GV_WHEEL+ii].origin, wheelUp, up, top );
+				VectorMA( part[BP_GV_WHEEL+ii].origin, -( veh->wheelRadius + wheelDown ), up, bottom );
+				trace_t ground;
+				CGame::trace( &ground, top, nullptr, nullptr, bottom, drawInfo->basicInfo.entityNum, MASK_SOLID );
+				if( ground.fraction < 1.0f && !ground.startsolid )
+				{
+					const float below = ground.fraction * ( wheelUp + veh->wheelRadius + wheelDown ) - wheelUp;
+					VectorMA( part[BP_GV_WHEEL+ii].origin, std::clamp( veh->wheelRadius - below, -wheelDown, wheelUp ), up, part[BP_GV_WHEEL+ii].origin );
+				}
+			}
 			
 			CGame::addVehiclePart( &part[BP_GV_WHEEL+ii] );
 		}
