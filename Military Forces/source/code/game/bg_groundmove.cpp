@@ -31,6 +31,7 @@ namespace
 		float	damping;		// of the suspension, 1 is no bounce at all
 		float	sag;			// how far it sits down on its springs at rest
 		float	travel;			// how much further the springs go before the hull is on the ground
+		float	clearance;		// how far above the ground its underside rests
 		float	lateralGrip;	// grip across the hull, as a share of its weight
 		float	driveGrip;		// grip along the hull, for driving and braking
 		float	rollingDrag;	// what slows it when it coasts
@@ -54,6 +55,9 @@ namespace
 		h.damping = 0.6f + 0.4f * heavy;
 		h.sag = 0.6f - 0.3f * heavy;
 		h.travel = 1.2f - 0.7f * heavy;
+		// Wheels stand on the ground: a wheeled vehicle's underside is the bottom of its wheels. A tracked hull is
+		// kept a unit clear, or its tracks cut into uneven ground
+		h.clearance = availableVehicles[vehicle].wheelRadius > 0 && !h.tracked ? 0.0f : 1.0f;
 		h.lateralGrip = h.tracked ? 3.0f : 1.3f + 0.5f * heavy;
 		h.driveGrip = h.tracked ? 1.6f : 1.25f;
 		// tracks and their drive train hold a standing tank on a fair slope; wheels roll more freely
@@ -283,7 +287,7 @@ void PlayerMove::groundVehicleAccelerate()
 	AngleVectors( yawOnly, hullForward, nullptr, nullptr );
 
 	// how far the springs are pressed: at rest, by their sag
-	const float restHeight = footing.height - veh.mins[2] + 1.0f;
+	const float restHeight = footing.height - veh.mins[2] + handling.clearance;
 	// springs press no further than their travel: past that the hull itself is on the ground
 	const float travel = handling.travel;
 	float pressed = afloat ? handling.sag : restHeight + handling.sag - pm->ps->origin[2];
@@ -327,7 +331,7 @@ void PlayerMove::groundVehicleAccelerate()
 		pm->trace( &surface, over, vec3_origin, vec3_origin, here, pm->ps->clientNum, MASK_SOLID, false );
 		if( surface.fraction < 1.0f && !surface.startsolid && surface.plane.normal[2] > 0.1f && surface.endpos[2] > here[2] + 1.0f )
 		{
-			pm->ps->origin[2] = surface.endpos[2] - veh.mins[2] + 1.0f;
+			pm->ps->origin[2] = surface.endpos[2] - veh.mins[2] + handling.clearance;
 			if( pm->ps->velocity[2] < 0 )
 				pm->ps->velocity[2] = 0;
 		}
@@ -498,7 +502,7 @@ void PlayerMove::adjustToTerrain( )
 	// The hull lies on the ground only while its wheels or tracks reach it. Ground that is merely near underneath
 	// - the far side of a crest it has just flown off - does not turn it
 	constexpr float droop = 1.0f;
-	const float above = pm->ps->origin[2] - ( footing.height - veh.mins[2] + 1.0f + handling.sag );
+	const float above = pm->ps->origin[2] - ( footing.height - veh.mins[2] + handling.clearance + handling.sag );
 	// The hull has a spin of its own, about its pitch and its roll, that it keeps: what it was turning at when its
 	// wheels left the ground it goes on turning at in the air
 	float& pitchSpin = pm->ps->vehicleSpin[PITCH];
