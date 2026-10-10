@@ -77,14 +77,19 @@ FireWeapon
 */
 void FireWeapon( GameEntity *ent ) 
 {
+	// The weapon is the one the player has selected now. What the entity shows other players can still be the
+	// weapon of the vehicle before this one for a frame after a spawn, and nothing is fired on that
+	const int weapon = ent->client_->ps_.weaponIndex;
+	if( weapon <= 0 || weapon >= bg_numberOfWeapons )
+		return;
 	ent->client_->accuracy_shots_++;
 
 	// a stealth aircraft gives itself away with what leaves its bay, not with its gun
-	if( (availableVehicles[ent->client_->vehicle_].flags & VF_STEALTH) && availableWeapons[ent->s.weaponIndex].type != WT_MACHINEGUN ) 
+	if( (availableVehicles[ent->client_->vehicle_].flags & VF_STEALTH) && availableWeapons[weapon].type != WT_MACHINEGUN ) 
 		ent->client_->ps_.timers[TIMER_REVEAL] = std::max( ent->client_->ps_.timers[TIMER_REVEAL], theLevel.time_ + stealthPenalty( ent->client_->vehicle_ ) );
 
 	// fire the specific weapon
-	switch( availableWeapons[ent->s.weaponIndex].type ) 
+	switch( availableWeapons[weapon].type ) 
 	{
 	case WT_ANTIAIRMISSILE:
 		fire_antiair( ent );

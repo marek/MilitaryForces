@@ -625,7 +625,7 @@ static void G_MissileImpact( GameEntity *ent, trace_t *trace )
 			if ( VectorLength( velocity ) == 0 ) 
 				velocity[2] = 1;
 
-			actualdamage = ent->damage_ + ((rand() % (ent->damage_/2)) - (ent->damage_/4));
+			actualdamage = ent->damage_ >= 2 ? ent->damage_ + ((rand() % (ent->damage_/2)) - (ent->damage_/4)) : ent->damage_;
 			Game::damage( other, 
 					  ent, 
 					  theLevel.getEntity(ent->r.ownerNum),//&g_entities[ent->r.ownerNum], 
@@ -1365,8 +1365,12 @@ void fire_autocannon( GameEntity *self, bool main )
 	float		spreadY = spreadX;
 	const int	vehicleFlags = availableVehicles[self->client_->vehicle_].flags;
 
-	spreadX = ((rand() % static_cast<unsigned int>(spreadX)) - spreadX/2)/10;
-	spreadY = ((rand() % static_cast<unsigned int>(spreadY)) - spreadY/2)/10;
+	if( weapIdx <= 0 || weapIdx >= bg_numberOfWeapons )
+		return;
+	// a gun with no spread fires dead straight
+	const unsigned spreadRange = static_cast<unsigned>( std::max( spreadX, 0.0f ) );
+	spreadX = spreadRange ? ((rand() % spreadRange) - spreadX/2)/10 : 0.0f;
+	spreadY = spreadRange ? ((rand() % spreadRange) - spreadY/2)/10 : 0.0f;
 
 	// gun positions sharing the machine gun: each one that bears on where the crew looks fires along that line
 	if( !main && (vehicleFlags & VF_GUNSTATIONS) )

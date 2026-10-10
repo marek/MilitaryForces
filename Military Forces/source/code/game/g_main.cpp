@@ -1482,7 +1482,9 @@ void SetLeader( int team, int client )
 {
 	GameClient* cl = theLevel.getClient(client);
 
-	if( !cl || cl->pers_.connected_ == GameClient::ClientPersistant::CON_DISCONNECTED ) 
+	if( !cl )
+		return;
+	if( cl->pers_.connected_ == GameClient::ClientPersistant::CON_DISCONNECTED ) 
 	{
 		PrintTeam(team, va("print \"%s is not connected\n\"", cl->pers_.netname_) );
 		return;
@@ -1519,7 +1521,8 @@ void CheckTeamLeader( int team )
 	for( i = 1 ; i <= theLevel.maxclients_ ; i++ ) 
 	{
 		GameClient* cl = theLevel.getClient(i);
-		if( cl->sess_.sessionTeam_ != team )
+		// an empty slot has no client
+		if( !cl || cl->sess_.sessionTeam_ != team )
 			continue;
 		if( cl->sess_.teamLeader_ )
 			break;

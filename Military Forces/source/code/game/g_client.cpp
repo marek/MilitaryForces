@@ -433,7 +433,7 @@ int TeamLeader( int team )
 {
 	int		i;
 
-	for ( i = 0 ; i < theLevel.maxclients_ ; i++ ) 
+	for ( i = 1 ; i <= theLevel.maxclients_ ; i++ ) 
 	{
 		GameClient* cl = theLevel.getClient(i);
 		if( !cl || cl->pers_.connected_ == GameClient::ClientPersistant::CON_DISCONNECTED ) 

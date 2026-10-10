@@ -745,8 +745,8 @@ void SetTeam( GameEntity *ent, char *s )
 	{
 		teamLeader = TeamLeader( team );
 		// if there is no team leader or the team leader is a bot and this client is not a bot
-		if ( teamLeader == -1 || ( !(theLevel.getEntity(clientNum)->r.svFlags & SVF_BOT) && 
-			(theLevel.getEntity(teamLeader)->r.svFlags & SVF_BOT) ) )
+		GameEntity* leader = teamLeader >= 0 ? theLevel.getEntity( teamLeader ) : nullptr;
+		if ( !leader || ( !(ent->r.svFlags & SVF_BOT) && (leader->r.svFlags & SVF_BOT) ) )
 		{
 			SetLeader( team, clientNum );
 		}

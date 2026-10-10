@@ -204,10 +204,7 @@ bool PlayerMove::toggle_HeloGear()
 		return false;
 	}
 
-	if( pm->ps->speed > availableVehicles[pm->vehicle].stallspeed * 10 * SPEED_GREEN_ARC ) {
-		pm->ps->timers[TIMER_GEAR] = pm->cmd.serverTime + availableVehicles[pm->vehicle].gearTime + 100;
-		return false;
-	}
+	// a helicopter's gear goes up and down at any speed and in any attitude, and only when the pilot says so
 
 	if( pm->ps->ONOFF & OO_GEAR ) {
 		PlayerMove::addEvent( EV_GEAR_UP );
@@ -584,14 +581,6 @@ void PlayerMove::heloMove( )
 		// limit roll and pitch
 		vehdir[PITCH] = vehdir[PITCH] < 0 ? std::max(-MAX_HELO_PITCH, vehdir[PITCH]) : std::min (MAX_HELO_PITCH, vehdir[PITCH]);
 		vehdir[ROLL] = vehdir[ROLL] < 0 ? std::max(-MAX_HELO_ROLL, vehdir[ROLL]) : std::min (MAX_HELO_ROLL, vehdir[ROLL]);
-
-		if( (availableVehicles[pm->vehicle].caps & HC_GEAR) && (pm->ps->ONOFF & OO_GEAR) &&
-			(pm->ps->speed > availableVehicles[pm->vehicle].stallspeed * 10 * SPEED_GREEN_ARC) &&
-			!pm->ps->timers[TIMER_GEARANIM] ) {
-			PlayerMove::addEvent( EV_GEAR_UP );
-			pm->ps->timers[TIMER_GEAR] = pm->cmd.serverTime + availableVehicles[pm->vehicle].gearTime + 100;
-			pm->ps->timers[TIMER_GEARANIM] = pm->cmd.serverTime + availableVehicles[pm->vehicle].gearTime;
-		}
     }
 
 	// Show turrets

@@ -1309,12 +1309,13 @@ namespace
 	constexpr GunStation b17Stations[] = {
 		// Fields like the real turrets, which is what gives the bomber its weak sides. The chin turret covers a cone
 		// ahead, tilted a little down. The top and ball turrets cover their hemispheres but stop short of level. The
-		// tail guns cover a narrow cone astern. Level with the bomber, from the beam to the rear quarter, nothing
-		// bears: the real aircraft had only its hand-held waist guns there, and this model has none
+		// tail guns cover a wide cone astern, wider than the real mount's, so that a fighter sitting behind is under
+		// fire. Level with the bomber on the beam nothing bears: the real aircraft had only its hand-held waist
+		// guns there, and this model has none
 		{ 33.4f, 0.0f, -3.7f,   0.98f, 0.0f, -0.17f,  62.0f, 1.0f, 45.0f },
-		{  7.5f, 0.0f,  9.4f,   0.0f,  0.0f,  1.0f,   84.0f, 1.0f, 45.0f },
-		{ -18.0f, 0.0f, -6.3f,  0.0f,  0.0f, -1.0f,   84.0f, 1.7f, 45.0f },
-		{ -65.3f, 0.0f,  3.1f, -1.0f,  0.0f,  0.0f,   32.0f, 0.5f, 30.0f },
+		{  7.5f, 0.0f,  9.4f,   0.0f,  0.0f,  1.0f,   87.0f, 1.0f, 45.0f },
+		{ -18.0f, 0.0f, -6.3f,  0.0f,  0.0f, -1.0f,   87.0f, 1.7f, 45.0f },
+		{ -65.3f, 0.0f,  3.1f, -1.0f,  0.0f,  0.0f,   55.0f, 0.5f, 30.0f },
 	};
 }
 

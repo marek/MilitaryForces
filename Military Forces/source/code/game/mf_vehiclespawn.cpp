@@ -92,7 +92,9 @@ void MF_Spawn_Helo(GameEntity *ent, int idx, bool landed)
 	if( availableVehicles[idx].caps & HC_GEAR ) 
 		ent->gearheight_ = availableVehicles[idx].gearheight;
 
-	ent->client_->ps_.ONOFF |= OO_GEAR;
+	// one that starts in the air and can raise its gear starts with it up; after that only the pilot moves it
+	if( landed || !(availableVehicles[idx].caps & HC_GEAR) )
+		ent->client_->ps_.ONOFF |= OO_GEAR;
 
 	// update gear anim
 	ent->updateGear_ = true;

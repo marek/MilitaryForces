@@ -49,7 +49,7 @@ extern vmCvar_t	ui_captureLimit;
 extern vmCvar_t	ui_fragLimit;
 extern vmCvar_t	ui_gameType;
 extern vmCvar_t	ui_netGameType;
-//extern vmCvar_t	ui_netGameset;
+extern vmCvar_t	ui_netGameset;
 extern vmCvar_t	ui_actualNetGameType;
 extern vmCvar_t	ui_joinGameType;
 extern vmCvar_t	ui_netSource;

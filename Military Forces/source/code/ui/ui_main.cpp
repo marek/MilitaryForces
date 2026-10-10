@@ -72,6 +72,10 @@ static const char *mfqGamesets[] = {	// make sure this matches exactly with game
 
 static int const numGamesets = sizeof(mfqGamesets) / sizeof(const char*);
 
+// the vehicle sets a vote can ask for: what the menu shows, and what the server calls each
+static const char *gamesetVoteNames[] = { "Modern", "World War II", "World War I" };
+static const char *gamesetVoteCodes[] = { "modern", "ww2", "ww1" };
+
 static const char *teamArenaGameNames[] = {
 	"Deathmatch",
 	"Tournament",
@@ -1075,6 +1079,14 @@ static void UI_DrawGameType(rectDef_t *rect, float scale, const vec4_t color, in
   Text_Paint(rect->x, rect->y, scale, color, uiInfo.gameTypes[ui_gameType.integer].gameType, 0, 0, textStyle);
 }
 
+static void UI_DrawNetGameset(rectDef_t *rect, float scale, const vec4_t color, int textStyle) {
+	if (ui_netGameset.integer < 0 || ui_netGameset.integer >= numGamesets) {
+		CvarSystem::set("ui_netGameset", "0");
+		ui_netGameset.integer = 0;
+	}
+	Text_Paint(rect->x, rect->y, scale, color, gamesetVoteNames[ui_netGameset.integer], 0, 0, textStyle);
+}
+
 static void UI_DrawNetGameType(rectDef_t *rect, float scale, const vec4_t color, int textStyle) {
 	if (ui_netGameType.integer < 0 || ui_netGameType.integer > uiInfo.numGameTypes) {
 		CvarSystem::set("ui_netGameType", "0");
@@ -1083,12 +1095,6 @@ static void UI_DrawNetGameType(rectDef_t *rect, float scale, const vec4_t color,
   Text_Paint(rect->x, rect->y, scale, color, uiInfo.gameTypes[ui_netGameType.integer].gameType , 0, 0, textStyle);
 }
 
-//static void UI_DrawNetGameset(rectDef_t *rect, float scale, vec4_t color, int textStyle) {
-//	if (ui_netGameset.integer < 0 || ui_netGameset.integer > numGamesets) {
-//		CvarSystem::set("ui_netGameset", "0");
-//	}
-//  Text_Paint(rect->x, rect->y, scale, color, gameset_items[ui_netGameset.integer] , 0, 0, textStyle);
-//}
 
 static void UI_DrawJoinGameType(rectDef_t *rect, float scale, const vec4_t color, int textStyle) {
 	if (ui_joinGameType.integer < 0 || ui_joinGameType.integer > uiInfo.numJoinGameTypes) {
@@ -2195,7 +2201,7 @@ void Menus::ownerDraw(float x, float y, float w, float h, float text_x, float te
       UI_DrawNetGameType(&rect, scale, color, textStyle);
       break;
     case UI_NETGAMESET:
-      //UI_DrawNetGameset(&rect, scale, color, textStyle);
+      UI_DrawNetGameset(&rect, scale, color, textStyle);
       break;
     case UI_JOINGAMETYPE:
 	  UI_DrawJoinGameType(&rect, scale, color, textStyle);
@@ -2559,39 +2565,19 @@ static bool UI_NetGameType_HandleKey(int flags, float *special, int key) {
   return false;
 }
 
-//static bool UI_NetGameset_HandleKey(int flags, float *special, int key)
-//{
-//	// valid action?
-//	if (key == K_MOUSE1 || key == K_MOUSE2 || key == K_ENTER || key == K_KP_ENTER)
-//	{
-//		// cycle up/down through values
-//		if (key == K_MOUSE2)
-//		{
-//			ui_netGameset.integer--;
-//		}
-//		else
-//		{
-//			ui_netGameset.integer++;
-//		}
-//
-//		// wrap (both ends)
-//		if( ui_netGameset.integer < 0 )
-//		{
-//			ui_netGameset.integer = numGamesets - 1;
-//		}
-//		else if (ui_netGameset.integer >= numGamesets )
-//		{
-//			ui_netGameset.integer = 0;
-//		} 
-//
-//		// re-set the value into cvar
-//		CvarSystem::set( "ui_netGameset", va("%d", ui_netGameset.integer));
-//
-//		return true;
-//	}
-//
-//	return false;
-//}
+
+// the vehicle set to vote for: a click steps through them, the other button steps back
+static bool UI_NetGameset_HandleKey(int flags, float *special, int key) {
+	if (key == K_MOUSE1 || key == K_MOUSE2 || key == K_ENTER || key == K_KP_ENTER) {
+		int set = ui_netGameset.integer + ( key == K_MOUSE2 ? -1 : 1 );
+		if( set < 0 ) set = numGamesets - 1;
+		else if( set >= numGamesets ) set = 0;
+		ui_netGameset.integer = set;
+		CvarSystem::set( "ui_netGameset", va("%d", set));
+		return true;
+	}
+	return false;
+}
 
 static bool UI_JoinGameType_HandleKey(int flags, float *special, int key) {
 	if (key == K_MOUSE1 || key == K_MOUSE2 || key == K_ENTER || key == K_KP_ENTER) {
@@ -2877,7 +2863,7 @@ bool Menus::ownerDrawHandleKey(int ownerDraw, int flags, float *special, int key
       return UI_NetGameType_HandleKey(flags, special, key);
       break;
     case UI_NETGAMESET:
-      //return UI_NetGameset_HandleKey(flags, special, key);
+      return UI_NetGameset_HandleKey(flags, special, key);
       break;
     case UI_JOINGAMETYPE:
       return UI_JoinGameType_HandleKey(flags, special, key);
@@ -3972,9 +3958,11 @@ void Menus::runMenuScript(char **args)
 			{
 				CommandBuffer::executeText( EXEC_APPEND, va("callvote g_gametype %i\n",uiInfo.gameTypes[ui_netGameType.integer].gtEnum) );
 			}
-		//} else if (Q_stricmp(name, "voteSet") == 0) {	// TEMP DISABLED FOR NOW
-//			if (ui_netGameset.integer >= 0 && ui_netGameset.integer < numGamesets) 
-				//CommandBuffer::executeText( EXEC_APPEND, va("callvote mf_gameset %s\n",gameset_codes[ui_netGameset.integer]) );
+		}
+		else if (Q_stricmp(name, "voteSet") == 0)
+		{
+			if (ui_netGameset.integer >= 0 && ui_netGameset.integer < numGamesets) 
+				CommandBuffer::executeText( EXEC_APPEND, va("callvote mf_gameset %s\n",gamesetVoteCodes[ui_netGameset.integer]) );
 		} 
 		else if (Q_stricmp(name, "voteLeader") == 0) 
 		{
@@ -6416,7 +6404,7 @@ static vmCvar_t	ui_teamName;
 vmCvar_t	ui_dedicated;
 vmCvar_t	ui_gameType;
 vmCvar_t	ui_netGameType;
-//vmCvar_t	ui_netGameset;
+vmCvar_t	ui_netGameset;
 vmCvar_t	ui_actualNetGameType;
 vmCvar_t	ui_joinGameType;
 vmCvar_t	ui_netSource;
@@ -6567,7 +6555,7 @@ static cvarTable_t		cvarTable[] = {
 	{ &ui_gameType, "ui_gametype", "0", CVAR_ARCHIVE },
 	{ &ui_joinGameType, "ui_joinGametype", "0", CVAR_ARCHIVE },
 	{ &ui_netGameType, "ui_netGametype", "0", CVAR_ARCHIVE },
-//	{ &ui_netGameset, "ui_netGameset", "0", CVAR_ARCHIVE },
+	{ &ui_netGameset, "ui_netGameset", "0", CVAR_ARCHIVE },
 	{ &ui_actualNetGameType, "ui_actualNetGametype", "0", CVAR_ARCHIVE },
 	{ &ui_redteam1, "ui_redteam1", "0", CVAR_ARCHIVE },
 	{ &ui_redteam2, "ui_redteam2", "0", CVAR_ARCHIVE },
