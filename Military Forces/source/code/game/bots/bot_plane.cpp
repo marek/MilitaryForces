@@ -82,7 +82,19 @@ struct PlaneTasks
 	static bool evading( Mind& c ) { return c.bot.desire == Goal::Evade && (c.sense.blindsided || c.sense.enemy); }
 	static bool blindsided( Mind& c ) { return c.sense.blindsided; }
 	// attacking, and not just leaving after a pass
-	static bool engaging( Mind& c ) { return c.sense.enemy && c.bot.desire == Goal::Attack && theLevel.time_ > c.bot.egressTime; }
+	static bool enemyHasTurrets( Mind& c ) { return c.sense.enemy && (availableVehicles[c.sense.enemy->client_->vehicle_].flags & VF_GUNSTATIONS); }
+	// just through a firing pass on an aircraft: on out before coming round. From one with turrets, until clear of them
+	static bool extending( Mind& c )
+	{
+		if( !c.sense.enemy || !c.sense.enemyAir || c.bot.desire != Goal::Attack || theLevel.time_ > c.bot.egressTime )
+			return false;
+		return !enemyHasTurrets( c ) || Distance( c.sense.enemy->r.currentOrigin, c.ent->r.currentOrigin ) < turretClear;
+	}
+	// an air enemy is turned back on as soon as the fighter is clear, whatever is left of the time allowed for it
+	static bool engaging( Mind& c )
+	{
+		return c.sense.enemy && c.bot.desire == Goal::Attack && (theLevel.time_ > c.bot.egressTime || (c.sense.enemyAir && !extending( c )));
+	}
 	static bool canLevelBomb( Mind& c ) { return bomber( c ) && !c.sense.enemyAir && hasBombs( c ); }
 	// bold or cunning bomber pilots dive on a ground target when high and close enough
 	static bool canDiveBomb( Mind& c )
@@ -156,8 +168,8 @@ struct PlaneTasks
 		c.travelTo( c.enemyPosition() );
 		if( !c.sense.enemyAir && c.sense.enemyDist < 900 )
 			c.bot.egressTime = theLevel.time_ + 5000;
-		if( c.sense.enemyAir && c.sense.enemyDist < 500 )
-			c.bot.egressTime = theLevel.time_ + 2500;
+		if( c.sense.enemyAir && c.sense.enemyDist < passEnds )
+			c.bot.egressTime = theLevel.time_ + (enemyHasTurrets( c ) ? 6000 : 2500);
 	}
 
 	// keep flying the turn and the climb or dive that the arc choice settled on
@@ -574,6 +586,15 @@ struct PlaneTasks
 		c.snapShot = fabs( enemyTurn( c ) ) < 6.0f;
 		c.view[YAW] = c.ps.vehicleAngles[YAW];
 		c.holdAltitude();
+		return Status::Running;
+	}
+
+	// straight on at full power, at the height it has: distance is what gets it out of the guns it has just flown past
+	static Status extend( Mind& c )
+	{
+		c.view[YAW] = c.ps.vehicleAngles[YAW];
+		c.holdAltitude();
+		c.cmd.forwardmove = moveFull;
 		return Status::Running;
 	}
 
@@ -1210,6 +1231,7 @@ struct PlaneTasks
 			t.when( "evading", evading, t.selector( "evade", {
 				t.when( "blindsided", blindsided, t.action( "break away", breakAway ) ),
 				t.action( "flee", flee ) } ) ),
+			t.when( "through a pass", extending, t.action( "extend", extend ) ),
 			t.when( "engaging", engaging, attack ),
 			t.when( "wants height", climbing, t.action( "gain height", gainHeight ) ),
 			t.when( "bomber with payload", canBombStructure, t.action( "bomb structure", bombStructure ) ),
@@ -1261,7 +1283,6 @@ void Bots::thinkPlane( GameEntity* ent, State& bot, const Sense& sense, usercmd_
 
 	// turrets: look at a nearby enemy aircraft and fire whatever bears, in bursts, holding course meanwhile as a
 	// player does with free look. Not while landing, taking off or low, where steering matters more
-	constexpr float turretRange = 2200.0f;
 	constexpr int turretBurst = 1800, turretPause = 1200;
 	// the target is the nearest enemy aircraft, whatever the bomber itself is after: a bomber's own enemy is on the ground
 	GameEntity* raider = sense.airThreat && sense.airThreatDist < turretRange ? sense.airThreat : nullptr;

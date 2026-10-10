@@ -356,12 +356,13 @@ void BotSenses::sense( GameEntity* ent, Bots::State& bot, Bots::Sense& out )
 			VectorMA( target, std::min( dist / shotSpeed, 1.5f ), out.enemy->client_->ps_.velocity, target );
 		const unsigned int enemyCat = availableVehicles[out.enemy->client_->vehicle_].cat;
 		// An aircraft with gun turrets is approached from where the fewest of them can bear: each turret only covers
-		// its own field, and a fighter that flies into four of them at once does not live. While more turrets bear
-		// on where the fighter is than on the best side, it flies for that side and holds its fire; once there it
-		// goes in. Pilots with little cunning do not think of it
+		// its own field. That choice is made out of gun range, where it costs nothing: the fighter flies for a point
+		// at gun range on the thinnest side. Inside gun range it does what a person does, which is put the nose on
+		// the bomber and shoot; a fighter that goes on circling for a better side there is only a target.
+		// Pilots with little cunning do not think of the approach at all
 		bool flanking = false;
 		if( BotSenses::roleOf( ent->client_->vehicle_ ) == Bots::Role::Fighter && (availableVehicles[out.enemy->client_->vehicle_].flags & VF_GUNSTATIONS) &&
-			out.enemyVisible && dist > 500 && Bots::character( bot ).cunning > 0.25f )
+			out.enemyVisible && dist > gunRange && Bots::character( bot ).cunning > 0.25f )
 		{
 			const int theirs = out.enemy->client_->vehicle_;
 			const float* hull = out.enemy->client_->ps_.vehicleAngles;
@@ -391,8 +392,7 @@ void BotSenses::sense( GameEntity* ent, Bots::State& bot, Bots::Sense& out )
 			}
 			if( fewest < onMe )
 			{
-				constexpr float standOff = 900.0f;
-				target = Vec3( out.enemy->r.currentOrigin ) + side * standOff;
+				target = Vec3( out.enemy->r.currentOrigin ) + side * gunRange;
 				flanking = true;
 			}
 		}

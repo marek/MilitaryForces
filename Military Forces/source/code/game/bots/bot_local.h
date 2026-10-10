@@ -28,6 +28,10 @@ namespace bots
 	constexpr float approachFloor = 150.0f;
 	constexpr float heloCruiseHeight = 500.0f;
 	constexpr float heloLowHeight = 180.0f;
+	constexpr float gunRange = 2500.0f;	// how far off a pilot opens fire with the gun
+	constexpr float turretRange = 2200.0f;	// how far off a bomber's gunners open fire
+	constexpr float passEnds = 500.0f;	// a firing pass on an aircraft is broken off this close
+	constexpr float turretClear = 1600.0f;	// after a pass on an aircraft with turrets the fighter flies out this far before turning back
 	constexpr float planeEnemyRange = 14000.0f;	// how far away an enemy is noticed, from the air and from the surface
 	constexpr float surfaceEnemyRange = 7000.0f;
 

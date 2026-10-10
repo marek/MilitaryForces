@@ -151,7 +151,7 @@ void BotWeapons::fireWeapons( GameEntity* ent, Bots::State& bot, const Bots::Sen
 	float gunCone = fixedGunCone;
 	if( gun && availableWeapons[gun].turret )
 		gunCone = availableWeapons[gun].maxturns[YAW] > availableWeapons[gun].minturns[YAW] ? std::clamp( availableWeapons[gun].maxturns[YAW], fixedGunCone, 90.0f ) : 90.0f;
-	if( gun && ps.ammo[WP_MACHINEGUN] > 0 && aimError < gunCone && sense.enemyDist < 2500 )
+	if( gun && ps.ammo[WP_MACHINEGUN] > 0 && aimError < gunCone && sense.enemyDist < gunRange )
 		cmd.buttons |= BUTTON_ATTACK;
 
 	// the selection takes a moment to change: nothing is fired from the old one
