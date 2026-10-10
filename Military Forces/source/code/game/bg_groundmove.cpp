@@ -89,13 +89,16 @@ namespace
 	MoveHit moveHit;
 }
 
-// The box a ground vehicle is moved with. Its underside is lifted well clear of the ground: the wheels or tracks
-// carry the vehicle, and a box that reached down to them would rest on every slope and lift them off it
-static void PM_GroundMoveMins( int vehicle, vec3_t mins )
+// The box a ground vehicle is moved through the world with: a small core in the upper middle of the hull. A box
+// the size of the hull stays level while the hull tilts, so on any slope its leading bottom edge would dig into
+// the ground and drag. The ground is the footing's business; what the hull's ends and sides run into is found by
+// probes that tilt with it
+static void PM_GroundCoreBox( int vehicle, vec3_t mins, vec3_t maxs )
 {
 	const completeVehicleData_t& veh = availableVehicles[vehicle];
-	VectorCopy( veh.mins, mins );
-	mins[2] += std::min( ( veh.maxs[2] - veh.mins[2] ) * 0.6f, ( veh.maxs[0] - veh.mins[0] ) * 0.4f );
+	const float half = 0.3f * std::min( veh.maxs[0] - veh.mins[0], veh.maxs[1] - veh.mins[1] );
+	VectorSet( mins, -half, -half, veh.mins[2] + ( veh.maxs[2] - veh.mins[2] ) * 0.55f );
+	VectorSet( maxs, half, half, veh.maxs[2] );
 }
 
 // Finds the ground under each point the vehicle stands on and lays one surface through those that touch
@@ -498,12 +501,13 @@ void PlayerMove::stepSlideMove_GV()
 
 	// how high a vehicle can step: a good part of its own height
 	const float stepSize = std::max( 6.0f, ( availableVehicles[pm->vehicle].maxs[2] - availableVehicles[pm->vehicle].mins[2] ) * 0.6f );
-	PM_GroundMoveMins( pm->vehicle, mins );
+	Vec3 maxs;
+	PM_GroundCoreBox( pm->vehicle, mins, maxs );
 
 	// room above to lift the vehicle
 	up = startOrigin;
 	up[2] += stepSize;
-	pm->trace( &trace, startOrigin, mins, pm->maxs, up, pm->ps->clientNum, pm->tracemask, false );
+	pm->trace( &trace, startOrigin, mins, maxs, up, pm->ps->clientNum, pm->tracemask, false );
 	if( trace.allsolid )
 		return;
 
@@ -515,7 +519,7 @@ void PlayerMove::stepSlideMove_GV()
 	// and back down onto whatever is underneath
 	VectorCopy( pm->ps->origin, down );
 	down[2] -= stepSize;
-	pm->trace( &trace, pm->ps->origin, mins, pm->maxs, down, pm->ps->clientNum, pm->tracemask, false );
+	pm->trace( &trace, pm->ps->origin, mins, maxs, down, pm->ps->clientNum, pm->tracemask, false );
 	if( !trace.allsolid )
 		VectorCopy( trace.endpos, pm->ps->origin );
 
@@ -577,12 +581,73 @@ void PlayerMove::groundVehicleMove( )
 		pm->ps->velocity[2] += pml.groundRise;
 	VectorCopy( pm->ps->velocity, carried );
 	moveHit = MoveHit{};
+	Vec3 startOrigin;
+	VectorCopy( pm->ps->origin, startOrigin );
+	// through the world with the core box; other vehicles and people are met with the whole hull below
+	const int fullMask = pm->tracemask;
+	pm->tracemask &= ~CONTENTS_BODY;
 	stepSlideMove_GV();
+	pm->tracemask = fullMask;
 	if( pm->ps->ONOFF & OO_LANDED )
 	{
 		// only what the move changed is kept of the adjustment
 		for( int i = 0; i < 3; i++ )
 			pm->ps->velocity[i] = before[i] + ( pm->ps->velocity[i] - carried[i] );
+	}
+
+	{
+		const completeVehicleData_t& veh = availableVehicles[pm->vehicle];
+		// another vehicle or a person in the way of the hull stops it there
+		if( fullMask & CONTENTS_BODY )
+		{
+			vec3_t hullMins;
+			VectorCopy( veh.mins, hullMins );
+			hullMins[2] += ( veh.maxs[2] - veh.mins[2] ) * 0.3f;
+			trace_t body;
+			pm->trace( &body, startOrigin, hullMins, pm->maxs, pm->ps->origin, pm->ps->clientNum, CONTENTS_BODY, false );
+			if( body.fraction < 1.0f && !body.allsolid && body.entityNum != ENTITYNUM_WORLD && body.entityNum != ENTITYNUM_NONE )
+			{
+				VectorCopy( body.endpos, pm->ps->origin );
+				PlayerMove::addTouchEnt_GV( body.entityNum );
+				if( !moveHit.hit )
+				{
+					moveHit.hit = true;
+					VectorCopy( body.plane.normal, moveHit.normal );
+					moveHit.entity = body.entityNum;
+				}
+			}
+		}
+		// The hull's nose, tail and sides, tilted as the hull is. What one of them reaches that is no ground to
+		// drive on is a wall: the vehicle stops with that end against it
+		vec3_t axis[3];
+		AnglesToAxis( pm->ps->vehicleAngles, axis );
+		const float middle = ( veh.mins[2] + veh.maxs[2] ) * 0.5f;
+		const struct { int along; float reach; } ends[4] = { { 0, veh.maxs[0] }, { 0, veh.mins[0] }, { 1, veh.maxs[1] }, { 1, veh.mins[1] } };
+		for( const auto& end : ends )
+		{
+			vec3_t from, to;
+			VectorMA( pm->ps->origin, middle, axis[2], from );
+			VectorMA( from, end.reach, axis[end.along], to );
+			trace_t wall;
+			pm->trace( &wall, from, vec3_origin, vec3_origin, to, pm->ps->clientNum, MASK_SOLID | CONTENTS_PLAYERCLIP, false );
+			if( wall.fraction >= 1.0f || wall.startsolid || wall.plane.normal[2] >= handling.standNormal )
+				continue;
+			// back off, level, by as far as that end is into it
+			vec3_t out = { wall.plane.normal[0], wall.plane.normal[1], 0 };
+			if( VectorNormalize( out ) < 0.01f )
+				continue;
+			const float into = ( 1.0f - wall.fraction ) * fabsf( end.reach );
+			vec3_t reach;
+			VectorSubtract( to, from, reach );
+			VectorNormalize( reach );
+			VectorMA( pm->ps->origin, into * fabsf( DotProduct( reach, out ) ), out, pm->ps->origin );
+			if( !moveHit.hit )
+			{
+				moveHit.hit = true;
+				VectorCopy( out, moveHit.normal );
+				moveHit.entity = ENTITYNUM_WORLD;
+			}
+		}
 	}
 
 	// Ran into something it cannot drive over: part of the blow comes back, and it scrapes along. Against
@@ -773,7 +838,8 @@ bool PlayerMove::slideMove_GV() {
 	Vec3		endClipVelocity;
 	Vec3		mins;
 	
-	PM_GroundMoveMins( pm->vehicle, mins );
+	Vec3 maxs;
+	PM_GroundCoreBox( pm->vehicle, mins, maxs );
 	
 	numbumps = 4;
 
@@ -802,7 +868,7 @@ bool PlayerMove::slideMove_GV() {
 		pm->trace ( &trace, 
 					pm->ps->origin, 
 					mins, 
-					pm->maxs, 
+					maxs, 
 					end, 
 					pm->ps->clientNum, 
 					pm->tracemask,
