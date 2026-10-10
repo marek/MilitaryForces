@@ -799,8 +799,11 @@ void PlayerMove::groundVehicleMove( )
 			trace_t face;
 			pm->trace( &face, from, vec3_origin, vec3_origin, to, pm->ps->clientNum, MASK_SOLID | CONTENTS_PLAYERCLIP, false );
 			// a face is in the way only if it faces the point coming at it, and is no overhang seen from underneath
+			// A face the vehicle is already on is not in its way, however steep: one carried up a steep face by its
+			// speed goes on up it and over the top. A wall is a face that stands up from the surface the hull lies on
+			constexpr float standsUp = 0.5f;
 			if( face.fraction >= 1.0f || face.startsolid || face.plane.normal[2] >= handling.standNormal || face.plane.normal[2] < -0.1f ||
-				DotProduct( step, face.plane.normal ) >= 0 )
+				DotProduct( step, face.plane.normal ) >= 0 || DotProduct( face.plane.normal, hull[2] ) >= standsUp )
 				continue;
 			const float share = std::max( 0.0f, ( face.fraction * ( length + clear ) - clear ) / length );
 			if( share < allowed )
@@ -869,7 +872,7 @@ void PlayerMove::groundVehicleMove( )
 			vec3_t probing;
 			VectorSubtract( to, from, probing );
 			if( wall.fraction >= 1.0f || wall.startsolid || wall.plane.normal[2] >= handling.standNormal || wall.plane.normal[2] < -0.1f ||
-				DotProduct( probing, wall.plane.normal ) >= 0 )
+				DotProduct( probing, wall.plane.normal ) >= 0 || DotProduct( wall.plane.normal, axis[2] ) >= 0.5f )
 				continue;
 			// back off, level, by as far as that end is into it
 			vec3_t out = { wall.plane.normal[0], wall.plane.normal[1], 0 };
