@@ -15,11 +15,19 @@ namespace bots
 	constexpr signed char moveNone = 0;
 	constexpr float planeCruiseHeight = 1400.0f;	// heights above ground that pilots keep to
 	constexpr float planeMinHeight = 450.0f;
+	constexpr float bomberMinRunHeight = 800.0f;	// a bomb run is flown this high at least, and no higher than the top figure:
+	constexpr float bomberMaxRunHeight = 1800.0f;	// higher costs a slow bomber minutes of climbing and its aim on anything that moves
+	constexpr float bomberCeilingMargin = 700.0f;	// kept clear under a roof or the top of the map
+
+	// the height above ground a bomber flies its run at, given its present height and the open air above it
+	inline float bomberRunHeight( float height, float ceilingAbove )
+	{
+		return std::clamp( height + ceilingAbove - bomberCeilingMargin, bomberMinRunHeight, bomberMaxRunHeight );
+	}
 	// the least height over the ground while lining up to land
 	constexpr float approachFloor = 150.0f;
 	constexpr float heloCruiseHeight = 500.0f;
 	constexpr float heloLowHeight = 180.0f;
-	constexpr float bomberMinHeight = 2200.0f;
 	constexpr float planeEnemyRange = 14000.0f;	// how far away an enemy is noticed, from the air and from the surface
 	constexpr float surfaceEnemyRange = 7000.0f;
 

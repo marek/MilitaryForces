@@ -36,7 +36,7 @@ struct GoalScoring
 	// how far a bomber is below the height it wants for a bomb run, with extra weight when well below
 	static float bomberAltitudeNeed( const Situation& s )
 	{
-		const float want = std::clamp( s.sense.height + BotWorld::ceilingAbove( s.ent->r.currentOrigin, s.ent->s.number ) - 700.0f, 800.0f, 3500.0f );
+		const float want = bomberRunHeight( s.sense.height, BotWorld::ceilingAbove( s.ent->r.currentOrigin, s.ent->s.number ) );
 		return std::clamp( 1.0f - s.sense.height / want, 0.0f, 1.0f ) + (s.sense.height < want * 0.6f ? 0.5f : 0.0f);
 	}
 	// an enemy aircraft: 1 when close, fading to nothing a little beyond the range
@@ -89,11 +89,11 @@ struct GoalScoring
 		return score * duelResolve( s, 0.7f );
 	}
 
-	// gain height: a bomber for its run, a fighter to come down on a distant enemy, a stealth aircraft while unseen
+	// gain height: a bomber with a load for its run, a fighter to come down on a distant enemy, a stealth aircraft while unseen
 	static float climb( const Situation& s )
 	{
 		float score = 0.0f;
-		if( s.sense.role == Role::Bomber )
+		if( s.sense.role == Role::Bomber && hasGroundWeapons( s ) )
 			score = 1.2f * s.who.patience * bomberAltitudeNeed( s ) * (1.0f - 0.5f * selfDefence( s ));
 		else if( s.sense.role == Role::Fighter && s.sense.enemy && s.sense.enemyAir && s.sense.enemyDist > 3000 )
 			score = 0.5f * s.who.patience * std::clamp( (s.sense.enemy->r.currentOrigin[2] + 400 - s.ent->r.currentOrigin[2]) / 800.0f, 0.0f, 1.0f );
@@ -127,6 +127,20 @@ struct GoalScoring
 		return true;
 	}
 
+	// a bomber that has dropped everything: its guns are for keeping fighters off, not a reason to stay out
+	static bool payloadGone( const Situation& s )
+	{
+		if( s.sense.role != Role::Bomber || hasGroundWeapons( s ) )
+			return false;
+		for( int slot : secondaryWeaponSlots )
+		{
+			const int type = availableWeapons[availableVehicles[s.vehicle].weapons[slot]].type;
+			if( type == WT_IRONBOMB || type == WT_GUIDEDBOMB || type == WT_ANTIGROUNDMISSILE || type == WT_ROCKET )
+				return true;
+		}
+		return false;
+	}
+
 	// go back to a pad for fuel, repairs, ammunition or flares
 	static float rearm( const Situation& s )
 	{
@@ -142,7 +156,7 @@ struct GoalScoring
 			need = 1.0f + ( fuelWanted - fuel ) * fuelPull;
 		else if( s.sense.health < 0.45f )
 			need = 0.2f + 0.8f * s.who.caution;
-		else if( BotWeapons::outOfAmmo( s.vehicle, s.ps ) || suppliesGone( s ) )
+		else if( BotWeapons::outOfAmmo( s.vehicle, s.ps ) || suppliesGone( s ) || payloadGone( s ) )
 			need = 0.7f;
 		else if( availableVehicles[s.vehicle].ammo[WP_FLARE] > 0 && s.ps.ammo[WP_FLARE] <= 0 && s.sense.role != Role::Tank )
 			need = 0.3f * s.who.caution;

@@ -238,6 +238,8 @@ struct PlaneTasks
 		const float groundRun = stall * rotateSpeed * stall * rotateSpeed / (2.0f * groundAcceleration) * 1.15f;
 		const float turnRate = std::max( 10.0f, c.veh.turnspeed[YAW] ) * std::numbers::pi_v<float> / 180.0f;
 		const float radius = stall * 1.15f / turnRate;
+		// the run estimate is rough and a runway end is unforgiving: a comfortable length is half as much again
+		const float comfortable = groundRun * 1.5f + 150.0f;
 		float best = 0, bestRun = 0, longest = 0;
 		bool bestClear = false;
 		for( int step = 0; step < 24; step++ )
@@ -274,7 +276,10 @@ struct PlaneTasks
 				}
 			}
 			const float score = (run >= groundRun ? 5000.0f : 0.0f) + (rollClear ? 3000.0f : 0.0f) + (departClear ? 4000.0f - fabs( departTurn ) * 5.0f : 0.0f) +
-				std::min( run, groundRun * 2.0f ) * 2.0f;
+				// more runway is better up to twice a comfortable length: with the credit stopping at the bare
+				// need, the first short heading tied with the long one, was chosen, was then found too short to
+				// be comfortable, and the aircraft taxied about looking for a better place for the rest of the game
+				std::min( run, comfortable * 2.0f ) * 2.0f;
 			if( score > best )
 			{
 				best = score;
@@ -289,8 +294,7 @@ struct PlaneTasks
 			Common::printf( "BOTTAKEOFF t %d bot %d veh %d at %.0f %.0f %.0f facing %.0f chose %.0f then %.0f run %.0f need %.0f longest %.0f score %.0f\n", theLevel.time_, c.ent->s.number,
 				c.client->vehicle_, origin[0], origin[1], origin[2], c.ps.vehicleAngles[YAW], c.bot.takeoffYaw, c.bot.departYaw, bestRun, groundRun, longest, best );
 #endif
-		// the run estimate is rough and a runway end is unforgiving: with less than a comfortable length, taxi to a better place
-		const float comfortable = groundRun * 1.5f + 150.0f;
+		// with less than a comfortable length, taxi to a better place
 		if( bestRun < comfortable && findTaxiSpot( c, origin, comfortable ) )
 			return;
 		// someone is standing on the run: give them a moment to move before rolling
@@ -1239,7 +1243,7 @@ void Bots::thinkPlane( GameEntity* ent, State& bot, const Sense& sense, usercmd_
 
 	mind.cruise = planeCruiseHeight;
 	if( sense.role == Role::Bomber )
-		mind.cruise = std::clamp( sense.height + BotWorld::ceilingAbove( ent->r.currentOrigin, ent->s.number ) - 700.0f, 800.0f, 3500.0f );
+		mind.cruise = bomberRunHeight( sense.height, BotWorld::ceilingAbove( ent->r.currentOrigin, ent->s.number ) );
 	else if( bot.desire == Goal::Climb )
 		mind.cruise = sense.height + 500.0f;
 	else if( !sense.enemy || !sense.enemyAir )
