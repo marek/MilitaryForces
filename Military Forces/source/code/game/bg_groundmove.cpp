@@ -155,11 +155,11 @@ static Footing PM_GroundFooting( pmove_t* pm, int vehicle, const Handling& handl
 	float along[MAX_CONTACTS], across[MAX_CONTACTS];
 	footing.points = PM_ContactPoints( vehicle, tracked, along, across );
 
-	float sumF[2] = { 0, 0 }, sumZF[2] = { 0, 0 }, sumR[2] = { 0, 0 }, sumZR[2] = { 0, 0 }, sumZ = 0, meanF = 0, meanR = 0;
-	int countF[2] = { 0, 0 }, countR[2] = { 0, 0 };
-	float steep = 0;
-	int bearing = 0;
-	float bearF = 0, bearR = 0;
+	// what each point found: ground at all, how high, how steep, and whether the point bears on it
+	bool found[MAX_CONTACTS] = {}, bears[MAX_CONTACTS] = {};
+	float height[MAX_CONTACTS] = {}, slant[MAX_CONTACTS] = {};
+	int bearing = 0, reached = 0;
+	const float pitchNow = DEG2RAD( AngleNormalize180( pm->ps->vehicleAngles[PITCH] ) ), rollNow = DEG2RAD( AngleNormalize180( pm->ps->vehicleAngles[ROLL] ) );
 	for( int i = 0; i < footing.points; i++ )
 	{
 		vec3_t start, end;
@@ -180,27 +180,51 @@ static Footing PM_GroundFooting( pmove_t* pm, int vehicle, const Handling& handl
 		// a point that starts inside something, or finds ground higher than it can ride up, stands at that most
 		if( tr.startsolid || tr.endpos[2] > ride )
 			tr.endpos[2] = ride;
-		footing.touching++;
-		steep += tr.startsolid ? 1.0f : tr.plane.normal[2];
-		const int f = along[i] > 0 ? 1 : 0, r = across[i] > 0 ? 1 : 0;
-		sumF[f] += along[i]; sumZF[f] += tr.endpos[2]; countF[f]++;
-		sumR[r] += across[i]; sumZR[r] += tr.endpos[2]; countR[r]++;
-		sumZ += tr.endpos[2]; meanF += along[i]; meanR += across[i];
+		found[i] = true;
+		reached++;
+		height[i] = tr.endpos[2];
+		slant[i] = tr.startsolid ? 1.0f : tr.plane.normal[2];
 		// Does this point bear on that ground, or only hang over it? It bears if the ground is within a wheel's
 		// droop of where the tilted hull holds the wheel
 		constexpr float droopReach = 2.0f;
-		const float pitchNow = DEG2RAD( AngleNormalize180( pm->ps->vehicleAngles[PITCH] ) ), rollNow = DEG2RAD( AngleNormalize180( pm->ps->vehicleAngles[ROLL] ) );
 		const float wheelAt = pm->ps->origin[2] + veh.mins[2] - along[i] * tanf( pitchNow ) - across[i] * tanf( rollNow );
-		if( tr.endpos[2] >= wheelAt - droopReach - handling.sag )
+		bears[i] = height[i] >= wheelAt - droopReach - handling.sag;
+		if( bears[i] )
+			bearing++;
+	}
+	if( !reached )
+		return footing;
+
+	// The vehicle stands on the points that bear. A wheel that has gone over an edge and has lower ground somewhere
+	// beneath it says nothing about where the vehicle is: counted in, it would lower the ground under the middle
+	// and the vehicle would be taken for airborne the moment its nose was over. With no point bearing - coming
+	// down onto the ground - all that found ground are used, so the landing is seen coming
+	float sumF[2] = { 0, 0 }, sumZF[2] = { 0, 0 }, sumR[2] = { 0, 0 }, sumZR[2] = { 0, 0 }, sumZ = 0, meanF = 0, meanR = 0;
+	int countF[2] = { 0, 0 }, countR[2] = { 0, 0 };
+	float steep = 0, bearF = 0, bearR = 0;
+	for( int i = 0; i < footing.points; i++ )
+	{
+		if( !found[i] || ( bearing && !bears[i] ) )
+			continue;
+		footing.touching++;
+		steep += slant[i];
+		const int f = along[i] > 0 ? 1 : 0, r = across[i] > 0 ? 1 : 0;
+		sumF[f] += along[i]; sumZF[f] += height[i]; countF[f]++;
+		sumR[r] += across[i]; sumZR[r] += height[i]; countR[r]++;
+		sumZ += height[i]; meanF += along[i]; meanR += across[i];
+		if( bears[i] )
 		{
-			bearing++; bearF += along[i]; bearR += across[i];
+			bearF += along[i]; bearR += across[i];
 		}
 	}
-	if( !footing.touching )
-		return footing;
 
 	footing.back = countF[0] > 0; footing.front = countF[1] > 0;
 	footing.left = countR[0] > 0; footing.right = countR[1] > 0;
+	// With only one end or one side bearing there is no rise to measure between them. The ground is then taken to
+	// run on as the hull lies - a vehicle with its nose off the top of a ramp is still on the ramp, not on level
+	// ground at the height of its back wheels
+	footing.slopeForward = -tanf( pitchNow );
+	footing.slopeRight = -tanf( rollNow );
 	// the rise between the points behind the middle and those ahead of it, and between the two sides
 	if( footing.front && footing.back )
 		footing.slopeForward = ( sumZF[1] / countF[1] - sumZF[0] / countF[0] ) / ( sumF[1] / countF[1] - sumF[0] / countF[0] );
