@@ -280,8 +280,16 @@ void PlayerMove::groundVehicleAccelerate()
 	if( pm->ps->stats[STAT_FUEL] <= 0 )
 		throttle = 0;
 
-	const bool afloat = pm->waterlevel && (veh.caps & HC_AMPHIBIOUS);
-	Footing footing = afloat ? Footing{} : PM_GroundFooting( pm, pm->vehicle, handling );
+	// An amphibious vehicle floats once the water is up to its middle; with only its wheels wet it is still
+	// driving on the bottom
+	// An amphibious vehicle is afloat when it is in the water and its wheels are not standing on the bottom, or
+	// when it has gone right under. Where the bottom comes up to its wheels - a shore, a ramp - it is driving again
+	Footing footing = PM_GroundFooting( pm, pm->vehicle, handling );
+	const bool onBottom = footing.touching > 0 && footing.height - veh.mins[2] + handling.clearance + handling.sag - pm->ps->origin[2] > 0;
+	const bool afloat = (veh.caps & HC_AMPHIBIOUS) && ( pm->waterlevel >= 3 || ( pm->waterlevel >= 1 && !onBottom ) );
+	if( afloat )
+		footing = Footing{};
+	pml.afloat = afloat;
 	const vec3_t yawOnly = { 0, pm->ps->vehicleAngles[YAW], 0 };
 	vec3_t hullForward;
 	AngleVectors( yawOnly, hullForward, nullptr, nullptr );
@@ -390,7 +398,25 @@ void PlayerMove::groundVehicleAccelerate()
 	const float weightOnGround = GROUND_GRAVITY * ( handling.tracked ? 1.0f : normal[2] ) * support;
 
 	if( afloat )
+	{
+		// it rides at the surface, and comes up to it when it has gone under
+		constexpr float surfacing = 70.0f, settling = 40.0f;
 		speedUp = 0;
+		if( pm->waterlevel >= 3 )
+			speedUp = surfacing;
+		else if( pm->waterlevel == 1 )
+		{
+			// sitting high, on its wheels: it settles until the water is at its middle
+			vec3_t under;
+			VectorCopy( pm->ps->origin, under );
+			under[2] += veh.mins[2];
+			trace_t water;
+			pm->trace( &water, pm->ps->origin, vec3_origin, vec3_origin, under, pm->ps->clientNum, MASK_WATER, false );
+			const float high = water.fraction * -veh.mins[2];
+			if( high > 0.3f )
+				speedUp = -std::min( settling, high / dt );
+		}
+	}
 	else
 	{
 		// springs and shock absorbers, in short steps so a stiff suspension stays calm at any frame rate
@@ -493,8 +519,17 @@ Lays the hull on the ground it stands on. With nothing under one end it tips tha
 void PlayerMove::adjustToTerrain( ) 
 {
 	const completeVehicleData_t& veh = availableVehicles[pm->vehicle];
-	if( pm->waterlevel && (veh.caps & HC_AMPHIBIOUS) )
+	if( pml.afloat )
+	{
+		// afloat it rights itself and lies level on the water, whatever way up it went in
+		constexpr float rightingTime = 0.5f;
+		const float share = 1.0f - expf( -pml.frametime / rightingTime );
+		float pitch = AngleNormalize180( pm->ps->vehicleAngles[PITCH] ), roll = AngleNormalize180( pm->ps->vehicleAngles[ROLL] );
+		pm->ps->vehicleAngles[PITCH] = pitch - pitch * share;
+		pm->ps->vehicleAngles[ROLL] = roll - roll * share;
+		pm->ps->vehicleSpin[PITCH] = pm->ps->vehicleSpin[ROLL] = 0;
 		return;
+	}
 
 	const Handling handling = handlingOf( pm->vehicle );
 	const Footing footing = PM_GroundFooting( pm, pm->vehicle, handling );

@@ -422,7 +422,6 @@ void PlayerMove::setWaterLevel( ) {
 				pm->waterlevel = 3;
 			} else {
 				if( availableVehicles[pm->vehicle].caps & HC_AMPHIBIOUS ) {
-					pm->ps->vehicleAngles[0] = pm->ps->vehicleAngles[2] = 0;
 					VectorCopy( pm->ps->origin, start );
 					start[2] += 10;
 					VectorCopy( pm->ps->origin, end );
