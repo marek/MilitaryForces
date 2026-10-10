@@ -1590,11 +1590,24 @@ void Rider_Leave( GameEntity *ent, bool forced )
 		return;
 
 	GameClient* pilot = theLevel.getClient( pilotNum );
+	// the share of his health a jump at speed costs
+	float jumpHurt = 0.0f;
 	if( pilot && pilot->pers_.connected_ == GameClient::ClientPersistant::CON_CONNECTED ) 
 	{
-		bool parked = (pilot->ps_.ONOFF & OO_LANDED) != 0 || VectorLength( pilot->ps_.velocity ) < 60;
-		if( !forced && !parked ) 
-			return;
+		// A rider may jump from a moving vehicle. High up the parachute sees to it; near the ground the speed of
+		// the vehicle is what he hits the ground with
+		constexpr float jumpSafeSpeed = 20.0f, jumpDeadlySpeed = 250.0f;	// a HMMWV flat out does about 40, a helicopter 300
+		const float speed = VectorLength( pilot->ps_.velocity );
+		if( speed > jumpSafeSpeed )
+		{
+			Vec3 below;
+			trace_t ground;
+			VectorCopy( pilot->ps_.origin, below );
+			below[2] -= LQM_CHUTE_MIN_HEIGHT;
+			GameHost::trace( &ground, pilot->ps_.origin, nullptr, nullptr, below, pilotNum, MASK_SOLID, false );
+			if( ground.fraction < 1.0f )
+				jumpHurt = std::clamp( (speed - jumpSafeSpeed) / (jumpDeadlySpeed - jumpSafeSpeed), 0.0f, 1.0f );
+		}
 
 		// a passenger set down after a real journey: if they go on to take a vehicle alive, the pilot scores again
 		// (only for someone the enemy forced out of their vehicle, so it cannot be farmed between friends)
@@ -1611,6 +1624,11 @@ void Rider_Leave( GameEntity *ent, bool forced )
 			origin = origin + right * ( -availableVehicles[vehicle].deckPos[1] );
 			origin[2] += availableVehicles[vehicle].deckPos[2];
 		}
+		else if( vehicle >= 0 && !(availableVehicles[vehicle].cat & CAT_LQM) && speed > jumpSafeSpeed ) 
+		{
+			// off the back of a moving vehicle, where it is not about to be
+			origin = origin + forward * ( availableVehicles[vehicle].mins[0] - 15 );
+		}
 		else if( vehicle >= 0 && !(availableVehicles[vehicle].cat & CAT_LQM) ) 
 		{
 			float side = (client->sess_.seat_ & 1) ? 1.0f : -1.0f;
@@ -1625,8 +1643,13 @@ void Rider_Leave( GameEntity *ent, bool forced )
 	if( pilot && pilot->pers_.connected_ == GameClient::ClientPersistant::CON_CONNECTED ) 
 		GameHost::sendServerCommand( pilotNum, va( "print \"%s^7 left your vehicle\n\"", client->pers_.netname_ ) );
 	Game::rider_SetVehicle( ent->s.number, client->vehicle_ );
+	const int clientNum = ent->s.number;
 	switch_vehicle( ent );
-}
+	// the switch made a new entity for the soldier
+	GameEntity* soldier = theLevel.getEntity( clientNum );
+	if( jumpHurt > 0.0f && soldier && soldier->client_ && soldier->health_ > 0 )
+		Game::damage( soldier, nullptr, soldier, nullptr, nullptr, std::max( 1, static_cast<int>( jumpHurt * availableVehicles[soldier->client_->vehicle_].maxhealth ) ),
+			DAMAGE_NO_PROTECTION, MOD_FALLING, CAT_ANY );}
 
 /*
 =================

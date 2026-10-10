@@ -43,6 +43,8 @@ vmCvar_t	g_botDebug;
 vmCvar_t	g_botPeaceful;
 #endif
 vmCvar_t	g_botLanding;
+vmCvar_t	g_baseSAMs;
+vmCvar_t	g_baseGuns;
 vmCvar_t	g_botVehicles;
 vmCvar_t	g_abandonTime;
 vmCvar_t	g_enterRange;
@@ -146,6 +148,9 @@ cvarTable_t		gameCvarTable[] = {
 	{ &g_botPeaceful, "g_botPeaceful", "0", 0, 0, false  },
 #endif
 	{ &g_botLanding, "g_botLanding", "1", 0, 0, false  },
+	// air defence sites stood around each base on a map that places none: missiles and guns, per base
+	{ &g_baseSAMs, "g_baseSAMs", "6", CVAR_ARCHIVE, 0, false  },
+	{ &g_baseGuns, "g_baseGuns", "6", CVAR_ARCHIVE, 0, false  },
 	{ &g_botVehicles, "g_botVehicles", "", 0, 0, false  },
 	{ &g_abandonTime, "g_abandonTime", "300", 0, 0, true  },
 	{ &g_enterRange, "g_enterRange", "45", 0, 0, true  },
@@ -444,6 +449,7 @@ void G_InitGame( int levelTime, int randomSeed )
 	{
 		// MFQ3 mission scripts
 		G_LoadMissionScripts();
+		Game::placeBaseDefences();
 
 		// init some MFQ3 stuff
 		DroneInit();
