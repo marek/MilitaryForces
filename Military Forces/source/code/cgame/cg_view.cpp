@@ -50,6 +50,23 @@ void CGame::calcVrect() {
 
 //==============================================================================
 
+// The vehicle the view is on: the one of the player being watched, which is not the viewer's own when following
+// someone as a spectator. The camera's distance, height and cockpit position are that vehicle's
+static int viewedVehicle()
+{
+	if( cg.snap )
+	{
+		const int client = cg.snap->ps.clientNum;
+		if( client >= 0 && client < MAX_CLIENTS )
+		{
+			const int watched = cgs.clientinfo[client].vehicle;
+			if( watched >= 0 && watched < bg_numberOfVehicles )
+				return watched;
+		}
+	}
+	return cg_vehicle.integer >= 0 && cg_vehicle.integer < bg_numberOfVehicles ? cg_vehicle.integer : 0;
+}
+
 /*
 ===============
 CGame::offsetVehicleView
@@ -73,14 +90,14 @@ void CGame::offsetVehicleView( bool spectator )
 	char test[ 64 ];
 #endif
 	// reset 3rd person camera distance and height to vehicle default (only when valid)
-	if( cg_vehicle.integer != lastVehicle )
+	if( viewedVehicle() != lastVehicle )
 	{
 		// reset
-		cg_thirdPersonRange.value = availableVehicles[ cg_vehicle.integer ].cam_dist[ CAMERA_V_DEFAULT ];
-		cg_thirdPersonHeight.value = availableVehicles[ cg_vehicle.integer ].cam_height[ CAMERA_V_DEFAULT ];
+		cg_thirdPersonRange.value = availableVehicles[ viewedVehicle() ].cam_dist[ CAMERA_V_DEFAULT ];
+		cg_thirdPersonHeight.value = availableVehicles[ viewedVehicle() ].cam_height[ CAMERA_V_DEFAULT ];
 
 		// save vehicle we reset for
-		lastVehicle = cg_vehicle.integer;
+		lastVehicle = viewedVehicle();
 	}
 
 	// get vars
@@ -89,13 +106,13 @@ void CGame::offsetVehicleView( bool spectator )
 
 	// clamp distance
 	VehicleData::limitFloat( &dist,
-					availableVehicles[cg_vehicle.integer].cam_dist[ CAMERA_V_MIN ],
-					availableVehicles[cg_vehicle.integer].cam_dist[ CAMERA_V_MAX ] );
+					availableVehicles[viewedVehicle()].cam_dist[ CAMERA_V_MIN ],
+					availableVehicles[viewedVehicle()].cam_dist[ CAMERA_V_MAX ] );
 
 	// clamp height
 	VehicleData::limitFloat( &height,
-					availableVehicles[cg_vehicle.integer].cam_height[ CAMERA_V_MIN ],
-					availableVehicles[cg_vehicle.integer].cam_height[ CAMERA_V_MAX ] );
+					availableVehicles[viewedVehicle()].cam_height[ CAMERA_V_MIN ],
+					availableVehicles[viewedVehicle()].cam_height[ CAMERA_V_MAX ] );
 
 #ifdef _VIEW_SETTING_DISPLAY
 	sprintf( test,"d=%f h=%f", dist, height );
@@ -129,13 +146,13 @@ void CGame::offsetVehicleView( bool spectator )
 
     VectorCopy( cg.refdef.vieworg, start );
 	if( !spectator ) {
-		start[2] += availableVehicles[cg_vehicle.integer].maxs[2];
+		start[2] += availableVehicles[viewedVehicle()].maxs[2];
 	}
     VectorCopy( cg.refdef.vieworg, view );
 
 	if( !spectator ) {
-		VectorMA( view, /*-(availableVehicles[cg_vehicle.integer].cam_dist[ CAMERA_V_DEFAULT ]*/ - dist/*)*/, forward, view );
-		view[2] += /*(availableVehicles[cg_vehicle.integer].cam_height[ CAMERA_V_DEFAULT ]*/ + height /*)*/;
+		VectorMA( view, /*-(availableVehicles[viewedVehicle()].cam_dist[ CAMERA_V_DEFAULT ]*/ - dist/*)*/, forward, view );
+		view[2] += /*(availableVehicles[viewedVehicle()].cam_height[ CAMERA_V_DEFAULT ]*/ + height /*)*/;
 	}
 
     CGame::trace( &trace, start, mins, maxs, view, cg.predictedPlayerState.clientNum, MASK_SOLID );
@@ -178,14 +195,14 @@ void CGame::offsetVehicleViewCFV( bool spectator )
 	char test[ 64 ];
 #endif
 	// reset 3rd person camera distance and height to vehicle default (only when valid)
-	if( cg_vehicle.integer != lastVehicle )
+	if( viewedVehicle() != lastVehicle )
 	{
 		// reset
-		cg_thirdPersonRange.value = availableVehicles[ cg_vehicle.integer ].cam_dist[ CAMERA_V_DEFAULT ];
-		cg_thirdPersonHeight.value = availableVehicles[ cg_vehicle.integer ].cam_height[ CAMERA_V_DEFAULT ];
+		cg_thirdPersonRange.value = availableVehicles[ viewedVehicle() ].cam_dist[ CAMERA_V_DEFAULT ];
+		cg_thirdPersonHeight.value = availableVehicles[ viewedVehicle() ].cam_height[ CAMERA_V_DEFAULT ];
 
 		// save vehicle we reset for
-		lastVehicle = cg_vehicle.integer;
+		lastVehicle = viewedVehicle();
 	}
 
 	// get vars
@@ -194,13 +211,13 @@ void CGame::offsetVehicleViewCFV( bool spectator )
 
 	// clamp distance
 	VehicleData::limitFloat( &dist,
-					availableVehicles[cg_vehicle.integer].cam_dist[ CAMERA_V_MIN ],
-					availableVehicles[cg_vehicle.integer].cam_dist[ CAMERA_V_MAX ] );
+					availableVehicles[viewedVehicle()].cam_dist[ CAMERA_V_MIN ],
+					availableVehicles[viewedVehicle()].cam_dist[ CAMERA_V_MAX ] );
 
 	// clamp height
 	VehicleData::limitFloat( &height,
-					availableVehicles[cg_vehicle.integer].cam_height[ CAMERA_V_MIN ],
-					availableVehicles[cg_vehicle.integer].cam_height[ CAMERA_V_MAX ] );
+					availableVehicles[viewedVehicle()].cam_height[ CAMERA_V_MIN ],
+					availableVehicles[viewedVehicle()].cam_height[ CAMERA_V_MAX ] );
 
 #ifdef _VIEW_SETTING_DISPLAY
 	sprintf( test,"d=%f h=%f", dist, height );
@@ -231,18 +248,18 @@ void CGame::offsetVehicleViewCFV( bool spectator )
     VectorCopy( cg.refdef.vieworg, start );
 	if( !spectator ) {
 		if( cg_advanced.integer )
-			VectorMA(start, availableVehicles[cg_vehicle.integer].maxs[2], up, start);
+			VectorMA(start, availableVehicles[viewedVehicle()].maxs[2], up, start);
 		else
-			start[2] += availableVehicles[cg_vehicle.integer].maxs[2];
+			start[2] += availableVehicles[viewedVehicle()].maxs[2];
 	}
     VectorCopy( cg.refdef.vieworg, view );
 
 	if( !spectator ) {
-		VectorMA( view, /*-(availableVehicles[cg_vehicle.integer].cam_dist[ CAMERA_V_DEFAULT ]*/ - dist/*)*/, forward, view );
+		VectorMA( view, /*-(availableVehicles[viewedVehicle()].cam_dist[ CAMERA_V_DEFAULT ]*/ - dist/*)*/, forward, view );
 		if( cg_advanced.integer )
-			VectorMA(view, availableVehicles[cg_vehicle.integer].maxs[2], up, view);
+			VectorMA(view, availableVehicles[viewedVehicle()].maxs[2], up, view);
 		else
-			view[2] += /*(availableVehicles[cg_vehicle.integer].cam_height[ CAMERA_V_DEFAULT ]*/ + height /*)*/;
+			view[2] += /*(availableVehicles[viewedVehicle()].cam_height[ CAMERA_V_DEFAULT ]*/ + height /*)*/;
 	}
 
     CGame::trace( &trace, start, mins, maxs, view, cg.predictedPlayerState.clientNum, MASK_SOLID );
@@ -277,9 +294,9 @@ void CGame::offsetCockpitView( )
 
     VectorCopy( cg.refdef.vieworg, view );
 
-	VectorMA( view, availableVehicles[cg_vehicle.integer].cockpitview[0], forward, view );
-	VectorMA( view, availableVehicles[cg_vehicle.integer].cockpitview[1], right, view );
-	VectorMA( view, availableVehicles[cg_vehicle.integer].cockpitview[2], up, view );
+	VectorMA( view, availableVehicles[viewedVehicle()].cockpitview[0], forward, view );
+	VectorMA( view, availableVehicles[viewedVehicle()].cockpitview[1], right, view );
+	VectorMA( view, availableVehicles[viewedVehicle()].cockpitview[2], up, view );
 
     VectorCopy( view, cg.refdef.vieworg );
 }
