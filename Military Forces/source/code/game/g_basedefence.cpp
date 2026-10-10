@@ -12,8 +12,8 @@
 void SP_misc_groundinstallation( GameEntity *sp_ent );
 
 // Air defence for a base on a map that places none of its own: SAM and gun sites are stood on open, level ground
-// around each team's spawn points, clear of everything a base is used for. Where they stand is drawn from the map's
-// name, so a map has the same sites every time it is played.
+// around each team's spawn points, clear of everything a base is used for. Where they stand is drawn afresh every
+// game.
 namespace
 {
 	constexpr float nearestToSpawn = 160.0f;	// no site closer than this to where a vehicle appears
@@ -131,15 +131,6 @@ namespace
 		return -1;
 	}
 
-	unsigned seedFor( int team )
-	{
-		char mapname[MAX_QPATH];
-		CvarSystem::variableStringBuffer( "mapname", mapname, sizeof( mapname ) );
-		unsigned seed = 2166136261u + static_cast<unsigned>( team );
-		for( const char* c = mapname; *c; c++ )
-			seed = (seed ^ static_cast<unsigned char>( *c )) * 16777619u;
-		return seed;
-	}
 }
 
 void Game::placeBaseDefences()
@@ -164,7 +155,7 @@ void Game::placeBaseDefences()
 	{
 		if( map.spawns[team].empty() )
 			continue;
-		std::mt19937 dice( seedFor( team ) );
+		std::mt19937 dice( std::random_device{}() );
 		std::uniform_real_distribution<float> anyAngle( 0.0f, 2.0f * std::numbers::pi_v<float> ), anyDistance( nearestToSpawn, farthestFromSpawn );
 		std::uniform_int_distribution<size_t> anySpawn( 0, map.spawns[team].size() - 1 );
 		const struct { const std::vector<int>& kinds; int wanted; } batches[] = { { missiles, g_baseSAMs.integer }, { guns, g_baseGuns.integer } };
