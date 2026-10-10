@@ -347,6 +347,7 @@ struct PlaneTasks
 			if( fabs( AngleSubtract( c.view[YAW], c.ps.vehicleAngles[YAW] ) ) > 6 )
 				c.cmd.forwardmove = c.speed < 12 ? moveFull : -moveFull;
 		}
+		bool waiting = false;
 		if( c.speed < c.veh.stallspeed * 0.5f )
 		{
 			vec3_t flat = { 0, c.ps.vehicleAngles[YAW], 0 }, forward;
@@ -361,7 +362,37 @@ struct PlaneTasks
 				const float dist = VectorNormalize( rel );
 				if( dist < 320 && fabs( rel[2] * dist ) < 120 && DotProduct( rel, forward ) > 0.4f )
 				{
+					// taxiing round one that will not move: only what is right under the nose stops it
+					constexpr float underNose = 110.0f;
+					if( theLevel.time_ < c.bot.sidestepTime && dist > underNose )
+						continue;
 					c.cmd.forwardmove = c.speed > 1 ? -moveFull : moveNone;
+					waiting = true;
+					// Two aircraft that each wait for the other would stand there for the rest of the game. After
+					// a few seconds of waiting on one that stands still, taxi round it, to the right as traffic
+					// does (to the left where the right is not clear)
+					constexpr int patience = 5000, sidestepFor = 9000;
+					constexpr float sidestep = 220.0f, aheadOfIt = 120.0f;
+					const bool standing = VectorLength( other->client_->ps_.velocity ) < 5.0f;
+					if( standing && c.bot.heldSince && theLevel.time_ - c.bot.heldSince > patience )
+					{
+						vec3_t right;
+						AngleVectors( flat, nullptr, right, nullptr );
+						for( float side : { 1.0f, -1.0f } )
+						{
+							Vec3 spot;
+							VectorMA( c.ent->r.currentOrigin, side * sidestep, right, spot );
+							VectorMA( spot, aheadOfIt, forward, spot );
+							trace_t way;
+							GameHost::trace( &way, c.ent->r.currentOrigin, nullptr, nullptr, spot, c.ent->s.number, MASK_PLAYERSOLID, false );
+							if( way.fraction < 1.0f )
+								continue;
+							VectorCopy( spot, c.bot.taxiSpot );
+							c.bot.taxiTime = c.bot.sidestepTime = theLevel.time_ + sidestepFor;
+							c.bot.heldSince = 0;
+							break;
+						}
+					}
 					break;
 				}
 				// stay off the path of an aircraft on its take-off roll, unless already standing in it
@@ -380,6 +411,10 @@ struct PlaneTasks
 				}
 			}
 		}
+		if( !waiting )
+			c.bot.heldSince = 0;
+		else if( !c.bot.heldSince )
+			c.bot.heldSince = theLevel.time_;
 		return Status::Running;
 	}
 

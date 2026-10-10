@@ -150,6 +150,8 @@ public:
 		int		takeoffTime = 0;	// the take-off plan holds until then
 		int		taxiTime = 0;	// taxiing to a better spot until then
 		int		holdTime = 0;	// holding short until then
+		int		heldSince = 0;	// waiting on the ground for an aircraft standing ahead since then, 0 when not
+		int		sidestepTime = 0;	// taxiing round one that would not move, until then
 		int		takeoffHolds = 0;	// holds in a row, so it does not wait for ever
 		vec3_t	taxiSpot = { 0, 0, 0 };	// where it taxis to before rolling
 	};

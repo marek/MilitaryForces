@@ -385,7 +385,9 @@ void PlayerMove::groundVehicleAccelerate()
 			// On a hill the engine first carries the vehicle's weight up it: all of it on a slope it can climb
 			// at low speed, less as it gathers speed, so a steep hill is taken slowly and a gentle one hardly
 			// costs anything
-			const float uphill = -DotProduct( down, forward ) * ( target > 0 ? -1.0f : 1.0f );
+			// how hard gravity pulls against the way it is being driven: along the hull when driving forwards,
+			// against it in reverse
+			const float uphill = -DotProduct( down, forward ) * ( target > 0 ? 1.0f : -1.0f );
 			if( uphill > 0 )
 			{
 				const float power = std::clamp( 1.6f - fabsf( speedForward ) / std::max( topSpeed, 1.0f ), 0.6f, 1.0f );
