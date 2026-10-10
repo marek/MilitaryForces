@@ -353,6 +353,18 @@ void CGame::vehicleObituary( entityState_t *ent )
 
 }
 
+// The reticle for the weapon in a slot when nothing is tracked. An empty slot, or a weapon with no reticle of its
+// own, shows the gun's: a vehicle with a gun always has something to aim it with
+int CGame::reticleOf( int vehicle, int weaponNum )
+{
+	const completeVehicleData_t& veh = availableVehicles[vehicle];
+	const int weapon = weaponNum >= 0 && weaponNum < MAX_WEAPONS_PER_VEHICLE ? veh.weapons[weaponNum] : 0;
+	const int own = weapon > 0 ? static_cast<int>( availableWeapons[weapon].crosshair ) : 0;
+	if( own > CH_DEFAULT && own < CH_NUMCROSSHAIRS && cgs.media.reticle[own] )
+		return own;
+	return veh.weapons[WP_MACHINEGUN] > 0 ? CH_GUNMODE : own;
+}
+
 /*
 =============
 CGame::vehicleMuzzleFlash

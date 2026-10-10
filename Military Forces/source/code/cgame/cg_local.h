@@ -1656,6 +1656,7 @@ public:
 	static void drawTopBottom(float x, float y, float w, float h, float size);
 	static bool genericShadow( BasicDrawInfo_t *drawInfo, float *shadowPlane );
 	static void resetReticles( );
+	static int reticleOf( int vehicle, int weaponNum );
 	static void addReticleEntityToScene( refEntity_t * pReticle, ClientEntity * pTarget );
 	static void draw_Reticles();
 	static void addLagometerFrameInfo( );

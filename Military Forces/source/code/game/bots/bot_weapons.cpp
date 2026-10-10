@@ -145,8 +145,13 @@ void BotWeapons::fireWeapons( GameEntity* ent, Bots::State& bot, const Bots::Sen
 	if( !clear )
 		return;
 
+	// a fixed gun fires when the nose is on the target; a turret gun as far round as the turret reaches
 	const int gun = veh.weapons[WP_MACHINEGUN];
-	if( gun && ps.ammo[WP_MACHINEGUN] > 0 && aimError < 3.0f && sense.enemyDist < 2500 )
+	constexpr float fixedGunCone = 3.0f;
+	float gunCone = fixedGunCone;
+	if( gun && availableWeapons[gun].turret )
+		gunCone = availableWeapons[gun].maxturns[YAW] > availableWeapons[gun].minturns[YAW] ? std::clamp( availableWeapons[gun].maxturns[YAW], fixedGunCone, 90.0f ) : 90.0f;
+	if( gun && ps.ammo[WP_MACHINEGUN] > 0 && aimError < gunCone && sense.enemyDist < 2500 )
 		cmd.buttons |= BUTTON_ATTACK;
 
 	// the selection takes a moment to change: nothing is fired from the old one

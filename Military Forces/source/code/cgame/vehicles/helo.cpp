@@ -369,8 +369,8 @@ void ClientEntity::helo( clientInfo_t *ci )
 		}
 		else if(!(ps->stats[STAT_LOCKINFO] & LI_TRACKING) || (availableWeapons[availableVehicles[ci->vehicle].weapons[this->currentState.weaponNum]].type == WT_MACHINEGUN))
 		{
-			reticle.customShader = availableWeapons[availableVehicles[ci->vehicle].weapons[this->currentState.weaponNum]].crosshair;
-			reticle.hModel = cgs.media.reticle[availableWeapons[availableVehicles[ci->vehicle].weapons[this->currentState.weaponNum]].crosshair];
+			reticle.customShader = CGame::reticleOf( ci->vehicle, this->currentState.weaponNum );
+			reticle.hModel = cgs.media.reticle[reticle.customShader];
 
 			AngleVectors( this->currentState.angles, forward, right, up );
 			RotatePointAroundVector( temp, up, forward, this->lerpAngles2[ROLL] );

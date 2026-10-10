@@ -951,6 +951,13 @@ static void ClientThink_real( GameEntity *ent )
 				if( rider->pers_.cmd_.buttons & (BUTTON_ATTACK|BUTTON_ATTACK_MAIN) ) 
 					pm.cmd.buttons |= BUTTON_ATTACK;
 			}
+			else if( availableWeapons[availableVehicles[client->vehicle_].weapons[WP_MACHINEGUN]].turret )
+			{
+				// the vehicle's gun is its turret: the gunner has it, on either trigger
+				pm.cmd.buttons &= ~BUTTON_ATTACK;
+				if( rider->pers_.cmd_.buttons & (BUTTON_ATTACK|BUTTON_ATTACK_MAIN) ) 
+					pm.cmd.buttons |= BUTTON_ATTACK;
+			}
 			else if( availableWeapons[client->ps_.weaponIndex].turret ) 
 			{
 				pm.cmd.buttons &= ~BUTTON_ATTACK_MAIN;

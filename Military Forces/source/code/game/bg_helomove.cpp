@@ -595,8 +595,14 @@ void PlayerMove::heloMove( )
 	else if( diff[YAW] > turnspeed[TURRET_YAW] ) turret_yaw += turnspeed[TURRET_YAW];
 	else turret_yaw += diff[YAW];
 	if( turret_yaw > 180 ) turret_yaw -= 360;// limit to +- 180
-	min = availableWeapons[pm->ps->weaponIndex].minturns[1];
-	max = availableWeapons[pm->ps->weaponIndex].maxturns[1];
+	// the turret is the vehicle's gun when that is a turret, whatever else is selected
+	const unsigned ownGun = availableVehicles[pm->vehicle].weapons[WP_MACHINEGUN];
+	const completeWeaponData_t& turretGun = availableWeapons[ownGun && availableWeapons[ownGun].turret ? ownGun : pm->ps->weaponIndex];
+	// a gun fixed to the nose still follows the look a few degrees either way, so it can be aimed with the mouse
+	constexpr float fixedGunCone = 4.0f;
+	const bool fixedGun = !turretGun.turret;
+	min = fixedGun ? -fixedGunCone : turretGun.minturns[1];
+	max = fixedGun ? fixedGunCone : turretGun.maxturns[1];
 	if( max > min ) {
 		if( turret_yaw > max ) turret_yaw = max;
 		else if( turret_yaw < min ) turret_yaw = min;
@@ -612,8 +618,8 @@ void PlayerMove::heloMove( )
 	if( diff[PITCH] < -turnspeed[GUN_PITCH] ) gun_pitch -= turnspeed[GUN_PITCH];
 	else if( diff[PITCH] > turnspeed[GUN_PITCH] ) gun_pitch += turnspeed[GUN_PITCH];
 	else gun_pitch += diff[PITCH];
-	min = availableWeapons[pm->ps->weaponIndex].minturns[0];
-	max = availableWeapons[pm->ps->weaponIndex].maxturns[0];
+	min = fixedGun ? -fixedGunCone : turretGun.minturns[0];
+	max = fixedGun ? fixedGunCone : turretGun.maxturns[0];
 	if( gun_pitch > 180 ) gun_pitch -= 360;// limit to +-180 to make it easier
 	if( gun_pitch > max ) gun_pitch = max;
 	else if( gun_pitch < min ) gun_pitch = min;

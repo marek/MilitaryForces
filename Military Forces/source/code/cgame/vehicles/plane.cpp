@@ -332,8 +332,8 @@ void ClientEntity::plane( clientInfo_t *ci )
 		}
 		else
 		{
-			reticle.customShader = availableWeapons[availableVehicles[ci->vehicle].weapons[this->currentState.weaponNum]].crosshair;
-			reticle.hModel = cgs.media.reticle[ availableWeapons[availableVehicles[ci->vehicle].weapons[this->currentState.weaponNum]].crosshair ];
+			reticle.customShader = CGame::reticleOf( ci->vehicle, this->currentState.weaponNum );
+			reticle.hModel = cgs.media.reticle[reticle.customShader];
 			ang = Vec3( this->currentState.angles[0], this->currentState.angles[1], 0 );
 			AnglesToAxis( ang, reticle.axis );
 			VectorScale( reticle.axis[0], 2.0f, reticle.axis[0] );

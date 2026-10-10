@@ -434,8 +434,12 @@ void MF_ClientSpawn( int clientNum, long cs_flags )
 
 	eventSequence = client->ps_.eventSequence;
 
-	//memset (client, 0, sizeof(*client));
+	// the vehicle menu's state and the time of the last command carry over; everything else of the life goes
+	const int menuFlags = client->ps_.pm_flags & (PMF_VEHICLESELECT|PMF_VEHICLESPAWN);
+	const int commandTime = client->ps_.commandTime;
 	client->clear();
+	client->ps_.pm_flags = menuFlags;
+	client->ps_.commandTime = commandTime;
 
 	client->pers_ = saved;
 	client->sess_ = savedSess;

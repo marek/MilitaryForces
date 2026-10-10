@@ -918,39 +918,11 @@ GameClient::GameClient() :
 void
 GameClient::clear()
 {
+	// Back to how a newly made client starts, every member of it and the whole of its movement state. Nothing is
+	// listed here by name, so nothing added to the class later can be forgotten, and nothing of one life - a
+	// velocity, a timer, a turret's angle - is there at the start of the next
+	*this = GameClient();
+	ps_ = {};
 	memset(&pers_, 0, sizeof(pers_));
-	memset(&sess_, 0, sizeof(sess_));
-	readyToExit_ = false;
-	noclip_ = false;
-	devHold_ = false;
-	ruseBlown_ = false;
-	ruseSeenTime_ = 0;
-	riderAmmo_ = 0;
-	riderFireTime_ = 0;
-	lastCmdTime_ = 0;
-	buttons_ = 0;
-	oldbuttons_ = 0;
-	latched_buttons_ = 0;
-	VectorClear(oldOrigin_);
-	damage_done_ = 0;
-	damage_knockback_ = 0;
-	VectorClear(damage_from_);
-	damage_fromWorld_ = false;
-	accuracy_shots_ = 0;
-	accuracy_hits_ = 0;
-	lastkilled_client_ = 0;
-	lasthurt_client_ = 0;
-	lasthurt_mod_ = 0;
-	respawnTime_ = 0;
-	inactivityTime_ = 0;
-	inactivityWarning_ = false;
-	airOutTime_ = 0;
-	lastKillTime_ = 0;
-	switchTeamTime_ = 0;
-	timeResidual_ = 0;
-	areabits_ = nullptr;
-	vehicle_ = 0;
-	nextVehicle_ = 0;	
-	advancedControls_ = 0;
 }
 
