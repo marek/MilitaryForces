@@ -264,10 +264,12 @@ void ClientEntity::groundVehicle( clientInfo_t *ci )
 
 			CGame::addReticleEntityToScene( &reticlelock, nullptr );
 		}
-		// The gun's reticle stays while a missile is tracking or locked: the gun is still there to be aimed, on its
-		// own trigger
+		// Once a missile has its lock its marks sit on the target and no longer follow the view, so the gun gets
+		// its own reticle to be aimed with. Before the lock the missile's mark is where the view points, and a
+		// second one on top of it would say nothing
 		const bool tracking = ( ps->stats[STAT_LOCKINFO] & LI_TRACKING ) != 0;
-		if( !tracking || availableVehicles[ci->vehicle].weapons[WP_MACHINEGUN] )
+		const bool locked = ( ps->stats[STAT_LOCKINFO] & LI_LOCKING ) != 0;
+		if( !tracking || ( locked && availableVehicles[ci->vehicle].weapons[WP_MACHINEGUN] ) )
 		{
 			reticle = {};
 			reticle.customShader = tracking ? static_cast<int>( CH_GUNMODE ) : CGame::reticleOf( ci->vehicle, this->currentState.weaponNum );
