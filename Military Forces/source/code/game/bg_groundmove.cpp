@@ -48,11 +48,12 @@ namespace
 		h.tracked = !(veh.caps & HC_WHEELS);
 		// from a one tonne buggy to a twenty tonne hull and beyond
 		const float heavy = std::clamp( ( h.mass - 1.0f ) / 19.0f, 0.0f, 1.0f );
-		// a light car rides on long soft springs that let it bounce through a dip and off a crest; a tank's are
-		// short and dead
-		h.damping = 0.3f + 0.7f * heavy;
-		h.sag = 3.5f - 2.3f * heavy;
-		h.travel = 8.0f - 5.0f * heavy;
+		// Springs in proportion to the vehicle: a Humvee stands eight units tall and its suspension moves about a
+		// quarter of a metre, one unit. A light car sits half a unit down on its springs and has a unit of travel
+		// left; a tank's suspension hardly shows. Bounce and air come from the ground, not from long springs
+		h.damping = 0.6f + 0.4f * heavy;
+		h.sag = 0.6f - 0.3f * heavy;
+		h.travel = 1.2f - 0.7f * heavy;
 		h.lateralGrip = h.tracked ? 3.0f : 1.3f + 0.5f * heavy;
 		h.driveGrip = h.tracked ? 1.6f : 1.25f;
 		// tracks and their drive train hold a standing tank on a fair slope; wheels roll more freely
@@ -101,6 +102,33 @@ static void PM_GroundCoreBox( int vehicle, vec3_t mins, vec3_t maxs )
 	VectorSet( maxs, half, half, veh.maxs[2] );
 }
 
+// The points a vehicle stands on, along the hull and across it to the right: the wheels its model has, where it
+// has them, or four points along each track
+static int PM_ContactPoints( int vehicle, bool tracked, float* along, float* across )
+{
+	constexpr float inset = 0.85f;
+	const completeVehicleData_t& veh = availableVehicles[vehicle];
+	int points = 0;
+	if( !tracked && veh.wheelRadius > 0 )
+	{
+		// a model's second axis points left
+		for( int i = 0; i < veh.wheels && i < MAX_CONTACTS; i++ )
+		{
+			along[points] = veh.wheelPos[i][0]; across[points++] = -veh.wheelPos[i][1];
+		}
+		return points;
+	}
+	const float front = veh.maxs[0] * inset, back = veh.mins[0] * inset, side = veh.maxs[1] * inset;
+	const int perSide = tracked ? 4 : 2;
+	for( int i = 0; i < perSide; i++ )
+	{
+		const float f = back + ( front - back ) * i / ( perSide - 1 );
+		along[points] = f; across[points++] = side;
+		along[points] = f; across[points++] = -side;
+	}
+	return points;
+}
+
 // Finds the ground under each point the vehicle stands on and lays one surface through those that touch
 static Footing PM_GroundFooting( pmove_t* pm, int vehicle, const Handling& handling )
 {
@@ -111,8 +139,6 @@ static Footing PM_GroundFooting( pmove_t* pm, int vehicle, const Handling& handl
 	// stand on reaches over its length
 	constexpr float below = 20.0f;
 	const float above = tracked ? 30.0f : 6.0f;
-	// the points sit a little inside the hull's outline
-	constexpr float inset = 0.85f;
 	const completeVehicleData_t& veh = availableVehicles[vehicle];
 	const vec3_t yawOnly = { 0, pm->ps->vehicleAngles[YAW], 0 };
 	vec3_t forward, right;
@@ -120,25 +146,7 @@ static Footing PM_GroundFooting( pmove_t* pm, int vehicle, const Handling& handl
 
 	Footing footing;
 	float along[MAX_CONTACTS], across[MAX_CONTACTS];
-	if( !tracked && veh.wheelRadius > 0 )
-	{
-		// the wheels the model has, where it has them (a model's second axis points left)
-		for( int i = 0; i < veh.wheels && i < MAX_CONTACTS; i++ )
-		{
-			along[footing.points] = veh.wheelPos[i][0]; across[footing.points++] = -veh.wheelPos[i][1];
-		}
-	}
-	else
-	{
-		const float front = veh.maxs[0] * inset, back = veh.mins[0] * inset, side = veh.maxs[1] * inset;
-		const int perSide = tracked ? 4 : 2;
-		for( int i = 0; i < perSide; i++ )
-		{
-			const float f = back + ( front - back ) * i / ( perSide - 1 );
-			along[footing.points] = f; across[footing.points++] = side;
-			along[footing.points] = f; across[footing.points++] = -side;
-		}
-	}
+	footing.points = PM_ContactPoints( vehicle, tracked, along, across );
 
 	float sumF[2] = { 0, 0 }, sumZF[2] = { 0, 0 }, sumR[2] = { 0, 0 }, sumZR[2] = { 0, 0 }, sumZ = 0, meanF = 0, meanR = 0;
 	int countF[2] = { 0, 0 }, countR[2] = { 0, 0 };
@@ -149,15 +157,20 @@ static Footing PM_GroundFooting( pmove_t* pm, int vehicle, const Handling& handl
 		VectorMA( pm->ps->origin, along[i], forward, start );
 		VectorMA( start, across[i], right, start );
 		VectorCopy( start, end );
-		start[2] = pm->ps->origin[2] + veh.mins[2] + above;
+		// From the top of the hull down. Much of the ground in these maps is a surface with nothing behind it: a
+		// look that starts under it, as one from wheel height does on a face that rises ahead, sees nothing at
+		// all, and the vehicle drives into the hill. What a wheel or track cannot ride up onto still counts as
+		// ground under that point, at the most it can ride up
+		const float ride = pm->ps->origin[2] + veh.mins[2] + above;
+		start[2] = pm->ps->origin[2] + veh.maxs[2];
 		end[2] = pm->ps->origin[2] + veh.mins[2] - below;
 		trace_t tr;
 		pm->trace( &tr, start, vec3_origin, vec3_origin, end, pm->ps->clientNum, MASK_SOLID, false );
 		if( tr.fraction >= 1.0f )
 			continue;
-		// a point that starts inside something stands on the top of what a wheel can ride over
-		if( tr.startsolid )
-			tr.endpos[2] = start[2];
+		// a point that starts inside something, or finds ground higher than it can ride up, stands at that most
+		if( tr.startsolid || tr.endpos[2] > ride )
+			tr.endpos[2] = ride;
 		footing.touching++;
 		steep += tr.startsolid ? 1.0f : tr.plane.normal[2];
 		const int f = along[i] > 0 ? 1 : 0, r = across[i] > 0 ? 1 : 0;
@@ -276,7 +289,9 @@ void PlayerMove::groundVehicleAccelerate()
 	float pressed = afloat ? handling.sag : restHeight + handling.sag - pm->ps->origin[2];
 	const bool touching = footing.touching > 0 && pressed > 0;
 	const bool standing = afloat || ( touching && footing.steepness >= handling.standNormal );
-	if( standing && pressed > handling.sag + travel )
+	// Ground is ground whether or not it can be driven on: a vehicle on a face too steep for it slides down that
+	// face, it does not sink into it
+	if( ( standing || touching ) && pressed > handling.sag + travel )
 	{
 		// The springs are right down: the ground itself holds the hull up. It comes up out of the ground no
 		// faster than it is moving, so a face it drives at lifts it instead of throwing it
@@ -289,6 +304,34 @@ void PlayerMove::groundVehicleAccelerate()
 	}
 	const float support = afloat ? 1.0f : static_cast<float>( footing.touching ) / std::max( footing.points, 1 );
 
+	pm->ground.valid = true;
+	pm->ground.touching = footing.touching;
+	pm->ground.points = footing.points;
+	pm->ground.pressed = pressed;
+	pm->ground.steepness = footing.steepness;
+	pm->ground.normalZ = footing.normal[2];
+	pm->ground.slopeForward = footing.slopeForward;
+	pm->ground.slopeRight = footing.slopeRight;
+	pm->ground.standing = standing;
+	pm->ground.topSpeed = veh.maxspeed * GROUND_SPEED_SCALE / ( pm->waterlevel + 1 );
+	if( !afloat && !footing.touching )
+	{
+		// Nothing under any point. If the ground's surface is just overhead, the vehicle has got under it - such
+		// a surface has no inside to stop anything - and is put back on top
+		vec3_t over, here;
+		VectorCopy( pm->ps->origin, here );
+		here[2] += veh.mins[2];
+		VectorCopy( pm->ps->origin, over );
+		over[2] += ( veh.maxs[2] - veh.mins[2] ) * 6.0f;
+		trace_t surface;
+		pm->trace( &surface, over, vec3_origin, vec3_origin, here, pm->ps->clientNum, MASK_SOLID, false );
+		if( surface.fraction < 1.0f && !surface.startsolid && surface.plane.normal[2] > 0.1f && surface.endpos[2] > here[2] + 1.0f )
+		{
+			pm->ps->origin[2] = surface.endpos[2] - veh.mins[2] + 1.0f;
+			if( pm->ps->velocity[2] < 0 )
+				pm->ps->velocity[2] = 0;
+		}
+	}
 	if( !standing )
 	{
 		// in the air it is a thrown weight: what it had, and gravity
@@ -298,7 +341,13 @@ void PlayerMove::groundVehicleAccelerate()
 			// Slipping down ground too steep to stand on: it scrapes, and the faster it slides the more it
 			// scrapes, so it comes down at a slide and not at the speed of a fall
 			constexpr float slideFriction = 0.8f, slideDrag = 1.5f;
-			const float into = DotProduct( pm->ps->velocity, footing.normal );
+			float into = DotProduct( pm->ps->velocity, footing.normal );
+			// and it does not move into the face
+			if( into < 0 )
+			{
+				VectorMA( pm->ps->velocity, -into, footing.normal, pm->ps->velocity );
+				into = 0;
+			}
 			Vec3 along;
 			VectorMA( pm->ps->velocity, -into, footing.normal, along );
 			const float speed = VectorLength( along );
@@ -421,6 +470,7 @@ void PlayerMove::groundVehicleAccelerate()
 	for( int i = 0; i < 3; i++ )
 		pm->ps->velocity[i] = forward[i] * speedForward + side[i] * speedSide + normal[i] * speedUp;
 
+	pm->ground.speedForward = speedForward;
 	// the speed shown is the speed along the hull; backwards is carried as a flag
 	pm->ps->speed = fabsf( speedForward ) / GROUND_SPEED_SCALE * 10;
 	if( speedForward < -1.0f ) pm->ps->ONOFF |= OO_STALLED;
@@ -583,6 +633,55 @@ void PlayerMove::groundVehicleMove( )
 	moveHit = MoveHit{};
 	Vec3 startOrigin;
 	VectorCopy( pm->ps->origin, startOrigin );
+	// No wheel or track goes through a face it cannot ride up. Each point the vehicle stands on is carried along
+	// this frame's move at axle height; where one meets such a face, the whole vehicle stops short of it. Much of
+	// the ground is a surface with nothing behind it, so once a point is through there is nothing to stop the rest
+	{
+		const completeVehicleData_t& veh = availableVehicles[pm->vehicle];
+		float along[MAX_CONTACTS], across[MAX_CONTACTS];
+		const int points = PM_ContactPoints( pm->vehicle, handling.tracked, along, across );
+		const vec3_t yawOnly = { 0, pm->ps->vehicleAngles[YAW], 0 };
+		vec3_t ahead, right;
+		AngleVectors( yawOnly, ahead, right, nullptr );
+		const float axle = veh.mins[2] + std::max( veh.wheelRadius, 2.0f );
+		float allowed = 1.0f;
+		vec3_t faceNormal = { 0, 0, 0 };
+		for( int i = 0; i < points; i++ )
+		{
+			vec3_t from, to;
+			VectorMA( pm->ps->origin, along[i], ahead, from );
+			VectorMA( from, across[i], right, from );
+			from[2] += axle;
+			VectorMA( from, pml.frametime, pm->ps->velocity, to );
+			// a little further than the move, so it stops clear of the face and not on it
+			vec3_t step;
+			VectorSubtract( to, from, step );
+			const float length = VectorNormalize( step );
+			if( length < 0.01f )
+				continue;
+			constexpr float clear = 2.0f;
+			VectorMA( to, clear, step, to );
+			trace_t face;
+			pm->trace( &face, from, vec3_origin, vec3_origin, to, pm->ps->clientNum, MASK_SOLID | CONTENTS_PLAYERCLIP, false );
+			if( face.fraction >= 1.0f || face.startsolid || face.plane.normal[2] >= handling.standNormal )
+				continue;
+			const float share = std::max( 0.0f, ( face.fraction * ( length + clear ) - clear ) / length );
+			if( share < allowed )
+			{
+				allowed = share;
+				VectorCopy( face.plane.normal, faceNormal );
+			}
+		}
+		if( allowed < 1.0f )
+		{
+			// the move goes only that far; what the vehicle does about the face is settled with the other hits
+			moveHit.hit = true;
+			VectorCopy( faceNormal, moveHit.normal );
+			moveHit.entity = ENTITYNUM_WORLD;
+			VectorScale( pm->ps->velocity, allowed, pm->ps->velocity );
+			VectorScale( carried, allowed, carried );
+		}
+	}
 	// through the world with the core box; other vehicles and people are met with the whole hull below
 	const int fullMask = pm->tracemask;
 	pm->tracemask &= ~CONTENTS_BODY;
@@ -650,6 +749,9 @@ void PlayerMove::groundVehicleMove( )
 		}
 	}
 
+	pm->ground.hit = moveHit.hit;
+	pm->ground.hitEntity = moveHit.entity;
+	pm->ground.hitNormalZ = moveHit.normal[2];
 	// Ran into something it cannot drive over: part of the blow comes back, and it scrapes along. Against
 	// another vehicle the weights decide who gives way
 	if( moveHit.hit )

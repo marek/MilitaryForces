@@ -906,6 +906,7 @@ void PlayerMove::single(pmove_t *pmove) {
 	pm->numtouch = 0;
 	pm->pushEntity = ENTITYNUM_NONE;
 	pm->landingSpeed = 0;
+	pm->ground = {};
 	pm->watertype = 0;
 	pm->waterlevel = 0;
 

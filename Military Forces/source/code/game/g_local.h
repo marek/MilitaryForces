@@ -962,6 +962,7 @@ extern	vmCvar_t	g_knockback;
 extern	vmCvar_t	g_forcerespawn;
 extern	vmCvar_t	g_inactivity;
 extern	vmCvar_t	g_debugMove;
+extern	vmCvar_t	g_debugGround;
 extern	vmCvar_t	g_debugAlloc;
 extern	vmCvar_t	g_debugDamage;
 extern	vmCvar_t	g_synchronousClients;

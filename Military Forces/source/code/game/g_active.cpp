@@ -1053,6 +1053,30 @@ static void ClientThink_real( GameEntity *ent )
 	    Game::damage( ent, nullptr, ent, nullptr, nullptr, 100000, DAMAGE_NO_PROTECTION, MOD_CRASH, CAT_ANY );
 	}
 
+	// g_debugGround 1 writes what a person's ground vehicle is doing ten times a second, and every frame while
+	// something is off (2: bots' vehicles as well). GVODD names what is off
+	if( g_debugGround.integer && pm.ground.valid && ( g_debugGround.integer > 1 || !(ent->r.svFlags & SVF_BOT) ) )
+	{
+		const playerState_t& ps = client->ps_;
+		const float speed = VectorLength( ps.velocity );
+		const char* odd = nullptr;
+		if( pm.ground.touching && pm.ground.pressed > 12.0f ) odd = "SUNK";
+		else if( speed > pm.ground.topSpeed * 2.5f + 100.0f ) odd = "FAST";
+		else if( !pm.ground.touching && ps.velocity[2] < -400.0f ) odd = "FALLING";
+		else if( pm.ground.touching && !pm.ground.standing ) odd = "SLIDING";
+		static int lastPrint[MAX_CLIENTS + 1];
+		int& last = lastPrint[ent->s.number <= MAX_CLIENTS ? ent->s.number : 0];
+		if( odd || theLevel.time_ - last >= 100 )
+		{
+			last = theLevel.time_;
+			Common::printf( "%s t %d cl %d veh %d org %.1f %.1f %.1f vel %.0f %.0f %.0f ang %.0f %.0f %.0f touch %d/%d pressed %.1f steep %.2f nz %.2f slope %.2f %.2f stand %d fwd %.0f top %.0f water %d thr %d brake %d hit %d ent %d hnz %.2f\n",
+				odd ? va( "GVODD %s", odd ) : "GVTRACE", theLevel.time_, ent->s.number, client->vehicle_, ps.origin[0], ps.origin[1], ps.origin[2], ps.velocity[0], ps.velocity[1], ps.velocity[2],
+				ps.vehicleAngles[0], ps.vehicleAngles[1], ps.vehicleAngles[2], pm.ground.touching, pm.ground.points, pm.ground.pressed, pm.ground.steepness, pm.ground.normalZ,
+				pm.ground.slopeForward, pm.ground.slopeRight, pm.ground.standing, pm.ground.speedForward, pm.ground.topSpeed, pm.waterlevel, ps.throttle, ( ps.ONOFF & OO_SPEEDBRAKE ) != 0,
+				pm.ground.hit, pm.ground.hitEntity, pm.ground.hitNormalZ );
+		}
+	}
+
 	// A ground vehicle that ran into another shoves it: the lighter one gets most of the speed
 	if( pm.pushEntity != ENTITYNUM_NONE )
 	{

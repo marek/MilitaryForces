@@ -51,6 +51,7 @@ vmCvar_t	g_knockback;
 vmCvar_t	g_forcerespawn;
 vmCvar_t	g_inactivity;
 vmCvar_t	g_debugMove;
+vmCvar_t	g_debugGround;
 vmCvar_t	g_debugDamage;
 vmCvar_t	g_debugAlloc;
 static vmCvar_t	g_weaponRespawn;
@@ -154,6 +155,7 @@ cvarTable_t		gameCvarTable[] = {
 	{ &g_forcerespawn, "g_forcerespawn", "20", 0, 0, true },
 	{ &g_inactivity, "g_inactivity", "0", 0, 0, true },
 	{ &g_debugMove, "g_debugMove", "0", 0, 0, false },
+	{ &g_debugGround, "g_debugGround", "0", 0, 0, false },
 	{ &g_debugDamage, "g_debugDamage", "0", 0, 0, false },
 	{ &g_debugAlloc, "g_debugAlloc", "0", 0, 0, false },
 	{ &g_motd, "g_motd", "", 0, 0, false },

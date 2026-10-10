@@ -185,6 +185,18 @@ struct pmove_t {
 	float		*gunnerAngles;
 	unsigned	stationsLagging;	// gun positions still swinging round to the aim: they do not fire yet
 
+	// what a ground vehicle's footing found this frame, for the server's trace of it (out)
+	struct GroundReport
+	{
+		bool	valid;
+		int		touching, points;
+		float	pressed, steepness, normalZ, slopeForward, slopeRight, speedForward, topSpeed;
+		bool	standing;
+		bool	hit;
+		int		hitEntity;
+		float	hitNormalZ;
+	} ground;
+
 	// a ground vehicle that came down on the ground this frame: how hard, past what its springs absorb (out)
 	float		landingSpeed;
 
