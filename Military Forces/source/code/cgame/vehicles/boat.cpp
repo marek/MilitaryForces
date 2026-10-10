@@ -219,9 +219,13 @@ void ClientEntity::boat( clientInfo_t *ci )
 
 			CGame::addReticleEntityToScene( &reticlelock, nullptr );
 		}
-		else
+		// The gun's reticle stays while a missile is tracking or locked: the gun is still there to be aimed, on its
+		// own trigger
+		const bool tracking = ( ps->stats[STAT_LOCKINFO] & LI_TRACKING ) != 0;
+		if( !tracking || availableVehicles[ci->vehicle].weapons[WP_MACHINEGUN] )
 		{
-			reticle.customShader = CGame::reticleOf( ci->vehicle, this->currentState.weaponNum );
+			reticle = {};
+			reticle.customShader = tracking ? static_cast<int>( CH_GUNMODE ) : CGame::reticleOf( ci->vehicle, this->currentState.weaponNum );
 			reticle.hModel = cgs.media.reticle[reticle.customShader];
 
 			AngleVectors( this->currentState.angles, forward, right, up );

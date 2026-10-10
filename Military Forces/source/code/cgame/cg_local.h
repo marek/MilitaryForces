@@ -42,7 +42,7 @@ enum quality_t {
 // If you absolutely need something stored, it can either be kept
 // by the server in the server stored userinfos, or stashed in a cvar.
 
-inline constexpr int MAX_RETICLES = 2;
+inline constexpr int MAX_RETICLES = 3;	// the tracked target, its lock, and the gun
 
 inline constexpr int POWERUP_BLINKS = 5;
 

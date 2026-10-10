@@ -82,6 +82,9 @@ namespace
 		float	height = 0;			// of that ground under the vehicle's middle
 		vec3_t	normal = { 0, 0, 1 };
 		float	steepness = 1;		// the upward part of the ground's own normal under the points, on average
+		// where the points that touch lie, on average, from the vehicle's middle: 0 with all of them down, towards
+		// 1 as only those at the front (or the right) are left, towards -1 for the back (or the left)
+		float	leanForward = 0, leanRight = 0;
 	};
 
 	// what the vehicle ran into during this frame's move
@@ -155,6 +158,8 @@ static Footing PM_GroundFooting( pmove_t* pm, int vehicle, const Handling& handl
 	float sumF[2] = { 0, 0 }, sumZF[2] = { 0, 0 }, sumR[2] = { 0, 0 }, sumZR[2] = { 0, 0 }, sumZ = 0, meanF = 0, meanR = 0;
 	int countF[2] = { 0, 0 }, countR[2] = { 0, 0 };
 	float steep = 0;
+	int bearing = 0;
+	float bearF = 0, bearR = 0;
 	for( int i = 0; i < footing.points; i++ )
 	{
 		vec3_t start, end;
@@ -181,6 +186,15 @@ static Footing PM_GroundFooting( pmove_t* pm, int vehicle, const Handling& handl
 		sumF[f] += along[i]; sumZF[f] += tr.endpos[2]; countF[f]++;
 		sumR[r] += across[i]; sumZR[r] += tr.endpos[2]; countR[r]++;
 		sumZ += tr.endpos[2]; meanF += along[i]; meanR += across[i];
+		// Does this point bear on that ground, or only hang over it? It bears if the ground is within a wheel's
+		// droop of where the tilted hull holds the wheel
+		constexpr float droopReach = 2.0f;
+		const float pitchNow = DEG2RAD( AngleNormalize180( pm->ps->vehicleAngles[PITCH] ) ), rollNow = DEG2RAD( AngleNormalize180( pm->ps->vehicleAngles[ROLL] ) );
+		const float wheelAt = pm->ps->origin[2] + veh.mins[2] - along[i] * tanf( pitchNow ) - across[i] * tanf( rollNow );
+		if( tr.endpos[2] >= wheelAt - droopReach - handling.sag )
+		{
+			bearing++; bearF += along[i]; bearR += across[i];
+		}
 	}
 	if( !footing.touching )
 		return footing;
@@ -198,6 +212,20 @@ static Footing PM_GroundFooting( pmove_t* pm, int vehicle, const Handling& handl
 	footing.slopeForward = std::clamp( footing.slopeForward, -steepest, steepest );
 	footing.slopeRight = std::clamp( footing.slopeRight, -steepest, steepest );
 	footing.steepness = steep / footing.touching;
+	{
+		float reachF = 0.01f, reachR = 0.01f, allF = 0, allR = 0;
+		for( int i = 0; i < footing.points; i++ )
+		{
+			reachF = std::max( reachF, fabsf( along[i] ) ); reachR = std::max( reachR, fabsf( across[i] ) );
+			allF += along[i]; allR += across[i];
+		}
+		// against where they would lie with every point down, so a model with its wheels off centre is not leaning
+		if( bearing )
+		{
+			footing.leanForward = ( bearF / bearing - allF / footing.points ) / reachF;
+			footing.leanRight = ( bearR / bearing - allR / footing.points ) / reachR;
+		}
+	}
 	footing.height = sumZ / footing.touching - footing.slopeForward * meanF / footing.touching - footing.slopeRight * meanR / footing.touching;
 	for( int i = 0; i < 3; i++ )
 		footing.normal[i] = -footing.slopeForward * forward[i] - footing.slopeRight * right[i];
@@ -555,29 +583,32 @@ void PlayerMove::adjustToTerrain( )
 	else
 	{
 		// On the ground the hull eases round to it: most of what is left of the way in each settling time, so it
-		// rolls over an edge with its weight instead of snapping onto the next face. With one end out over
-		// nothing its weight turns it that way, faster and faster. Either way the turning becomes its spin
-		constexpr float tipping = 420.0f;		// degrees a second each second
+		// rolls over an edge with its weight instead of snapping onto the next face, and that turning is its spin.
+		// With some of its points out over nothing its weight turns it towards them: a nose off a ledge drops,
+		// a corner off it drops that corner, and the more of it is unsupported the harder
+		constexpr float tipping = 1200.0f, leaning = 0.08f;		// degrees a second each second, with one end wholly off
 		const float share = 1.0f - expf( -dt / handling.settleTime );
 		const float pitchBefore = pitch, rollBefore = roll;
-		if( footing.front && footing.back )
+		if( fabsf( footing.leanForward ) < leaning )
 		{
 			pitch += AngleSubtract( -RAD2DEG( atanf( footing.slopeForward ) ), pitch ) * share;
 			pitchSpin = dt > 0 ? ( pitch - pitchBefore ) / dt : 0.0f;
 		}
 		else
 		{
-			pitchSpin += ( footing.back ? tipping : -tipping ) * dt;
+			// supported at the back means the nose goes down, which is pitch going up
+			pitchSpin += -footing.leanForward * tipping * dt;
 			pitch += pitchSpin * dt;
 		}
-		if( footing.left && footing.right )
+		if( fabsf( footing.leanRight ) < leaning )
 		{
 			roll += AngleSubtract( -RAD2DEG( atanf( footing.slopeRight ) ), roll ) * share;
 			rollSpin = dt > 0 ? ( roll - rollBefore ) / dt : 0.0f;
 		}
 		else
 		{
-			rollSpin += ( footing.left ? tipping : -tipping ) * dt;
+			// supported on the left means the right side goes down, which is roll going up
+			rollSpin += -footing.leanRight * tipping * dt;
 			roll += rollSpin * dt;
 		}
 	}
