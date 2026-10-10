@@ -195,6 +195,7 @@ struct pmove_t {
 		bool	hit;
 		int		hitEntity;
 		float	hitNormalZ;
+		int		hitBy;			// what found it: 1 a wheel's path, 2 the core box, 3 another vehicle, 4 a hull probe
 	} ground;
 
 	// a ground vehicle that came down on the ground this frame: how hard, past what its springs absorb (out)

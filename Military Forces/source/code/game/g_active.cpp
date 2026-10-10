@@ -1063,17 +1063,18 @@ static void ClientThink_real( GameEntity *ent )
 		if( pm.ground.touching && pm.ground.pressed > 12.0f ) odd = "SUNK";
 		else if( speed > pm.ground.topSpeed * 2.5f + 100.0f ) odd = "FAST";
 		else if( !pm.ground.touching && ps.velocity[2] < -400.0f ) odd = "FALLING";
+		else if( pm.ground.hit ) odd = "HIT";
 		else if( pm.ground.touching && !pm.ground.standing ) odd = "SLIDING";
 		static int lastPrint[MAX_CLIENTS + 1];
 		int& last = lastPrint[ent->s.number <= MAX_CLIENTS ? ent->s.number : 0];
 		if( odd || theLevel.time_ - last >= 100 )
 		{
 			last = theLevel.time_;
-			Common::printf( "%s t %d cl %d veh %d org %.1f %.1f %.1f vel %.0f %.0f %.0f ang %.0f %.0f %.0f touch %d/%d pressed %.1f steep %.2f nz %.2f slope %.2f %.2f stand %d fwd %.0f top %.0f water %d thr %d brake %d hit %d ent %d hnz %.2f\n",
+			Common::printf( "%s t %d cl %d veh %d org %.1f %.1f %.1f vel %.0f %.0f %.0f ang %.0f %.0f %.0f touch %d/%d pressed %.1f steep %.2f nz %.2f slope %.2f %.2f stand %d fwd %.0f top %.0f water %d thr %d brake %d hit %d ent %d hnz %.2f by %d\n",
 				odd ? va( "GVODD %s", odd ) : "GVTRACE", theLevel.time_, ent->s.number, client->vehicle_, ps.origin[0], ps.origin[1], ps.origin[2], ps.velocity[0], ps.velocity[1], ps.velocity[2],
 				ps.vehicleAngles[0], ps.vehicleAngles[1], ps.vehicleAngles[2], pm.ground.touching, pm.ground.points, pm.ground.pressed, pm.ground.steepness, pm.ground.normalZ,
 				pm.ground.slopeForward, pm.ground.slopeRight, pm.ground.standing, pm.ground.speedForward, pm.ground.topSpeed, pm.waterlevel, ps.throttle, ( ps.ONOFF & OO_SPEEDBRAKE ) != 0,
-				pm.ground.hit, pm.ground.hitEntity, pm.ground.hitNormalZ );
+				pm.ground.hit, pm.ground.hitEntity, pm.ground.hitNormalZ, pm.ground.hitBy );
 		}
 	}
 

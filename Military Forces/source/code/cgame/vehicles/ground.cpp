@@ -84,6 +84,47 @@ void ClientEntity::groundVehicle( clientInfo_t *ci )
 
     // get the rotation information
     this->vehicleLerpAngles();
+	// The body sways on its springs with what the vehicle is doing: the nose lifts as it pulls away and dips as it
+	// brakes (the other way round in reverse), and it leans out of a turn. A light car shows it, a tank hardly. It
+	// is drawn only: where the vehicle is and what it hits do not change
+	{
+		constexpr float pitchPerSpeed = 0.02f, rollPerTurn = 0.00022f, most = 3.0f, easing = 6.0f;
+		struct Sway { float speed, yaw, pitch, roll; int time; };
+		static Sway swaying[MAX_GENTITIES];
+		const int number = this->currentState.number;
+		const completeVehicleData_t& swayVeh = availableVehicles[ci->vehicle];
+		if( number >= 0 && number < MAX_GENTITIES )
+		{
+			Sway& sway = swaying[number];
+			vec3_t ahead;
+			AngleVectors( this->lerpAngles, ahead, nullptr, nullptr );
+			const float along = DotProduct( this->currentState.pos.trDelta, ahead );
+			const float seconds = ( cg.time - sway.time ) * 0.001f;
+			float wantPitch = 0, wantRoll = 0;
+			if( seconds > 0.001f && seconds < 0.25f )
+			{
+				// a heavy vehicle sways less: a tank a fifth of what a buggy does
+				const float weight = swayVeh.mass > 0 ? swayVeh.mass : 20.0f;
+				const float light = 1.0f / ( 1.0f + weight * 0.2f );
+				const float gaining = ( along - sway.speed ) / seconds;
+				const float turning = AngleSubtract( this->lerpAngles[YAW], sway.yaw ) / seconds;
+				// gaining speed forwards lifts the nose, which is pitch going down
+				wantPitch = std::clamp( -gaining * pitchPerSpeed * light * 6.0f, -most, most );
+				// turning left (yaw rising) leans the body to the right, which is roll going up
+				wantRoll = std::clamp( turning * along * rollPerTurn * light * 6.0f, -most, most );
+			}
+			const float share = seconds > 0 ? std::min( 1.0f, seconds * easing ) : 0.0f;
+			sway.pitch += ( wantPitch - sway.pitch ) * share;
+			sway.roll += ( wantRoll - sway.roll ) * share;
+			sway.speed = along;
+			sway.yaw = this->lerpAngles[YAW];
+			sway.time = cg.time;
+			if( (swayVeh.cat & CAT_GROUND) && !(this->currentState.ONOFF & OO_LANDED) )
+				sway.pitch = sway.roll = 0;		// in the air there is nothing to sway against
+			this->lerpAngles[PITCH] += sway.pitch;
+			this->lerpAngles[ROLL] += sway.roll;
+		}
+	}
     AnglesToAxis( this->lerpAngles, drawInfo.basicInfo.axis );
 
 	// position and orientation

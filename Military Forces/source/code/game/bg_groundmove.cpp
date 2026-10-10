@@ -161,7 +161,7 @@ static Footing PM_GroundFooting( pmove_t* pm, int vehicle, const Handling& handl
 	int bearing = 0, reached = 0;
 	// the hull's tilt, as far as it tells where its wheels are: one standing on its nose after a bad landing has
 	// its wheels nowhere useful, and is treated as lying no steeper than this so that it finds the ground again
-	constexpr float tiltCounted = 40.0f;
+	constexpr float tiltCounted = 75.0f;
 	const float pitchNow = DEG2RAD( std::clamp( AngleNormalize180( pm->ps->vehicleAngles[PITCH] ), -tiltCounted, tiltCounted ) );
 	const float rollNow = DEG2RAD( std::clamp( AngleNormalize180( pm->ps->vehicleAngles[ROLL] ), -tiltCounted, tiltCounted ) );
 	for( int i = 0; i < footing.points; i++ )
@@ -238,7 +238,8 @@ static Footing PM_GroundFooting( pmove_t* pm, int vehicle, const Handling& handl
 		footing.slopeRight = ( sumZR[1] / countR[1] - sumZR[0] / countR[0] ) / ( sumR[1] / countR[1] - sumR[0] / countR[0] );
 	// an edge under one end is not a slope to lie on: the surface through the points is never steeper than a
 	// vehicle can stand on
-	const float steepest = tracked ? 5.0f : 1.2f;
+	// (as steep as 79 degrees: a vehicle carried up a face by its speed still lies on that face)
+	const float steepest = 5.0f;
 	footing.slopeForward = std::clamp( footing.slopeForward, -steepest, steepest );
 	footing.slopeRight = std::clamp( footing.slopeRight, -steepest, steepest );
 	footing.steepness = steep / footing.touching;
@@ -818,6 +819,7 @@ void PlayerMove::groundVehicleMove( )
 			moveHit.hit = true;
 			VectorCopy( faceNormal, moveHit.normal );
 			moveHit.entity = ENTITYNUM_WORLD;
+			pm->ground.hitBy = 1;
 			VectorScale( pm->ps->velocity, allowed, pm->ps->velocity );
 			VectorScale( carried, allowed, carried );
 		}
@@ -853,6 +855,7 @@ void PlayerMove::groundVehicleMove( )
 					moveHit.hit = true;
 					VectorCopy( body.plane.normal, moveHit.normal );
 					moveHit.entity = body.entityNum;
+					pm->ground.hitBy = 3;
 				}
 			}
 		}
@@ -871,7 +874,10 @@ void PlayerMove::groundVehicleMove( )
 			pm->trace( &wall, from, vec3_origin, vec3_origin, to, pm->ps->clientNum, MASK_SOLID | CONTENTS_PLAYERCLIP, false );
 			vec3_t probing;
 			VectorSubtract( to, from, probing );
-			if( wall.fraction >= 1.0f || wall.startsolid || wall.plane.normal[2] >= handling.standNormal || wall.plane.normal[2] < -0.1f ||
+			// For the hull's ends only what is close to upright is a wall. Where the ground steepens ahead the hull
+			// is still coming round to it and its nose reaches into the slope; that slope is the wheels' business
+			constexpr float upright = 0.3f;
+			if( wall.fraction >= 1.0f || wall.startsolid || wall.plane.normal[2] >= std::min( handling.standNormal, upright ) || wall.plane.normal[2] < -0.1f ||
 				DotProduct( probing, wall.plane.normal ) >= 0 || DotProduct( wall.plane.normal, axis[2] ) >= 0.5f )
 				continue;
 			// back off, level, by as far as that end is into it
@@ -888,6 +894,7 @@ void PlayerMove::groundVehicleMove( )
 				moveHit.hit = true;
 				VectorCopy( out, moveHit.normal );
 				moveHit.entity = ENTITYNUM_WORLD;
+				pm->ground.hitBy = 4;
 			}
 		}
 	}
@@ -1159,6 +1166,7 @@ bool PlayerMove::slideMove_GV() {
 			moveHit.hit = true;
 			VectorCopy( trace.plane.normal, moveHit.normal );
 			moveHit.entity = trace.entityNum;
+			pm->ground.hitBy = 2;
 		}
 
 		time_left -= time_left * trace.fraction;
