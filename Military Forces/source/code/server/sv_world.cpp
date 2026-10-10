@@ -172,6 +172,25 @@ void ServerMain::clearWorld( ) {
 
 /*
 ===============
+ServerMain::unlinkAllEntities
+
+The game is about to throw its entities away and start again on the same map: nothing may stay linked into the
+sectors, or the first area query of the new game walks a link to an entity that is no longer there.
+===============
+*/
+void ServerMain::unlinkAllEntities()
+{
+	for( int i = 0; i < sv_numworldSectors; i++ )
+		sv_worldSectors[i].entities = nullptr;
+	for( SV_Entity& ent : theSV.serverEntities_ )
+	{
+		ent.worldSector_ = nullptr;
+		ent.nextEntityInWorldSector_ = nullptr;
+	}
+}
+
+/*
+===============
 GameHost::unlinkEntity
 
 ===============

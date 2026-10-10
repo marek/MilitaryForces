@@ -362,6 +362,7 @@ void ServerMain::restartGameProgs( )
 		return;
 
 	theSG.shutdown();
+	ServerMain::unlinkAllEntities();
 
 	ServerMain::initGame();
 }

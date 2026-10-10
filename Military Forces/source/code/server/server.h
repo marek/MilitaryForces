@@ -466,6 +466,7 @@ public:
 	static void restartGameProgs( );
 	static bool inPVSIgnorePortals( const vec3_t p1, const vec3_t p2);
 	static void clearWorld ();
+	static void unlinkAllEntities();
 	static clipHandle_t clipHandleForEntity( EntityBase* gameEnt );
 	static void sectorList_f();
 	static void clipToEntity( trace_t *trace, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int entityNum, int contentmask, bool capsule );
