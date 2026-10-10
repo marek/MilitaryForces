@@ -209,6 +209,11 @@ void Game::damage( GameEntity *targ, GameEntity *inflictor, GameEntity* attacker
 		float	mass;
 
 		mass = 200;
+		// A hit throws a ground vehicle by its weight: the figure above is a soldier's, a tenth of a tonne. A
+		// shell that sends a buggy skidding barely rocks a tank
+		const float shoved = Game::shovableMass( targ->s.number );
+		if( shoved > 0 )
+			mass *= shoved * 10.0f;
 
 		VectorScale (dir, g_knockback.value * (float)knockback / mass, kvel);
 		VectorAdd (targ->client_->ps_.velocity, kvel, targ->client_->ps_.velocity);

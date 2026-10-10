@@ -588,6 +588,7 @@ public:
 
 public:
 	static void riderAngles( GameClient *rider, GameClient *pilot, vec3_t out );
+	static float shovableMass( int entityNum );
 	static bool riderVehicleValid( GameClient *pilot, GameEntity *veh );
 	static void riderThink( GameEntity *ent );
 	static void riderEndFrame( GameEntity *ent );

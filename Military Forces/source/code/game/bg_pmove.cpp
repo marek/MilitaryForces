@@ -904,6 +904,7 @@ void PlayerMove::single(pmove_t *pmove) {
 
 	// clear results
 	pm->numtouch = 0;
+	pm->pushEntity = ENTITYNUM_NONE;
 	pm->watertype = 0;
 	pm->waterlevel = 0;
 

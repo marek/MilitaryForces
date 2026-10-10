@@ -185,12 +185,19 @@ struct pmove_t {
 	float		*gunnerAngles;
 	unsigned	stationsLagging;	// gun positions still swinging round to the aim: they do not fire yet
 
+	// a ground vehicle that ran into another: which, how fast and which way, for the game to shove it (out)
+	int			pushEntity;
+	float		pushSpeed;
+	vec3_t		pushDir;
+
 	int			advancedControls;	// MFQ3
 
 	// callbacks to test the world
 	// these will be different functions during game and cgame
 	void		(*trace)( trace_t *results, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int passEntityNum, int contentMask, bool capsule );
 	int			(*pointcontents)( const vec3_t point, int passEntityNum );
+	// the weight in tonnes of a vehicle that can be shoved, 0 for anything else; may be null
+	float		(*entityMass)( int entityNum );
 };
 
 // if a full pmove isn't done on the client, you can just update the angles
@@ -926,6 +933,7 @@ struct completeVehicleData_t
 	vec3_t			cam_dist;		// how far away is the camera {min, max, defualt}
 	vec3_t			cam_height;		// how high is the default {min, max, default}
     unsigned int    stallspeed;	
+	float			mass;			// ground vehicles: weight in tonnes (0 means a medium vehicle)
     unsigned int    maxspeed;	    // max speed at military thrust
     int			    minthrottle;    // can be less than 0 for ground vehicles
     int			    maxthrottle;    // if > 10 means afterburner

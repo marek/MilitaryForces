@@ -314,6 +314,7 @@ static void NotSelectedThink( GameEntity *ent, usercmd_t *ucmd )
 	pm.tracemask = MASK_PLAYERSOLID & ~CONTENTS_BODY;	// spectators can fly through bodies
 	pm.trace = GameHost::trace;
 	pm.pointcontents = GameHost::pointContents;
+	pm.entityMass = Game::shovableMass;
 
 	// perform a pmove
 	Pmove (&pm);
@@ -355,6 +356,7 @@ static void SpectatorThink( GameEntity *ent, usercmd_t *ucmd )
 		pm.tracemask = MASK_PLAYERSOLID & ~CONTENTS_BODY;	// spectators can fly through bodies
 		pm.trace = GameHost::trace;
 		pm.pointcontents = GameHost::pointContents;
+		pm.entityMass = Game::shovableMass;
 
 		// perform a pmove
 		pm.vehicle = -1;
@@ -399,6 +401,7 @@ static void MissionEditorThink( GameEntity *ent, usercmd_t *ucmd )
 		pm.tracemask = MASK_PLAYERSOLID & ~CONTENTS_BODY;	// spectators can fly through bodies
 		pm.trace = GameHost::trace;
 		pm.pointcontents = GameHost::pointContents;
+		pm.entityMass = Game::shovableMass;
 
 		// perform a pmove
 		pm.vehicle = -1;
@@ -620,6 +623,18 @@ static void SendPendingPredictableEvents( playerState_t *ps )
 		// set back external event
 		ps->externalEvent = extEvent;
 	}
+}
+
+// the weight of a ground vehicle with someone at the wheel, which another vehicle can shove; 0 for anything else
+float Game::shovableMass( int entityNum )
+{
+	GameEntity* ent = entityNum >= 0 && entityNum < ENTITYNUM_MAX_NORMAL ? theLevel.getEntity( entityNum ) : nullptr;
+	if( !ent || !ent->inuse_ || !ent->client_ || ent->client_->vehicle_ < 0 || ent->health_ <= 0 )
+		return 0.0f;
+	const completeVehicleData_t& veh = availableVehicles[ent->client_->vehicle_];
+	if( !(veh.cat & CAT_GROUND) )
+		return 0.0f;
+	return veh.mass > 0 ? veh.mass : 20.0f;
 }
 
 void Game::riderAngles( GameClient *rider, GameClient *pilot, vec3_t out )
@@ -900,6 +915,7 @@ static void ClientThink_real( GameEntity *ent )
 
 	pm.trace = GameHost::trace;
 	pm.pointcontents = GameHost::pointContents;
+	pm.entityMass = Game::shovableMass;
 	pm.debugLevel = g_debugMove.integer;
 
 	pm.pmove_fixed = (pmove_fixed.integer!=0) | client->pers_.pmoveFixed_;
@@ -1028,6 +1044,21 @@ static void ClientThink_real( GameEntity *ent )
 		!(availableVehicles[client->vehicle_].cat & CAT_BOAT) )
 	{
 	    Game::damage( ent, nullptr, ent, nullptr, nullptr, 100000, DAMAGE_NO_PROTECTION, MOD_CRASH, CAT_ANY );
+	}
+
+	// A ground vehicle that ran into another shoves it: the lighter one gets most of the speed
+	if( pm.pushEntity != ENTITYNUM_NONE )
+	{
+		GameEntity* other = theLevel.getEntity( pm.pushEntity );
+		const float otherMass = Game::shovableMass( pm.pushEntity ), ownMass = Game::shovableMass( ent->s.number );
+		if( other && otherMass > 0 && ownMass > 0 )
+		{
+			// how much of a blow comes back between two vehicles
+			constexpr float bounce = 0.1f;
+			const float closing = pm.pushSpeed - DotProduct( other->client_->ps_.velocity, pm.pushDir );
+			if( closing > 0 )
+				VectorMA( other->client_->ps_.velocity, ( 1.0f + bounce ) * ownMass / ( ownMass + otherMass ) * closing, pm.pushDir, other->client_->ps_.velocity );
+		}
 	}
 
 	// execute client events

@@ -10,23 +10,140 @@
 #include "bg_local.h"
 
 
-constexpr int PFRONT = 0;
-constexpr int PBACK = 1;
-constexpr int PLEFT = 2;
-constexpr int PRIGHT = 3;
-constexpr int PFRONTC = 4;
-constexpr int PBACKC = 5;
-constexpr int PLEFTC = 6;
-constexpr int PRIGHTC = 7;
-constexpr int PMAX = 8;
+namespace
+{
+	// a vehicle moves over the ground at twice the speed its table entry and its instruments give; every vehicle has
+	// always done so, and the entries are tuned to it
+	constexpr float GROUND_SPEED_SCALE = 2.0f;
+	// what pulls a ground vehicle down, in units a second each second
+	constexpr float GROUND_GRAVITY = 200.0f;
+	// a vehicle with no weight in its table entry is taken for a medium one, in tonnes
+	constexpr float DEFAULT_MASS = 20.0f;
+	// the slope of ground a vehicle can stand and drive on, as the upward part of its normal
+	constexpr float DRIVABLE_NORMAL = 0.6f;
 
+	constexpr int MAX_CONTACTS = 8;
 
+	// How a vehicle's weight and running gear make it behave. A light wheeled car rides soft, bounces and slides; a
+	// tank sits planted on its tracks, settles at once and holds its line
+	struct Handling
+	{
+		float	mass;			// tonnes
+		bool	tracked;
+		float	damping;		// of the suspension, 1 is no bounce at all
+		float	sag;			// how far it sits down on its springs at rest
+		float	lateralGrip;	// grip across the hull, as a share of its weight
+		float	driveGrip;		// grip along the hull, for driving and braking
+		float	rollingDrag;	// what slows it when it coasts
+		float	bounce;			// how much of an impact comes back off a wall
+		float	settleRate;		// degrees a second the hull turns to lie on the ground
+	};
 
-// a vehicle moves over the ground at twice the speed its table entry and its instruments give; every vehicle has
-// always done so, and the entries are tuned to it
-constexpr float GROUND_SPEED_SCALE = 2.0f;
-// how hard a ground vehicle that has left the ground is pulled down, in units a second each second
-constexpr float AIRBORNE_GRAVITY = 200.0f;
+	Handling handlingOf( int vehicle )
+	{
+		const completeVehicleData_t& veh = availableVehicles[vehicle];
+		Handling h;
+		h.mass = veh.mass > 0 ? veh.mass : DEFAULT_MASS;
+		h.tracked = !(veh.caps & HC_WHEELS);
+		// from a one tonne buggy to a twenty tonne hull and beyond
+		const float heavy = std::clamp( ( h.mass - 1.0f ) / 19.0f, 0.0f, 1.0f );
+		h.damping = 0.4f + 0.6f * heavy;
+		h.sag = 2.5f - 1.3f * heavy;
+		h.lateralGrip = h.tracked ? 1.6f : 0.7f + 0.3f * heavy;
+		h.driveGrip = h.tracked ? 0.9f : 0.8f;
+		h.rollingDrag = h.tracked ? 0.08f : 0.04f;
+		h.bounce = 0.35f - 0.3f * heavy;
+		h.settleRate = 260.0f - 140.0f * heavy;
+		return h;
+	}
+
+	// The ground under a vehicle, from the points it stands on: wheels at the four corners, or four points along
+	// each track
+	struct Footing
+	{
+		int		points = 0;
+		int		touching = 0;
+		bool	front = false, back = false, left = false, right = false;	// which sides have a point on the ground
+		float	slopeForward = 0;	// rise of the ground along the hull, and across it to the right
+		float	slopeRight = 0;
+		float	height = 0;			// of that ground under the vehicle's middle
+		vec3_t	normal = { 0, 0, 1 };
+	};
+
+	// what the vehicle ran into during this frame's move
+	struct MoveHit
+	{
+		bool	hit = false;
+		vec3_t	normal = { 0, 0, 0 };
+		int		entity = ENTITYNUM_NONE;
+	};
+	MoveHit moveHit;
+}
+
+// Finds the ground under each point the vehicle stands on and lays one surface through those that touch
+static Footing PM_GroundFooting( pmove_t* pm, int vehicle, bool tracked )
+{
+	// How far above and below the hull's underside the ground is looked for. A wheel rides up over what is no
+	// higher than this; anything taller is an obstacle for the hull, not ground to stand on
+	constexpr float above = 6.0f, below = 20.0f;
+	// the points sit a little inside the hull's outline
+	constexpr float inset = 0.85f;
+	const completeVehicleData_t& veh = availableVehicles[vehicle];
+	const vec3_t yawOnly = { 0, pm->ps->vehicleAngles[YAW], 0 };
+	vec3_t forward, right;
+	AngleVectors( yawOnly, forward, right, nullptr );
+
+	Footing footing;
+	float along[MAX_CONTACTS], across[MAX_CONTACTS];
+	const float front = veh.maxs[0] * inset, back = veh.mins[0] * inset, side = veh.maxs[1] * inset;
+	const int perSide = tracked ? 4 : 2;
+	for( int i = 0; i < perSide; i++ )
+	{
+		const float f = back + ( front - back ) * i / ( perSide - 1 );
+		along[footing.points] = f; across[footing.points++] = side;
+		along[footing.points] = f; across[footing.points++] = -side;
+	}
+
+	float sumF[2] = { 0, 0 }, sumZF[2] = { 0, 0 }, sumR[2] = { 0, 0 }, sumZR[2] = { 0, 0 }, sumZ = 0, meanF = 0, meanR = 0;
+	int countF[2] = { 0, 0 }, countR[2] = { 0, 0 };
+	for( int i = 0; i < footing.points; i++ )
+	{
+		vec3_t start, end;
+		VectorMA( pm->ps->origin, along[i], forward, start );
+		VectorMA( start, across[i], right, start );
+		VectorCopy( start, end );
+		start[2] = pm->ps->origin[2] + veh.mins[2] + above;
+		end[2] = pm->ps->origin[2] + veh.mins[2] - below;
+		trace_t tr;
+		pm->trace( &tr, start, vec3_origin, vec3_origin, end, pm->ps->clientNum, MASK_SOLID, false );
+		if( tr.fraction >= 1.0f )
+			continue;
+		// a point that starts inside something stands on the top of what a wheel can ride over
+		if( tr.startsolid )
+			tr.endpos[2] = start[2];
+		footing.touching++;
+		const int f = along[i] > 0 ? 1 : 0, r = across[i] > 0 ? 1 : 0;
+		sumF[f] += along[i]; sumZF[f] += tr.endpos[2]; countF[f]++;
+		sumR[r] += across[i]; sumZR[r] += tr.endpos[2]; countR[r]++;
+		sumZ += tr.endpos[2]; meanF += along[i]; meanR += across[i];
+	}
+	if( !footing.touching )
+		return footing;
+
+	footing.back = countF[0] > 0; footing.front = countF[1] > 0;
+	footing.left = countR[0] > 0; footing.right = countR[1] > 0;
+	// the rise between the points behind the middle and those ahead of it, and between the two sides
+	if( footing.front && footing.back )
+		footing.slopeForward = ( sumZF[1] / countF[1] - sumZF[0] / countF[0] ) / ( sumF[1] / countF[1] - sumF[0] / countF[0] );
+	if( footing.left && footing.right )
+		footing.slopeRight = ( sumZR[1] / countR[1] - sumZR[0] / countR[0] ) / ( sumR[1] / countR[1] - sumR[0] / countR[0] );
+	footing.height = sumZ / footing.touching - footing.slopeForward * meanF / footing.touching - footing.slopeRight * meanR / footing.touching;
+	for( int i = 0; i < 3; i++ )
+		footing.normal[i] = -footing.slopeForward * forward[i] - footing.slopeRight * right[i];
+	footing.normal[2] = 1.0f;
+	VectorNormalize( footing.normal );
+	return footing;
+}
 
 /*
 ===================
@@ -38,10 +155,6 @@ groundVehicle_Brakes
 void PlayerMove::groundVehicle_Brakes()
 {
 	if( pm->cmd.serverTime < pm->ps->timers[TIMER_BRAKE] ) return;
-
-	// can only be engaged when slow enough: up to a quarter of the vehicle's own top speed, so that a fast vehicle
-	// rolling down a slope can still be held
-	if( pm->ps->speed > std::max( 120.0f, availableVehicles[pm->vehicle].maxspeed * 2.5f ) ) return;
 
 	if( pm->ps->ONOFF & OO_SPEEDBRAKE ) {
 		pm->ps->ONOFF &= ~OO_SPEEDBRAKE;
@@ -82,237 +195,188 @@ void PlayerMove::groundVehicle_FuelFlow( int throttle )
 /*
 ===================
 PlayerMove::groundVehicleAccelerate
+
+What the engine, the brakes and the ground do to the vehicle's velocity over one frame. The vehicle is a weight
+with a velocity: gravity always pulls on it, its springs hold it off the ground, and its wheels or tracks drive,
+brake and grip only while they touch.
 ===================
 */
 void PlayerMove::groundVehicleAccelerate()
 {
-    float	topspeed = availableVehicles[pm->vehicle].maxspeed;
-    float	currspeed = static_cast<float>(pm->ps->speed)/10;
-	float	maxthrottle = availableVehicles[pm->vehicle].maxthrottle;
-	float	minthrottle = availableVehicles[pm->vehicle].minthrottle;
-    float	throttle = pm->ps->fixed_throttle;
-    float	accel = availableVehicles[pm->vehicle].accel * pml.frametime;
-	float	targetspeed;
-	float	angle = pm->ps->vehicleAngles[0];
-		
-	// account for water
-	topspeed /= (pm->waterlevel+1);
+	const completeVehicleData_t& veh = availableVehicles[pm->vehicle];
+	const Handling handling = handlingOf( pm->vehicle );
+	const float dt = pml.frametime;
+	const float maxthrottle = veh.maxthrottle, minthrottle = veh.minthrottle;
+	float throttle = pm->ps->fixed_throttle;
 
-	if( pm->ps->ONOFF & OO_LANDED ) {
-		
-		
-		// terrain angle for additional acceleration
-		// Original
-		if( angle > 180 ) angle -= 360;
-		else if( angle < -180 ) angle += 360;
-		if( Q_fabs(angle) < 36 ) angle /= 36;
-		else angle /= 18;
+	// a held key overrides the set throttle
+	if( pm->cmd.forwardmove > 0 ) throttle = maxthrottle;
+	else if( pm->cmd.forwardmove < 0 ) throttle = maxthrottle - minthrottle;
+	pm->ps->throttle = throttle;
+	// past the top of the range is reverse
+	if( throttle > maxthrottle )
+		throttle = -( throttle - maxthrottle );
+	if( pm->ps->stats[STAT_FUEL] <= 0 )
+		throttle = 0;
 
-		// check for overriding throttle
-		if( pm->cmd.forwardmove > 0 ) throttle = maxthrottle;
-		else if( pm->cmd.forwardmove < 0 ) throttle = maxthrottle - minthrottle;
+	const bool afloat = pm->waterlevel && (veh.caps & HC_AMPHIBIOUS);
+	Footing footing = afloat ? Footing{} : PM_GroundFooting( pm, pm->vehicle, handling.tracked );
+	const vec3_t yawOnly = { 0, pm->ps->vehicleAngles[YAW], 0 };
+	vec3_t hullForward;
+	AngleVectors( yawOnly, hullForward, nullptr, nullptr );
 
-		// set it back
-		pm->ps->throttle = throttle;
+	// how far the springs are pressed: at rest, by their sag
+	const float restHeight = footing.height - veh.mins[2] + 1.0f;
+	// springs press no further than their travel: past that the hull itself is on the ground
+	constexpr float travel = 4.0f;
+	float pressed = afloat ? handling.sag : std::min( restHeight + handling.sag - pm->ps->origin[2], handling.sag + travel );
+	const bool standing = afloat || ( footing.touching > 0 && pressed > 0 && footing.normal[2] >= DRIVABLE_NORMAL );
+	const float support = afloat ? 1.0f : static_cast<float>( footing.touching ) / std::max( footing.points, 1 );
 
-		// check for reverse
-		if( throttle > maxthrottle ) {
-			throttle = -(throttle - maxthrottle);
-		}
-		if( pm->ps->ONOFF & OO_STALLED ) {
-			currspeed *= -1;
-		}
-
-		// check for fuel
-		if( pm->ps->stats[STAT_FUEL] <= 0 ) throttle = 0;
-
-		// what is the speed to accelerate towards (consider handbrake)
-		if( (pm->ps->ONOFF & OO_SPEEDBRAKE) ) {
-			targetspeed = 0;
-			if( angle < -1 ) targetspeed += topspeed  *(angle / 5);
-		} else {
-			targetspeed = topspeed*throttle/maxthrottle;
-			targetspeed += topspeed * (angle / 5);
-		}
-
-		if( currspeed < targetspeed - accel ) currspeed += accel;
-		else if( currspeed > targetspeed + accel ) currspeed -= accel;
-		else currspeed = targetspeed;
-
-		// for negative speeds we set the flag OO_STALLED as speed is an unsigned int
-		if( currspeed < 0 ) {
-			currspeed *= -1;
-			pm->ps->ONOFF |= OO_STALLED;
-		} else {
-			pm->ps->ONOFF &= ~OO_STALLED;
-		}
-	} else {
-		// off the ground the engine does nothing: the vehicle flies on as it was thrown and the speed shown is the
-		// speed it really has over the ground. On landing it carries on from there
-		currspeed = sqrtf( pm->ps->velocity[0] * pm->ps->velocity[0] + pm->ps->velocity[1] * pm->ps->velocity[1] ) / GROUND_SPEED_SCALE;
-	}
-
-	// apply speed modifier
-    pm->ps->speed = currspeed*10;
-
-	// calculate fuel flow (for fuel flow we need abs value)
-	if( throttle < 0 )
+	if( !standing )
 	{
-		throttle *= -1;
+		// in the air it is a thrown weight: what it had, and gravity
+		pm->ps->velocity[2] -= GROUND_GRAVITY * dt;
+		pm->ps->ONOFF &= ~OO_LANDED;
+		pm->ps->speed = sqrtf( pm->ps->velocity[0] * pm->ps->velocity[0] + pm->ps->velocity[1] * pm->ps->velocity[1] ) / GROUND_SPEED_SCALE * 10;
+		groundVehicle_FuelFlow( fabs( throttle ) );
+		return;
+	}
+	if( !(pm->ps->ONOFF & OO_LANDED) )
+		pm->ps->ONOFF |= OO_VAPOR;		// came down: the game looks at how hard
+	pm->ps->ONOFF |= OO_LANDED;
+
+	const float* normal = footing.normal;
+	// along the hull and across it, on the ground
+	Vec3 forward, side;
+	for( int i = 0; i < 3; i++ )
+		forward[i] = hullForward[i] - DotProduct( hullForward, normal ) * normal[i];
+	VectorNormalize( forward );
+	CrossProduct( normal, forward, side );
+
+	float speedUp = DotProduct( pm->ps->velocity, normal );
+	float speedForward = DotProduct( pm->ps->velocity, forward );
+	float speedSide = DotProduct( pm->ps->velocity, side );
+	const float weightOnGround = GROUND_GRAVITY * normal[2] * support;
+
+	if( afloat )
+		speedUp = 0;
+	else
+	{
+		// springs and shock absorbers, in short steps so a stiff suspension stays calm at any frame rate
+		const float stiffness = GROUND_GRAVITY / handling.sag;
+		const float shock = 2.0f * handling.damping * sqrtf( stiffness );
+		const int steps = std::clamp( static_cast<int>( ceilf( dt / 0.008f ) ), 1, 12 );
+		const float step = dt / steps;
+		float moved = 0;
+		for( int i = 0; i < steps; i++ )
+		{
+			const float push = pressed > 0 ? std::max( 0.0f, ( stiffness * pressed - shock * speedUp ) * support ) : 0.0f;
+			speedUp += ( push - GROUND_GRAVITY * normal[2] ) * step;
+			pressed -= speedUp * step;
+			moved += speedUp * step;
+		}
+		// the move this frame goes as far as the springs carried it; the speed it ends with is kept for the next
+		pml.groundRise = moved / dt - speedUp;
 	}
 
-	PlayerMove::groundVehicle_FuelFlow( throttle );
+	// gravity along the slope
+	const vec3_t down = { 0, 0, -GROUND_GRAVITY };
+	if( !afloat )
+	{
+		speedForward += DotProduct( down, forward ) * dt;
+		speedSide += DotProduct( down, side ) * dt;
+	}
+
+	const float topSpeed = veh.maxspeed * GROUND_SPEED_SCALE / ( pm->waterlevel + 1 );
+	const float engine = veh.accel * GROUND_SPEED_SCALE;
+	const float grip = handling.driveGrip * weightOnGround;
+	const auto slow = [&]( float by ) {
+		speedForward = speedForward > 0 ? std::max( 0.0f, speedForward - by ) : std::min( 0.0f, speedForward + by );
+	};
+
+	if( pm->ps->ONOFF & OO_SPEEDBRAKE )
+		slow( grip * dt );								// brakes on: it stops, and holds on any slope they can grip
+	else
+	{
+		const float target = topSpeed * throttle / maxthrottle;
+		const float wanted = target - speedForward;
+		if( throttle != 0 && wanted * target > 0 )
+		{
+			// The engine pulls hardest at low speed, which is what takes a vehicle up a hill, and no harder than
+			// its wheels or tracks grip
+			const float low = std::min( 4.0f, topSpeed / std::max( fabsf( speedForward ), topSpeed * 0.25f ) );
+			const float pull = std::min( engine * low, grip ) * dt;
+			speedForward += std::clamp( wanted, -pull, pull );
+		}
+		else if( throttle != 0 && speedForward * target < 0 )
+			slow( grip * dt );							// driving the other way: braked first
+		else
+		{
+			// Faster than asked for, or coasting: the ground slows it, the engine holds it back, and the further
+			// over its speed it runs the harder the driver brakes. A slope can carry it past its top speed, not
+			// away with it, and a gentle slope lets it come to rest
+			const float over = std::clamp( ( fabsf( speedForward ) - fabsf( target ) ) / std::max( topSpeed, 1.0f ) - ( throttle != 0 ? 0.0f : 0.5f ), 0.0f, 1.0f );
+			const float drag = ( handling.rollingDrag * weightOnGround + ( throttle != 0 ? engine * 0.6f : 0.0f ) + grip * over ) * dt;
+			if( throttle != 0 && fabsf( wanted ) < drag )
+				speedForward = target;
+			else
+				slow( drag );
+		}
+	}
+
+	// what the wheels or tracks will not let slide sideways
+	const float held = handling.lateralGrip * weightOnGround * dt;
+	speedSide = speedSide > 0 ? std::max( 0.0f, speedSide - held ) : std::min( 0.0f, speedSide + held );
+
+	for( int i = 0; i < 3; i++ )
+		pm->ps->velocity[i] = forward[i] * speedForward + side[i] * speedSide + normal[i] * speedUp;
+
+	// the speed shown is the speed along the hull; backwards is carried as a flag
+	pm->ps->speed = fabsf( speedForward ) / GROUND_SPEED_SCALE * 10;
+	if( speedForward < -1.0f ) pm->ps->ONOFF |= OO_STALLED;
+	else if( speedForward > 1.0f || throttle >= 0 ) pm->ps->ONOFF &= ~OO_STALLED;
+
+	groundVehicle_FuelFlow( fabs( throttle ) );
 }
 
 /*
 ===================
 PlayerMove::adjustToTerrain
 
+Lays the hull on the ground it stands on. With nothing under one end it tips that way.
 ===================
 */
 void PlayerMove::adjustToTerrain( ) 
 {
-	trace_t		tr;
-	Vec3		dir, forward, right;
-	vec3_t		start[PMAX], end[PMAX];
-	float		hLength, hWidth, hLengthC, hWidthC;
-	int			i;
-	float		angleX, angleY, angleXC, angleYC;
-	float		heightX, heightY, heightXC, heightYC;
-	bool	fall = false;	
-	float		height;
-
-	if( pm->waterlevel && availableVehicles[pm->vehicle].caps & HC_AMPHIBIOUS ) {
+	// how fast a hull with one end over an edge tips, degrees a second
+	constexpr float tipRate = 60.0f;
+	const completeVehicleData_t& veh = availableVehicles[pm->vehicle];
+	if( pm->waterlevel && (veh.caps & HC_AMPHIBIOUS) )
 		return;
+
+	const Handling handling = handlingOf( pm->vehicle );
+	const Footing footing = PM_GroundFooting( pm, pm->vehicle, handling.tracked );
+	float pitch = AngleNormalize180( pm->ps->vehicleAngles[PITCH] ), roll = AngleNormalize180( pm->ps->vehicleAngles[ROLL] );
+	if( !footing.touching )
+	{
+		// thrown clear of the ground: the nose drops slowly
+		pitch = std::min( pitch + veh.turnspeed[0] * pml.frametime * 0.5f, 60.0f );
 	}
-
-	// set the height
-	VectorSet( start[0], pm->ps->origin[0], pm->ps->origin[1], pm->ps->origin[2] + 30 );
-	VectorSet( end[0], pm->ps->origin[0], pm->ps->origin[1], pm->ps->origin[2] + pm->mins[2] - 2 );
-	pm->trace ( &tr, 
-				start[0], 
-				nullptr,//availableVehicles[pm->vehicle].mins, 
-				nullptr,//availableVehicles[pm->vehicle].maxs, 
-				end[0], 
-				pm->ps->clientNum, 
-				MASK_SOLID,
-				false);
-	// one unit of clearance: with less, wheels and tracks cut into uneven ground
-	constexpr float groundClearance = 1.0f;
-	height = tr.endpos[2] - availableVehicles[pm->vehicle].mins[2] + groundClearance;
-
-	if( tr.fraction < 1.0f ) {
-
-		// set up start and endpoints for full and close distance
-		dir = Vec3( 0, pm->ps->vehicleAngles[1], 0 );
-		AngleVectors( dir, forward, right, nullptr );
-		VectorMA( pm->ps->origin, availableVehicles[pm->vehicle].maxs[0], forward, start[PFRONT] );
-		VectorMA( pm->ps->origin, availableVehicles[pm->vehicle].mins[0], forward, start[PBACK] );
-		VectorMA( pm->ps->origin, availableVehicles[pm->vehicle].maxs[1], right, start[PRIGHT] );
-		VectorMA( pm->ps->origin, availableVehicles[pm->vehicle].mins[1], right, start[PLEFT] );
-		VectorMA( pm->ps->origin, 1, forward, start[PFRONTC] );
-		VectorMA( pm->ps->origin, -1, forward, start[PBACKC] );
-		VectorMA( pm->ps->origin, 1, right, start[PRIGHTC] );
-		VectorMA( pm->ps->origin, -1, right, start[PLEFTC] );
-		for( i = 0; i < PMAX; i++ ) {
-			VectorCopy( start[i], end[i] );
-			start[i][2] = pm->ps->origin[2] + 20;
-			end[i][2] = pm->ps->origin[2] - 40;
-		//	start[i][2] = availableVehicles[pm->vehicle].mins[2];
-		//	end[i][2] = availableVehicles[pm->vehicle].mins[2]-2;
-		}
-		// get the projected length&width
-		VectorSubtract( start[PFRONT], start[PBACK], forward );
-		hLength = VectorLength( forward );
-		VectorSubtract( start[PRIGHT], start[PLEFT], right );
-		hWidth = VectorLength( right );
-		VectorSubtract( start[PFRONTC], start[PBACKC], forward );
-		hLengthC = VectorLength( forward );
-		VectorSubtract( start[PRIGHTC], start[PLEFTC], right );
-		hWidthC = VectorLength( right );
-
-		// do the ray tracing
-		for( i = 0; i < PMAX; i++ ) {
-			pm->trace ( &tr, 
-						start[i], 
-						vec3_origin, 
-						vec3_origin,
-						end[i], 
-						pm->ps->clientNum, 
-						MASK_SOLID,
-						false);
-			VectorCopy( tr.endpos, end[i] ); // New
-			if( tr.fraction == 1 ) fall = true;
-		}
-		// New way
-		VectorSubtract( end[PFRONT], end[PBACK], forward );
-		vectoangles( forward, dir );
-		angleX = dir[0];
-		heightX = pm->ps->origin[2] + (end[PFRONT][2] - end[PBACK][2])/2;
-
-		VectorSubtract( end[PRIGHT], end[PLEFT], forward );
-		vectoangles( forward, dir );
-		angleY = dir[0];
-		heightY = pm->ps->origin[2] + (end[PRIGHT][2] - end[PLEFT][2])/2;
-
-		VectorSubtract( end[PFRONTC], end[PBACKC], forward );
-		vectoangles( forward, dir );
-		angleXC = dir[0];
-		heightXC = pm->ps->origin[2] + (end[PFRONTC][2] - end[PBACKC][2])/2;
-
-		VectorSubtract( end[PRIGHTC], end[PLEFTC], forward );
-		vectoangles( forward, dir );
-		angleYC = dir[0];
-		heightYC = pm->ps->origin[2] + (end[PRIGHTC][2] - end[PLEFTC][2])/2;
-
-		// check which one to use
-		if( !fall ) {
-			pm->ps->vehicleAngles[PITCH] = angleX;
-			pm->ps->vehicleAngles[ROLL] = angleY;
-		} else {
-			float diffp, diffr;
-			if( heightXC < heightX ) {
-				diffp = angleX - pm->ps->vehicleAngles[PITCH];
-			} else {
-				diffp = angleXC - pm->ps->vehicleAngles[PITCH];
-			}
-			while( diffp > 180 ) diffp -= 360;
-			while( diffp < -180) diffp += 360;
-			if( diffp > 0 ) {
-				pm->ps->vehicleAngles[0] += availableVehicles[pm->vehicle].turnspeed[0] * pml.frametime;
-			} else if( diffp < 0 ) {
-				pm->ps->vehicleAngles[0] -= availableVehicles[pm->vehicle].turnspeed[0] * pml.frametime;
-			}
-			if( heightYC < heightY ) {
-				diffr = angleY - pm->ps->vehicleAngles[ROLL];
-			} else {
-				diffr = angleYC - pm->ps->vehicleAngles[ROLL];
-			}
-			while( diffr > 180 ) diffr -= 360;
-			while( diffr < -180) diffr += 360;
-			if( diffr > 0 ) {
-				pm->ps->vehicleAngles[2] += availableVehicles[pm->vehicle].turnspeed[0] * pml.frametime;
-			} else if( diffr < 0 ) {
-				pm->ps->vehicleAngles[2] -= availableVehicles[pm->vehicle].turnspeed[0] * pml.frametime;
-			}
-		}
-		// set height
-		pm->ps->origin[2] = height;
-		if( !(pm->ps->ONOFF & OO_LANDED) ) {
-			pm->ps->ONOFF |= OO_VAPOR;
-		}
-		pm->ps->ONOFF |= OO_LANDED;
-	} else {
-		pm->ps->ONOFF &= ~OO_LANDED;
-		if( pm->ps->ONOFF & OO_STALLED ) {
-			if( pm->ps->vehicleAngles[0] > 269 || pm->ps->vehicleAngles[0] < 90 ) 
-				pm->ps->vehicleAngles[0] -= availableVehicles[pm->vehicle].turnspeed[0] * pml.frametime;
-		} else {
-			if( pm->ps->vehicleAngles[0] < 89 || pm->ps->vehicleAngles[0] > 270 )
-				pm->ps->vehicleAngles[0] += availableVehicles[pm->vehicle].turnspeed[0] * pml.frametime;
-		}
-//		Common::printf( "%.1f\n", pm->ps->vehicleAngles[2] );
+	else
+	{
+		const float turn = handling.settleRate * pml.frametime;
+		if( footing.front && footing.back )
+			pitch += std::clamp( AngleSubtract( -RAD2DEG( atanf( footing.slopeForward ) ), pitch ), -turn, turn );
+		else
+			pitch += ( footing.back ? tipRate : -tipRate ) * pml.frametime;
+		if( footing.left && footing.right )
+			roll += std::clamp( AngleSubtract( -RAD2DEG( atanf( footing.slopeRight ) ), roll ), -turn, turn );
+		else
+			roll += ( footing.left ? tipRate : -tipRate ) * pml.frametime;
 	}
+	pm->ps->vehicleAngles[PITCH] = std::clamp( pitch, -80.0f, 80.0f );
+	pm->ps->vehicleAngles[ROLL] = std::clamp( roll, -80.0f, 80.0f );
 }
 
 /*
@@ -333,7 +397,6 @@ ends on ground that is not too steep and gets the vehicle further than sliding d
 */
 void PlayerMove::stepSlideMove_GV()
 {
-	constexpr float drivableNormal = 0.6f;
 	Vec3	startOrigin, startVelocity, slideOrigin, slideVelocity, up, down, mins;
 	trace_t	trace;
 
@@ -371,7 +434,8 @@ void PlayerMove::stepSlideMove_GV()
 
 	const float slideDistance = ( slideOrigin[0] - startOrigin[0] ) * ( slideOrigin[0] - startOrigin[0] ) + ( slideOrigin[1] - startOrigin[1] ) * ( slideOrigin[1] - startOrigin[1] );
 	const float stepDistance = ( pm->ps->origin[0] - startOrigin[0] ) * ( pm->ps->origin[0] - startOrigin[0] ) + ( pm->ps->origin[1] - startOrigin[1] ) * ( pm->ps->origin[1] - startOrigin[1] );
-	const bool drivable = trace.fraction < 1.0f && trace.plane.normal[2] >= drivableNormal;
+	// a step is taken onto the ground, never onto another vehicle
+	const bool drivable = trace.fraction < 1.0f && trace.plane.normal[2] >= DRIVABLE_NORMAL && trace.entityNum == ENTITYNUM_WORLD;
 	if( !drivable || stepDistance <= slideDistance )
 	{
 		VectorCopy( slideOrigin, pm->ps->origin );
@@ -405,7 +469,6 @@ void PlayerMove::groundVehicleMove( )
 	float		smove = pm->cmd.rightmove;
 	float		turret_yaw = pm->ps->turretAngle;
 	float		gun_pitch = pm->ps->gunAngle;
-	float		speed;
     float		topSpeed, currSpeed, turnModifier;
 	int anim = 0;
 
@@ -414,27 +477,54 @@ void PlayerMove::groundVehicleMove( )
 		groundVehicle_Brakes();
 	}
 
-	// set speed
+	// engine, brakes, springs, grip and gravity on the velocity
+	pml.groundRise = 0;
 	PlayerMove::groundVehicleAccelerate();
 
-	// speed
-	speed = static_cast<float>(pm->ps->speed)/10;
-	if( pm->ps->ONOFF & OO_STALLED ) {
-		AngleVectors( pm->ps->vehicleAngles, forward, nullptr, nullptr );
-		VectorNegate( forward, forward );
-	} else {
-		AngleVectors( pm->ps->vehicleAngles, forward, nullptr, nullptr );
-	}
-	if( pm->ps->ONOFF & OO_LANDED ) {
-		// on the ground a vehicle goes where its hull points, along the ground under it. It keeps nothing of the
-		// direction an edge or a wall knocked it into the frame before
-		VectorScale( forward, speed * GROUND_SPEED_SCALE, pm->ps->velocity );
-	} else {
-		// in the air it is a thrown weight: what it had, and gravity
-		pm->ps->velocity[2] -= AIRBORNE_GRAVITY * pml.frametime;
+	// The move. Over the frame the vehicle rises or sinks as far as its springs carried it, which is not what its
+	// speed is at the end of the frame
+	const Handling handling = handlingOf( pm->vehicle );
+	Vec3 before, carried;
+	VectorCopy( pm->ps->velocity, before );
+	if( pm->ps->ONOFF & OO_LANDED )
+		pm->ps->velocity[2] += pml.groundRise;
+	VectorCopy( pm->ps->velocity, carried );
+	moveHit = MoveHit{};
+	stepSlideMove_GV();
+	if( pm->ps->ONOFF & OO_LANDED )
+	{
+		// only what the move changed is kept of the adjustment
+		for( int i = 0; i < 3; i++ )
+			pm->ps->velocity[i] = before[i] + ( pm->ps->velocity[i] - carried[i] );
 	}
 
-	stepSlideMove_GV();
+	// Ran into something it cannot drive over: part of the blow comes back, and it scrapes along. Against
+	// another vehicle the weights decide who gives way
+	if( moveHit.hit )
+	{
+		const float into = -DotProduct( before, moveHit.normal );
+		if( into > 0 )
+		{
+			const float other = pm->entityMass && moveHit.entity != ENTITYNUM_WORLD ? pm->entityMass( moveHit.entity ) : 0.0f;
+			// the share of its speed into the obstacle that it has afterwards: negative is a bounce back
+			const float kept = other > 0 ? ( handling.mass - handling.bounce * other ) / ( handling.mass + other ) : -handling.bounce;
+			const float normalNow = DotProduct( pm->ps->velocity, moveHit.normal );
+			VectorMA( pm->ps->velocity, -kept * into - normalNow, moveHit.normal, pm->ps->velocity );
+			// scraping takes speed along the obstacle in proportion to the blow
+			constexpr float scrape = 0.3f;
+			Vec3 sliding;
+			VectorMA( pm->ps->velocity, -DotProduct( pm->ps->velocity, moveHit.normal ), moveHit.normal, sliding );
+			const float along = VectorLength( sliding );
+			if( along > 0.01f && other <= 0 )
+				VectorMA( pm->ps->velocity, -std::min( along, scrape * into * ( 1.0f + handling.bounce ) ) / along, sliding, pm->ps->velocity );
+			if( other > 0 )
+			{
+				pm->pushEntity = moveHit.entity;
+				pm->pushSpeed = into;
+				VectorScale( moveHit.normal, -1.0f, pm->pushDir );
+			}
+		}
+	}
 
 	// put the vehicle into the landscape with proper angles
 	PlayerMove::adjustToTerrain();
@@ -665,6 +755,13 @@ bool PlayerMove::slideMove_GV() {
 			(trace.entityNum == ENTITYNUM_WORLD &&
 			!(trace.surfaceFlags & SURF_SKY)) ) {
 			PlayerMove::addTouchEnt_GV( trace.entityNum );
+		}
+		// the first thing in the way that is no ground to drive on
+		if( !moveHit.hit && trace.plane.normal[2] < DRIVABLE_NORMAL )
+		{
+			moveHit.hit = true;
+			VectorCopy( trace.plane.normal, moveHit.normal );
+			moveHit.entity = trace.entityNum;
 		}
 
 		time_left -= time_left * trace.fraction;

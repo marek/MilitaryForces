@@ -433,6 +433,18 @@ void CGame::predictPlayerState( ) {
 	cg_pmove.ps = &cg.predictedPlayerState;
 	cg_pmove.trace = CGame::trace;
 	cg_pmove.pointcontents = CGame::pointContents;
+	// the weight of another player's ground vehicle, as the server has it
+	cg_pmove.entityMass = []( int entityNum ) -> float {
+		if( entityNum < 0 || entityNum >= MAX_GENTITIES )
+			return 0.0f;
+		const entityState_t& state = cg_entities[entityNum].currentState;
+		if( state.eType != ET_VEHICLE || state.clientNum < 0 || state.clientNum >= MAX_CLIENTS )
+			return 0.0f;
+		const int vehicle = cgs.clientinfo[state.clientNum].vehicle;
+		if( vehicle < 0 || vehicle >= bg_numberOfVehicles || !(availableVehicles[vehicle].cat & CAT_GROUND) )
+			return 0.0f;
+		return availableVehicles[vehicle].mass > 0 ? availableVehicles[vehicle].mass : 20.0f;
+	};
 	if ( cg_pmove.ps->pm_type == PM_DEAD ) {
 		cg_pmove.tracemask = MASK_PLAYERSOLID & ~CONTENTS_BODY;
 	}

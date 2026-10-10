@@ -25,6 +25,7 @@ struct pml_t {
 	trace_t		groundTrace;
 
 	float		impactSpeed;
+	float		groundRise;		// ground vehicles: added to the upward speed for this frame's move only
 
 	vec3_t		previous_origin;
 	vec3_t		previous_velocity;

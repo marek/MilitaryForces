@@ -17,6 +17,7 @@ static const VehicleEntry entries[] =
 		.turnspeed = {50, 100, 100},
 		.cam_dist = {0, 100, 35.7},
 		.cam_height = {0, 100, 11.9},
+		.mass = 19.0f,
 		.maxspeed = 70,
 		.minthrottle = -5,
 		.maxthrottle = 10,
