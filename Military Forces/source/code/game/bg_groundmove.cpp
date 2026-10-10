@@ -177,7 +177,10 @@ static Footing PM_GroundFooting( pmove_t* pm, int vehicle, const Handling& handl
 		// where the tilted hull holds this wheel, and the most it can ride up from there: on a slope the uphill
 		// wheels are already higher than the hull's middle, and are measured from where they are
 		const float wheelAt = pm->ps->origin[2] + veh.mins[2] - along[i] * tanf( pitchNow ) - across[i] * tanf( rollNow );
-		const float ride = wheelAt + above;
+		// Never less than it could ride up with the hull level, though: a hull that comes down nose first has its
+		// front wheels "held" far below the ground it is landing on, and ground that is right there under it must
+		// not be taken for lower than it is - the vehicle would sink into it
+		const float ride = std::max( wheelAt, pm->ps->origin[2] + veh.mins[2] ) + above;
 		start[2] = std::max( pm->ps->origin[2] + veh.maxs[2], ride + 1.0f );
 		end[2] = pm->ps->origin[2] + veh.mins[2] - below;
 		trace_t tr;
@@ -369,9 +372,11 @@ void PlayerMove::groundVehicleAccelerate()
 		const float rise = std::max( 60.0f, VectorLength( pm->ps->velocity ) * 1.5f ) * dt;
 		pm->ps->origin[2] += std::min( pressed - ( handling.sag + travel ), rise );
 		pressed = handling.sag + travel;
+		// What speed it had into the ground is gone, and none of it comes back: ground that steepens under a fast
+		// vehicle turns it up the slope, it does not throw it off
 		const float sinking = DotProduct( pm->ps->velocity, footing.normal );
 		if( sinking < 0 )
-			VectorMA( pm->ps->velocity, -sinking * ( 1.0f + handling.bounce ), footing.normal, pm->ps->velocity );
+			VectorMA( pm->ps->velocity, -sinking, footing.normal, pm->ps->velocity );
 	}
 	const float support = afloat ? 1.0f : static_cast<float>( footing.touching ) / std::max( footing.points, 1 );
 
