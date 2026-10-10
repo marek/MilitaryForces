@@ -1013,7 +1013,7 @@ static void ClientThink_real( GameEntity *ent )
 		if( client->ps_.ONOFF & OO_VAPOR ) 
 		{
 			client->ps_.ONOFF &= ~OO_VAPOR;
-			float impact = -client->ps_.velocity[2] - 100;
+			float impact = pm.landingSpeed - 100;
 			if( impact > 0 )
 				Game::damage( ent, nullptr, ent, nullptr, nullptr, impact/2, DAMAGE_NO_PROTECTION, MOD_CRASH, CAT_ANY );
 		}

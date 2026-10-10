@@ -32,11 +32,13 @@ namespace
 		bool	tracked;
 		float	damping;		// of the suspension, 1 is no bounce at all
 		float	sag;			// how far it sits down on its springs at rest
+		float	travel;			// how much further the springs go before the hull is on the ground
 		float	lateralGrip;	// grip across the hull, as a share of its weight
 		float	driveGrip;		// grip along the hull, for driving and braking
 		float	rollingDrag;	// what slows it when it coasts
+		float	climb;			// the steepest slope, in degrees, its engine can hold it on at low speed
 		float	bounce;			// how much of an impact comes back off a wall
-		float	settleRate;		// degrees a second the hull turns to lie on the ground
+		float	settleTime;		// seconds the hull takes to come most of the way round to lie on the ground
 	};
 
 	Handling handlingOf( int vehicle )
@@ -47,13 +49,18 @@ namespace
 		h.tracked = !(veh.caps & HC_WHEELS);
 		// from a one tonne buggy to a twenty tonne hull and beyond
 		const float heavy = std::clamp( ( h.mass - 1.0f ) / 19.0f, 0.0f, 1.0f );
-		h.damping = 0.4f + 0.6f * heavy;
-		h.sag = 2.5f - 1.3f * heavy;
-		h.lateralGrip = h.tracked ? 1.6f : 0.7f + 0.3f * heavy;
-		h.driveGrip = h.tracked ? 0.9f : 0.8f;
-		h.rollingDrag = h.tracked ? 0.08f : 0.04f;
+		// a light car rides on long soft springs that let it bounce through a dip and off a crest; a tank's are
+		// short and dead
+		h.damping = 0.3f + 0.7f * heavy;
+		h.sag = 3.5f - 2.3f * heavy;
+		h.travel = 8.0f - 5.0f * heavy;
+		h.lateralGrip = h.tracked ? 3.0f : 1.3f + 0.5f * heavy;
+		h.driveGrip = h.tracked ? 1.6f : 1.25f;
+		// tracks and their drive train hold a standing tank on a fair slope; wheels roll more freely
+		h.rollingDrag = h.tracked ? 0.25f : 0.08f;
+		h.climb = h.tracked ? 50.0f : 40.0f;
 		h.bounce = 0.35f - 0.3f * heavy;
-		h.settleRate = 260.0f - 140.0f * heavy;
+		h.settleTime = 0.12f + 0.16f * heavy;
 		return h;
 	}
 
@@ -68,6 +75,7 @@ namespace
 		float	slopeRight = 0;
 		float	height = 0;			// of that ground under the vehicle's middle
 		vec3_t	normal = { 0, 0, 1 };
+		float	steepness = 1;		// the upward part of the ground's own normal under the points, on average
 	};
 
 	// what the vehicle ran into during this frame's move
@@ -78,6 +86,15 @@ namespace
 		int		entity = ENTITYNUM_NONE;
 	};
 	MoveHit moveHit;
+}
+
+// The box a ground vehicle is moved with. Its underside is lifted well clear of the ground: the wheels or tracks
+// carry the vehicle, and a box that reached down to them would rest on every slope and lift them off it
+static void PM_GroundMoveMins( int vehicle, vec3_t mins )
+{
+	const completeVehicleData_t& veh = availableVehicles[vehicle];
+	VectorCopy( veh.mins, mins );
+	mins[2] += std::min( ( veh.maxs[2] - veh.mins[2] ) * 0.6f, ( veh.maxs[0] - veh.mins[0] ) * 0.4f );
 }
 
 // Finds the ground under each point the vehicle stands on and lays one surface through those that touch
@@ -106,6 +123,7 @@ static Footing PM_GroundFooting( pmove_t* pm, int vehicle, bool tracked )
 
 	float sumF[2] = { 0, 0 }, sumZF[2] = { 0, 0 }, sumR[2] = { 0, 0 }, sumZR[2] = { 0, 0 }, sumZ = 0, meanF = 0, meanR = 0;
 	int countF[2] = { 0, 0 }, countR[2] = { 0, 0 };
+	float steep = 0;
 	for( int i = 0; i < footing.points; i++ )
 	{
 		vec3_t start, end;
@@ -122,6 +140,7 @@ static Footing PM_GroundFooting( pmove_t* pm, int vehicle, bool tracked )
 		if( tr.startsolid )
 			tr.endpos[2] = start[2];
 		footing.touching++;
+		steep += tr.startsolid ? 1.0f : tr.plane.normal[2];
 		const int f = along[i] > 0 ? 1 : 0, r = across[i] > 0 ? 1 : 0;
 		sumF[f] += along[i]; sumZF[f] += tr.endpos[2]; countF[f]++;
 		sumR[r] += across[i]; sumZR[r] += tr.endpos[2]; countR[r]++;
@@ -137,6 +156,12 @@ static Footing PM_GroundFooting( pmove_t* pm, int vehicle, bool tracked )
 		footing.slopeForward = ( sumZF[1] / countF[1] - sumZF[0] / countF[0] ) / ( sumF[1] / countF[1] - sumF[0] / countF[0] );
 	if( footing.left && footing.right )
 		footing.slopeRight = ( sumZR[1] / countR[1] - sumZR[0] / countR[0] ) / ( sumR[1] / countR[1] - sumR[0] / countR[0] );
+	// an edge under one end is not a slope to lie on: the surface through the points is never steeper than a
+	// vehicle can stand on
+	constexpr float steepest = 1.2f;
+	footing.slopeForward = std::clamp( footing.slopeForward, -steepest, steepest );
+	footing.slopeRight = std::clamp( footing.slopeRight, -steepest, steepest );
+	footing.steepness = steep / footing.touching;
 	footing.height = sumZ / footing.touching - footing.slopeForward * meanF / footing.touching - footing.slopeRight * meanR / footing.touching;
 	for( int i = 0; i < 3; i++ )
 		footing.normal[i] = -footing.slopeForward * forward[i] - footing.slopeRight * right[i];
@@ -228,9 +253,18 @@ void PlayerMove::groundVehicleAccelerate()
 	// how far the springs are pressed: at rest, by their sag
 	const float restHeight = footing.height - veh.mins[2] + 1.0f;
 	// springs press no further than their travel: past that the hull itself is on the ground
-	constexpr float travel = 4.0f;
-	float pressed = afloat ? handling.sag : std::min( restHeight + handling.sag - pm->ps->origin[2], handling.sag + travel );
-	const bool standing = afloat || ( footing.touching > 0 && pressed > 0 && footing.normal[2] >= DRIVABLE_NORMAL );
+	const float travel = handling.travel;
+	float pressed = afloat ? handling.sag : restHeight + handling.sag - pm->ps->origin[2];
+	const bool standing = afloat || ( footing.touching > 0 && pressed > 0 && footing.steepness >= DRIVABLE_NORMAL );
+	if( standing && pressed > handling.sag + travel )
+	{
+		// the springs are right down: the ground itself holds the hull up, and it goes no lower
+		pm->ps->origin[2] += pressed - ( handling.sag + travel );
+		pressed = handling.sag + travel;
+		const float sinking = DotProduct( pm->ps->velocity, footing.normal );
+		if( sinking < 0 )
+			VectorMA( pm->ps->velocity, -sinking * ( 1.0f + handling.bounce ), footing.normal, pm->ps->velocity );
+	}
 	const float support = afloat ? 1.0f : static_cast<float>( footing.touching ) / std::max( footing.points, 1 );
 
 	if( !standing )
@@ -243,7 +277,12 @@ void PlayerMove::groundVehicleAccelerate()
 		return;
 	}
 	if( !(pm->ps->ONOFF & OO_LANDED) )
-		pm->ps->ONOFF |= OO_VAPOR;		// came down: the game looks at how hard
+	{
+		// came down: how hard is the speed into the ground, less what its springs take up. Driving down a slope
+		// is not falling
+		pm->ps->ONOFF |= OO_VAPOR;
+		pm->landingSpeed = std::max( 0.0f, -DotProduct( pm->ps->velocity, footing.normal ) - 10.0f * handling.travel );
+	}
 	pm->ps->ONOFF |= OO_LANDED;
 
 	const float* normal = footing.normal;
@@ -308,6 +347,16 @@ void PlayerMove::groundVehicleAccelerate()
 			const float low = std::min( 4.0f, topSpeed / std::max( fabsf( speedForward ), topSpeed * 0.25f ) );
 			const float pull = std::min( engine * low, grip ) * dt;
 			speedForward += std::clamp( wanted, -pull, pull );
+			// On a hill the engine first carries the vehicle's weight up it: all of it on a slope it can climb
+			// at low speed, less as it gathers speed, so a steep hill is taken slowly and a gentle one hardly
+			// costs anything
+			const float uphill = -DotProduct( down, forward ) * ( target > 0 ? -1.0f : 1.0f );
+			if( uphill > 0 )
+			{
+				const float power = std::clamp( 1.6f - fabsf( speedForward ) / std::max( topSpeed, 1.0f ), 0.6f, 1.0f );
+				const float carried = std::min( { uphill, GROUND_GRAVITY * sinf( DEG2RAD( handling.climb ) ) * power, grip } ) * dt;
+				speedForward += target > 0 ? carried : -carried;
+			}
 		}
 		else if( throttle != 0 && speedForward * target < 0 )
 			slow( grip * dt );							// driving the other way: braked first
@@ -317,7 +366,7 @@ void PlayerMove::groundVehicleAccelerate()
 			// over its speed it runs the harder the driver brakes. A slope can carry it past its top speed, not
 			// away with it, and a gentle slope lets it come to rest
 			const float over = std::clamp( ( fabsf( speedForward ) - fabsf( target ) ) / std::max( topSpeed, 1.0f ) - ( throttle != 0 ? 0.0f : 0.5f ), 0.0f, 1.0f );
-			const float drag = ( handling.rollingDrag * weightOnGround + ( throttle != 0 ? engine * 0.6f : 0.0f ) + grip * over ) * dt;
+			const float drag = ( handling.rollingDrag * weightOnGround + engine * 0.6f + grip * over ) * dt;
 			if( throttle != 0 && fabsf( wanted ) < drag )
 				speedForward = target;
 			else
@@ -365,13 +414,15 @@ void PlayerMove::adjustToTerrain( )
 	}
 	else
 	{
-		const float turn = handling.settleRate * pml.frametime;
+		// The hull eases round to the ground: most of what is left of the way in each settling time, so it rolls
+		// over an edge with its weight instead of snapping onto the next face, and never swings past
+		const float share = 1.0f - expf( -pml.frametime / handling.settleTime );
 		if( footing.front && footing.back )
-			pitch += std::clamp( AngleSubtract( -RAD2DEG( atanf( footing.slopeForward ) ), pitch ), -turn, turn );
+			pitch += AngleSubtract( -RAD2DEG( atanf( footing.slopeForward ) ), pitch ) * share;
 		else
 			pitch += ( footing.back ? tipRate : -tipRate ) * pml.frametime;
 		if( footing.left && footing.right )
-			roll += std::clamp( AngleSubtract( -RAD2DEG( atanf( footing.slopeRight ) ), roll ), -turn, turn );
+			roll += AngleSubtract( -RAD2DEG( atanf( footing.slopeRight ) ), roll ) * share;
 		else
 			roll += ( footing.left ? tipRate : -tipRate ) * pml.frametime;
 	}
@@ -410,8 +461,7 @@ void PlayerMove::stepSlideMove_GV()
 
 	// how high a vehicle can step: a good part of its own height
 	const float stepSize = std::max( 6.0f, ( availableVehicles[pm->vehicle].maxs[2] - availableVehicles[pm->vehicle].mins[2] ) * 0.6f );
-	VectorCopy( availableVehicles[pm->vehicle].mins, mins );
-	mins[2] += 4;
+	PM_GroundMoveMins( pm->vehicle, mins );
 
 	// room above to lift the vehicle
 	up = startOrigin;
@@ -686,8 +736,7 @@ bool PlayerMove::slideMove_GV() {
 	Vec3		endClipVelocity;
 	Vec3		mins;
 	
-	VectorCopy( availableVehicles[pm->vehicle].mins, mins );
-	mins[2] += 4;
+	PM_GroundMoveMins( pm->vehicle, mins );
 	
 	numbumps = 4;
 

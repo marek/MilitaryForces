@@ -185,6 +185,9 @@ struct pmove_t {
 	float		*gunnerAngles;
 	unsigned	stationsLagging;	// gun positions still swinging round to the aim: they do not fire yet
 
+	// a ground vehicle that came down on the ground this frame: how hard, past what its springs absorb (out)
+	float		landingSpeed;
+
 	// a ground vehicle that ran into another: which, how fast and which way, for the game to shove it (out)
 	int			pushEntity;
 	float		pushSpeed;
