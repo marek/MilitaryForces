@@ -159,7 +159,11 @@ static Footing PM_GroundFooting( pmove_t* pm, int vehicle, const Handling& handl
 	bool found[MAX_CONTACTS] = {}, bears[MAX_CONTACTS] = {};
 	float height[MAX_CONTACTS] = {}, slant[MAX_CONTACTS] = {};
 	int bearing = 0, reached = 0;
-	const float pitchNow = DEG2RAD( AngleNormalize180( pm->ps->vehicleAngles[PITCH] ) ), rollNow = DEG2RAD( AngleNormalize180( pm->ps->vehicleAngles[ROLL] ) );
+	// the hull's tilt, as far as it tells where its wheels are: one standing on its nose after a bad landing has
+	// its wheels nowhere useful, and is treated as lying no steeper than this so that it finds the ground again
+	constexpr float tiltCounted = 40.0f;
+	const float pitchNow = DEG2RAD( std::clamp( AngleNormalize180( pm->ps->vehicleAngles[PITCH] ), -tiltCounted, tiltCounted ) );
+	const float rollNow = DEG2RAD( std::clamp( AngleNormalize180( pm->ps->vehicleAngles[ROLL] ), -tiltCounted, tiltCounted ) );
 	for( int i = 0; i < footing.points; i++ )
 	{
 		vec3_t start, end;
@@ -170,8 +174,11 @@ static Footing PM_GroundFooting( pmove_t* pm, int vehicle, const Handling& handl
 		// look that starts under it, as one from wheel height does on a face that rises ahead, sees nothing at
 		// all, and the vehicle drives into the hill. What a wheel or track cannot ride up onto still counts as
 		// ground under that point, at the most it can ride up
-		const float ride = pm->ps->origin[2] + veh.mins[2] + above;
-		start[2] = pm->ps->origin[2] + veh.maxs[2];
+		// where the tilted hull holds this wheel, and the most it can ride up from there: on a slope the uphill
+		// wheels are already higher than the hull's middle, and are measured from where they are
+		const float wheelAt = pm->ps->origin[2] + veh.mins[2] - along[i] * tanf( pitchNow ) - across[i] * tanf( rollNow );
+		const float ride = wheelAt + above;
+		start[2] = std::max( pm->ps->origin[2] + veh.maxs[2], ride + 1.0f );
 		end[2] = pm->ps->origin[2] + veh.mins[2] - below;
 		trace_t tr;
 		pm->trace( &tr, start, vec3_origin, vec3_origin, end, pm->ps->clientNum, MASK_SOLID, false );
@@ -187,7 +194,6 @@ static Footing PM_GroundFooting( pmove_t* pm, int vehicle, const Handling& handl
 		// Does this point bear on that ground, or only hang over it? It bears if the ground is within a wheel's
 		// droop of where the tilted hull holds the wheel
 		constexpr float droopReach = 2.0f;
-		const float wheelAt = pm->ps->origin[2] + veh.mins[2] - along[i] * tanf( pitchNow ) - across[i] * tanf( rollNow );
 		bears[i] = height[i] >= wheelAt - droopReach - handling.sag;
 		if( bears[i] )
 			bearing++;
@@ -597,10 +603,15 @@ void PlayerMove::adjustToTerrain( )
 	const float dt = pml.frametime;
 	if( !footing.touching || above > droop )
 	{
-		// in the air nothing turns it but the spin it has, which the air takes away slowly
-		constexpr float airDrag = 0.25f;
+		// In the air nothing turns it but the spin it has, which dies away, and it does not go on turning past
+		// standing on its nose or its side: a flight ends with the vehicle somewhere near the right way up
+		constexpr float airDrag = 1.0f, airSpin = 140.0f, airTilt = 60.0f;
+		pitchSpin = std::clamp( pitchSpin, -airSpin, airSpin );
+		rollSpin = std::clamp( rollSpin, -airSpin, airSpin );
 		pitch += pitchSpin * dt;
 		roll += rollSpin * dt;
+		if( fabsf( pitch ) > airTilt ) { pitch = std::clamp( pitch, -airTilt, airTilt ); pitchSpin = 0; }
+		if( fabsf( roll ) > airTilt ) { roll = std::clamp( roll, -airTilt, airTilt ); rollSpin = 0; }
 		pitchSpin *= expf( -airDrag * dt );
 		rollSpin *= expf( -airDrag * dt );
 	}
