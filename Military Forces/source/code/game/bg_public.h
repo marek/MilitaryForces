@@ -725,7 +725,7 @@ inline constexpr int VF_DOORGUNS = 8;	// one gun in each door, sharing one weapo
 
 // door guns stop short of the fuselage line; both fire only when the aim is this close to straight ahead or behind
 inline constexpr float DOORGUN_STOP = 2.0f;
-inline constexpr float DOORGUN_BOTH = 4.0f;
+inline constexpr float DOORGUN_BOTH = 8.0f;	// both door guns bear this far either side of the fuselage line, past where each stops: a cone of 10 degrees ahead and astern
 // where the Huey's door mounts are, from the model's turret tags
 inline constexpr float DOORGUN_FORWARD = 4.1f;
 inline constexpr float DOORGUN_SIDE = 6.6f;

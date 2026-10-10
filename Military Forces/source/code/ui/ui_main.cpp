@@ -2022,41 +2022,27 @@ static void UI_DrawVehiclePreview( rectDef_t *rect, float scale, const vec4_t co
 	int vehicleCat = -1;
 //	char * dir = NULL;
 	char * pIconString = nullptr;
-	static qhandle_t pictureHandle = -1;
-	static int lastVehicle = -1;
+	// Looked up by name every time it is drawn. A picture's number is good only until the renderer loads the next
+	// map: kept from before, it draws whatever picture has that number now
+	qhandle_t pictureHandle = 0;
 
 	// find out the current UI vehicle index
 	vehicle = CvarSystem::variableValue("ui_vehicle");
 	vehicleCat = CvarSystem::variableValue("ui_vehicleCat");
 
-	// valid?
 	if( vehicle >= 0 )
 	{
 		if(UI_CAT_GI == vehicleCat &&  vehicle < bg_numberOfGroundInstallations) {
-			if( pictureHandle == -1 || lastVehicle != vehicle ) {
-				// create filename string
-				pIconString = va( "models/vehicles/npc/%s/%s_icon", availableGroundInstallations[ vehicle ].modelName, availableGroundInstallations[ vehicle ].modelName );
-				pictureHandle = refExport.RegisterShaderNoMip( pIconString );
-			}
+			pIconString = va( "models/vehicles/npc/%s/%s_icon", availableGroundInstallations[ vehicle ].modelName, availableGroundInstallations[ vehicle ].modelName );
+			pictureHandle = refExport.RegisterShaderNoMip( pIconString );
 		} else if (vehicle < bg_numberOfVehicles) {
-			// register different shader? (only do this on change)
-			if( pictureHandle == -1 || lastVehicle != vehicle) {
-				// create filename string
-				pIconString = VehicleData::createModelPathname( vehicle, "models/vehicles/%s/%s/%s_icon" );
-				pictureHandle = refExport.RegisterShaderNoMip( pIconString );
-			}
+			pIconString = VehicleData::createModelPathname( vehicle, "models/vehicles/%s/%s/%s_icon" );
+			pictureHandle = refExport.RegisterShaderNoMip( pIconString );
 		}
 
 		// draw (if valid picture handle)
 		if( pictureHandle )
 			Menus::drawHandlePic( rect->x, rect->y, rect->w, rect->h, pictureHandle );
-
-		// save last done
-		lastVehicle = vehicle;
-	}
-	else
-	{
-		// invalid vehicle draw nothing
 	}
 
 #endif

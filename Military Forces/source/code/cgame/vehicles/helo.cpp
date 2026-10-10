@@ -367,9 +367,15 @@ void ClientEntity::helo( clientInfo_t *ci )
 
 			CGame::addReticleEntityToScene( &reticlelock, nullptr );
 		}
-		else if(!(ps->stats[STAT_LOCKINFO] & LI_TRACKING) || (availableWeapons[availableVehicles[ci->vehicle].weapons[this->currentState.weaponNum]].type == WT_MACHINEGUN))
+		// Once a missile has its lock its marks sit on the target and no longer follow the view, so the gun gets
+		// its own reticle to be aimed with. Before the lock there is one reticle only, the selected weapon's
+		const bool tracking = ( ps->stats[STAT_LOCKINFO] & LI_TRACKING ) != 0;
+		const bool locked = ( ps->stats[STAT_LOCKINFO] & LI_LOCKING ) != 0;
+		const bool gunSelected = availableWeapons[availableVehicles[ci->vehicle].weapons[this->currentState.weaponNum]].type == WT_MACHINEGUN;
+		if( !tracking || gunSelected || ( locked && availableVehicles[ci->vehicle].weapons[WP_MACHINEGUN] ) )
 		{
-			reticle.customShader = CGame::reticleOf( ci->vehicle, this->currentState.weaponNum );
+			reticle = {};
+			reticle.customShader = tracking && !gunSelected ? static_cast<int>( CH_GUNMODE ) : CGame::reticleOf( ci->vehicle, this->currentState.weaponNum );
 			reticle.hModel = cgs.media.reticle[reticle.customShader];
 
 			AngleVectors( this->currentState.angles, forward, right, up );

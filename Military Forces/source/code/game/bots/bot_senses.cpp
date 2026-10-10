@@ -173,6 +173,29 @@ GameEntity* BotSenses::findEnemy( GameEntity* ent, Bots::State& bot, Bots::Role 
 	GameEntity* leader = BotSenses::leaderOf( bot );
 	const int leaderTarget = leader ? BotSenses::targetOf( leader ) : -1;
 
+	// Who is shooting up the team's vehicles on the ground near here: an aircraft with nothing more pressing goes
+	// to their help. A team mate under fire gives its attacker away, so the aircraft knows where to look
+	constexpr int underFireTime = 6000;
+	constexpr float planeHelpReach = 7000.0f, heloHelpReach = 4500.0f;
+	bool harassing[MAX_CLIENTS + 1] = {};
+	if( flyer && g_gametype.integer >= GT_TEAM && ( role == Bots::Role::Fighter || role == Bots::Role::AttackHelo ) )
+	{
+		const float reach = (veh.cat & CAT_PLANE) ? planeHelpReach : heloHelpReach;
+		for( int i = 1; i <= theLevel.maxclients_; i++ )
+		{
+			GameEntity* mate = theLevel.getEntity( i );
+			if( mate == ent || !alive( mate ) || !OnSameTeam( ent, mate ) || mate->client_->vehicle_ < 0 )
+				continue;
+			if( !(availableVehicles[mate->client_->vehicle_].cat & (CAT_GROUND|CAT_BOAT|CAT_LQM)) )
+				continue;
+			const int by = mate->client_->lasthurt_client_;
+			if( by < 1 || by > MAX_CLIENTS || theLevel.time_ > mate->client_->lastEnemyHitTime_ + underFireTime )
+				continue;
+			if( Distance( ent->r.currentOrigin, mate->r.currentOrigin ) <= reach )
+				harassing[by] = true;
+		}
+	}
+
 	GameEntity* best = nullptr;
 	float bestScore = 0;
 	for( int i = 1; i <= theLevel.maxclients_; i++ )
@@ -194,7 +217,7 @@ GameEntity* BotSenses::findEnemy( GameEntity* ent, Bots::State& bot, Bots::Role 
 		// being shot gives the shooter away: the bot knows roughly where its attacker is, seen or not
 		constexpr int grudgeTime = 8000;
 		const bool attackedBy = client->lasthurt_client_ == i && theLevel.time_ < bot.hitTime + grudgeTime;
-		if( attackedBy )
+		if( attackedBy || harassing[i] )
 		{
 			VectorCopy( other->r.currentOrigin, seen.position );
 			seen.time = theLevel.time_;
@@ -269,6 +292,10 @@ GameEntity* BotSenses::findEnemy( GameEntity* ent, Bots::State& bot, Bots::Role 
 		// fight what the leader is fighting
 		if( leaderTarget == i )
 			score *= 0.35f;
+		// whoever is shooting up the team's vehicles on the ground nearby: the better the team player, the sooner
+		// it drops what it was doing for them
+		if( harassing[i] )
+			score *= 0.7f - 0.4f * Bots::character( bot ).teamwork;
 		// whoever carries our flag comes before everyone
 		if( g_gametype.integer == GT_CTF && (oc->ps_.objectives & (client->sess_.sessionTeam_ == ClientBase::TEAM_RED ? OB_REDFLAG : OB_BLUEFLAG)) )
 			score *= 0.15f;
