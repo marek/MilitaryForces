@@ -14,8 +14,8 @@ Entity_Helicopter::checkForTakeoffOrLanding()
     float	throttle = client_->ps_.fixed_throttle;
     int		maxthrottle = availableVehicles[client_->vehicle_].maxthrottle;
 
-	// get real throttle
-	throttle > maxthrottle ? -(throttle-maxthrottle) : throttle;	// real vert speed
+	// the collective as the pilot has it: up is positive, down negative (the stored value counts down past the maximum)
+	throttle = throttle > maxthrottle ? -(throttle - maxthrottle) : throttle;
 
 	startpos = Vec3( s.pos.trBase[0], s.pos.trBase[1], s.pos.trBase[2] + r.mins[2] );
 	if( client_->ps_.ONOFF & OO_GEAR ) 
@@ -28,13 +28,13 @@ Entity_Helicopter::checkForTakeoffOrLanding()
 	GameHost::trace (&trace, startpos, wheelMins, wheelMaxs, endpos, s.number, MASK_PLAYERSOLID, false );
 
 	// check for takeoff
-	if((client_->ps_.ONOFF & OO_LANDEDTERRAIN) && throttle) 
+	if((client_->ps_.ONOFF & OO_LANDEDTERRAIN) && throttle > 0) 
 	{
 		client_->ps_.ONOFF &= ~(OO_LANDEDTERRAIN|OO_LANDED);
 	} 
 	else if (client_->ps_.ONOFF & OO_LANDED && !(client_->ps_.ONOFF & OO_LANDEDTERRAIN)) 
 	{
-		if(throttle)
+		if(throttle > 0)
 			client_->ps_.ONOFF &= ~OO_LANDED;
 		else 
 		{
@@ -47,8 +47,10 @@ Entity_Helicopter::checkForTakeoffOrLanding()
 	} 
 	else 
 	{ 
-		// check for landing
-		if( trace.fraction == 1.0 ) 
+		// check for landing. Not while the pilot is pulling up: a helicopter standing on the ground with its
+		// collective raised is leaving, and taken for landing again it would be set down and its collective
+		// zeroed every frame, never to lift
+		if( trace.fraction == 1.0 || throttle > 0 ) 
 			return;
 		if( trace.entityNum != ENTITYNUM_NONE && (client_->ps_.ONOFF & OO_GEAR) ) 
 		{
