@@ -1,17 +1,5 @@
 #include "game.h"
-
-
-#pragma message( "+++TODO+++ decls (remove when finished porting to C++!)" )
-void G_InitGame( int levelTime, int randomSeed );
-void G_ShutdownGame();
-char *MF_ClientConnect( int clientNum, bool firstTime, bool isBot );
-void MF_ClientBegin( int clientNum );
-void ClientUserinfoChanged( int clientNum );
-void ClientDisconnect( int clientNum );
-void ClientCommand( int clientNum );
-void ClientThink( int clientNum );
-void G_RunFrame( int levelTime );
-bool ConsoleCommand();
+#include "g_local.h"
 
 
 

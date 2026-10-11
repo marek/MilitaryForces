@@ -872,6 +872,9 @@ void DeathmatchScoreboardMessage (GameEntity *client);
 //
 // g_main.c
 //
+void G_InitGame( int levelTime, int randomSeed );
+void G_RunFrame( int levelTime );
+void G_ShutdownGame();
 void FindIntermissionPoint( );
 void SetLeader(int team, int client);
 void CheckTeamLeader( int team );

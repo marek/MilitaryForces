@@ -3,14 +3,6 @@
 
 
 
-#pragma message( "+++TODO+++ decls (remove when finished porting to C++!)" )
-void _UI_Init( bool );
-void _UI_Shutdown();
-void _UI_KeyEvent( int, bool );
-void _UI_MouseEvent( int, int );
-void _UI_Refresh( int );
-bool _UI_IsFullscreen();
-void _UI_SetActiveMenu( UserInterface::MenuCommand );
 
 
 

@@ -1,11 +1,3 @@
-set(VEHICLELIB_SOURCES
-    bg_datamanager.cpp bg_md3utils.cpp bg_vehicleextra.cpp bg_vehicleinfo.cpp
-    bg_vehicleinfo_boats.cpp bg_vehicleinfo_ground.cpp bg_vehicleinfo_helos.cpp
-    bg_vehicleinfo_infantry.cpp bg_vehicleinfo_planes.cpp bg_vehicleinfo_vehicle.cpp
-    bg_weaponinfo.cpp bg_weaponinfo_bombs.cpp bg_weaponinfo_guns.cpp
-    bg_weaponinfo_missiles.cpp bg_weaponinfo_other.cpp)
-list(TRANSFORM VEHICLELIB_SOURCES PREPEND "${SOURCE_DIR}/vehiclelib/")
-
 set(GAME_SOURCES
     bg_boatmove.cpp bg_groundmove.cpp bg_helomove.cpp bg_loadouts.cpp bg_lqmmove.cpp bg_md3util.cpp
     bg_mfq3util.cpp bg_missionrules.cpp bg_misc.cpp bg_planemove.cpp bg_pmove.cpp bg_slidemove.cpp bg_vehicledata.cpp

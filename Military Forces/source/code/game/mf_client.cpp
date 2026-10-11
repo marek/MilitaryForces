@@ -264,7 +264,6 @@ void MF_ClientSpawn( int clientNum, long cs_flags )
 		break;
 	default:
 		//Common::error( ERR_DROP, "Invalid vehicle type in MF_ClientSpawn" );
-#pragma message("-->make GameEntity_Spectator!!")
 		fresh = std::make_unique<GameEntity>();	// not chosen yet.. just spectator 
 		break;
 	}

@@ -1,9 +1,6 @@
 #include "cg.h"
 #include "cg_local.h"
 
-#pragma message( "+++TODO+++ decls (remove when finished porting to C++!)" )
-void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum );
-void CG_Shutdown();
 
 
 

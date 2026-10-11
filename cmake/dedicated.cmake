@@ -7,7 +7,6 @@ set(DEDICATED_SOURCES
     ${SYSTEM_SOURCES}
     ${SYSTEM_PLATFORM_SOURCES}
     ${SOURCE_DIR}/null/null_client.cpp
-    ${VEHICLELIB_SOURCES}
     ${GAME_SOURCES})
 
 add_executable(${DEDICATED_NAME} ${DEDICATED_SOURCES})

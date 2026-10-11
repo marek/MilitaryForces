@@ -1,7 +1,6 @@
 #include "g_local.h"
 #include "g_miscvehicle.h"
 #include "g_missionrules.h"
-#include "../vehiclelib/bg_datamanager.h"
 #include "g_level.h"
 #include "bots/bot.h"
 
@@ -188,9 +187,6 @@ cvarTable_t		gameCvarTable[] = {
 static int		gameCvarTableSize = std::size( gameCvarTable );
 
 
-void G_InitGame( int levelTime, int randomSeed );
-void G_RunFrame( int levelTime );
-void G_ShutdownGame();
 static void CheckExitRules();
 
 
@@ -362,7 +358,6 @@ void G_InitGame( int levelTime, int randomSeed )
 
 	// MFQ3: (for now) always set the 'g_synchronousClients' var to 0, as setting to 1
 	// causes glitching/flickering with the models
-#pragma message( "g_synchronousClients is always being set to 0 in G_InitGame()" )
 	CvarSystem::set( "g_synchronousClients", "0" );
 
 	// set some level globals
@@ -407,14 +402,6 @@ void G_InitGame( int levelTime, int randomSeed )
 	//memset( g_clients, 0, MAX_CLIENTS * sizeof(g_clients[0]) );
 	//level.clients = g_clients;
 
-	// set client fields on player ents
-#pragma message("cant do this with the new system.... find solution!!")
-	//for( int i=1 ; i <= theLevel.maxclients_ ; i++ ) 
-	//{
-	//	//g_entities[i].client = level.clients + i;
-	//	reinterpret_cast<GameEntity*>(theLevel.gameEntities_.at(i))->client_ = theLevel.clients_.at(i);
-	//}
-
 	// always leave room for the max number of clients,
 	// even if they aren't all used, so numbers inside that
 	// range are NEVER anything but clients
@@ -429,7 +416,6 @@ void G_InitGame( int levelTime, int randomSeed )
 
 	// MFQ3 data
 	VehicleData::loadAllVehicleData();
-	//DataManager::getInstance().createAllData();
 
 	// parse the key/value pairs and spawn gentities
 	Game::spawnEntitiesFromString();
@@ -1683,7 +1669,6 @@ void G_RunFrame( int levelTime )
 	theLevel.framenum_++;
 	theLevel.previousTime_ = theLevel.time_;
 	theLevel.time_ = levelTime;
-	int msec = theLevel.time_ - theLevel.previousTime_;
 
 	// get any cvar changes
 	G_UpdateCvars();

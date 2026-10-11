@@ -91,7 +91,6 @@ static void CG_AttractParticles(particle_t * a, particle_t * b)
 {
 	Vec3 vtemp;
 	float ftemp;
-	float dtime = (cg.time - a->lastthink)*0.001;
 	
 	vtemp = b->trBase - a->trBase;
 	ftemp = VectorNormalize(vtemp);
@@ -176,7 +175,6 @@ static void CG_ParticleEmitterThink(particleWorld_t * w, particleEmitter_t * e)
 {
 	int			i;
 	long		ptime = cg.time - e->birthtime;
-	float		dtime = (cg.time - e->lastthink)*0.001;
 
 	// *
 	// Emitter Life
@@ -203,7 +201,6 @@ static void CG_ParticleEmitterThink(particleWorld_t * w, particleEmitter_t * e)
 static void CG_ParticleSystemThink(particleWorld_t * w, particleSystem_t * s)
 {
 	long		ptime = cg.time - s->birthtime;
-	float		dtime = (cg.time - s->lastthink)*0.001;
 
 	// *
 	// System Life

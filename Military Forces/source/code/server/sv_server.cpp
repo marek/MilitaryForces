@@ -189,7 +189,6 @@ ServerStatic::initClients( int numClients )
 void
 ServerStatic::changeMaxNumClients( int newNumClients, int newClientsBeginAt )
 {
-#pragma message("verify this works!!!!!")
 	// can this be dangerous ? probably not as it is bounded beforehand anyway in ServerMain::changeMaxClients,
 	// so it shouldnt throw away any old clients anyway
 	svClients_.resize( newNumClients + 1 );

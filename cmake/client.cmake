@@ -3,12 +3,11 @@ if(USE_MUMBLE)
     list(APPEND CLIENT_DEFINITIONS USE_MUMBLE)
 endif()
 
-set(MF_LIBRARIES vehiclelib game cgame ui)
+set(MF_LIBRARIES game cgame ui)
 if(NOT USE_RENDERER_DLOPEN)
     list(APPEND MF_LIBRARIES renderer)
 endif()
 
-add_library(vehiclelib OBJECT ${VEHICLELIB_SOURCES})
 add_library(game OBJECT ${GAME_SOURCES})
 add_library(cgame OBJECT ${CGAME_SOURCES})
 add_library(ui OBJECT ${UI_SOURCES})

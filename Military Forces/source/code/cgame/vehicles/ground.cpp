@@ -393,13 +393,7 @@ void CGame::groundVehicleObituary( entityState_t *ent, clientInfo_t *ci )
     if ( !targetInfo ) {
 	    return;
     }
-#pragma message("remove the problem checking here!")
-	if( Info::valueForKey( targetInfo, "n" ) != nullptr ) {
-		Q_strncpyz( targetName, Info::valueForKey( targetInfo, "n" ), sizeof(targetName) - 2);
-	}
-	else {
-		Common::error( ERR_DROP, "MFQ3 Error (3): Invalid targetinfo\n" );
-	}	
+	Q_strncpyz( targetName, Info::valueForKey( targetInfo, "n" ), sizeof(targetName) - 2);
     strcat( targetName, S_COLOR_WHITE );
 
     message2 = "";
@@ -472,22 +466,11 @@ void CGame::groundVehicleObituary( entityState_t *ent, clientInfo_t *ci )
     if ( !attackerInfo ) {
 	    attacker = ENTITYNUM_WORLD;
 	    strcpy( attackerName, "noname" );
-    } else {
-		if( Info::valueForKey( attackerInfo, "n" ) != nullptr ) {
-			Q_strncpyz( attackerName, Info::valueForKey( attackerInfo, "n" ), sizeof(attackerName) - 2);
-		}
-		else {
-			Common::error( ERR_DROP, "MFQ3 Error (1): Bad attackerInfo!\n" );
-		}
+    } else {		Q_strncpyz( attackerName, Info::valueForKey( attackerInfo, "n" ), sizeof(attackerName) - 2);
 	    strcat( attackerName, S_COLOR_WHITE );
 	    // check for kill messages about the current clientNum
 	    if ( target == cg.snap->ps.clientNum ) {
-			if( attackerName != nullptr ) {
-				Q_strncpyz( cg.killerName, attackerName, sizeof( cg.killerName ) );
-			}
-			else {
-				Common::error( ERR_DROP, "MFQ3 Error (2): No attackerName!\n" );
-			}
+			Q_strncpyz( cg.killerName, attackerName, sizeof( cg.killerName ) );
 	    }
     }
 

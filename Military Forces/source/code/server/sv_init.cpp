@@ -553,7 +553,6 @@ void ServerMain::spawnServer( char *server, bool killBots )
 					EntityBase		*ent;
 
 					cl->state_ = SV_Client::CS_ACTIVE;
-//#pragma message("does the entity already exist there ??")
 					ent = theSV.getEntityByNum( i );
 					ent->s.number = i;
 					//cl->gentity_ = ent;

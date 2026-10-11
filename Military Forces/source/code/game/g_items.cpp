@@ -38,7 +38,7 @@ constexpr int RESPAWN_FUEL = 35;
 
 static int Pickup_Ammo( GameEntity *ent, GameEntity *other )
 {
-	int		quantity, i;
+	int		quantity;
 
 	if( ent->count_ ) 
 		quantity = ent->count_;
@@ -502,7 +502,6 @@ ClearRegisteredItems
 */
 void ClearRegisteredItems() 
 {
-#pragma message("this should probably be removed!")
 	memset( itemRegistered, 0, sizeof( itemRegistered ) );
 	// Always load health/ammo/fuel pickups
 	RegisterItem( GameShared::findItem( "5 Health" ) );

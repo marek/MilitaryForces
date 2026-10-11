@@ -439,7 +439,6 @@ float vectoyaw( const vec3_t vec )
 //	theLevel.num_entities_++;
 //
 //	// let the server system know that there are more entities
-//#pragma message("shouldnt need to call SV_LocateGameData here anymore..")
 //	//GameHost::locateGameData( &theLevel.gameEntities_, &theLevel.clients_ );
 //	//GameHost::locateGameData( (void*)level.gentities, level.num_entities, sizeof( gentity_t ), 
 //	//	&level.clients[0].ps, sizeof( level.clients[0] ) );

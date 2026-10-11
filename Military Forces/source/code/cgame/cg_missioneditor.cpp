@@ -858,7 +858,6 @@ void ME_ExportToScript( const char* scriptname )
 	char			outstring[1024];
 	const char		*info, *mapname;
 	fileHandle_t	f;
-	static char		buf[MAX_MENUDEFFILE];
 	int				i, j;
 	IGME_vehicle_t* veh;
 

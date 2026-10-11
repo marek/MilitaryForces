@@ -1749,14 +1749,6 @@ void CGame::drawStatusBar_MFQ3_new( ) {
 	int			targetheading, targetrange, altitude = 0, stallcolor;
 	int			speed, stallspeed = availableVehicles[vehicle].stallspeed;
 
-	static vec4_t colors[] = { 
-//		{ 0.2, 1.0, 0.2, 1.0 } , { 1.0, 0.2, 0.2, 1.0 }, {0.5, 0.5, 0.5, 1} };
-		{ 1.0f, 0.89f, 0.0f, 1.0f } ,		// normal, yellow
-		{ 1.0f, 0.0f, 0.0f, 1.0f },		// low health, red
-		{0.5f, 0.5f, 0.5f, 1.0f},			// weapon firing, grey
-		{ 1.0f, 1.0f, 1.0f, 1.0f },		// health > 100, white
-		{ 0.3f, 1.0f, 0.3f, 1.0f }		// green
-	};
 
 	if ( cg_drawStatus.integer == 0 ) {
 		return;

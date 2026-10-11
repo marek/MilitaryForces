@@ -58,7 +58,7 @@ static void P_DamageFeedback( GameEntity *player )
 	{
 		player->pain_debounce_time_ = theLevel.time_ + 700;
 
-#pragma message( "Possible future <client> event loss from calling Game::addEvent()!" )
+// a player has one event slot per frame, so a second Game::addEvent() in the same frame can replace the first
 /* MFQ3: don't create this event because (1) we don't need it and (2) it masks out our EV_VEHICLE_GIB event
          approximatley 15% of the time (for some reason, possibly that the previous Game::addEvent( EV_VEHICLE_GIB ) has not
 		 yet been processed and we therefore overwrite that event with this one)

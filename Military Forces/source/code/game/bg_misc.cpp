@@ -328,7 +328,6 @@ This needs to be the same for client side prediction and server use.
 */
 bool GameShared::canItemBeGrabbed( int gametype, const entityState_t *ent, const playerState_t *ps, int idx ) {
 	gitem_t	*item;
-	int		i;
 
 	if ( ent->modelindex < 1 || ent->modelindex >= bg_numItems ) {
 		Common::error( ERR_DROP, "GameShared::canItemBeGrabbed: index out of range" );

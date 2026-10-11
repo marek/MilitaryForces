@@ -77,30 +77,11 @@ static int const numGamesets = sizeof(mfqGamesets) / sizeof(const char*);
 static const char *gamesetVoteNames[] = { "Modern", "World War II", "World War I" };
 static const char *gamesetVoteCodes[] = { "modern", "ww2", "ww1" };
 
-static const char *teamArenaGameNames[] = {
-	"Deathmatch",
-	"Tournament",
-	"Single Player",
-	"MFQ3 Mission Editor",
-	"Team Deathmatch",
-	"Capture the Flag",
-	"One Flag CTF",
-	"Overload",
-	"Harvester",
-	"Team Tournament",
-};
 
 
 
 static const int numServerFilters = sizeof(serverFilters) / sizeof(serverFilter_t);
 
-static const char *sortKeys[] = {
-	"Server Name",
-	"Map Name",
-	"Open Player Spots",
-	"Game Type",
-	"Ping Time"
-};
 
 static char* netnames[] = {
 	"???",
@@ -134,12 +115,6 @@ static vmCvar_t  ui_debug;
 static vmCvar_t  ui_initialized;
 static vmCvar_t  ui_teamArenaFirstRun;
 
-void _UI_Init( int );
-void _UI_Shutdown( );
-void _UI_KeyEvent( int key, int down );
-void _UI_MouseEvent( int dx, int dy );
-void _UI_Refresh( int realtime );
-bool _UI_IsFullscreen( );
 
 
 
@@ -1960,70 +1935,6 @@ UI_DrawVehiclePreview
 */
 static void UI_DrawVehiclePreview( rectDef_t *rect, float scale, const vec4_t color, int textStyle )
 {
-#if 0
-	// * EXPERIMENTAL MODEL RATHER THAN PICTURE CODE *
-	refdef_t		refdef;
-	refEntity_t		plane;
-	Vec3			origin;
-	Vec3			angles;
-	float			x, y, w, h;
-	
-	static int		old = 0;
-	static float	angle = 180;
-	qhandle_t& hModel = planeModel;
-	
-	if( !hModel ) 
-		hModel = refExport.RegisterModel("models/mapobjects/f-14/f-14.md3");
-
-	// setup the refdef
-	memset( &refdef, 0, sizeof( refdef ) );
-	refdef.rdflags = RDF_NOWORLDMODEL;
-	AxisClear( refdef.viewaxis );
-
-	x = rect->x;
-	y = rect->y;
-	w = rect->w;
-	h = rect->h;
-	Menus::adjustFrom640( &x, &y, &w, &h );
-	refdef.x = x;
-	refdef.y = y;
-	refdef.width = w;
-	refdef.height = h;
-
-	refdef.fov_x = 58;
-	refdef.fov_y = 8;
-	refdef.time = uiInfo.uiUtils.dc_->realTime_;
-
-	refExport.ClearScene();
-
-	// add the model
-	origin[0] = 520;
-	origin[1] = -50;
-	origin[2] = -20;
-	memset( &plane, 0, sizeof(plane) );
-	VectorSet( angles, 10, angle, 0 );
-	AnglesToAxis( angles, plane.axis );
-	plane.hModel = hModel;
-	VectorCopy( origin, plane.origin );
-	VectorCopy( origin, plane.lightingOrigin );
-	plane.renderfx = RF_LIGHTING_ORIGIN | RF_NOSHADOW;
-	VectorCopy( plane.origin, plane.oldorigin );
-
-	refExport.AddRefEntityToScene( &plane );
-
-	refExport.RenderScene( &refdef );
-
-	// spin
-	if( uiInfo.uiDC.realTime > old + 20 ) { 
-		angle++;
-		old =  uiInfo.uiDC.realTime;
-	}
-	if( angle >= 360 ) angle -= 360;
-	//	Menus::fillRect(rect->x, rect->y, rect->w, rect->h, color );
-/*
-	Text_Paint(rect->x, rect->y, scale, color, "Waiting for New key... Press ESCAPE to cancel", 0, 0, textStyle);
-*/
-#else
 	// DRAW VEHICLE ICON CODE
 	int vehicle = -1;
 	int vehicleCat = -1;
@@ -2052,7 +1963,6 @@ static void UI_DrawVehiclePreview( rectDef_t *rect, float scale, const vec4_t co
 			Menus::drawHandlePic( rect->x, rect->y, rect->w, rect->h, pictureHandle );
 	}
 
-#endif
 }
 
 /*
@@ -5830,15 +5740,8 @@ void _UI_Init( bool inGameLoad )
 		menuSet = "ui/menus.txt";
 	}
 
-#if 0
-	if (uiInfo.inGameLoad) {
-		Menus::loadMenus("ui/ingame.txt", true);
-	} else { // bk010222: left this: Menus::loadMenus(menuSet, true);
-	}
-#else 
 	Menus::loadMenus(menuSet, true);
 	Menus::loadMenus("ui/ingame.txt", false);
-#endif
 	
 	uiInfo.uiUtils.menu_CloseAll();
 
@@ -6174,7 +6077,6 @@ void Menus::drawConnectScreen( bool overlay )
 
 	bool& resetRequest = midPanelRequested;
 	bool& giveUpLoadingGfx = midPanelGivenUp;
-	static float w = 0.0f;
 	
 	// find the menu
 	menu = uiInfo.uiUtils.menu_FindByName( "Connect" );

@@ -16,9 +16,6 @@
 #include "../qcommon/client_host.h"
 #include "../ui/ui_shared.h"
 #include "../renderercommon/tr_public.h"
-#include "../vehiclelib/bg_datamanager.h"
-#include "../vehiclelib/bg_vehicleinfo.h"
-#include "../vehiclelib/bg_weaponinfo.h"
 
 // used for 2D drawing using the shared UI code
 //extern displayContextDef_t * DC;
@@ -1276,6 +1273,8 @@ extern	vmCvar_t		cg_shadowDebug;
 //
 // cg_main.c
 //
+void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum );
+void CG_Shutdown();
 
 //void QDECL CG_Error( const char *msg, ... );
 
