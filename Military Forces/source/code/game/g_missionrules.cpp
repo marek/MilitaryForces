@@ -377,21 +377,22 @@ namespace
 	std::vector<Listed> findMissions()
 	{
 		std::vector<Listed> found;
+		// by map, not by folder: a pak lists its files, not the folders they are in
 		int numMaps = 0;
-		char** maps = FileSystem::listFiles( "missions", "/", &numMaps );
+		char** maps = FileSystem::listFiles( "maps", ".bsp", &numMaps );
 		for( int m = 0; m < numMaps; ++m )
 		{
-			if( maps[m][0] == '.' )
-				continue;
+			char map[MAX_QPATH];
+			COM_StripExtension( maps[m], map, sizeof( map ) );
 			int numFiles = 0;
-			char** files = FileSystem::listFiles( va( "missions/%s", maps[m] ), ".mis", &numFiles );
+			char** files = FileSystem::listFiles( va( "missions/%s", map ), ".mis", &numFiles );
 			for( int f = 0; f < numFiles; ++f )
 			{
 				Listed listed = {};
 				char name[MAX_QPATH];
 				COM_StripExtension( files[f], name, sizeof( name ) );
-				Com_sprintf( listed.id, sizeof( listed.id ), "%s/%s", maps[m], name );
-				if( readOverview( va( "missions/%s/%s", maps[m], files[f] ), listed.overview ) )
+				Com_sprintf( listed.id, sizeof( listed.id ), "%s/%s", map, name );
+				if( readOverview( va( "missions/%s/%s", map, files[f] ), listed.overview ) )
 					found.push_back( listed );
 			}
 			FileSystem::freeFileList( files );
