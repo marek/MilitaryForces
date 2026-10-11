@@ -273,6 +273,13 @@ void Game::baseSitesCommand()
 {
 	char arg[MAX_TOKEN_CHARS];
 	CommandSystem::argvBuffer( 1, arg, sizeof( arg ) );
+	// "areas": the runways, recharge areas and destroyable buildings sites keep clear of, as boxes
+	if( !Q_stricmp( arg, "areas" ) )
+	{
+		for( const Box& box : survey().keepClear )
+			Common::printf( "BASEAREA %.0f %.0f %.0f to %.0f %.0f %.0f\n", box.mins[0], box.mins[1], box.mins[2], box.maxs[0], box.maxs[1], box.maxs[2] );
+		return;
+	}
 	bool destroy = !Q_stricmp( arg, "destroy" ) && g_cheats.integer;
 	int up = 0;
 	for( const Site& site : placedSites )
@@ -291,4 +298,31 @@ void Game::baseSitesCommand()
 			availableGroundInstallations[site.installation].descriptiveName, ent->r.currentOrigin[0], ent->r.currentOrigin[1], ent->r.currentOrigin[2] );
 	}
 	Common::printf( "BASESITES standing %d of %d\n", up, static_cast<int>( placedSites.size() ) );
+}
+
+// "groundprofile x0 y0 x1 y1 steps top": the height of the ground under the height top along a line and what it is made of there, for finding
+// out what a vehicle met (a kerb, a rim, a gap) without seeing it
+void Game::groundProfileCommand()
+{
+	if( !g_cheats.integer )
+		return;
+	char arg[MAX_TOKEN_CHARS];
+	float value[6] = {};
+	for( int i = 0; i < 6; i++ )
+	{
+		CommandSystem::argvBuffer( i + 1, arg, sizeof( arg ) );
+		value[i] = static_cast<float>( atof( arg ) );
+	}
+	const int steps = std::clamp( static_cast<int>( value[4] ), 1, 400 );
+	constexpr float toBelow = 4000.0f;
+	const float fromAbove = value[5];
+	for( int i = 0; i <= steps; i++ )
+	{
+		const float part = static_cast<float>( i ) / steps;
+		Vec3 top( value[0] + ( value[2] - value[0] ) * part, value[1] + ( value[3] - value[1] ) * part, fromAbove ), bottom = top;
+		bottom[2] = -toBelow;
+		trace_t tr;
+		GameHost::trace( &tr, top, nullptr, nullptr, bottom, ENTITYNUM_NONE, MASK_SOLID, false );
+		Common::printf( "GROUNDPROFILE %.1f %.1f z %.1f normal %.2f %.2f %.2f entity %d\n", top[0], top[1], tr.endpos[2], tr.plane.normal[0], tr.plane.normal[1], tr.plane.normal[2], tr.entityNum );
+	}
 }

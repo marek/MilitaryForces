@@ -617,6 +617,7 @@ public:
 	static void placeBaseDefences();
 	static void runBaseDefences();
 	static void baseSitesCommand();
+	static void groundProfileCommand();
 	static bool loadOverviewAndEntities( char *filename, mission_overview_t* overview, mission_vehicle_t* vehs, mission_groundInstallation_t* gis );
 	static void updateIPBans();
 	static void addIP( char *str );

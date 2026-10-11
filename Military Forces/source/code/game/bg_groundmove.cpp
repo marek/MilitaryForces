@@ -667,6 +667,13 @@ PlayerMove::groundVehicleMove
 ===================
 */
 
+// how high a ground vehicle can step: a good part of its own height
+static float stepHeightOf( int vehicle )
+{
+	constexpr float least = 6.0f, shareOfHeight = 0.6f;
+	return std::max( least, ( availableVehicles[vehicle].maxs[2] - availableVehicles[vehicle].mins[2] ) * shareOfHeight );
+}
+
 /*
 ===================
 stepSlideMove_GV
@@ -689,8 +696,7 @@ void PlayerMove::stepSlideMove_GV()
 	VectorCopy( pm->ps->origin, slideOrigin );
 	VectorCopy( pm->ps->velocity, slideVelocity );
 
-	// how high a vehicle can step: a good part of its own height
-	const float stepSize = std::max( 6.0f, ( availableVehicles[pm->vehicle].maxs[2] - availableVehicles[pm->vehicle].mins[2] ) * 0.6f );
+	const float stepSize = stepHeightOf( pm->vehicle );
 	Vec3 maxs;
 	PM_GroundCoreBox( pm->vehicle, mins, maxs );
 
@@ -715,8 +721,9 @@ void PlayerMove::stepSlideMove_GV()
 
 	const float slideDistance = ( slideOrigin[0] - startOrigin[0] ) * ( slideOrigin[0] - startOrigin[0] ) + ( slideOrigin[1] - startOrigin[1] ) * ( slideOrigin[1] - startOrigin[1] );
 	const float stepDistance = ( pm->ps->origin[0] - startOrigin[0] ) * ( pm->ps->origin[0] - startOrigin[0] ) + ( pm->ps->origin[1] - startOrigin[1] ) * ( pm->ps->origin[1] - startOrigin[1] );
-	// a step is taken onto the ground, never onto another vehicle
-	const bool drivable = trace.fraction < 1.0f && trace.plane.normal[2] >= handlingOf( pm->vehicle ).standNormal && trace.entityNum == ENTITYNUM_WORLD;
+	// A step is taken onto the ground and onto what a map builds its ground from (a runway is an entity of its own,
+	// with a lip where it meets the terrain), never onto another player's vehicle
+	const bool drivable = trace.fraction < 1.0f && trace.plane.normal[2] >= handlingOf( pm->vehicle ).standNormal && trace.entityNum > MAX_CLIENTS;
 	if( !drivable || stepDistance <= slideDistance )
 	{
 		VectorCopy( slideOrigin, pm->ps->origin );
@@ -811,6 +818,20 @@ void PlayerMove::groundVehicleMove( )
 			if( face.fraction >= 1.0f || face.startsolid || face.plane.normal[2] >= handling.standNormal || face.plane.normal[2] < -0.1f ||
 				DotProduct( step, face.plane.normal ) >= 0 || DotProduct( face.plane.normal, hull[2] ) >= standsUp )
 				continue;
+			// a face no higher than the vehicle can step is a kerb, not a wall: the same stretch one step up is clear,
+			// and the step move takes it from here
+			{
+				const float stepHeight = stepHeightOf( pm->vehicle );
+				vec3_t fromUp, toUp;
+				VectorCopy( from, fromUp );
+				VectorCopy( to, toUp );
+				fromUp[2] += stepHeight;
+				toUp[2] += stepHeight;
+				trace_t over;
+				pm->trace( &over, fromUp, vec3_origin, vec3_origin, toUp, pm->ps->clientNum, MASK_SOLID | CONTENTS_PLAYERCLIP, false );
+				if( over.fraction >= 1.0f && !over.startsolid )
+					continue;
+			}
 			const float share = std::max( 0.0f, ( face.fraction * ( length + clear ) - clear ) / length );
 			if( share < allowed )
 			{
@@ -885,6 +906,17 @@ void PlayerMove::groundVehicleMove( )
 			if( wall.fraction >= 1.0f || wall.startsolid || wall.plane.normal[2] >= std::min( handling.standNormal, upright ) || wall.plane.normal[2] < -0.1f ||
 				DotProduct( probing, wall.plane.normal ) >= 0 || DotProduct( wall.plane.normal, axis[2] ) >= 0.5f )
 				continue;
+			// what that end has met is no higher than the vehicle steps: a kerb, which the step move takes
+			{
+				const float lift = stepHeightOf( pm->vehicle ) + veh.mins[2] + 1.0f - middle;
+				vec3_t fromUp, toUp;
+				VectorMA( from, lift, axis[2], fromUp );
+				VectorMA( to, lift, axis[2], toUp );
+				trace_t over;
+				pm->trace( &over, fromUp, vec3_origin, vec3_origin, toUp, pm->ps->clientNum, MASK_SOLID | CONTENTS_PLAYERCLIP, false );
+				if( lift > 0.0f && over.fraction >= 1.0f && !over.startsolid )
+					continue;
+			}
 			// back off, level, by as far as that end is into it
 			vec3_t out = { wall.plane.normal[0], wall.plane.normal[1], 0 };
 			if( VectorNormalize( out ) < 0.01f )

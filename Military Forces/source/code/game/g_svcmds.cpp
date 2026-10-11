@@ -452,6 +452,11 @@ bool ConsoleCommand()
 	}
 
 #ifdef MF_BOT_DEBUG
+	if( Q_stricmp( cmd, "groundprofile" ) == 0 ) 
+	{
+		Game::groundProfileCommand();
+		return true;
+	}
 	if( Q_stricmp( cmd, "basesites" ) == 0 ) 
 	{
 		Game::baseSitesCommand();

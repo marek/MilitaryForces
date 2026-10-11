@@ -158,6 +158,11 @@ void SV_Client::addServerCommand( const char *cmd ) {
 	if( this->state_ < SV_Client::CS_PRIMED )
 		return;
 
+	// A bot reads no commands. Queued for it they only wait to be marked read once a frame, and a frame that sends
+	// more than the queue holds (a full server, everyone's details changing at once) would drop every bot for it
+	if( this->netchan_.remoteAddress().type == NA_BOT )
+		return;
+
 	this->reliableSequence_++;
 	// if we would be losing an old command that hasn't been acknowledged,
 	// we must drop the connection
@@ -195,7 +200,10 @@ A NULL client will broadcast to all clients
 void QDECL ServerMain::sendServerCommand( SV_Client *cl, const char *fmt, ... ) 
 {
 	va_list		argptr;
-	byte		message[MAX_MSGLEN];
+	// Twice the longest command that is sent: anything longer is refused below, and this routine can be entered
+	// again from inside itself (a client dropped for a full queue is announced to the others), so a buffer the
+	// size of a whole network message here is what ran the stack out with a full server
+	byte		message[MAX_STRING_CHARS * 2];
 	
 	va_start (argptr,fmt);
 	Q_vsnprintf (reinterpret_cast<char *>(message), sizeof(message), fmt,argptr);

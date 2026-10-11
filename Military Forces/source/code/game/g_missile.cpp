@@ -7,6 +7,15 @@
 #include "g_local.h"
 #include "g_level.h"
 
+// A hit counts towards the firer's accuracy when a player fired. A ground installation fires too and has no player
+// behind it, and a firer may be gone by the time its shot lands.
+static void creditHit( int ownerNum )
+{
+	GameEntity* owner = ownerNum >= 0 && ownerNum < ENTITYNUM_MAX_NORMAL ? theLevel.getEntity( ownerNum ) : nullptr;
+	if( owner && owner->inuse_ && owner->client_ )
+		owner->client_->accuracy_hits_++;
+}
+
 constexpr int MISSILE_PRESTEP_TIME = 50;
 
 ///*
@@ -80,7 +89,7 @@ struct Think_ExplodeMissile : public GameEntity::EntityFunc_Think
 								self_, self_->splashMethodOfDeath_, self_->targetcat_ ) )
 			{
 				//g_entities[ent->r.ownerNum].client->accuracy_hits++;
-				theLevel.getEntity(self_->r.ownerNum)->client_->accuracy_hits_++;
+				creditHit( self_->r.ownerNum );
 			}
 		}
 
@@ -124,7 +133,7 @@ struct Think_ExplodeFlak : public GameEntity::EntityFunc_Think
 								self_, self_->splashMethodOfDeath_, self_->targetcat_ ) ) 
 			{
 				//g_entities[ent->r.ownerNum].client->accuracy_hits++;
-				theLevel.getEntity(self_->r.ownerNum)->client_->accuracy_hits_++;
+				creditHit( self_->r.ownerNum );
 			}
 		}
 		GameHost::linkEntity( self_ );
@@ -169,7 +178,7 @@ struct Think_ExplodeCFlare : public GameEntity::EntityFunc_Think
 								self_, self_->splashMethodOfDeath_, self_->targetcat_ ) ) 
 			{
 				//g_entities[ent->r.ownerNum].client->accuracy_hits++;
-				theLevel.getEntity(self_->r.ownerNum)->client_->accuracy_hits_++;
+				creditHit( self_->r.ownerNum );
 			}
 		}
 		
@@ -617,7 +626,7 @@ static void G_MissileImpact( GameEntity *ent, trace_t *trace )
 
 			if( LogAccuracyHit( other, theLevel.getEntity(ent->r.ownerNum) ) )// &g_entities[ent->r.ownerNum] ) ) 
 			{
-				theLevel.getEntity(ent->r.ownerNum)->client_->accuracy_hits_++;
+				creditHit( ent->r.ownerNum );
 				//g_entities[ent->r.ownerNum].client->accuracy_hits++;
 				hitClient = true;
 			}
@@ -694,7 +703,7 @@ static void G_MissileImpact( GameEntity *ent, trace_t *trace )
 			other, ent->splashMethodOfDeath_, ent->targetcat_ ) ) 
 		{
 			if( !hitClient ) 
-				theLevel.getEntity(ent->r.ownerNum)->client_->accuracy_hits_++;
+				creditHit( ent->r.ownerNum );
 				//g_entities[ent->r.ownerNum].client->accuracy_hits++;
 		}
 	}
@@ -2058,8 +2067,7 @@ constexpr int FLAK_DEVIATION_HEIGHT = 200;
 void fire_flak_GI (GameEntity *self)
 {
 	GameEntity	*bolt;
-	Vec3		start, offset;
-	bool	wingtip = false;
+	Vec3		start;
 	int		fuse;
 	static int	seed = 0x92;
 	int dis;
@@ -2068,7 +2076,8 @@ void fire_flak_GI (GameEntity *self)
 	dis = Distance(self->r.currentOrigin,self->tracktarget_->r.currentOrigin);
 	if(dis < 1000)
 		return;	// Need to be above reasonably!
-	fuse = static_cast<float>(dis)/availableWeapons[self->s.weaponIndex].muzzleVelocity;
+	// the shell bursts when it has flown that far, in milliseconds
+	fuse = static_cast<int>( dis * 1000.0f / std::max( 1, static_cast<int>( availableWeapons[self->s.weaponIndex].muzzleVelocity ) ) );
 
 
 	// Cheat using a random detonation position near player
@@ -2079,8 +2088,8 @@ void fire_flak_GI (GameEntity *self)
 	start[2] = self->tracktarget_->r.currentOrigin[2] + (FLAK_DEVIATION_HEIGHT - (FLAK_DEVIATION_HEIGHT * -1) + 1) * 
 				Q_random( &seed ) + (FLAK_DEVIATION_HEIGHT * -1);
 
-	// Remove one weapon to fire
-	VehicleData::removeWeaponFromLoadout(self->s.weaponIndex, &self->loadout_, &self->client_->ps_, &wingtip, offset, 0 );
+	// one shell gone. (A site has no player behind it and no loadout: its shells are its count)
+	self->count_--;
 	
 	bolt = theLevel.spawnEntity();
 	bolt->classname_ = "flak";
