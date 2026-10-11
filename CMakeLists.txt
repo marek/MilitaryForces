@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.21)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 
-project(MilitaryForces VERSION 1.0.9 LANGUAGES C CXX)
+project(MilitaryForces VERSION 25.0.0 LANGUAGES C CXX)
 
 set(CLIENT_NAME MilitaryForces)
 set(SOURCE_DIR "${CMAKE_SOURCE_DIR}/Military Forces/source/code")
