@@ -35,19 +35,19 @@ jobs:
         working-directory: MilitaryForces
     steps:
       # same layout as the workspace: MilitaryForces/ and assets/ side by side
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           path: MilitaryForces
 
       - name: game data
         if: env.WITH_ASSETS == 'true'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           repository: marek/MilitaryForcesAssets
           ssh-key: ${{ secrets.ASSETS_DEPLOY_KEY }}
           path: assets
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         if: env.WITH_ASSETS == 'true'
         with:
           python-version: '3.x'
@@ -61,7 +61,7 @@ jobs:
       - name: macOS libraries (cached)
         if: runner.os == 'macOS'
         id: deps
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: MilitaryForces/deps
           key: deps-${{ matrix.platform }}-${{ hashFiles('MilitaryForces/misc/macos/build-deps.sh') }}
@@ -113,14 +113,14 @@ jobs:
         run: cpack --preset ${{ matrix.platform }}
 
       - name: keep packages
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: package-${{ matrix.platform }}
           path: MilitaryForces/dist/militaryforces-*
           if-no-files-found: error
 
       - name: keep symbols
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: symbols-${{ matrix.platform }}
           path: MilitaryForces/builds/${{ matrix.platform }}/symbols
@@ -134,8 +134,8 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
         with:
           pattern: package-*
           path: dist
