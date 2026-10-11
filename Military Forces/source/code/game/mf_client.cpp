@@ -531,7 +531,26 @@ void MF_ClientSpawn( int clientNum, long cs_flags )
 		} 
 		else if( availableVehicles[vehIndex].cat & CAT_HELO ) 
 		{
-			MF_Spawn_Helo( ent, vehIndex, false );
+			// a spawn point on the ground or on a pad: the helicopter stands there on its gear. Only one up in the
+			// air starts flying
+			constexpr float groundSpawn = 128.0f;
+			bool landed = false;
+			trace_t	trace;
+			Vec3	endpos;
+			endpos = spawn_origin;
+			endpos[2] -= groundSpawn;
+			GameHost::trace( &trace, spawn_origin, nullptr, nullptr, endpos, ENTITYNUM_NONE, MASK_SOLID, false );
+			bool terrain = false;
+			if( trace.fraction < 1.0f && trace.entityNum != ENTITYNUM_NONE ) 
+			{
+				landed = true;
+				terrain = !canLandOnIt( theLevel.getEntity( trace.entityNum ) );
+				spawn_origin[2] = trace.endpos[2] - availableVehicles[vehIndex].mins[2] + 1 +
+					( (availableVehicles[vehIndex].caps & HC_GEAR) ? availableVehicles[vehIndex].gearheight : 0 );
+			}
+			MF_Spawn_Helo( ent, vehIndex, landed );
+			if( landed && terrain )
+				ent->client_->ps_.ONOFF |= OO_LANDEDTERRAIN;
 		} 
 		else if( availableVehicles[vehIndex].cat & CAT_LQM ) 
 		{

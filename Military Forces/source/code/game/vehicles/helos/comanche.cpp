@@ -1,6 +1,6 @@
 #include "../vehicle_table.h"
 
-// RAH-66 Comanche, RAH-66 Comanche (AT), RAH-66 Comanche (AA)
+// RAH-66 Comanche (mixed), RAH-66 Comanche (AT), RAH-66 Comanche (AA), RAH-66 Comanche (Rockets)
 static const VehicleEntry entries[] =
 {
 	{ 55,
@@ -26,8 +26,8 @@ static const VehicleEntry entries[] =
 		.maxhealth = 200,
 		.gunoffset = {18, 0, -4},
 		.maxfuel = 160,
-		.weapons = { WI_MGT_20MM, WI_HELLFIRE_L, WI_STINGER, 0, 0, 0, 0, WI_FLARE },
-		.ammo = { 500, 4, 2, 0, 0, 0, 0, 30 },
+		.weapons = { WI_MGT_20MM, WI_HELLFIRE_L, WI_STINGER_PAIR, 0, 0, 0, 0, WI_FLARE },
+		.ammo = { 500, 4, 2, 0, 0, 0, 0, 30 },	// four Hellfires and four Stingers, the Stingers two to a station
 		.turret = { 1, 0, 0, 0, 0, 0, 0, 0 },
 		.cockpitview = {0, 0, 10},
 		.radarRange = 8000,
@@ -98,6 +98,41 @@ static const VehicleEntry entries[] =
 		.maxfuel = 160,
 		.weapons = { WI_MGT_20MM, WI_STINGER_PAIR, 0, 0, 0, 0, 0, WI_FLARE },
 		.ammo = { 500, 6, 0, 0, 0, 0, 0, 30 },
+		.turret = { 1, 0, 0, 0, 0, 0, 0, 0 },
+		.cockpitview = {0, 0, 10},
+		.radarRange = 8000,
+		.radarRange2 = 6500,
+		.trackCone = -1,
+		.gearTime = 1000,
+		.bayTime = 500,
+		.liftRate = 1.35f,
+	} },
+
+	{ 65,
+	{
+		.descriptiveName = "RAH-66 Comanche (Rockets)",
+		.tinyName = "RAH-66",
+		.modelName = "comanche",
+		.shadowShader = SHADOW_DEFAULT,
+		.gameset = MF_GAMESET_MODERN,
+		.team = MF_TEAM_ANY,
+		.cat = CAT_HELO,
+		.cls = CLASS_HELO_ATTACK,
+		.flags = VF_STEALTH,
+		.caps = HC_GEAR|HC_WEAPONBAY,
+		.turnspeed = {50, 125, 70},
+		.cam_dist = {0, 100, 80},
+		.cam_height = {0, 100, 25},
+		.maxspeed = 195,
+		.minthrottle = -5,
+		.maxthrottle = 10,
+		.engines = 1,
+		.accel = 33,
+		.maxhealth = 200,
+		.gunoffset = {18, 0, -4},
+		.maxfuel = 160,
+		.weapons = { WI_MGT_20MM, WI_FFAR_LARGE, WI_HELLFIRE_L, 0, 0, 0, 0, WI_FLARE },
+		.ammo = { 500, 12, 2, 0, 0, 0, 0, 30 },	// two pods of six rockets and two Hellfires
 		.turret = { 1, 0, 0, 0, 0, 0, 0, 0 },
 		.cockpitview = {0, 0, 10},
 		.radarRange = 8000,

@@ -142,6 +142,12 @@ bool _UI_IsFullscreen( );
 
 
 
+// Handles the UI looked up for itself and keeps between frames. A map change restarts the renderer, after which an
+// old handle names some other image or none; the UI's init clears them so each is looked up again.
+static qhandle_t planeModel = 0;
+static bool midPanelRequested = false;
+static bool midPanelGivenUp = false;
+
 static void AssetCache() 
 {
 	int n;
@@ -1963,7 +1969,7 @@ static void UI_DrawVehiclePreview( rectDef_t *rect, float scale, const vec4_t co
 	
 	static int		old = 0;
 	static float	angle = 180;
-	static qhandle_t hModel = 0;
+	qhandle_t& hModel = planeModel;
 	
 	if( !hModel ) 
 		hModel = refExport.RegisterModel("models/mapobjects/f-14/f-14.md3");
@@ -5760,6 +5766,10 @@ void _UI_Init( bool inGameLoad )
 	const char *menuSet;
 	int start;
 
+	planeModel = 0;
+	midPanelRequested = midPanelGivenUp = false;
+	uiInfo.uiUtils.dc_->assets_.midPanelGfx = 0;
+
 	//uiInfo.inGameLoad = inGameLoad;
 
 	Menus::registerCvars();
@@ -6147,8 +6157,8 @@ void Menus::drawConnectScreen( bool overlay )
 	int gameset = 0;
 	menuDef_t * menu = nullptr;
 
-	static bool resetRequest = false;
-	static bool giveUpLoadingGfx = false;
+	bool& resetRequest = midPanelRequested;
+	bool& giveUpLoadingGfx = midPanelGivenUp;
 	static float w = 0.0f;
 	
 	// find the menu

@@ -627,7 +627,31 @@ void PlayerMove::heloMove( )
 	else if( gun_pitch > 360 ) gun_pitch -= 360;
 
 	// return angles
+	const float pitchWas = pm->ps->vehicleAngles[PITCH], rollWas = pm->ps->vehicleAngles[ROLL];
 	VectorCopy( vehdir, pm->ps->vehicleAngles );
+	// On the ground the hull lies the way the ground does, not level with the horizon: nose and one side as far
+	// down as the surface under it slopes, eased so that touching down does not snap it over
+	if( pm->ps->ONOFF & OO_LANDED )
+	{
+		constexpr float groundBelow = 96.0f, settleRate = 60.0f, steepest = 30.0f;
+		vec3_t below;
+		trace_t ground;
+		VectorCopy( pm->ps->origin, below );
+		below[2] -= groundBelow - pm->mins[2];
+		pm->trace( &ground, pm->ps->origin, nullptr, nullptr, below, pm->ps->clientNum, pm->tracemask, false );
+		float wantPitch = 0.0f, wantRoll = 0.0f;
+		if( ground.fraction < 1.0f && ground.plane.normal[2] > 0.1f )
+		{
+			vec3_t ahead, right;
+			const vec3_t heading = { 0, vehdir[YAW], 0 };
+			AngleVectors( heading, ahead, right, nullptr );
+			wantPitch = std::clamp( RAD2DEG( atan2( DotProduct( ground.plane.normal, ahead ), ground.plane.normal[2] ) ), -steepest, steepest );
+			wantRoll = std::clamp( RAD2DEG( atan2( DotProduct( ground.plane.normal, right ), ground.plane.normal[2] ) ), -steepest, steepest );
+		}
+		const float step = settleRate * pml.frametime;
+		pm->ps->vehicleAngles[PITCH] = pitchWas + std::clamp( AngleSubtract( wantPitch, pitchWas ), -step, step );
+		pm->ps->vehicleAngles[ROLL] = rollWas + std::clamp( AngleSubtract( wantRoll, rollWas ), -step, step );
+	}
 	pm->ps->turretAngle = turret_yaw;
 	pm->ps->gunAngle = gun_pitch;
 

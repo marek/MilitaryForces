@@ -615,6 +615,8 @@ public:
 	static void spawnMissionVehicles( mission_vehicle_t* vehs );
 	static void spawnMissionGroundInstallations( mission_groundInstallation_t* gis );
 	static void placeBaseDefences();
+	static void runBaseDefences();
+	static void baseSitesCommand();
 	static bool loadOverviewAndEntities( char *filename, mission_overview_t* overview, mission_vehicle_t* vehs, mission_groundInstallation_t* gis );
 	static void updateIPBans();
 	static void addIP( char *str );
@@ -956,8 +958,10 @@ extern	vmCvar_t	g_botDebug;
 extern	vmCvar_t	g_botPeaceful;
 #endif
 extern	vmCvar_t	g_botLanding;
+extern	vmCvar_t	g_botStrategy;
 extern	vmCvar_t	g_baseSAMs;
 extern	vmCvar_t	g_baseGuns;
+extern	vmCvar_t	g_baseSiteRespawn;
 extern	vmCvar_t	g_botVehicles;
 extern	vmCvar_t	g_abandonTime;
 extern	vmCvar_t	g_enterRange;

@@ -2,6 +2,7 @@
 #include "../g_level.h"
 #include "bot.h"
 #include "bot_local.h"
+#include "bot_team.h"
 #include "bot_airnav.h"
 #include "bot_groundnav.h"
 #include <algorithm>
@@ -32,6 +33,7 @@ void Bots::reset()
 	typeCrashes_.fill( 0 );
 	AirNav::reset();
 	GroundNav::reset();
+	BotTeam::reset();
 }
 
 bool Bots::isBot( int clientNum )
@@ -65,6 +67,7 @@ bool Bots::unfitHere( int type )
 // crashing on this map is picked less
 void Bots::onDeath( GameEntity* self, GameEntity* attacker, int meansOfDeath )
 {
+	BotTeam::onDeath( self, attacker );
 	if( !self || !self->client_ || !isBot( self->s.number ) || self->client_->vehicle_ < 0 )
 		return;
 
@@ -147,7 +150,8 @@ bool Bots::teamHasSupplier( int team, GameEntity* except )
 }
 
 // a weighted draw among the vehicles this team may take on this map
-int Bots::pickVehicle( int teamFlag, bool allowInfantry, const Character* who, const State* memory )
+// (teamKind: only vehicles of the kind the team asked for, see BotTeam)
+int Bots::pickVehicle( int teamFlag, bool allowInfantry, const Character* who, const State* memory, int teamKind )
 {
 	unsigned int cats = spawnCategories();
 	if( g_botVehicles.string[0] )
@@ -174,6 +178,8 @@ int Bots::pickVehicle( int teamFlag, bool allowInfantry, const Character* who, c
 		const completeVehicleData_t& veh = availableVehicles[i];
 		if( !(veh.gameset & gameset) || !(veh.team & teamFlag) || !(veh.cat & cats) || !VehicleData::selectable( i ) )
 			continue;
+		if( teamKind >= 0 && static_cast<int>( BotTeam::kindOf( i ) ) != teamKind )
+			continue;
 		// bots do not take nuclear weapons
 		bool nuke = false;
 		for( unsigned int weapon : veh.weapons )
@@ -193,7 +199,7 @@ int Bots::pickVehicle( int teamFlag, bool allowInfantry, const Character* who, c
 		else if( (veh.cat & CAT_LQM) && allowInfantry ) weight = 8;
 		// the character's own taste
 		if( who )
-			weight = static_cast<int>( weight * 10 * std::max( 0.0f, who->prefer[kind] ) );
+			weight = static_cast<int>( weight * 10 * std::max( teamKind >= 0 ? 0.1f : 0.0f, who->prefer[kind] ) );
 		// supplies are for team mates: nobody flies the supply helicopter in a free-for-all
 		if( g_gametype.integer < GT_TEAM && BotWeapons::carriesSupplies( i ) )
 			continue;
@@ -321,7 +327,8 @@ void Bots::select( GameEntity* ent, State& bot )
 
 	if( client->sess_.sessionTeam_ == ClientBase::TEAM_SPECTATOR )
 	{
-		char team[8] = "auto";
+		char team[8];
+		Q_strncpyz( team, g_gametype.integer >= GT_TEAM ? BotTeam::sideToJoin( bot ) : "auto", sizeof( team ) );
 		SetTeam( ent, team );
 		return;
 	}
@@ -331,7 +338,15 @@ void Bots::select( GameEntity* ent, State& bot )
 		teamFlag = client->sess_.sessionTeam_ == ClientBase::TEAM_RED ? MF_TEAM_1 : MF_TEAM_2;
 
 	if( bot.vehicle < 0 || bot.vehicle >= bg_numberOfVehicles || !(availableVehicles[bot.vehicle].team & teamFlag) )
-		bot.vehicle = pickVehicle( teamFlag, true, &character( bot ), &bot );
+	{
+		// the team's make-up comes before the bot's own taste
+		BotTeam::Kind kind;
+		bot.vehicle = -1;
+		if( BotTeam::wantedKind( ent, kind ) )
+			bot.vehicle = pickVehicle( teamFlag, false, &character( bot ), &bot, static_cast<int>( kind ) );
+		if( bot.vehicle < 0 )
+			bot.vehicle = pickVehicle( teamFlag, !BotTeam::level(), &character( bot ), &bot );
+	}
 	if( bot.vehicle < 0 )
 		return;
 
@@ -374,12 +389,17 @@ void Bots::think( GameEntity* ent, State& bot, usercmd_t& cmd )
 		const bool teamGame = g_gametype.integer >= GT_TEAM;
 		const bool fillSupply = teamGame && !supplier && !reconsider && !teamHasSupplier( client->sess_.sessionTeam_, ent ) &&
 			random() < 0.35f * character( bot ).teamwork;
-		if( reconsider || fillSupply )
+		// the team's make-up: the bot that respawns next takes the kind the team is shortest of
+		BotTeam::Kind teamKind;
+		const bool refit = BotTeam::wantedKind( ent, teamKind ) && teamKind != BotTeam::kindOf( flown );
+		if( reconsider || fillSupply || refit )
 		{
 			int teamFlag = MF_TEAM_ANY;
 			if( g_gametype.integer >= GT_TEAM )
 				teamFlag = client->sess_.sessionTeam_ == ClientBase::TEAM_RED ? MF_TEAM_1 : MF_TEAM_2;
-			int vehicle = pickVehicle( teamFlag, false, &character( bot ), &bot );
+			int vehicle = refit ? pickVehicle( teamFlag, false, &character( bot ), &bot, static_cast<int>( teamKind ) ) : -1;
+			if( vehicle < 0 && (reconsider || fillSupply) )
+				vehicle = pickVehicle( teamFlag, false, &character( bot ), &bot );
 			if( fillSupply && vehicle >= 0 && !BotWeapons::carriesSupplies( vehicle ) )
 				vehicle = -1;
 			if( vehicle >= 0 )
@@ -498,8 +518,17 @@ void Bots::think( GameEntity* ent, State& bot, usercmd_t& cmd )
 		}
 	}
 
-	// capturing: to their flag, and with it back to ours
-	if( bot.desire == Goal::Capture )
+	// the team's plan: where this bot is asked to be. It goes there when it has nothing more pressing, which a fight,
+	// an empty tank and a missile all are
+	const BotTeam::Assignment& job = BotTeam::of( ent->s.number );
+	const bool obeys = job.job != BotTeam::Job::None && character( bot ).teamwork >= (BotTeam::level() >= 2 ? 0.15f : 0.3f);
+	if( obeys && job.hasPlace && (bot.desire == Goal::Roam || bot.desire == Goal::Capture) )
+	{
+		VectorCopy( job.place, bot.goal );
+		bot.goalTime = theLevel.time_ + 3000;
+	}
+	// capturing: to their flag, and with it back to ours; an attacker told to gather first goes to the flag when the push does
+	else if( bot.desire == Goal::Capture )
 	{
 		const bool carrying = (ps.objectives & (OB_REDFLAG|OB_BLUEFLAG)) != 0;
 		const int own = client->sess_.sessionTeam_;
@@ -568,6 +597,7 @@ void Bots::runFrame()
 {
 	if( g_botMinPlayers.integer > 0 )
 		fill();
+	BotTeam::runFrame();
 
 	for( int i = 1; i <= theLevel.maxclients_ && i <= MAX_CLIENTS; i++ )
 	{

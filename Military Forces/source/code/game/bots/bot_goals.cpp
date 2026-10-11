@@ -2,6 +2,7 @@
 #include "../g_level.h"
 #include "bot.h"
 #include "bot_local.h"
+#include "bot_team.h"
 #include <algorithm>
 #include <cmath>
 
@@ -55,6 +56,15 @@ struct GoalScoring
 	// one against one, an honourable character does not run or leave to rearm
 	static float duelResolve( const Situation& s, float weight ) { return s.sense.duel ? 1.0f - weight * s.who.honour : 1.0f; }
 
+	// a stealth helicopter's fight is its missiles: with none left for this enemy it has nothing to stay for
+	static bool strikeSpent( const Situation& s )
+	{
+		if( !s.sense.stealth || s.sense.role != Role::AttackHelo || !s.sense.enemy )
+			return false;
+		bool guided = false;
+		return BotWeapons::findWeaponSlot( s.vehicle, s.ps, s.sense.enemyAir, 0.0f, guided ) < 0 || !guided;
+	}
+
 	// fight: by aggression, less when hurt; a bomber without bombs has little to fight with
 	static float attack( const Situation& s )
 	{
@@ -68,6 +78,8 @@ struct GoalScoring
 		float score = s.who.aggression * (0.4f + 0.6f * s.sense.health);
 		if( s.sense.role == Role::Bomber && !hasGroundWeapons( s ) )
 			score *= 0.5f;
+		if( strikeSpent( s ) )
+			score *= 0.3f;
 		if( s.sense.role == Role::Bomber && s.sense.enemyAir && s.sense.enemyDist < 2500 )
 			score += 0.4f * selfDefence( s );
 		return score;
@@ -156,7 +168,7 @@ struct GoalScoring
 			need = 1.0f + ( fuelWanted - fuel ) * fuelPull;
 		else if( s.sense.health < 0.45f )
 			need = 0.2f + 0.8f * s.who.caution;
-		else if( BotWeapons::outOfAmmo( s.vehicle, s.ps ) || suppliesGone( s ) || payloadGone( s ) )
+		else if( BotWeapons::outOfAmmo( s.vehicle, s.ps ) || suppliesGone( s ) || payloadGone( s ) || strikeSpent( s ) )
 			need = 0.7f;
 		else if( availableVehicles[s.vehicle].ammo[WP_FLARE] > 0 && s.ps.ammo[WP_FLARE] <= 0 && s.sense.role != Role::Tank )
 			need = 0.3f * s.who.caution;
@@ -179,6 +191,10 @@ struct GoalScoring
 		const bool carrying = (s.ps.objectives & (OB_REDFLAG|OB_BLUEFLAG)) != 0;
 		if( carrying )
 			return 1.6f;
+		// the team's plan: those told to guard, escort or hunt leave the flag to those sent for it
+		const BotTeam::Job job = BotTeam::of( s.ent->s.number ).job;
+		if( job != BotTeam::Job::None && job != BotTeam::Job::Attack )
+			return 0.0f;
 		// the nearer their flag, the less a passing enemy is worth turning aside for: a bot that has fought its way
 		// to the enemy base goes on and takes the flag
 		constexpr float flagNear = 4000.0f;

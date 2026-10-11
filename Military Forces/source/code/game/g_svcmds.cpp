@@ -8,6 +8,7 @@
 // this file holds commands that can be executed by the server console, but not remote clients
 
 #include "g_local.h"
+#include "bots/bot_team.h"
 #include "g_level.h"
 #include "bots/bot.h"
 
@@ -451,6 +452,16 @@ bool ConsoleCommand()
 	}
 
 #ifdef MF_BOT_DEBUG
+	if( Q_stricmp( cmd, "basesites" ) == 0 ) 
+	{
+		Game::baseSitesCommand();
+		return true;
+	}
+	if( Q_stricmp( cmd, "botteams" ) == 0 ) 
+	{
+		BotTeam::listCommand();
+		return true;
+	}
 	if( Q_stricmp( cmd, "botlist" ) == 0 ) 
 	{
 		Bots::listCommand();

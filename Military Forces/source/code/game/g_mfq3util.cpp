@@ -102,6 +102,13 @@ void updateTargetTracking( GameEntity *ent )
 		RotatePointAroundVector( dir, right, temp, ent->client_->ps_.gunAngle );
 		forward = dir;
 	} 
+	else if( availableVehicles[ent->client_->vehicle_].cat & CAT_HELO )
+	{
+		// a helicopter does not point its nose at what it attacks the way an aeroplane does: its seeker looks where
+		// the pilot looks
+		VectorCopy( ent->client_->ps_.viewangles, dir );
+		AngleVectors( dir, forward, nullptr, nullptr );
+	}
 	else
 	{
 		VectorCopy( ent->s.angles, dir );
@@ -111,6 +118,49 @@ void updateTargetTracking( GameEntity *ent )
 	// no target yet
 	if( !ent->tracktarget_ ) 
 	{
+		// Ground targets first by a narrow cone about the aim: a sweep of the whole hull along that line, which is
+		// what follows, strikes the ground beside a target on it long before it reaches the target
+		if( groundinstallations )
+		{
+			constexpr float acquireCone = 0.9986f;	// three degrees
+			GameEntity* found = nullptr;
+			float best = acquireCone;
+			for( int i = 1; i < theLevel.num_entities_; i++ )
+			{
+				GameEntity* other = theLevel.getEntity( i );
+				if( !other || other == ent || !other->inuse_ || other->health_ <= 0 )
+					continue;
+				if( other->s.eType == ET_VEHICLE && other->client_ )
+				{
+					if( other->client_->vehicle_ < 0 || !(availableVehicles[other->client_->vehicle_].cat & targetcat) || other->client_->sess_.ridingClient_ >= 0 )
+						continue;
+				}
+				else if( other->s.eType == ET_MISC_VEHICLE )
+				{
+					if( other->s.modelindex != 255 && !(availableVehicles[other->s.modelindex].cat & targetcat) )
+						continue;
+				}
+				else
+					continue;
+				Vec3 to = Vec3( other->r.currentOrigin ) - Vec3( ent->r.currentOrigin );
+				const float dist = VectorNormalize( to );
+				const float dot = DotProduct( forward, to );
+				if( dist > radarrange || dot < best )
+					continue;
+				if( other->client_ && VehicleData::stealthHidden( other->client_->vehicle_, other->client_->ps_.timers[TIMER_REVEAL], theLevel.time_, dist, radarrange ) )
+					continue;
+				GameHost::trace( &tr, ent->r.currentOrigin, nullptr, nullptr, other->r.currentOrigin, ent->s.number, MASK_SOLID, false );
+				if( tr.fraction < 1.0f && tr.entityNum != other->s.number )
+					continue;
+				found = other;
+				best = dot;
+			}
+			if( found )
+			{
+				track( ent, found );
+				return;
+			}
+		}
 		endpos = ent->r.currentOrigin + forward * ( radarrange );
 		GameHost::trace( &tr, ent->r.currentOrigin, ent->r.mins, ent->r.maxs, endpos, ent->s.number, MASK_ALL, false );
 		// nothing found

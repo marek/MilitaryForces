@@ -252,6 +252,103 @@ struct HeloTasks
 		return Status::Running;
 	}
 
+	// A stealth helicopter fights from where it cannot be seen: it comes in low with the bay shut, rises from behind
+	// cover inside missile range, fires, drops, and comes up next somewhere else. It does not stay for a fight at
+	// close quarters, which is the other side's game.
+	static constexpr float closeQuarters = 1800.0f, clearOfThem = 3200.0f, strikeShare = 0.85f, sameSpot = 500.0f, sidestep = 700.0f;
+
+	static int guidedAmmo( const Mind& c )
+	{
+		int ammo = 0;
+		for( int slot : secondaryWeaponSlots )
+		{
+			const int type = availableWeapons[c.veh.weapons[slot]].type;
+			if( c.veh.weapons[slot] && (type == WT_ANTIAIRMISSILE || type == WT_ANTIGROUNDMISSILE) )
+				ammo += c.ps.ammo[slot];
+		}
+		return ammo;
+	}
+	// how far off it fires: most of the reach of the missile it would use on this enemy
+	static float strikeRange( const Mind& c )
+	{
+		bool guided = false;
+		const int slot = BotWeapons::findWeaponSlot( c.client->vehicle_, c.ps, c.sense.enemyAir, 0.0f, guided );
+		if( slot < 0 || !guided )
+			return 0.0f;
+		const float range = static_cast<float>( availableWeapons[c.veh.weapons[slot]].range );
+		return (range > 0 ? range : 3000.0f) * strikeShare;
+	}
+	static bool stealthStriking( Mind& c )
+	{
+		return c.sense.stealth && c.sense.enemy && c.bot.desire == Goal::Attack && strikeRange( c ) > closeQuarters;
+	}
+	// once it has started to leave it keeps going until it is well clear
+	static bool tooClose( Mind& c )
+	{
+		const float dist = Distance( c.sense.enemy->r.currentOrigin, c.ent->r.currentOrigin );
+		c.bot.breakingOff = dist < (c.bot.breakingOff ? clearOfThem : closeQuarters);
+		return c.bot.breakingOff;
+	}
+	static bool outOfStrikeRange( Mind& c ) { return Distance( c.sense.enemy->r.currentOrigin, c.ent->r.currentOrigin ) > strikeRange( c ); }
+
+	static Status breakOff( Mind& c )
+	{
+		c.view[YAW] = c.sense.enemyAngles[YAW] + 180.0f;
+		c.bot.exposed = false;
+		c.cover = true;
+		c.defending = true;
+		c.wantHeight = 90.0f;
+		c.mode = Run;
+		return Status::Running;
+	}
+
+	// towards the enemy, low, weapons held: nothing that would show it before it is ready
+	static Status stalk( Mind& c )
+	{
+		closeOnEnemy( c );
+		c.cover = true;
+		c.wantHeight = 90.0f;
+		return Status::Running;
+	}
+
+	// in view at its firing place. It goes back down as soon as a missile has left, or when the time is up
+	static Status strikeExposed( Mind& c )
+	{
+		faceEnemy( c );
+		c.standoff = c.sense.enemyDist;
+		c.wantHeight = std::max( c.sense.height, heloLowHeight );
+		if( guidedAmmo( c ) < c.bot.strikeAmmo || theLevel.time_ > c.bot.popTime )
+		{
+			c.bot.exposed = false;
+			c.bot.hideTime = theLevel.time_ + 4000 + static_cast<int>( 3000 * c.who().caution );
+			VectorCopy( c.ent->r.currentOrigin, c.bot.lastPop );
+			c.bot.hasHide = Bots::findHidePoint( c.ent, c.bot, c.sense.enemy );
+			// cover right where it has just been seen is no cover: go along the line across the enemy's view instead
+			if( !c.bot.hasHide || Distance( c.bot.hidePoint, c.bot.lastPop ) < sameSpot )
+			{
+				Vec3 right;
+				const Vec3 facing( 0, c.sense.enemyAngles[YAW], 0 );
+				AngleVectors( facing, nullptr, right, nullptr );
+				const Vec3 aside = Vec3( c.ent->r.currentOrigin ) + right * (c.bot.breakSide * sidestep);
+				VectorCopy( aside, c.bot.hidePoint );
+				c.bot.hasHide = true;
+				c.bot.breakSide = -c.bot.breakSide;
+			}
+		}
+		return Status::Running;
+	}
+
+	static Status exposeForStrike( Mind& c )
+	{
+		bool guided = false;
+		const int slot = BotWeapons::findWeaponSlot( c.client->vehicle_, c.ps, c.sense.enemyAir, c.sense.enemyDist, guided );
+		const int lockDelay = slot >= 0 ? availableWeapons[c.veh.weapons[slot]].lockdelay : 0;
+		c.bot.exposed = true;
+		c.bot.strikeAmmo = guidedAmmo( c );
+		c.bot.popTime = theLevel.time_ + lockDelay + 2500 + static_cast<int>( 2000 * c.who().patience );
+		return strikeExposed( c );
+	}
+
 	// the weapon slot holding crates of that kind, or -1
 	static int crateSlot( const Mind& c, int type )
 	{
@@ -608,6 +705,16 @@ struct HeloTasks
 			t.when( "sees the enemy", seesEnemy, t.action( "expose", expose ) ),
 			t.action( "pop up", popUp ) } );
 
+		const auto* stealthStrike = t.selector( "stealth strike", {
+			t.when( "at close quarters", tooClose, t.action( "break off", breakOff ) ),
+			t.when( "hiding", inCover, t.selector( "cover", {
+				t.when( "knows cover", hasCover, t.action( "move to cover", moveToCover ) ),
+				t.action( "sink into cover", sinkIntoCover ) } ) ),
+			t.when( "exposed", exposed, t.action( "strike exposed", strikeExposed ) ),
+			t.when( "out of missile range", outOfStrikeRange, t.action( "stalk", stalk ) ),
+			t.when( "sees the enemy", seesEnemy, t.action( "expose for strike", exposeForStrike ) ),
+			t.action( "pop up", popUp ) } );
+
 		const auto* act = t.selector( "helicopter", {
 			t.when( "missile inbound", missileInbound, t.action( "dodge missile", dodgeMissile ) ),
 			t.when( "wants to rearm", rearming, rearm ),
@@ -616,6 +723,7 @@ struct HeloTasks
 			t.when( "evading", evading, t.action( "evade", evade ) ),
 			t.when( "capturing", capturing, t.action( "go to flag", goToFlag ) ),
 			t.when( "carries supplies", carriesCrates, t.action( "resupply team mate", resupply ) ),
+			t.when( "stealth with missiles", stealthStriking, stealthStrike ),
 			t.when( "fighting", fighting, popAndCover ),
 			t.when( "has an enemy", hasEnemy, t.action( "close on enemy", closeOnEnemy ) ),
 			t.when( "has a leader", hasLeader, t.action( "escort", escort ) ),
@@ -640,10 +748,15 @@ void Bots::thinkHelo( GameEntity* ent, State& bot, const Sense& sense, usercmd_t
 
 	// attack helicopters fly low by default, transports higher; the steps change it as they need
 	mind.wantHeight = sense.role == Role::AttackHelo ? heloLowHeight : heloCruiseHeight * 0.6f;
-	if( !HeloTasks::fighting( mind ) )
+	if( !HeloTasks::fighting( mind ) && !HeloTasks::stealthStriking( mind ) )
 		bot.exposed = false;
 	view[YAW] = ps.vehicleAngles[YAW];
 	view[PITCH] = sense.enemy ? std::clamp( AngleSubtract( sense.enemyAngles[PITCH], 0 ), -30.0f, 45.0f ) : 0.0f;
 
 	runTree( tree, mind, "helo" );
+
+	// an open bay shows a stealth helicopter to everyone: it is shut again as soon as nothing is about to leave it
+	constexpr int bayTap = 400;
+	if( sense.stealth && (ps.ONOFF & OO_WEAPONBAY) && !bot.exposed && (theLevel.time_ / bayTap) % 2 )
+		cmd.buttons |= BUTTON_WEAPONBAY;
 }

@@ -2,6 +2,7 @@
 #include "../g_level.h"
 #include "bot.h"
 #include "bot_local.h"
+#include "bot_team.h"
 #include <algorithm>
 #include <bit>
 #include <cmath>
@@ -196,6 +197,7 @@ GameEntity* BotSenses::findEnemy( GameEntity* ent, Bots::State& bot, Bots::Role 
 		}
 	}
 
+	const BotTeam::Assignment& teamJob = BotTeam::of( ent->s.number );
 	GameEntity* best = nullptr;
 	float bestScore = 0;
 	for( int i = 1; i <= theLevel.maxclients_; i++ )
@@ -229,9 +231,18 @@ GameEntity* BotSenses::findEnemy( GameEntity* ent, Bots::State& bot, Bots::Role 
 		{
 			VectorCopy( other->r.currentOrigin, seen.position );
 			seen.time = theLevel.time_;
+			BotTeam::report( client->sess_.sessionTeam_, i, other->r.currentOrigin );
 		}
 		else
 		{
+			// what a team mate saw, once word of it has got round
+			vec3_t told;
+			int toldTime;
+			if( BotTeam::known( client->sess_.sessionTeam_, i, told, toldTime ) && toldTime > seen.time )
+			{
+				VectorCopy( told, seen.position );
+				seen.time = toldTime;
+			}
 			if( !seen.time || theLevel.time_ > seen.time + Bots::memoryTime( bot ) )
 				continue;
 			// remembered, not seen: counts as further away, and is forgotten once the bot gets there and finds nothing
@@ -296,6 +307,22 @@ GameEntity* BotSenses::findEnemy( GameEntity* ent, Bots::State& bot, Bots::Role 
 		// it drops what it was doing for them
 		if( harassing[i] )
 			score *= 0.7f - 0.4f * Bots::character( bot ).teamwork;
+		// the team's plan: the enemy it was sent for; for a guard or an escort, whoever is near what it guards and
+		// nobody far from it; for air cover, aircraft over the place it covers
+		if( teamJob.job != BotTeam::Job::None )
+		{
+			constexpr float guardedNear = 2500.0f, guardedFar = 5000.0f;
+			if( teamJob.target == i )
+				score *= 0.3f;
+			if( teamJob.hasPlace && (teamJob.job == BotTeam::Job::Defend || teamJob.job == BotTeam::Job::Escort || teamJob.job == BotTeam::Job::AirCover) )
+			{
+				const float from = Distance( other->r.currentOrigin, teamJob.place );
+				if( from < guardedNear && (teamJob.job != BotTeam::Job::AirCover || air) )
+					score *= 0.5f;
+				else if( from > guardedFar )
+					score *= 2.0f;
+			}
+		}
 		// whoever carries our flag comes before everyone
 		if( g_gametype.integer == GT_CTF && (oc->ps_.objectives & (client->sess_.sessionTeam_ == ClientBase::TEAM_RED ? OB_REDFLAG : OB_BLUEFLAG)) )
 			score *= 0.15f;
@@ -393,6 +420,24 @@ void BotSenses::sense( GameEntity* ent, Bots::State& bot, Bots::Sense& out )
 			if( fewest < onMe )
 			{
 				target = Vec3( out.enemy->r.currentOrigin ) + side * gunRange;
+				flanking = true;
+			}
+		}
+		// Several of the team on one enemy: each comes in along its own bearing and height, and where they are to go
+		// in together it waits at its place until the others are at theirs
+		const BotTeam::Assignment& teamJob = BotTeam::of( ent->s.number );
+		if( !flanking && teamJob.flank && out.enemyVisible )
+		{
+			const bool flyer = (availableVehicles[ent->client_->vehicle_].cat & (CAT_PLANE|CAT_HELO)) != 0;
+			const float standOff = flyer ? gunRange : 900.0f;
+			if( dist > standOff * 1.4f || theLevel.time_ < teamJob.goTime )
+			{
+				Vec3 side;
+				const Vec3 bearing( 0, teamJob.bearing, 0 );
+				AngleVectors( bearing, side, nullptr, nullptr );
+				target = Vec3( out.enemy->r.currentOrigin ) + side * standOff;
+				if( flyer )
+					target[2] += teamJob.lift;
 				flanking = true;
 			}
 		}

@@ -57,7 +57,10 @@ namespace
 			if( !ent || !ent->inuse_ )
 				continue;
 			if( ent->s.eType == ET_MISC_VEHICLE && ent->s.modelindex == 255 )
+			{
 				map.hasSites = true;
+				map.sites.push_back( Vec3( ent->r.currentOrigin ) );
+			}
 			else if( isClass( ent, "trigger_recharge" ) || ent->s.eType == ET_EXPLOSIVE )
 				map.keepClear.push_back( { Vec3( ent->r.absmin ), Vec3( ent->r.absmax ) } );
 			else if( isClass( ent, "team_CTF_" ) || isClass( ent, "info_player_" ) )
@@ -131,10 +134,68 @@ namespace
 		return -1;
 	}
 
+	// a site this file placed: which entity it is, and when its replacement is due once it is gone
+	struct Site
+	{
+		int	entity;
+		int	team;
+		int	installation;
+		int	replaceAt = 0;
+	};
+	std::vector<Site> placedSites;
+	int nextSiteCheck = 0;
+	constexpr int siteCheckEvery = 1000;
+
+	bool standing( const Site& site )
+	{
+		GameEntity* ent = theLevel.getEntity( site.entity );
+		return ent && ent->inuse_ && ent->s.eType == ET_MISC_VEHICLE && ent->s.modelindex == 255 && ent->health_ > 0 && !ent->freeAfterEvent_;
+	}
+
+	// one site of this kind at a random place round the team's base that will take it; its entity number, or -1
+	int placeSite( BaseMap& map, int team, int installation, std::mt19937& dice )
+	{
+		if( map.spawns[team].empty() )
+			return -1;
+		std::uniform_real_distribution<float> anyAngle( 0.0f, 2.0f * std::numbers::pi_v<float> ), anyDistance( nearestToSpawn, farthestFromSpawn );
+		std::uniform_int_distribution<size_t> anySpawn( 0, map.spawns[team].size() - 1 );
+		for( int attempt = 0; attempt < triesPerSite; attempt++ )
+		{
+			const float angle = anyAngle( dice ), distance = anyDistance( dice );
+			Vec3 from = map.spawns[team][anySpawn( dice )], spot;
+			from[0] += cos( angle ) * distance;
+			from[1] += sin( angle ) * distance;
+			from[2] += groundSpawnHeight;
+			if( !siteAt( map, team, installation, from, spot ) )
+				continue;
+			// the spawn routine makes the entity that stays from this one, in the next free slot
+			const int before = theLevel.num_entities_;
+			GameEntity* ent = theLevel.spawnEntity();
+			ent->classname_ = "misc_vehicle";
+			VectorCopy( spot, ent->s.origin );
+			VectorSet( ent->s.angles, 0, angle * 180.0f / std::numbers::pi_v<float>, 0 );
+			ent->model_ = Game::newString( availableGroundInstallations[installation].modelName );
+			ent->team_ = Game::newString( team == ClientBase::TEAM_RED ? "red" : "blue" );
+			ent->s.modelindex = -1;
+			ent->s.modelindex2 = installation;
+			SP_misc_groundinstallation( ent );
+			map.sites.push_back( spot );
+			for( int i = MAX_CLIENTS + 1; i < std::max( before, theLevel.num_entities_ ); i++ )
+			{
+				GameEntity* made = theLevel.getEntity( i );
+				if( made && made->inuse_ && made->s.eType == ET_MISC_VEHICLE && made->s.modelindex == 255 && Distance( made->r.currentOrigin, spot ) < 1.0f )
+					return i;
+			}
+			return -1;
+		}
+		return -1;
+	}
 }
 
 void Game::placeBaseDefences()
 {
+	placedSites.clear();
+	nextSiteCheck = 0;
 	if( g_gametype.integer < GT_TEAM )
 		return;
 	BaseMap map = survey();
@@ -151,13 +212,11 @@ void Game::placeBaseDefences()
 		if( const int i = installationNamed( name ); i >= 0 && (availableGroundInstallations[i].gameset & gameset) )
 			guns.push_back( i );
 
+	std::mt19937 dice( std::random_device{}() );
 	for( int team : { ClientBase::TEAM_RED, ClientBase::TEAM_BLUE } )
 	{
 		if( map.spawns[team].empty() )
 			continue;
-		std::mt19937 dice( std::random_device{}() );
-		std::uniform_real_distribution<float> anyAngle( 0.0f, 2.0f * std::numbers::pi_v<float> ), anyDistance( nearestToSpawn, farthestFromSpawn );
-		std::uniform_int_distribution<size_t> anySpawn( 0, map.spawns[team].size() - 1 );
 		const struct { const std::vector<int>& kinds; int wanted; } batches[] = { { missiles, g_baseSAMs.integer }, { guns, g_baseGuns.integer } };
 		int placed = 0;
 		for( const auto& batch : batches )
@@ -165,30 +224,71 @@ void Game::placeBaseDefences()
 			for( int n = 0; n < batch.wanted && !batch.kinds.empty(); n++ )
 			{
 				const int installation = batch.kinds[n % batch.kinds.size()];
-				for( int attempt = 0; attempt < triesPerSite; attempt++ )
-				{
-					const float angle = anyAngle( dice ), distance = anyDistance( dice );
-					Vec3 from = map.spawns[team][anySpawn( dice )], spot;
-					from[0] += cos( angle ) * distance;
-					from[1] += sin( angle ) * distance;
-					from[2] += groundSpawnHeight;
-					if( !siteAt( map, team, installation, from, spot ) )
-						continue;
-					GameEntity* ent = theLevel.spawnEntity();
-					ent->classname_ = "misc_vehicle";
-					VectorCopy( spot, ent->s.origin );
-					VectorSet( ent->s.angles, 0, angle * 180.0f / std::numbers::pi_v<float>, 0 );
-					ent->model_ = Game::newString( availableGroundInstallations[installation].modelName );
-					ent->team_ = Game::newString( team == ClientBase::TEAM_RED ? "red" : "blue" );
-					ent->s.modelindex = -1;
-					ent->s.modelindex2 = installation;
-					SP_misc_groundinstallation( ent );
-					map.sites.push_back( spot );
-					placed++;
-					break;
-				}
+				const int entity = placeSite( map, team, installation, dice );
+				if( entity < 0 )
+					continue;
+				placedSites.push_back( { entity, team, installation } );
+				placed++;
 			}
 		}
 		Common::printf( "Base defences: %d sites for team %s\n", placed, team == ClientBase::TEAM_RED ? "red" : "blue" );
 	}
+}
+
+// A site that was destroyed is replaced after g_baseSiteRespawn seconds by one of its kind at a new random place
+// round the same base; 0 leaves destroyed sites gone.
+void Game::runBaseDefences()
+{
+	if( placedSites.empty() || theLevel.time_ < nextSiteCheck )
+		return;
+	nextSiteCheck = theLevel.time_ + siteCheckEvery;
+	for( Site& site : placedSites )
+	{
+		if( site.entity >= 0 && standing( site ) )
+			continue;
+		site.entity = -1;
+		if( g_baseSiteRespawn.integer <= 0 )
+		{
+			site.replaceAt = 0;
+			continue;
+		}
+		if( !site.replaceAt )
+			site.replaceAt = theLevel.time_ + g_baseSiteRespawn.integer * 1000;
+		if( theLevel.time_ < site.replaceAt )
+			continue;
+		BaseMap map = survey();
+		std::mt19937 dice( std::random_device{}() );
+		site.entity = placeSite( map, site.team, site.installation, dice );
+		// no room just now: tried again at the next check
+		if( site.entity >= 0 )
+		{
+			site.replaceAt = 0;
+			Common::printf( "Base defences: a %s site for team %s is back\n", availableGroundInstallations[site.installation].descriptiveName, site.team == ClientBase::TEAM_RED ? "red" : "blue" );
+		}
+	}
+}
+
+// lists the sites this file placed; "destroy" knocks out the first one standing, for the scenarios
+void Game::baseSitesCommand()
+{
+	char arg[MAX_TOKEN_CHARS];
+	CommandSystem::argvBuffer( 1, arg, sizeof( arg ) );
+	bool destroy = !Q_stricmp( arg, "destroy" ) && g_cheats.integer;
+	int up = 0;
+	for( const Site& site : placedSites )
+	{
+		if( !standing( site ) )
+			continue;
+		GameEntity* ent = theLevel.getEntity( site.entity );
+		if( destroy )
+		{
+			destroy = false;
+			Game::damage( ent, nullptr, nullptr, nullptr, nullptr, ent->health_ + 1, DAMAGE_NO_PROTECTION, MOD_UNKNOWN, CAT_ANY );
+			continue;
+		}
+		up++;
+		Common::printf( "BASESITE %s %s at %.0f %.0f %.0f\n", site.team == ClientBase::TEAM_RED ? "red" : "blue",
+			availableGroundInstallations[site.installation].descriptiveName, ent->r.currentOrigin[0], ent->r.currentOrigin[1], ent->r.currentOrigin[2] );
+	}
+	Common::printf( "BASESITES standing %d of %d\n", up, static_cast<int>( placedSites.size() ) );
 }

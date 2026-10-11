@@ -15,7 +15,7 @@ set(GAME_SOURCES
     vehicles/planes/a10.cpp vehicles/planes/b-2.cpp vehicles/planes/b17g.cpp vehicles/planes/bf-109g.cpp vehicles/planes/camel.cpp vehicles/planes/dr1.cpp
     vehicles/planes/f-14.cpp vehicles/planes/f-15.cpp vehicles/planes/f-16.cpp vehicles/planes/f-18.cpp vehicles/planes/f-5.cpp vehicles/planes/fw190a8.cpp
     vehicles/planes/jas-39.cpp vehicles/planes/p-51d.cpp vehicles/planes/spitfire_mk5b.cpp vehicles/registry.cpp
-    bg_weapondata.cpp g_active.cpp g_arenas.cpp g_boat.cpp bots/bot_manager.cpp bots/bot_characters.cpp bots/bot_world.cpp bots/bot_airnav.cpp bots/bot_groundnav.cpp bots/bot_senses.cpp bots/bot_goals.cpp bots/bot_weapons.cpp bots/bot_plane.cpp bots/bot_debug.cpp bots/bot_landing.cpp bots/bot_helo.cpp bots/bot_surface.cpp bots/bot_infantry.cpp g_client.cpp g_cmds.cpp
+    bg_weapondata.cpp g_active.cpp g_arenas.cpp g_boat.cpp bots/bot_manager.cpp bots/bot_team.cpp bots/bot_characters.cpp bots/bot_world.cpp bots/bot_airnav.cpp bots/bot_groundnav.cpp bots/bot_senses.cpp bots/bot_goals.cpp bots/bot_weapons.cpp bots/bot_plane.cpp bots/bot_debug.cpp bots/bot_landing.cpp bots/bot_helo.cpp bots/bot_surface.cpp bots/bot_infantry.cpp g_client.cpp g_cmds.cpp
     g_combat.cpp g_entity.cpp g_groundinstallation.cpp g_groundvehicle.cpp g_helo.cpp g_items.cpp
     g_level.cpp g_lqm.cpp g_main.cpp g_mem.cpp g_mfq3ents.cpp g_mfq3util.cpp g_misc.cpp
     g_basedefence.cpp g_miscvehicle.cpp g_missile.cpp g_missions.cpp g_mover.cpp g_plane.cpp g_scripts.cpp g_session.cpp

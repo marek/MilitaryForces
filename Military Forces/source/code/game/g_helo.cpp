@@ -63,6 +63,14 @@ Entity_Helicopter::checkForTakeoffOrLanding()
 					else 
 						client_->ps_.ONOFF |= OO_LANDEDTERRAIN|OO_LANDED;
 					client_->ps_.fixed_throttle = 0;
+					// The ground was looked for a little ahead of a fast descent, and found there: the helicopter
+					// goes down the rest of the way, or it would stand in the air over where it landed
+					const float gap = trace.fraction * height;
+					client_->ps_.origin[2] -= gap;
+					s.pos.trBase[2] -= gap;
+					r.currentOrigin[2] -= gap;
+					VectorClear( client_->ps_.velocity );
+					GameHost::linkEntity( this );
 				}
 				else 
 				{

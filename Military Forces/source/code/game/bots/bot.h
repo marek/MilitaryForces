@@ -106,6 +106,9 @@ public:
 		int		hideTime = 0;	// stays in cover, or keeps its hiding place, until then
 		bool	hasHide = false;
 		int		popTime = 0;	// a helicopter up out of cover goes back down then
+		vec3_t	lastPop = { 0, 0, 0 };	// where a stealth helicopter last came up to fire: not there again
+		int		strikeAmmo = 0;	// what it carried when it came up, to tell when a missile has gone
+		bool	breakingOff = false;	// getting out of a fight at close quarters
 		bool	exposed = false;	// up out of cover and shooting
 		int		flareTime = 0;
 		int		bombTime = 0;	// when a bomb or a crate was last released
@@ -193,6 +196,7 @@ public:
 	friend struct GoalScoring;
 	friend class BotWeapons;
 	friend class BotSenses;
+	friend class BotTeam;
 
 private:
 	// one bot's frame, and the pilot or driver for the kind of vehicle it is in
@@ -219,7 +223,7 @@ private:
 	static void logDeath( GameEntity* self, GameEntity* attacker, int meansOfDeath );
 	static void logState( GameEntity* ent, State& bot, const usercmd_t& cmd, const vec3_t view );
 	static void pickGoal( GameEntity* ent, State& bot, float radius );
-	static int pickVehicle( int teamFlag, bool allowInfantry = true, const Character* who = nullptr, const State* memory = nullptr );
+	static int pickVehicle( int teamFlag, bool allowInfantry = true, const Character* who = nullptr, const State* memory = nullptr, int teamKind = -1 );
 	static float failureSensitivity( const Character& who );
 	static float switchDesire( const State& bot, int kind );
 	static unsigned int spawnCategories();

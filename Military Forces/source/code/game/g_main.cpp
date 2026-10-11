@@ -43,8 +43,10 @@ vmCvar_t	g_botDebug;
 vmCvar_t	g_botPeaceful;
 #endif
 vmCvar_t	g_botLanding;
+vmCvar_t	g_botStrategy;
 vmCvar_t	g_baseSAMs;
 vmCvar_t	g_baseGuns;
+vmCvar_t	g_baseSiteRespawn;
 vmCvar_t	g_botVehicles;
 vmCvar_t	g_abandonTime;
 vmCvar_t	g_enterRange;
@@ -148,9 +150,13 @@ cvarTable_t		gameCvarTable[] = {
 	{ &g_botPeaceful, "g_botPeaceful", "0", 0, 0, false  },
 #endif
 	{ &g_botLanding, "g_botLanding", "1", 0, 0, false  },
+	// bots in a team game plan and work as a team (1) or each follow their own goals (0)
+	{ &g_botStrategy, "g_botStrategy", "1", CVAR_ARCHIVE, 0, false  },
 	// air defence sites stood around each base on a map that places none: missiles and guns, per base
 	{ &g_baseSAMs, "g_baseSAMs", "6", CVAR_ARCHIVE, 0, false  },
 	{ &g_baseGuns, "g_baseGuns", "6", CVAR_ARCHIVE, 0, false  },
+	// seconds until a destroyed base site is replaced at a new random place; 0: it stays gone
+	{ &g_baseSiteRespawn, "g_baseSiteRespawn", "300", CVAR_ARCHIVE, 0, false  },
 	{ &g_botVehicles, "g_botVehicles", "", 0, 0, false  },
 	{ &g_abandonTime, "g_abandonTime", "300", 0, 0, true  },
 	{ &g_enterRange, "g_enterRange", "45", 0, 0, true  },
@@ -1680,6 +1686,7 @@ void G_RunFrame( int levelTime )
 	G_UpdateCvars();
 
 	Bots::runFrame();
+	Game::runBaseDefences();
 
 	//
 	// go through all allocated objects
