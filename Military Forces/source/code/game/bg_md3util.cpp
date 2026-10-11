@@ -73,9 +73,9 @@ int VehicleData::getTagsContaining(const char* fileName, const char* str, md3Tag
 		for( i = 0; i < head.numFrames; ++i ) {
 			FileSystem::read(&frame, sizeof(frame), f);
 		}
+		// every tag is looked at; num limits the matches kept, not the tags read
 		total = head.numTags;
-		if( total > num ) total = num;
-		for( i = 0; i < total; ++ i ) {
+		for( i = 0; i < total && number < num; ++ i ) {
 			FileSystem::read(&tag, sizeof(tag), f);
 			if( Q_strncmp( tag.name, str, len ) == 0 ) {
 				tags[number] = tag;
