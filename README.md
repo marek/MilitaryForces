@@ -71,7 +71,9 @@ This edition is still being worked on. Here is what it brings so far.
 ## Building
 
 Needs CMake 3.25 or newer, Ninja and a C++23 compiler. On macOS, `misc/macos/build-deps.sh x86_64` (or `arm64`)
-builds SDL2, FreeType and OpenAL Soft into `deps/` first.
+builds SDL2, FreeType and OpenAL Soft into `deps/` first; on Linux, `misc/linux/build-deps.sh x86_64` (or `arm64`)
+does the same (it needs the X11, Wayland, PulseAudio, PipeWire and ALSA headers: see the workflow's Linux packages).
+The game carries those libraries beside itself; without `deps/` the system's own are used.
 
 ```bash
 cmake --preset darwin-arm
@@ -80,7 +82,9 @@ cpack --preset darwin-arm
 ```
 
 Presets: `darwin-x86`, `darwin-arm`, `linux-x86`, `linux-arm`, `windows`. Each builds into `builds/<preset>`, and
-`cpack` writes `dist/militaryforces-<version>-<preset>.zip` together with `dist/RELEASE_NOTES.md`.
+`cpack` writes `dist/militaryforces-<version>-<preset>.zip` together with `dist/RELEASE_NOTES.md`. Linux also gets a
+`.deb`: everything in `/opt/militaryforces`, with symlinks for `militaryforces`, `militaryforces-server` and the
+applications menu.
 
 The game data is a separate repository. Packaging takes the built paks from `../assets/build/mfdata`; set
 `-DMF_DATA_DIR=<folder>` if they are somewhere else. To run a build in place:

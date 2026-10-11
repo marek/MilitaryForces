@@ -825,6 +825,17 @@ int main( int argc, char **argv )
 #endif
 
 	Sys_ParseArgs( argc, argv );
+#ifdef __linux__
+	// the real place of the executable, so a symlink to it (/usr/bin/militaryforces) still finds the game's files
+	char exePath[ PATH_MAX ];
+	ssize_t exeLen = readlink( "/proc/self/exe", exePath, sizeof( exePath ) - 1 );
+	if( exeLen > 0 )
+	{
+		exePath[ exeLen ] = '\0';
+		Sys_SetBinaryPath( System::dirName( exePath ) );
+	}
+	else
+#endif
 	Sys_SetBinaryPath( System::dirName( argv[ 0 ] ) );
 	System::setDefaultInstallPath( DEFAULT_BASEDIR );
 

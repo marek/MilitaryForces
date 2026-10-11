@@ -41,6 +41,24 @@ if(APPLE AND BUILD_MACOS_APP)
     finish_macos_app()
 endif()
 
+# Linux: the libraries made by misc/linux/build-deps.sh are copied beside the executable (OpenAL Soft too: the game
+# opens it by name, and the copy is found first through the executable's $ORIGIN search path). Without them the
+# system's own are used
+set(MF_BUNDLED_LIBS "")
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    foreach(LIB libSDL2-2.0.so.0 libfreetype.so.6 libopenal.so.1)
+        unset(MF_LIB_FILE CACHE)
+        find_file(MF_LIB_FILE ${LIB} PATHS ${CMAKE_PREFIX_PATH} PATH_SUFFIXES lib NO_DEFAULT_PATH)
+        if(MF_LIB_FILE)
+            add_custom_command(TARGET ${CLIENT_NAME} POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy ${MF_LIB_FILE} $<TARGET_FILE_DIR:${CLIENT_NAME}>/${LIB}
+                VERBATIM)
+            list(APPEND MF_BUNDLED_LIBS ${LIB})
+        endif()
+    endforeach()
+    unset(MF_LIB_FILE CACHE)
+endif()
+
 mf_keep_symbols(${CLIENT_NAME})
 
 

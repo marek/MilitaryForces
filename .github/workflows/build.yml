@@ -24,8 +24,8 @@ jobs:
           - { platform: darwin-arm, os: macos-15, arch: arm64, shell: bash, experimental: false }
           - { platform: darwin-x86, os: macos-15-intel, arch: x86_64, shell: bash, experimental: false }
           # not built anywhere yet: reported, but they do not fail the run
-          - { platform: linux-x86, os: ubuntu-24.04, shell: bash, experimental: true }
-          - { platform: linux-arm, os: ubuntu-24.04-arm, shell: bash, experimental: true }
+          - { platform: linux-x86, os: ubuntu-24.04, arch: x86_64, shell: bash, experimental: true }
+          - { platform: linux-arm, os: ubuntu-24.04-arm, arch: arm64, shell: bash, experimental: true }
           - { platform: windows, os: windows-latest, shell: 'msys2 {0}', experimental: true }
     env:
       WITH_ASSETS: ${{ secrets.ASSETS_DEPLOY_KEY != '' }}
@@ -58,13 +58,14 @@ jobs:
         working-directory: assets
         run: python build.py
 
-      - name: macOS libraries (cached)
-        if: runner.os == 'macOS'
+      # SDL2, FreeType and OpenAL Soft, built from source and shipped beside the game
+      - name: libraries (cached)
+        if: runner.os != 'Windows'
         id: deps
         uses: actions/cache@v6
         with:
           path: MilitaryForces/deps
-          key: deps-${{ matrix.platform }}-${{ hashFiles('MilitaryForces/misc/macos/build-deps.sh') }}
+          key: deps-${{ matrix.platform }}-${{ hashFiles('MilitaryForces/misc/*/build-deps.sh') }}
 
       - name: macOS tools
         if: runner.os == 'macOS'
@@ -74,13 +75,21 @@ jobs:
         if: runner.os == 'macOS' && steps.deps.outputs.cache-hit != 'true'
         run: misc/macos/build-deps.sh ${{ matrix.arch }}
 
+      # the headers of the video and audio systems SDL2 and OpenAL Soft open at run time; the players need none of them
       - name: Linux packages
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y ninja-build g++-14 libsdl2-dev libfreetype-dev libcurl4-openssl-dev libopenal-dev libgl1-mesa-dev
+          sudo apt-get install -y ninja-build g++-14 libcurl4-openssl-dev libgl-dev libegl-dev \
+            libx11-dev libxext-dev libxrandr-dev libxcursor-dev libxfixes-dev libxi-dev libxss-dev libxkbcommon-dev \
+            libwayland-dev wayland-protocols libdecor-0-dev libdrm-dev libgbm-dev \
+            libpulse-dev libasound2-dev libpipewire-0.3-dev libdbus-1-dev libudev-dev
           echo "CC=gcc-14" >> "$GITHUB_ENV"
           echo "CXX=g++-14" >> "$GITHUB_ENV"
+
+      - name: Linux libraries
+        if: runner.os == 'Linux' && steps.deps.outputs.cache-hit != 'true'
+        run: misc/linux/build-deps.sh ${{ matrix.arch }}
 
       - name: Windows packages
         if: runner.os == 'Windows'

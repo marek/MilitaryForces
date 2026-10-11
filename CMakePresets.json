@@ -58,6 +58,7 @@
                 "rhs": "Linux"
             },
             "cacheVariables": {
+                "CMAKE_PREFIX_PATH": "${sourceDir}/deps/x86_64",
                 "MF_PLATFORM": "linux-x86"
             }
         },
@@ -70,6 +71,7 @@
                 "rhs": "Linux"
             },
             "cacheVariables": {
+                "CMAKE_PREFIX_PATH": "${sourceDir}/deps/arm64",
                 "MF_PLATFORM": "linux-arm"
             }
         },
