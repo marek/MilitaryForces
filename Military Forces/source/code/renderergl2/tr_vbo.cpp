@@ -605,12 +605,27 @@ void RB_UpdateTessVao(unsigned int attribBits)
 
 		R_BindVao(tess.vao);
 
-		// orphan old vertex buffer so we don't stall on it
-		qglBufferData(GL_ARRAY_BUFFER, tess.vao->vertexesSize, nullptr, GL_DYNAMIC_DRAW);
-
 		// if nothing to set, set everything
 		if(!(attribBits & ATTR_BITS))
 			attribBits = ATTR_BITS;
+
+		// The buffer is thrown away and made again for every batch so that the driver never waits on one still in
+		// use. It is made only as large as this batch needs, its attributes packed one after another: made at the
+		// full size a batch may ever have (10,000 vertices of every attribute, most of a megabyte with the
+		// indexes) the throwing away cost more than the drawing, for the four vertices of a HUD picture as for
+		// anything else.
+		constexpr int attribAlign = 16;
+		int packedOffset[ATTR_INDEX_COUNT] = {};
+		int packedSize = 0;
+		for (attribIndex = 0; attribIndex < ATTR_INDEX_COUNT; attribIndex++)
+		{
+			if (attribBits & (1 << attribIndex))
+			{
+				packedOffset[attribIndex] = packedSize;
+				packedSize += (tess.numVertexes * tess.vao->attribs[attribIndex].stride + attribAlign - 1) & ~(attribAlign - 1);
+			}
+		}
+		qglBufferData(GL_ARRAY_BUFFER, packedSize, nullptr, GL_STREAM_DRAW);
 
 		attribUpload = attribBits;
 
@@ -622,13 +637,13 @@ void RB_UpdateTessVao(unsigned int attribBits)
 			if (attribUpload & attribBit)
 			{
 				// note: tess has a VBO where stride == size
-				qglBufferSubData(GL_ARRAY_BUFFER, vAtb->offset, tess.numVertexes * vAtb->stride, tess.attribPointers[attribIndex]);
+				qglBufferSubData(GL_ARRAY_BUFFER, packedOffset[attribIndex], tess.numVertexes * vAtb->stride, tess.attribPointers[attribIndex]);
 			}
 
 			if (attribBits & attribBit)
 			{
-				if (!glRefConfig.vertexArrayObject)
-					qglVertexAttribPointer(attribIndex, vAtb->count, vAtb->type, vAtb->normalized, vAtb->stride, BUFFER_OFFSET(vAtb->offset));
+				// where this batch's copy of the attribute lies, which is different for every batch
+				qglVertexAttribPointer(attribIndex, vAtb->count, vAtb->type, vAtb->normalized, vAtb->stride, BUFFER_OFFSET(packedOffset[attribIndex]));
 
 				if (!(glState.vertexAttribsEnabled & attribBit))
 				{
@@ -646,10 +661,8 @@ void RB_UpdateTessVao(unsigned int attribBits)
 			}
 		}
 
-		// orphan old index buffer so we don't stall on it
-		qglBufferData(GL_ELEMENT_ARRAY_BUFFER, tess.vao->indexesSize, nullptr, GL_DYNAMIC_DRAW);
-
-		qglBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, tess.numIndexes * sizeof(tess.indexes[0]), tess.indexes);
+		// the indexes likewise: a new buffer of just their size, filled as it is made
+		qglBufferData(GL_ELEMENT_ARRAY_BUFFER, tess.numIndexes * sizeof(tess.indexes[0]), tess.indexes, GL_STREAM_DRAW);
 	}
 }
 
