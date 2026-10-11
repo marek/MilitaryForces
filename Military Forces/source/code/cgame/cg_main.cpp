@@ -6,6 +6,7 @@
 //
 // cg_main.c -- initialization and primary entry point for cgame
 #include "cg_local.h"
+#include "cg_mission.h"
 
 #include "../ui/ui_shared.h"
 #include "ui_displaycontext_cg.h"
@@ -1958,6 +1959,8 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 
 	s = CGame::configString( CS_LEVEL_START_TIME );
 	cgs.levelStartTime = atoi( s );
+
+	MissionHud::registerMedia();
 
 	// MFQ3: vehicle needs to be reset
 	if( cg_vehicle.integer != -1 ) {

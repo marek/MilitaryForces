@@ -7,6 +7,7 @@
 // cg_view.c -- setup all the parameters (position, angle, etc)
 // for a 3D rendering
 #include "cg_local.h"
+#include "cg_mission.h"
 
 
 //============================================================================
@@ -726,6 +727,7 @@ void CGame::drawActiveFrame( int serverTime, stereoFrame_t stereoView, bool demo
 		CGame::addPacketEntities();			// adter calcViewValues, so predicted player state is correct
 		CGame::addMarks();
 		CGame::addLocalEntities();
+		MissionHud::addToScene();
 
 
 		pw.systems[0].pos[0] = sin(static_cast<float>(cg.time)/100)*10;

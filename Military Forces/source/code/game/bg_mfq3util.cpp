@@ -23,6 +23,13 @@ void VehicleData::setMissionScriptOverviewDefaults( mission_overview_t* overview
 	overview->missionname[0] = 0;
 	overview->objective[0] = 0;
 	overview->valid = false;
+	overview->order = 0;
+	overview->description[0] = 0;
+	overview->briefing[0] = 0;
+	overview->success[0] = 0;
+	overview->failure[0] = 0;
+	overview->lives = 0;
+	overview->timelimit = 0;
 }
 
 // updateFormat should only be set to true to be backwards compatible after a format change
@@ -687,6 +694,34 @@ void VehicleData::parseOverview( char **buf, mission_overview_t* overview )
 				continue;
 			}
 		}
+		else if( !strcmp( token, "order" ) )
+		{
+			overview->order = atoi( COM_ParseExt( buf, false ) );
+		}
+		else if( !strcmp( token, "lives" ) )
+		{
+			overview->lives = atoi( COM_ParseExt( buf, false ) );
+		}
+		else if( !strcmp( token, "timelimit" ) )
+		{
+			overview->timelimit = atoi( COM_ParseExt( buf, false ) );
+		}
+		else if( !strcmp( token, "description" ) )
+		{
+			Q_strncpyz( overview->description, COM_ParseExt( buf, false ), sizeof( overview->description ) );
+		}
+		else if( !strcmp( token, "briefing" ) )
+		{
+			Q_strncpyz( overview->briefing, COM_ParseExt( buf, false ), sizeof( overview->briefing ) );
+		}
+		else if( !strcmp( token, "success" ) )
+		{
+			Q_strncpyz( overview->success, COM_ParseExt( buf, false ), sizeof( overview->success ) );
+		}
+		else if( !strcmp( token, "failure" ) )
+		{
+			Q_strncpyz( overview->failure, COM_ParseExt( buf, false ), sizeof( overview->failure ) );
+		}
 	}
 	VehicleData::checkMissionScriptOverviewValid(overview, false);// set to true after format change
 }
@@ -842,6 +877,10 @@ void VehicleData::parseVehicle( char **buf, mission_vehicle_t* veh )
 				continue;
 			}
 		}
+		else if( !strcmp( token, "Tag" ) )
+		{
+			Q_strncpyz( veh->tag, COM_ParseExt( buf, false ), sizeof( veh->tag ) );
+		}
 		else if( !strcmp( token, "Waypoints" ) )
 		{
 			VehicleData::parseWaypoints(buf, veh);
@@ -941,6 +980,10 @@ void VehicleData::parseGroundInstallation( char **buf, mission_groundInstallatio
 				continue;
 			}
 		}
+		else if( !strcmp( token, "Tag" ) )
+		{
+			Q_strncpyz( gi->tag, COM_ParseExt( buf, false ), sizeof( gi->tag ) );
+		}
 	}
 	gi->used = true;
 }
@@ -1002,7 +1045,8 @@ void VehicleData::resolveMissionGroundInstallation( mission_groundInstallation_t
 
 void VehicleData::parseEntities( char **buf, 
 						  mission_vehicle_t* vehs, 
-						  mission_groundInstallation_t* gis ) 
+						  mission_groundInstallation_t* gis,
+						  mission_rules_t* rules ) 
 {
 	char	*token;
 	int		numVeh = 0,
@@ -1057,6 +1101,11 @@ void VehicleData::parseEntities( char **buf,
 			++numGI;
 			continue;
 		}
+		else if( !strcmp(token, "PlayerStart" ) )
+		{
+			VehicleData::parsePlayerStart( buf, rules );
+			continue;
+		}
 		else if( !strcmp( token, "}" ) ) 
 		{
 			Common::printf("End of Entities\n");
@@ -1064,8 +1113,8 @@ void VehicleData::parseEntities( char **buf,
 		}
 		else
 		{
-			Common::printf(S_COLOR_RED "Invalid Token '%s' - parsing cancelled\n", token);
-			break;
+			Common::printf( S_COLOR_YELLOW "Unknown entity '%s' in mission, skipped\n", token );
+			SkipBracedSection( buf, 0 );
 		}
 	}
 
@@ -1074,7 +1123,8 @@ void VehicleData::parseEntities( char **buf,
 void VehicleData::parseMissionScripts( char *buf,
 							 mission_overview_t* overview,
 							 mission_vehicle_t* vehs, 
-							 mission_groundInstallation_t* gis) 
+							 mission_groundInstallation_t* gis,
+							 mission_rules_t* rules ) 
 {
 	char *token;
 
@@ -1095,17 +1145,45 @@ void VehicleData::parseMissionScripts( char *buf,
 		}
 		else if( !strcmp(token, "Entities" ) )
 		{
-			VehicleData::parseEntities(&buf, vehs, gis);
+			VehicleData::parseEntities(&buf, vehs, gis, rules);
+			continue;
+		}
+		else if( !strcmp(token, "Checkpoints" ) )
+		{
+			VehicleData::parseCheckpoints( &buf, rules );
+			continue;
+		}
+		else if( !strcmp(token, "Objectives" ) )
+		{
+			VehicleData::parseObjectives( &buf, rules );
 			continue;
 		}
 		else
 		{
-			Common::printf(S_COLOR_RED "Invalid Token '%s' - parsing cancelled\n", token);
-			break;
+			Common::printf( S_COLOR_YELLOW "Unknown block '%s' in mission, skipped\n", token );
+			SkipBracedSection( &buf, 0 );
 		}
 	}
 }
 
+
+// the Overview alone, for a list of missions: nothing is resolved against the vehicle table
+void VehicleData::parseMissionOverview( char *buf, mission_overview_t* overview )
+{
+	VehicleData::setMissionScriptOverviewDefaults( overview );
+	while( true )
+	{
+		const char* token = COM_Parse( &buf );
+		if( !token[0] )
+			break;
+		if( !strcmp( token, "Overview" ) )
+		{
+			VehicleData::parseOverview( &buf, overview );
+			break;
+		}
+		SkipBracedSection( &buf, 0 );
+	}
+}
 
 constexpr int DECK_GRID = 12;
 

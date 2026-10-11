@@ -72,7 +72,7 @@ GameEntity* SP_misc_vehicle( GameEntity *sp_ent );
 void MiscVehicle_Abandon( GameEntity *ent );
 void MiscVehicle_SpawnDecks( GameEntity *parent, int vehicle );
 void MiscVehicle_SetRoute( GameEntity *ent, const mission_waypoint_t *wps );
-void SP_misc_groundinstallation( GameEntity *sp_ent );
+GameEntity* SP_misc_groundinstallation( GameEntity *sp_ent );
 void DroneInit();
 void G_LoadMissionScripts();
 

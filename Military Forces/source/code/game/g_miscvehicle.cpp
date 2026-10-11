@@ -7,6 +7,7 @@
 #include "g_entity.h"
 #include "g_level.h"
 #include "g_miscvehicle.h"
+#include "g_missionrules.h"
 
 
 //------------------------------------------------------------------
@@ -30,6 +31,8 @@ void MiscVehicle_Die::execute( GameEntity *inflictor, GameEntity *attacker, int 
 		pos = pos * ( 0.5f );
 		AddScore( attacker, pos, Game::miscVehicle_TeamScore( self_, attacker ) );
 	}
+
+	MissionRules::placedDestroyed( self_ );
 
 	ExplodeVehicle(self_);
 	self_->freeAfterEvent_ = true;
@@ -639,7 +642,7 @@ GameEntity* SP_misc_vehicle( GameEntity *sp_ent )
 	return ent;
 }
 
-void SP_misc_groundinstallation( GameEntity *sp_ent )
+GameEntity* SP_misc_groundinstallation( GameEntity *sp_ent )
 {
 	int i = sp_ent->s.modelindex2;
 
@@ -647,7 +650,7 @@ void SP_misc_groundinstallation( GameEntity *sp_ent )
 	{
 		Common::printf ("%s (%s) cannot be spawned - index out of range\n", sp_ent->classname_, sp_ent->model_);
 		sp_ent->freeUp();
-		return;
+		return nullptr;
 	}
 
 	GameEntity* ent = theLevel.spawnEntity();
@@ -699,4 +702,6 @@ void SP_misc_groundinstallation( GameEntity *sp_ent )
 	GameHost::linkEntity (ent);
 
 	sp_ent->freeUp();
+
+	return ent;
 }

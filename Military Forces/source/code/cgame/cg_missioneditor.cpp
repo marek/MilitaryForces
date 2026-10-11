@@ -7,6 +7,10 @@
 
 constexpr float MAX_SELECTION_DISTANCE = 3000.0f;
 
+// what the loaded mission holds that the editor does not edit: written back unchanged when it is saved
+static mission_overview_t keptOverview;
+static mission_rules_t keptRules;
+
 static void ME_DrawVehicle( IGME_vehicle_t* veh );
 static void ME_CheckForSelection();
 static void ME_DragSelection( int x, int y );
@@ -886,18 +890,27 @@ void ME_ExportToScript( const char* scriptname )
 	Com_sprintf( outstring, sizeof(outstring), "\tgameset\t%d\n", static_cast<int>(cgs.gameset) );
 	FileSystem::write( outstring, strlen(outstring), f );
 
-	Com_sprintf( outstring, sizeof(outstring), "\tgametype\t%d\n", cgs.gametype );
+	// the game type the mission is played in, not the editor's own
+	Com_sprintf( outstring, sizeof(outstring), "\tgametype\t%d\n", keptOverview.gametype >= GT_FFA && keptOverview.gametype != GT_MISSION_EDITOR ? keptOverview.gametype : GT_FFA );
 	FileSystem::write( outstring, strlen(outstring), f );
 
-	Com_sprintf( outstring, sizeof(outstring), "\tmission\t%s\n", scriptname );
+	Com_sprintf( outstring, sizeof(outstring), "\tmission\t\"%s\"\n", keptOverview.missionname[0] ? keptOverview.missionname : scriptname );
 	FileSystem::write( outstring, strlen(outstring), f );
 
-	Com_sprintf( outstring, sizeof(outstring), "\tgoal\tSearchAndDestroy\n}\n\n" );
+	Com_sprintf( outstring, sizeof(outstring), "\tgoal\t\"%s\"\n", keptOverview.objective[0] ? keptOverview.objective : "SearchAndDestroy" );
 	FileSystem::write( outstring, strlen(outstring), f );
+
+	static char kept[MAX_MISSION_TEXT];
+	VehicleData::formatMissionOverviewKeys( keptOverview, kept, sizeof( kept ) );
+	FileSystem::write( kept, strlen( kept ), f );
+	FileSystem::write( "}\n\n", 3, f );
 
 	// entities and groundinstallations
 	Com_sprintf( outstring, sizeof(outstring), "Entities\n{\n", mapname );
 	FileSystem::write( outstring, strlen(outstring), f );
+
+	VehicleData::formatMissionStarts( keptRules, kept, sizeof( kept ) );
+	FileSystem::write( kept, strlen( kept ), f );
 	for( i = 0; i < IGME_MAX_VEHICLES; ++i ) {
 		veh = &cgs.IGME.vehicles[i]; 
 		if( !veh->active ) continue;
@@ -914,6 +927,12 @@ void ME_ExportToScript( const char* scriptname )
 
 			Com_sprintf( outstring, sizeof(outstring), "\t\tTeam\t%s\n", veh->side[0] ? veh->side : "?" );
 			FileSystem::write( outstring, strlen(outstring), f );
+
+			if( veh->tag[0] )
+			{
+				Com_sprintf( outstring, sizeof(outstring), "\t\tTag\t%s\n", veh->tag );
+				FileSystem::write( outstring, strlen(outstring), f );
+			}
 
 			Com_sprintf( outstring, sizeof(outstring), "\t\tOrigin\t%f;%f;%f\n", veh->origin[0],
 				veh->origin[1], veh->origin[2]);
@@ -949,6 +968,12 @@ void ME_ExportToScript( const char* scriptname )
 				FileSystem::write( outstring, strlen(outstring), f );
 			}
 
+			if( veh->tag[0] )
+			{
+				Com_sprintf( outstring, sizeof(outstring), "\t\tTag\t%s\n", veh->tag );
+				FileSystem::write( outstring, strlen(outstring), f );
+			}
+
 			Com_sprintf( outstring, sizeof(outstring), "\t\tOrigin\t%f;%f;%f\n", veh->origin[0],
 				veh->origin[1], veh->origin[2]);
 			FileSystem::write( outstring, strlen(outstring), f );
@@ -976,7 +1001,8 @@ void ME_ExportToScript( const char* scriptname )
 	Com_sprintf( outstring, sizeof(outstring), "}\n", mapname );
 	FileSystem::write( outstring, strlen(outstring), f );
 
-
+	VehicleData::formatMissionRules( keptRules, kept, sizeof( kept ) );
+	FileSystem::write( kept, strlen( kept ), f );
 
 	CGame::printf("Successfully saved to script\n");
 
@@ -1000,6 +1026,8 @@ void CGame::mE_SpawnMissionGroundInstallations(mission_groundInstallation_t* gis
 									 gis[i].angles);
 		if( veh && (!Q_stricmp( gis[i].teamname, "red" ) || !Q_stricmp( gis[i].teamname, "blue" )) )
 			Q_strncpyz( veh->side, gis[i].teamname, sizeof(veh->side) );
+		if( veh )
+			Q_strncpyz( veh->tag, gis[i].tag, sizeof(veh->tag) );
 	}
 }
 
@@ -1018,6 +1046,7 @@ void CGame::mE_SpawnMissionVehicles(mission_vehicle_t* vehs)
 		if( !veh ) continue;
 		if( !Q_stricmp( vehs[i].side, "red" ) || !Q_stricmp( vehs[i].side, "blue" ) )
 			Q_strncpyz( veh->side, vehs[i].side, sizeof(veh->side) );
+		Q_strncpyz( veh->tag, vehs[i].tag, sizeof(veh->tag) );
 		k = 0;
 		for( j = 0; j < IGME_MAX_WAYPOINTS; ++j )
 		{
@@ -1037,7 +1066,8 @@ void CGame::mE_SpawnMissionVehicles(mission_vehicle_t* vehs)
 bool CGame::mE_LoadOverviewAndEntities( char *filename,
 										mission_overview_t* overview,
 										mission_vehicle_t* vehs, 
-										mission_groundInstallation_t* gis)
+										mission_groundInstallation_t* gis,
+										mission_rules_t* rules)
 {
 	int					len;
 	fileHandle_t		f;
@@ -1063,7 +1093,7 @@ bool CGame::mE_LoadOverviewAndEntities( char *filename,
 
 	Common::printf( S_COLOR_GREEN "Successfully opened mission script: %s\n", filename );
 
-	VehicleData::parseMissionScripts(inbuffer, overview, vehs, gis);
+	VehicleData::parseMissionScripts(inbuffer, overview, vehs, gis, rules);
 
 	return true;
 }
@@ -1071,12 +1101,13 @@ bool CGame::mE_LoadOverviewAndEntities( char *filename,
 void ME_ImportScript( const char* scriptname )
 {
 	char				filename[256];
-	mission_overview_t	overview;
+	mission_overview_t&	overview = keptOverview;
 	mission_vehicle_t	vehicles[IGME_MAX_VEHICLES];
 	mission_groundInstallation_t installations[IGME_MAX_VEHICLES];
 	const char			*info, *mapname;
 
 	overview = {};
+	keptRules = {};
 	memset(&vehicles[0], 0, sizeof(vehicles));
 	memset(&installations[0], 0, sizeof(installations));
 
@@ -1085,7 +1116,7 @@ void ME_ImportScript( const char* scriptname )
 	mapname = Info::valueForKey( info, "mapname" );
 	Com_sprintf(filename, 255, "missions/%s/%s.mis", mapname, scriptname);
 
-	if( !CGame::mE_LoadOverviewAndEntities(filename, &overview, vehicles, installations) )
+	if( !CGame::mE_LoadOverviewAndEntities(filename, &overview, vehicles, installations, &keptRules) )
 	{
 		Common::printf( "Unable to load script\n" );
 		return;

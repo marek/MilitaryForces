@@ -8,6 +8,7 @@
 // executed by a key binding
 
 #include "cg_local.h"
+#include "cg_mission.h"
 
 static char* cycleCvars[] =
 {
@@ -726,6 +727,7 @@ static void CG_DevStatus_f( ) {
 
 static consoleCommand_t	commands[] = {
 	{ "dev_status", CG_DevStatus_f },
+	{ "where", MissionHud::whereCommand },
 	{ "dev_vehicle", CG_DevVehicle_f },
 	{ "testgun", CGame::testGun_f },
 	{ "testmodel", CGame::testModel_f },

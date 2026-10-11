@@ -6,6 +6,7 @@
 #include "g_entity.h"
 #include "g_level.h"
 #include "g_miscvehicle.h"
+#include "g_missionrules.h"
 
 
 void Game::loselock( GameEntity* ent )
@@ -39,6 +40,8 @@ void GroundInstallation_Die::execute( GameEntity *inflictor, GameEntity *attacke
 
 		AddScore( attacker, pos, score );
 	}
+
+	MissionRules::placedDestroyed( self_ );
 
 	ExplodeVehicle(self_);
 	self_->freeAfterEvent_ = true;

@@ -8,6 +8,7 @@
 // active (after loading) gameplay
 
 #include "cg_local.h"
+#include "cg_mission.h"
 #include "../ui/ui_public.h"
 
 #include "../ui/ui_shared.h"
@@ -2183,6 +2184,8 @@ void CGame::draw2D_MFQ3( ) {
 		CGame::drawIntermission();
 		return;
 	}
+
+	MissionHud::draw();
 
 	// don't draw any HUD if scoreboard is up
 	cg.scoreBoardShowing = CGame::drawScoreboard();

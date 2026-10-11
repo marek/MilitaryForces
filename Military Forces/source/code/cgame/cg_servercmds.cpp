@@ -10,6 +10,7 @@
 
 #include <algorithm>
 #include "cg_local.h"
+#include "cg_mission.h"
 
 struct orderTask_t {
 	const char *order;
@@ -323,6 +324,9 @@ void CGame::configStringModified( ) {
 	}
 	else if ( num == CS_SHADERSTATE ) {
 		CGame::shaderStateChanged();
+	}
+	else if ( num == CS_MISSION ) {
+		MissionHud::configStringChanged( num );
 	}
 		
 }

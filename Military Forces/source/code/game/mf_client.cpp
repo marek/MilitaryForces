@@ -12,6 +12,7 @@
 #include "g_boat.h"
 #include "g_lqm.h"
 #include "g_groundvehicle.h"
+#include "g_missionrules.h"
 
 namespace
 {
@@ -233,6 +234,10 @@ void MF_ClientSpawn( int clientNum, long cs_flags )
 	//int index = ent->s.number;// ent - g_entities;
 	//client = ent->client_;
 
+	const mission_playerstart_t* missionStart = (cs_flags & CS_LASTPOS) ? nullptr : MissionRules::startFor( clientNum );
+	if( missionStart )
+		MissionRules::chooseStartVehicle( clientNum );
+
 	char userinfo[MAX_INFO_STRING];
 	GameHost::getUserinfo( clientNum, userinfo, sizeof(userinfo) );
 
@@ -315,6 +320,13 @@ void MF_ClientSpawn( int clientNum, long cs_flags )
 		}
 		VectorCopy(client->ps_.vehicleAngles, spawn_angles);
 	} 
+	else if( missionStart && vehIndex >= 0 && vehIndex < bg_numberOfVehicles )
+	{
+		spawn_origin = Vec3( missionStart->origin );
+		spawn_angles = Vec3( missionStart->angles );
+		client->spawnHoldTime_ = 0;
+		client->spawnedTime_ = theLevel.time_;
+	}
 	else 
 	{
 		if ( client->sess_.sessionTeam_ == ClientBase::TEAM_SPECTATOR || 
@@ -747,6 +759,9 @@ void MF_ClientSpawn( int clientNum, long cs_flags )
 		// fire the targets of the spawn point
 		Game::useTargets( spawnPoint, ent );
 	}
+
+	if( missionStart && vehIndex >= 0 )
+		MissionRules::applyStart( ent, *missionStart );
 
 	// reset lockinfo
 	unlock( ent );

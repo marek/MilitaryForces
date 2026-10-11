@@ -618,7 +618,7 @@ public:
 	static void runBaseDefences();
 	static void baseSitesCommand();
 	static void groundProfileCommand();
-	static bool loadOverviewAndEntities( char *filename, mission_overview_t* overview, mission_vehicle_t* vehs, mission_groundInstallation_t* gis );
+	static bool loadOverviewAndEntities( char *filename, mission_overview_t* overview, mission_vehicle_t* vehs, mission_groundInstallation_t* gis, mission_rules_t* rules );
 	static void updateIPBans();
 	static void addIP( char *str );
 	static int QDECL sortClients( const void *a, const void *b );

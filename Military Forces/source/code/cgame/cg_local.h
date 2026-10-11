@@ -978,6 +978,7 @@ struct IGME_vehicle_t {
 	bool		groundInstallation;
 	int				vehidx;
 	char			side[8];
+	char			tag[MAX_NAME_LENGTH];
 	Vec3			angles;
 	Vec3			origin;
 	Vec3			selectorScale;
@@ -1850,7 +1851,7 @@ public:
 	static IGME_vehicle_t* mE_SpawnGroundInstallationAt( int idx, vec3_t pos, vec3_t angles );
 	static void mE_SpawnMissionGroundInstallations( mission_groundInstallation_t* gis );
 	static void mE_SpawnMissionVehicles( mission_vehicle_t* vehs );
-	static bool mE_LoadOverviewAndEntities( char *filename, mission_overview_t* overview, mission_vehicle_t* vehs, mission_groundInstallation_t* gis );
+	static bool mE_LoadOverviewAndEntities( char *filename, mission_overview_t* overview, mission_vehicle_t* vehs, mission_groundInstallation_t* gis, mission_rules_t* rules );
 	static void colorFromString( const char *v, vec3_t color );
 	static void clipMoveToEntities( const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int skipNumber, int mask, trace_t *tr );
 	static void interpolatePlayerState( bool grabAngles );

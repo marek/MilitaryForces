@@ -1099,16 +1099,6 @@ static void Cmd_GameCommand_f( GameEntity *ent )
 	G_Say( ent, ent, SAY_TELL, gc_orders[order] );
 }
 
-/*
-==================
-Cmd_Where_f
-==================
-*/
-static void Cmd_Where_f( GameEntity *ent )
-{
-	GameHost::sendServerCommand( ent->s.number, va("print \"%s\n\"", vtos( ent->s.origin ) ) );
-}
-
 static const char *gameNames[] = {
 	"Free For All",
 	"Tournament",
@@ -2015,8 +2005,6 @@ void ClientCommand( int clientNum )
 		Cmd_FollowCycle_f (ent, -1);
 	else if( Q_stricmp (cmd, "team") == 0 )
 		Cmd_Team_f (ent);
-	else if( Q_stricmp (cmd, "where") == 0 )
-		Cmd_Where_f (ent);
 	else if( Q_stricmp (cmd, "callvote") == 0 )
 		Cmd_CallVote_f (ent);
 	else if( Q_stricmp (cmd, "vote") == 0 )

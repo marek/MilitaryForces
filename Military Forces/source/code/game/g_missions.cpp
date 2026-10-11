@@ -7,6 +7,7 @@
 #include "g_entity.h"
 #include "g_level.h"
 #include "g_miscvehicle.h"
+#include "g_missionrules.h"
 
 
 void Game::spawnMissionVehicles(mission_vehicle_t* vehs)
@@ -25,6 +26,7 @@ void Game::spawnMissionVehicles(mission_vehicle_t* vehs)
 		GameEntity* veh = SP_misc_vehicle(ent);
 		if( veh )
 			MiscVehicle_SetRoute(veh, vehs[i].waypoints);
+		MissionRules::notePlaced( veh, vehs[i].tag );
 	}
 }
 
@@ -42,7 +44,7 @@ void Game::spawnMissionGroundInstallations(mission_groundInstallation_t* gis)
 			ent->team_ = Game::newString(gis[i].teamname);
 		ent->s.modelindex = -1;
 		ent->s.modelindex2 = gis[i].index;
-		SP_misc_groundinstallation(ent);
+		MissionRules::notePlaced( SP_misc_groundinstallation(ent), gis[i].tag );
 	}
 }
 
@@ -50,7 +52,8 @@ void Game::spawnMissionGroundInstallations(mission_groundInstallation_t* gis)
 bool Game::loadOverviewAndEntities( char *filename,
 										mission_overview_t* overview,
 										mission_vehicle_t* vehs,
-										mission_groundInstallation_t* gis)
+										mission_groundInstallation_t* gis,
+										mission_rules_t* rules)
 {
 	int					len;
 	fileHandle_t		f;
@@ -76,7 +79,7 @@ bool Game::loadOverviewAndEntities( char *filename,
 
 	Common::printf( S_COLOR_GREEN "Successfully opened mission script: %s\n", filename );
 
-	VehicleData::parseMissionScripts(inbuffer, overview, vehs, gis);
+	VehicleData::parseMissionScripts(inbuffer, overview, vehs, gis, rules);
 
 	return true;
 }
@@ -89,10 +92,12 @@ void G_LoadMissionScripts()
 	mission_overview_t	overview;
 	static mission_vehicle_t	vehicles[IGME_MAX_VEHICLES];
 	static mission_groundInstallation_t installations[IGME_MAX_VEHICLES];
+	static mission_rules_t rules;
 
 	overview = {};
 	memset(&vehicles[0], 0, sizeof(vehicles));
 	memset(&installations[0], 0, sizeof(installations));
+	rules = {};
 
 	if( strlen(mf_mission.string) > 31 )
 	{
@@ -110,10 +115,12 @@ void G_LoadMissionScripts()
 	CvarSystem::variableStringBuffer("mapname", buffer, 32);
 	Com_sprintf( filename, MAX_FILEPATH, "missions/%s/%s.mis", buffer, missionname );
 
-	if( !Game::loadOverviewAndEntities(filename, &overview, vehicles, installations) )
+	if( !Game::loadOverviewAndEntities(filename, &overview, vehicles, installations, &rules) )
 		return;
 
 	Game::spawnMissionVehicles(vehicles);
 
 	Game::spawnMissionGroundInstallations(installations);
+
+	MissionRules::begin( va( "%s/%s", buffer, missionname ), overview, rules );
 }

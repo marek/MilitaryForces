@@ -61,6 +61,9 @@ inline constexpr int CS_INTERMISSION = 22; // when 1, fraglimit/timelimit has be
 inline constexpr int CS_FLAGSTATUS = 23; // string indicating flag status in CTF
 inline constexpr int CS_SHADERSTATE = 24;
 inline constexpr int CS_BOTINFO = 25;
+inline constexpr int CS_MISSION = 26; // info string: mission title, state, lives, clock, next checkpoint
+inline constexpr int CS_MISSION_TEXT = 28; // the briefing while the mission runs, the success or failure text after it
+inline constexpr int CS_MISSION_OBJECTIVES = 29; // one entry per objective, MISSION_LIST_SEPARATOR between them
 
 inline constexpr int CS_ITEMS = 27; // string of 0's and 1's that tell which items are present
 
@@ -1189,6 +1192,18 @@ struct mission_waypoint_t {
 	vec3_t			origin;
 };
 
+inline constexpr int MISSION_LINE_LENGTH = 128;
+inline constexpr int MISSION_TEXT_LENGTH = 512;
+inline constexpr int MISSION_MAX_STARTS = 16;
+inline constexpr int MISSION_MAX_CHECKPOINTS = 64;
+inline constexpr int MISSION_MAX_OBJECTIVES = 8;
+inline constexpr char MISSION_LIST_SEPARATOR = '|';
+
+enum class MissionState { None, Running, Complete, Failed };
+enum class ObjectiveState { Open, Done, Failed };
+enum class ObjectiveType { Destroy, Checkpoints, Survive, Protect };
+enum class CheckpointKind { Air, Land, Sea };
+
 // mission scripts
 struct mission_overview_t {
 	char			mapname[MAX_NAME_LENGTH];
@@ -1197,6 +1212,13 @@ struct mission_overview_t {
 	char			missionname[MAX_NAME_LENGTH];
 	char			objective[MAX_NAME_LENGTH];
 	bool		valid;
+	int				order;
+	char			description[MISSION_LINE_LENGTH];
+	char			briefing[MISSION_TEXT_LENGTH];
+	char			success[MISSION_TEXT_LENGTH];
+	char			failure[MISSION_TEXT_LENGTH];
+	int				lives;
+	int				timelimit;			// seconds, 0: none
 };
 
 struct mission_groundInstallation_t {
@@ -1207,6 +1229,7 @@ struct mission_groundInstallation_t {
 	char			teamname[MAX_NAME_LENGTH];
 	vec3_t			origin;
 	vec3_t			angles;
+	char			tag[MAX_NAME_LENGTH];
 };
 
 
@@ -1220,6 +1243,42 @@ struct mission_vehicle_t {
 	vec3_t			origin;
 	vec3_t			angles;
 	mission_waypoint_t waypoints[IGME_MAX_WAYPOINTS];
+	char			tag[MAX_NAME_LENGTH];
+};
+
+struct mission_playerstart_t {
+	int				index;				// vehicle, -1: the player's own choice
+	char			objectname[MAX_NAME_LENGTH];
+	char			descriptivename[MAX_QPATH];
+	char			teamname[MAX_NAME_LENGTH];
+	vec3_t			origin;
+	vec3_t			angles;
+	int				speed;				// -1: what a spawn there gives
+	int				throttle;
+};
+
+struct mission_checkpoint_t {
+	vec3_t			origin;
+	float			radius;
+	CheckpointKind	kind;
+};
+
+struct mission_objective_t {
+	ObjectiveType	type;
+	char			tag[MAX_NAME_LENGTH];
+	int				count;				// 0: all
+	int				seconds;
+	char			text[MISSION_LINE_LENGTH];
+	bool			bonus;
+};
+
+struct mission_rules_t {
+	int						numStarts;
+	mission_playerstart_t	starts[MISSION_MAX_STARTS];
+	int						numCheckpoints;
+	mission_checkpoint_t	checkpoints[MISSION_MAX_CHECKPOINTS];
+	int						numObjectives;
+	mission_objective_t		objectives[MISSION_MAX_OBJECTIVES];
 };
 
 
@@ -1253,7 +1312,13 @@ public:
 	static unsigned gunStationsBearing( int vehicle, const vec3_t hullAngles, const vec3_t aimAngles );
 	static void gunStationAngles( int vehicle, int index, const vec3_t hullAngles, const vec3_t aimAngles, vec3_t out );
 	static unsigned gunStationsTrack( int vehicle, const vec3_t hullAngles, const vec3_t aimAngles, float seconds, float* pitch, float* yaw );
-	static void parseMissionScripts( char *buf, mission_overview_t* overview, mission_vehicle_t* vehs, mission_groundInstallation_t* gis);
+	static void parseMissionScripts( char *buf, mission_overview_t* overview, mission_vehicle_t* vehs, mission_groundInstallation_t* gis, mission_rules_t* rules = nullptr );
+	static void parseMissionOverview( char *buf, mission_overview_t* overview );
+	static void formatMissionOverviewKeys( const mission_overview_t& overview, char* out, int size );
+	static void formatMissionStarts( const mission_rules_t& rules, char* out, int size );
+	static void formatMissionRules( const mission_rules_t& rules, char* out, int size );
+	static const char* checkpointKindName( CheckpointKind kind );
+	static const char* objectiveTypeName( ObjectiveType type );
 	static void checkMissionScriptOverviewValid( mission_overview_t* overview, bool updateFormat );
 	static void setMissionScriptOverviewDefaults( mission_overview_t* overview );
 	static int getIndexOfVehicle( int start, int gameset, int team, int cat, int cls, int vehicleType, int change_vehicle, bool allowNukes );
@@ -1287,7 +1352,10 @@ private:
 	static void parseGroundInstallation( char **buf, mission_groundInstallation_t* gi );
 	static void resolveMissionVehicle( mission_vehicle_t* veh );
 	static void resolveMissionGroundInstallation( mission_groundInstallation_t* gi );
-	static void parseEntities( char **buf, mission_vehicle_t* vehs, mission_groundInstallation_t* gis );
+	static void parseEntities( char **buf, mission_vehicle_t* vehs, mission_groundInstallation_t* gis, mission_rules_t* rules );
+	static void parsePlayerStart( char **buf, mission_rules_t* rules );
+	static void parseCheckpoints( char **buf, mission_rules_t* rules );
+	static void parseObjectives( char **buf, mission_rules_t* rules );
 	static void findDeck( const char *name, completeVehicleData_t *veh );
 	static void findClipBoxes( const char *clipModel, completeVehicleData_t *veh );
 	static int QDECL posCompare( const void* a, const void* b );

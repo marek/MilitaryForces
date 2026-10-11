@@ -1,5 +1,6 @@
 #include "g_local.h"
 #include "g_miscvehicle.h"
+#include "g_missionrules.h"
 #include "../vehiclelib/bg_datamanager.h"
 #include "g_level.h"
 #include "bots/bot.h"
@@ -452,6 +453,7 @@ void G_InitGame( int levelTime, int randomSeed )
 
 	G_RemapTeamShaders();
 
+	MissionRules::clear();
 	if( g_gametype.integer != GT_MISSION_EDITOR )
 	{
 		// MFQ3 mission scripts
@@ -1772,6 +1774,8 @@ void G_RunFrame( int levelTime )
 
 	// see if it is time to end the level
 	CheckExitRules();
+
+	MissionRules::runFrame();
 
 	// update to team status?
 	CheckTeamStatus();

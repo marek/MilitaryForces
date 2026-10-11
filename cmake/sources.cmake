@@ -8,7 +8,7 @@ list(TRANSFORM VEHICLELIB_SOURCES PREPEND "${SOURCE_DIR}/vehiclelib/")
 
 set(GAME_SOURCES
     bg_boatmove.cpp bg_groundmove.cpp bg_helomove.cpp bg_loadouts.cpp bg_lqmmove.cpp bg_md3util.cpp
-    bg_mfq3util.cpp bg_misc.cpp bg_planemove.cpp bg_pmove.cpp bg_slidemove.cpp bg_vehicledata.cpp
+    bg_mfq3util.cpp bg_missionrules.cpp bg_misc.cpp bg_planemove.cpp bg_pmove.cpp bg_slidemove.cpp bg_vehicledata.cpp
     vehicles/boats/pbr31mk2.cpp vehicles/ground/brdm2.cpp vehicles/ground/fav.cpp vehicles/ground/humvee_50cal.cpp vehicles/ground/humvee_avng.cpp vehicles/ground/m1.cpp
     vehicles/ground/m4.cpp vehicles/ground/mlrs.cpp vehicles/ground/panzeriii.cpp vehicles/ground/t-90.cpp vehicles/ground/zsu-23.cpp vehicles/helos/comanche.cpp
     vehicles/helos/helo.cpp vehicles/helos/mi-24.cpp vehicles/helos/mi-35.cpp vehicles/helos/uh-1.cpp vehicles/infantry/major.cpp vehicles/infantry/sarge.cpp
@@ -18,7 +18,7 @@ set(GAME_SOURCES
     bg_weapondata.cpp g_active.cpp g_arenas.cpp g_boat.cpp bots/bot_manager.cpp bots/bot_team.cpp bots/bot_characters.cpp bots/bot_world.cpp bots/bot_airnav.cpp bots/bot_groundnav.cpp bots/bot_senses.cpp bots/bot_goals.cpp bots/bot_weapons.cpp bots/bot_plane.cpp bots/bot_debug.cpp bots/bot_landing.cpp bots/bot_helo.cpp bots/bot_surface.cpp bots/bot_infantry.cpp g_client.cpp g_cmds.cpp
     g_combat.cpp g_entity.cpp g_groundinstallation.cpp g_groundvehicle.cpp g_helo.cpp g_items.cpp
     g_level.cpp g_lqm.cpp g_main.cpp g_mem.cpp g_mfq3ents.cpp g_mfq3util.cpp g_misc.cpp
-    g_basedefence.cpp g_miscvehicle.cpp g_missile.cpp g_missions.cpp g_mover.cpp g_plane.cpp g_scripts.cpp g_session.cpp
+    g_basedefence.cpp g_miscvehicle.cpp g_missile.cpp g_missionrules.cpp g_missions.cpp g_mover.cpp g_plane.cpp g_scripts.cpp g_session.cpp
     g_spawn.cpp g_svcmds.cpp g_target.cpp g_team.cpp g_trigger.cpp g_utils.cpp g_vehicle.cpp
     g_waypoint.cpp g_weapon.cpp g_world.cpp game.cpp mf_client.cpp mf_vehiclespawn.cpp)
 list(TRANSFORM GAME_SOURCES PREPEND "${SOURCE_DIR}/game/")
@@ -26,7 +26,7 @@ list(TRANSFORM GAME_SOURCES PREPEND "${SOURCE_DIR}/game/")
 set(CGAME_SOURCES
     cg.cpp vehicles/boat.cpp vehicles/ground.cpp vehicles/helo.cpp vehicles/infantry.cpp vehicles/installation.cpp vehicles/plane.cpp vehicles/shared.cpp vehicles/unmanned.cpp cg_consolecmds.cpp cg_draw.cpp cg_drawnewhud.cpp
     cg_drawtools.cpp cg_effects.cpp cg_ents.cpp cg_event.cpp cg_info.cpp
-    cg_localents.cpp cg_main.cpp cg_marks.cpp cg_missioneditor.cpp
+    cg_localents.cpp cg_main.cpp cg_marks.cpp cg_mission.cpp cg_missioneditor.cpp
     cg_particles.cpp cg_players.cpp cg_playerstate.cpp cg_predict.cpp cg_scoreboard.cpp
     cg_servercmds.cpp cg_snapshot.cpp cg_testmodel.cpp cg_util.cpp 
     cg_view.cpp cg_weapons.cpp ui_displaycontext_cg.cpp ui_utils_cg.cpp)

@@ -24,6 +24,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "sv_client.h"
 #include "sv_server.h"
 #include "../game/game.h"
+#include "../game/g_missionrules.h"
 
 /*
 ===============================================================================
@@ -1654,6 +1655,9 @@ void ServerMain::addOperatorCommands( ) {
 	CommandSystem::addCommand ("map_restart", ServerMain::mapRestart_f);
 	CommandSystem::addCommand ("sectorlist", ServerMain::sectorList_f);
 	CommandSystem::addCommand ("map", ServerMain::map_f);
+	// like map, these start a game, so they work from the menu with none running
+	CommandSystem::addCommand ("missions", MissionRules::listCommand);
+	CommandSystem::addCommand ("mission", MissionRules::startCommand);
 	CommandSystem::setCommandCompletionFunc( "map", ServerMain::completeMapName );
 #ifndef PRE_RELEASE_DEMO
 	CommandSystem::addCommand ("devmap", ServerMain::map_f);

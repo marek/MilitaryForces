@@ -2,6 +2,7 @@
 #include "g_local.h"
 #include "bots/bot.h"
 #include "g_level.h"
+#include "g_missionrules.h"
 
 
 // these are just for logging, the client prints its own messages
@@ -239,6 +240,8 @@ VehicleDeathImpl( GameEntity* self, GameEntity* inflictor, GameEntity* attacker,
 		// the wreck falls for a while before its owner may leave it
 		self->client_->respawnTime_ = theLevel.time_ + 5000;
 	}
+
+	MissionRules::playerDestroyed( self );
 
 	GameHost::linkEntity( self );
 }

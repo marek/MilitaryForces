@@ -9,7 +9,7 @@
 #include <string_view>
 #include <vector>
 
-void SP_misc_groundinstallation( GameEntity *sp_ent );
+GameEntity* SP_misc_groundinstallation( GameEntity *sp_ent );
 
 // Air defence for a base on a map that places none of its own: SAM and gun sites are stood on open, level ground
 // around each team's spawn points, clear of everything a base is used for. Where they stand is drawn afresh every

@@ -179,7 +179,9 @@ void CGame::newClientInfo( int clientNum ) {
 
 	v = Info::valueForKey( configstring, "v" );
 	newInfo.vehicle = atoi( v );
-	if( newInfo.vehicle >= 0 && clientNum == cg.predictedPlayerEntity.currentState.clientNum )
+	// our own slot, or whoever we are watching. Our own is named outright: the predicted entity does not carry our
+	// number yet when the server seats us in a vehicle in the same update that puts us on a side
+	if( newInfo.vehicle >= 0 && (clientNum == cg.clientNum || clientNum == cg.predictedPlayerEntity.currentState.clientNum) )
 	{
 		CvarSystem::set( "cg_vehicle", va( "%d", newInfo.vehicle ) );
 		// only set "cg_nextvehicle" to the same as "cg_vehicle" when we currently don't have
