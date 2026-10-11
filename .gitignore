@@ -3,3 +3,13 @@ dist/
 deps/
 .DS_Store
 CMakeUserPresets.json
+# compiled files are made by the build, never committed
+*.exe
+*.dll
+*.so
+*.so.*
+*.dylib
+*.a
+*.o
+*.obj
+*.pdb
