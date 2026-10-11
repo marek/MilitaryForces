@@ -171,8 +171,16 @@ void MF_ClientBegin( int clientNum )
 	memset( &client->ps_, 0, sizeof( client->ps_ ) );
 	client->ps_.eFlags = flags;
 
-	// MFQ3 prepare
-	client->vehicle_ = client->nextVehicle_ = -1;
+	// MFQ3 prepare. The vehicle the player has already chosen is kept: whoever picks a vehicle and then a side, or
+	// changes sides, does not have to pick the vehicle again
+	client->vehicle_ = -1;
+	{
+		char userinfo[MAX_INFO_STRING];
+		GameHost::getUserinfo( clientNum, userinfo, sizeof( userinfo ) );
+		const char* chosen = Info::valueForKey( userinfo, "cg_nextVehicle" );
+		const int next = chosen[0] ? atoi( chosen ) : -1;
+		client->nextVehicle_ = next >= 0 && next < bg_numberOfVehicles ? next : -1;
+	}
 
 	// locate ent at a spawn point
 	MF_ClientSpawn( clientNum, 0 );

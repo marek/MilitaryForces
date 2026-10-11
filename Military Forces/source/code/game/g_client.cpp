@@ -676,6 +676,18 @@ void ClientUserinfoChanged( int clientNum )
 			client->vehicle_ = vehicle;
 		}
 
+		// In a team game, choosing a vehicle is enough: a player who has not chosen a side is put on the one that
+		// needs players and spawns in what he chose
+		if( g_teamAutoJoin.integer && g_gametype.integer >= GT_TEAM && nextVehicle >= 0 && nextVehicle < bg_numberOfVehicles &&
+			client->sess_.sessionTeam_ == ClientBase::TEAM_SPECTATOR && client->pers_.connected_ == GameClient::ClientPersistant::CON_CONNECTED &&
+			!(theLevel.getEntity( clientNum )->r.svFlags & SVF_BOT) )
+		{
+			char side[8] = "auto";
+			SetTeam( theLevel.getEntity( clientNum ), side );
+			// the side change began the player anew
+			client = theLevel.getClient( clientNum );
+		}
+
 		if( nextVehicle >= 0 && (client->ps_.pm_flags & PMF_VEHICLESELECT) )
 		{
 			client->ps_.pm_flags &= ~PMF_VEHICLESELECT;

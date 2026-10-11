@@ -17,70 +17,59 @@ DeathmatchScoreboardMessage
 */
 void DeathmatchScoreboardMessage( GameEntity *ent ) 
 {
-	char		entry[1024];
-	char		string[1000];
-	int			stringlength;
-	int			i, j;
-	GameClient	*cl;
-	int			numSorted, scoreFlags, accuracy, perfect;
-
-	// send the latest information on all clients
-	string[0] = 0;
-	stringlength = 0;
-	scoreFlags = 0;
-
-	numSorted = theLevel.numConnectedClients_;
-	
-	for( i=0 ; i < numSorted ; i++ )
+	// One command carries as many players as fit in it and says where in the list it starts, so a full server's
+	// scoreboard goes out as several commands. (All of it in one command was longer than a command may be from
+	// about thirty players on, and such a command is not sent at all.)
+	constexpr int roomForEntries = 900;
+	char		entry[128];
+	char		string[1024];
+	int			stringlength = 0;
+	int			first = 0, held = 0;
+	const int	numSorted = theLevel.numConnectedClients_;
+	const auto send = [&]()
 	{
-		int		ping;
+		GameHost::sendServerCommand( ent->s.number, va( "scores %i %i %i %i %i%s", numSorted,
+			theLevel.teamScores_[ClientBase::TEAM_RED], theLevel.teamScores_[ClientBase::TEAM_BLUE], first, held, string ) );
+		first += held;
+		held = 0;
+		stringlength = 0;
+		string[0] = 0;
+	};
 
-		cl = theLevel.getClient(theLevel.sortedClients_[i]);// &level.clients[level.sortedClients[i]];
-
+	string[0] = 0;
+	for( int i = 0; i < numSorted; i++ )
+	{
+		GameClient* cl = theLevel.getClient( theLevel.sortedClients_[i] );
+		int ping;
 		if( cl->pers_.connected_ == GameClient::ClientPersistant::CON_CONNECTING ) 
 			ping = -1;
 		else 
 			ping = cl->ps_.ping < 999 ? cl->ps_.ping : 999;
+		const int accuracy = cl->accuracy_shots_ ? cl->accuracy_hits_ * 100 / cl->accuracy_shots_ : 0;
+		const int perfect = ( cl->ps_.persistant[PERS_RANK] == 0 && cl->ps_.persistant[PERS_KILLED] == 0 ) ? 1 : 0;
 
-		if( cl->accuracy_shots_ ) 
-			accuracy = cl->accuracy_hits_ * 100 / cl->accuracy_shots_;
-		else 
-			accuracy = 0;
-
-		perfect = ( cl->ps_.persistant[PERS_RANK] == 0 && cl->ps_.persistant[PERS_KILLED] == 0 ) ? 1 : 0;
-
-		// SCORE_BLOCK = 15 parameters (make sure this ties with the value used in CG_ParseScores())
-		Com_sprintf( entry, sizeof(entry),
-			" %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i",
+		// SCORE_BLOCK = 9 values (the same number CGame::parseScores reads)
+		Com_sprintf( entry, sizeof(entry), " %i %i %i %i %i %i %i %i %i",
 			theLevel.sortedClients_[i],
 			cl->ps_.persistant[PERS_SCORE],
 			ping,
 			(theLevel.time_ - cl->pers_.enterTime_)/60000,
-			scoreFlags,
-			theLevel.getEntity(theLevel.sortedClients_[i])->s.objectives,// g_entities[theLevel.sortedClients_[i]].s.objectives,
+			theLevel.getEntity(theLevel.sortedClients_[i])->s.objectives,
 			accuracy, 
-			0,
-			0,
-			0,
-			0, 
-			0, 
 			perfect,
 			cl->ps_.persistant[PERS_CAPTURES],
 			cl->ps_.persistant[PERS_DEATHS] );
 
-		j = strlen(entry);
-		if( stringlength + j > 1024 )
-			break;
+		const int length = static_cast<int>( strlen( entry ) );
+		if( stringlength + length > roomForEntries )
+			send();
 		strcpy( string + stringlength, entry );
-		stringlength += j;
+		stringlength += length;
+		held++;
 	}
-
-	GameHost::sendServerCommand( ent->s.number,// ok ? before: ent-g_entities, 
-							  va("scores %i %i %i%s", 
-							  i, 
-							  theLevel.teamScores_[ClientBase::TEAM_RED], 
-							  theLevel.teamScores_[ClientBase::TEAM_BLUE],
-							  string ) );
+	// the last part; with nobody connected, still the team scores
+	if( held || !first )
+		send();
 }
 
 

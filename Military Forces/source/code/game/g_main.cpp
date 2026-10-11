@@ -120,7 +120,8 @@ cvarTable_t		gameCvarTable[] = {
 
 	{ &g_friendlyFire, "g_friendlyFire", "0", CVAR_ARCHIVE, 0, true  },
 
-	{ &g_teamAutoJoin, "g_teamAutoJoin", "0", CVAR_ARCHIVE  },
+	// team games: a player joining, or picking a vehicle without having picked a side, is put on a side (1) or left to pick (0)
+	{ &g_teamAutoJoin, "g_teamAutoJoin", "1", CVAR_ARCHIVE  },
 	{ &g_teamForceBalance, "g_teamForceBalance", "0", CVAR_ARCHIVE  },
 	{ &g_teamForceBalanceNum, "g_teamForceBalanceNum", "1", CVAR_ARCHIVE  },	// allowed spread when g_teamForceBalance == 1
 

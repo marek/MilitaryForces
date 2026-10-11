@@ -139,7 +139,12 @@ void CGame::newClientInfo( int clientNum ) {
 		// Make sure it only happens to the player changing teams, otherwise all vehicle's reset 
 		// (UserInfoChanged on g will reset all players)
 		CvarSystem::set( "cg_vehicle", "-1" );
-		CvarSystem::set( "cg_nextVehicle", va( "%d", -1 ) );
+		// the vehicle already chosen is kept when the new side may use it: picking a vehicle and then a side, or
+		// changing sides, does not mean picking the vehicle again
+		const int chosen = static_cast<int>( CGame::cvar_Get( "cg_nextVehicle" ) );
+		const int sideFlag = newInfo.team == ClientBase::TEAM_RED ? MF_TEAM_1 : newInfo.team == ClientBase::TEAM_BLUE ? MF_TEAM_2 : 0;
+		if( chosen < 0 || chosen >= bg_numberOfVehicles || !(availableVehicles[chosen].team & sideFlag) )
+			CvarSystem::set( "cg_nextVehicle", va( "%d", -1 ) );
 	}
 
 	// team task

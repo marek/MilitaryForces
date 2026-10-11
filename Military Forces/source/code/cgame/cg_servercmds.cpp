@@ -8,6 +8,7 @@
 // these are processed at snapshot transition time, so there will definately
 // be a valid snapshot this frame
 
+#include <algorithm>
 #include "cg_local.h"
 
 struct orderTask_t {
@@ -22,40 +23,39 @@ CGame::parseScores
 =================
 */
 
-constexpr int SCORE_BLOCK = 15; // this value must be exactly how many parameters we expect per client score
+constexpr int SCORE_BLOCK = 9; // this value must be exactly how many parameters we expect per client score
 
+// "scores <players> <red> <blue> <first> <count>" and then count players' values, for the players from first on in
+// the sorted list. A full scoreboard comes as several of these; the one that starts at 0 begins a new board.
 void CGame::parseScores( )
 {
-	int	i, objectives;
-
-	cg.numScores = atoi( CGame::argv( 1 ) );
-	if ( cg.numScores > MAX_CLIENTS )
-	{
-		cg.numScores = MAX_CLIENTS;
-	}
+	constexpr int header = 6;
+	const int total = std::clamp( atoi( CGame::argv( 1 ) ), 0, MAX_CLIENTS );
+	const int first = atoi( CGame::argv( 4 ) );
+	const int count = atoi( CGame::argv( 5 ) );
+	if( first < 0 || count < 0 || first + count > MAX_CLIENTS )
+		return;
 
 	cg.teamScores[0] = atoi( CGame::argv( 2 ) );
 	cg.teamScores[1] = atoi( CGame::argv( 3 ) );
 
-	memset( cg.scores, 0, sizeof( cg.scores ) );
-	for ( i = 0 ; i < cg.numScores ; i++ )
+	if( first == 0 )
+		memset( cg.scores, 0, sizeof( cg.scores ) );
+	// only the players that have arrived are shown until the rest do
+	cg.numScores = std::min( total, first + count );
+	for( int n = 0; n < count; n++ )
 	{
-		//
-		cg.scores[i].client = atoi( CGame::argv( i * SCORE_BLOCK + 4 ) );
-		cg.scores[i].score = atoi( CGame::argv( i * SCORE_BLOCK + 5 ) );
-		cg.scores[i].ping = atoi( CGame::argv( i * SCORE_BLOCK + 6 ) );
-		cg.scores[i].time = atoi( CGame::argv( i * SCORE_BLOCK + 7 ) );
-		cg.scores[i].scoreFlags = atoi( CGame::argv( i * SCORE_BLOCK + 8 ) );
-		objectives = atoi( CGame::argv( i * SCORE_BLOCK + 9 ) );
-		cg.scores[i].accuracy = atoi(CGame::argv( i * SCORE_BLOCK + 10));
-		cg.scores[i].impressiveCount = atoi(CGame::argv( i * SCORE_BLOCK + 11));
-		cg.scores[i].excellentCount = atoi(CGame::argv (i * SCORE_BLOCK + 12));
-		cg.scores[i].guantletCount = atoi(CGame::argv( i * SCORE_BLOCK + 13));
-		cg.scores[i].defendCount = atoi(CGame::argv( i * SCORE_BLOCK + 14));
-		cg.scores[i].assistCount = atoi(CGame::argv( i * 14 + 15));
-		cg.scores[i].perfect = atoi(CGame::argv( i * SCORE_BLOCK + 16));
-		cg.scores[i].captures = atoi(CGame::argv(i * SCORE_BLOCK + 17));
-		cg.scores[i].deaths = atoi( CGame::argv( i * SCORE_BLOCK + 18 ) );
+		const int i = first + n;
+		const int base = header + n * SCORE_BLOCK;
+		cg.scores[i].client = atoi( CGame::argv( base ) );
+		cg.scores[i].score = atoi( CGame::argv( base + 1 ) );
+		cg.scores[i].ping = atoi( CGame::argv( base + 2 ) );
+		cg.scores[i].time = atoi( CGame::argv( base + 3 ) );
+		const int objectives = atoi( CGame::argv( base + 4 ) );
+		cg.scores[i].accuracy = atoi( CGame::argv( base + 5 ) );
+		cg.scores[i].perfect = atoi( CGame::argv( base + 6 ) );
+		cg.scores[i].captures = atoi( CGame::argv( base + 7 ) );
+		cg.scores[i].deaths = atoi( CGame::argv( base + 8 ) );
 
 		if ( cg.scores[i].client < 0 || cg.scores[i].client >= MAX_CLIENTS )
 		{
