@@ -1,0 +1,3 @@
+#!/bin/sh
+# the game finds its renderers and mfdata beside its own executable
+exec /opt/militaryforces/MilitaryForces "$@"

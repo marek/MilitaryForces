@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Military Forces
+Comment=Air, land and sea combat
+Exec=militaryforces
+Icon=militaryforces
+Terminal=false
+Categories=Game;ActionGame;

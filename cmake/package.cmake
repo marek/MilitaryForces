@@ -32,13 +32,36 @@ install(PROGRAMS $<TARGET_FILE:${DEDICATED_NAME}> DESTINATION .)
 install(DIRECTORY ${MF_DATA_DIR}/ DESTINATION mfdata OPTIONAL
     FILES_MATCHING PATTERN "*.pk3" PATTERN "q3_*" EXCLUDE)
 
+# Linux also gets a .deb: the game in /opt/militaryforces, launchers in /usr/bin and an entry in the
+# applications menu; those three only go into the .deb, the .zip runs from its own folder
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    install(PROGRAMS ${CMAKE_SOURCE_DIR}/misc/linux/militaryforces ${CMAKE_SOURCE_DIR}/misc/linux/militaryforces-server
+        DESTINATION /usr/bin COMPONENT deb)
+    install(FILES ${CMAKE_SOURCE_DIR}/misc/linux/militaryforces.desktop
+        DESTINATION /usr/share/applications COMPONENT deb)
+    install(FILES ${CMAKE_SOURCE_DIR}/misc/linux/militaryforces.png
+        DESTINATION /usr/share/icons/hicolor/64x64/apps COMPONENT deb)
+endif()
+
 set(CPACK_PACKAGE_NAME militaryforces)
 set(CPACK_PACKAGE_FILE_NAME militaryforces-${PROJECT_VERSION}-${MF_PLATFORM})
+set(CPACK_PACKAGE_VENDOR "Military Forces")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Military Forces: air, land and sea combat")
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-    set(CPACK_GENERATOR "TGZ;ZIP")
+    set(CPACK_GENERATOR "ZIP;DEB")
 else()
     set(CPACK_GENERATOR ZIP)
 endif()
+
+set(CPACK_DEBIAN_FILE_NAME ${CPACK_PACKAGE_FILE_NAME}.deb)
+set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Marek Kudlacz <marek@kudlacz.com>")
+set(CPACK_DEBIAN_PACKAGE_SECTION games)
+set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "https://github.com/marek/MilitaryForces")
+# SDL2, FreeType and the C++ runtime are found from the binaries; OpenAL and curl are opened at run time
+set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
+set(CPACK_DEBIAN_PACKAGE_DEPENDS "libopenal1")
+set(CPACK_DEBIAN_PACKAGE_RECOMMENDS "libcurl4")
+set(CPACK_PROJECT_CONFIG_FILE ${CMAKE_SOURCE_DIR}/cmake/utils/package_generator.cmake)
 set(CPACK_INCLUDE_TOPLEVEL_DIRECTORY ON)
 set(CPACK_MF_DIST_DIR ${CMAKE_SOURCE_DIR}/dist)
 set(CPACK_MF_SOURCE_DIR ${CMAKE_SOURCE_DIR})
