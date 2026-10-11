@@ -146,7 +146,9 @@ inline constexpr int MAX_SNAPSHOT_ENTITIES = 2048;
 
 inline constexpr int PORT_ANY = -1;
 
-inline constexpr int MAX_RELIABLE_COMMANDS = 64; // max string commands buffered for restransmit
+// max string commands buffered for retransmit. A full server of 63 sends a loading client more than 64 before it
+// reads any (three prints and the details of every player who joins), and a client whose queue overflows is dropped
+inline constexpr int MAX_RELIABLE_COMMANDS = 256;
 
 enum netadrtype_t {
 	NA_BAD = 0,					// an address lookup failed

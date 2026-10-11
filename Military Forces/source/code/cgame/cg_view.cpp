@@ -67,6 +67,27 @@ static int viewedVehicle()
 	return cg_vehicle.integer >= 0 && cg_vehicle.integer < bg_numberOfVehicles ? cg_vehicle.integer : 0;
 }
 
+// What the camera's distance, height and seat position were last set up for. They are set up afresh for another
+// vehicle, for a new life in the same one, and for a new map: the values a player zoomed to, or the settings file
+// brought along, are for the life they were made in
+struct ViewSetUpFor
+{
+	int	vehicle = -1;
+	int	life = -1;
+	int	level = -1;
+	bool stale()
+	{
+		const int nowVehicle = viewedVehicle();
+		const int nowLife = cg.snap ? cg.snap->ps.persistant[PERS_SPAWN_COUNT] : -1;
+		if( nowVehicle == vehicle && nowLife == life && cgs.levelStartTime == level )
+			return false;
+		vehicle = nowVehicle;
+		life = nowLife;
+		level = cgs.levelStartTime;
+		return true;
+	}
+};
+
 /*
 ===============
 CGame::offsetVehicleView
@@ -84,20 +105,18 @@ void CGame::offsetVehicleView( bool spectator )
     trace_t	    trace;
     vec3_t		mins, maxs, start; 
 	float		dist, height;
-	static int	lastVehicle = -1;
+	static ViewSetUpFor setUpFor;
 
 #ifdef _VIEW_SETTING_DISPLAY
 	char test[ 64 ];
 #endif
 	// reset 3rd person camera distance and height to vehicle default (only when valid)
-	if( viewedVehicle() != lastVehicle )
+	if( setUpFor.stale() )
 	{
 		// reset
 		cg_thirdPersonRange.value = availableVehicles[ viewedVehicle() ].cam_dist[ CAMERA_V_DEFAULT ];
 		cg_thirdPersonHeight.value = availableVehicles[ viewedVehicle() ].cam_height[ CAMERA_V_DEFAULT ];
 
-		// save vehicle we reset for
-		lastVehicle = viewedVehicle();
 	}
 
 	// get vars
@@ -189,20 +208,18 @@ void CGame::offsetVehicleViewCFV( bool spectator )
     trace_t	    trace;
     vec3_t		mins, maxs, start; 
 	float		dist, height;
-	static int	lastVehicle = -1;
+	static ViewSetUpFor setUpFor;
 
 #ifdef _VIEW_SETTING_DISPLAY
 	char test[ 64 ];
 #endif
 	// reset 3rd person camera distance and height to vehicle default (only when valid)
-	if( viewedVehicle() != lastVehicle )
+	if( setUpFor.stale() )
 	{
 		// reset
 		cg_thirdPersonRange.value = availableVehicles[ viewedVehicle() ].cam_dist[ CAMERA_V_DEFAULT ];
 		cg_thirdPersonHeight.value = availableVehicles[ viewedVehicle() ].cam_height[ CAMERA_V_DEFAULT ];
 
-		// save vehicle we reset for
-		lastVehicle = viewedVehicle();
 	}
 
 	// get vars

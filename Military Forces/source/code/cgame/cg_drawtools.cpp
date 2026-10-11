@@ -934,6 +934,12 @@ bool CGame::polyMeshGeneratedShadow( BasicDrawInfo_t *drawInfo, float *shadowPla
 		}
 	}
 
+	// A shadow is twenty-five traces. Past this distance from the eye it is a few pixels of a dark smudge, and on a
+	// full server most vehicles are that far away
+	constexpr float shadowDrawnWithin = 3500.0f;
+	if( Distance( drawInfo->origin, cg.refdef.vieworg ) > shadowDrawnWithin )
+		return true;
+
 	// create the mesh
 	memset( verts, 0, sizeof( verts ) );
 
@@ -998,7 +1004,9 @@ bool CGame::polyMeshGeneratedShadow( BasicDrawInfo_t *drawInfo, float *shadowPla
 			VectorCopy( verts[y][x].xyz, start );
 			VectorCopy( verts[y][x].xyz, end );
 			end[2] -= 1024;
-			CGame::trace( &trace, start, mins, maxs, end, 0, traceMask );
+			// against the map alone: a shadow that also looked for every other vehicle under each of its points
+			// cost more, with sixty vehicles about, than drawing the vehicles did
+			CollisionModel::boxTrace( &trace, start, end, mins, maxs, 0, traceMask, false );
 			
 			// if we didn't starting our trace in the ground, set z
 			if( !trace.startsolid )
