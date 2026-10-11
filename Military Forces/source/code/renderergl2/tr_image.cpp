@@ -3173,6 +3173,44 @@ static char *CommaParse( char **data_p ) {
 }
 
 
+// One line of a skin file: the surface's name up to the first comma and the texture after it, each with the blanks
+// round it dropped. A surface name may have blanks in it ("strut lower f"), which a parser that splits at blanks
+// turns into three names and a skin that matches nothing. False at the end of the text.
+static bool skinLine( char** text, char* surface, int surfaceSize, char* texture, int textureSize )
+{
+	char* p = *text;
+	while( *p == '\n' || *p == '\r' || *p == ' ' || *p == '\t' )
+		p++;
+	if( !*p )
+	{
+		*text = p;
+		return false;
+	}
+	char* end = p;
+	while( *end && *end != '\n' && *end != '\r' )
+		end++;
+	char* comma = p;
+	while( comma < end && *comma != ',' )
+		comma++;
+	const auto copyTrimmed = []( const char* from, const char* to, char* out, int size )
+	{
+		while( from < to && ( *from == ' ' || *from == '\t' ) )
+			from++;
+		while( to > from && ( to[-1] == ' ' || to[-1] == '\t' ) )
+			to--;
+		const int length = static_cast<int>( to - from ) < size - 1 ? static_cast<int>( to - from ) : size - 1;
+		memcpy( out, from, length );
+		out[length] = 0;
+	};
+	copyTrimmed( p, comma, surface, surfaceSize );
+	if( comma < end )
+		copyTrimmed( comma + 1, end, texture, textureSize );
+	else
+		texture[0] = 0;
+	*text = end;
+	return true;
+}
+
 /*
 ===============
 RE_RegisterSkin
@@ -3244,32 +3282,22 @@ qhandle_t RE_RegisterSkin( const char *name ) {
 
 	totalSurfaces = 0;
 	text_p = text.c;
-	while ( text_p && *text_p ) {
-		// get surface name
-		token = CommaParse( &text_p );
-		Q_strncpyz( surfName, token, sizeof( surfName ) );
-
-		if ( !token[0] ) {
-			break;
+	char textureName[MAX_QPATH];
+	while ( text_p && skinLine( &text_p, surfName, sizeof( surfName ), textureName, sizeof( textureName ) ) ) {
+		if ( !surfName[0] ) {
+			continue;
 		}
 		// lowercase the surface name so skin compares are faster
 		Q_strlwr( surfName );
 
-		if ( *text_p == ',' ) {
-			text_p++;
-		}
-
-		if ( strstr( token, "tag_" ) ) {
+		if ( strstr( surfName, "tag_" ) ) {
 			continue;
 		}
-		
-		// parse the shader name
-		token = CommaParse( &text_p );
 
 		if ( skin->numSurfaces < MAX_SKIN_SURFACES ) {
 			surf = &parseSurfaces[skin->numSurfaces];
 			Q_strncpyz( surf->name, surfName, sizeof( surf->name ) );
-			surf->shader = R_FindShader( token, LIGHTMAP_NONE, true );
+			surf->shader = R_FindShader( textureName, LIGHTMAP_NONE, true );
 			skin->numSurfaces++;
 		}
 

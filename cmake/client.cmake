@@ -99,6 +99,14 @@ if(APPLE AND BUILD_MACOS_APP)
             COMMAND ${CMAKE_COMMAND} -DFOLDER=$<TARGET_FILE_DIR:${CLIENT_NAME}> -DSIGN=${MF_SIGN_IDENTITY} -DSEARCH=${MF_BUNDLE_SEARCH}
                 -P ${CMAKE_SOURCE_DIR}/cmake/utils/bundle_libs.cmake
             VERBATIM)
+        # A renderer rebuilt on its own is copied into the bundle as the linker made it, still looking for SDL2 by
+        # its build path: the game then runs with two copies of SDL2 and fails at start. The same fix-up is run for it
+        foreach(RENDERER IN LISTS MF_RENDERERS)
+            add_custom_command(TARGET ${RENDERER} POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -DFOLDER=$<TARGET_FILE_DIR:${CLIENT_NAME}> -DSIGN=${MF_SIGN_IDENTITY} -DSEARCH=${MF_BUNDLE_SEARCH}
+                    -P ${CMAKE_SOURCE_DIR}/cmake/utils/bundle_libs.cmake
+                VERBATIM)
+        endforeach()
     endif()
     add_custom_command(TARGET ${CLIENT_NAME} POST_BUILD
         COMMAND codesign --force --deep --sign ${MF_SIGN_IDENTITY} $<TARGET_BUNDLE_DIR:${CLIENT_NAME}>

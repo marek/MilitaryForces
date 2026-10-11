@@ -22,6 +22,16 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // tr_mesh.c: triangle model functions
 
 #include "tr_local.h"
+#include <set>
+#include <utility>
+
+// A surface a skin gives no texture to is a fault in the data that shows on screen as a white or black part. It is
+// said once for each skin and surface, to everyone, not every frame to developers only
+static bool firstTimeForSkin( const void* skin, const void* surface )
+{
+	static std::set<std::pair<const void*, const void*>> told;
+	return told.insert( { skin, surface } ).second;
+}
 
 static float ProjectRadius( float r, vec3_t location )
 {
@@ -372,10 +382,10 @@ void R_AddMD3Surfaces( trRefEntity_t *ent ) {
 				}
 			}
 			if (shader == tr.defaultShader) {
-				ri.Printf( PRINT_DEVELOPER, "WARNING: no shader for surface %s in skin %s\n", surface->name, skin->name);
+				if( firstTimeForSkin( skin, surface ) ) ri.Printf( PRINT_WARNING, "MISSING skin entry %s has none for surface \"%s\": it is drawn without a texture\n", skin->name, surface->name );
 			}
 			else if (shader->defaultShader) {
-				ri.Printf( PRINT_DEVELOPER, "WARNING: shader %s in skin %s not found\n", shader->name, skin->name);
+				if( firstTimeForSkin( skin, surface ) ) ri.Printf( PRINT_WARNING, "MISSING skin texture %s (skin %s, surface \"%s\")\n", shader->name, skin->name, surface->name );
 			}
 		} else if ( surface->numShaderIndexes <= 0 ) {
 			shader = tr.defaultShader;

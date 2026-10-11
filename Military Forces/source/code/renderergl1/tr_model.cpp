@@ -101,7 +101,7 @@ qhandle_t R_RegisterMD3(const char *name, model_t *mod)
 	}
 
 #ifdef _DEBUG
-	ri.Printf(PRINT_WARNING,"R_RegisterMD3: couldn't load %s\n", name);
+	ri.Printf(PRINT_WARNING,"MISSING model %s\n", name);
 #endif
 
 	mod->type = MOD_BAD;
@@ -471,10 +471,13 @@ static bool R_LoadMD3 (model_t *mod, int lod, void *buffer, const char *mod_name
 		Q_strlwr( surf->name );
 
 		// strip off a trailing _1 or _2
-		// this is a crutch for q3data being a mess
+		// this is a crutch for q3data being a mess. Only a digit is stripped: these models name their left and
+		// right surfaces _l and _r, and with those cut off too a skin could tell neither wing from the other and
+		// matched neither, so every such surface drew untextured under a team skin
 		j = strlen( surf->name );
-		if ( j > 2 && surf->name[j-2] == '_' ) {
-			surf->name[j-2] = 0;
+		if( j > 2 && surf->name[j - 2] == '_' && surf->name[j - 1] >= '0' && surf->name[j - 1] <= '9' )
+		{
+			surf->name[j - 2] = 0;
 		}
 
         // register the shaders

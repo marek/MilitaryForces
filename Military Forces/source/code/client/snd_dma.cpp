@@ -366,7 +366,7 @@ static sfxHandle_t	S_Base_RegisterSound( const char *name, bool compressed ) {
 
 	if ( sfx->soundData ) {
 		if ( sfx->defaultSound ) {
-			Common::printf( S_COLOR_YELLOW "WARNING: could not find %s - using default\n", sfx->soundName );
+			Common::printf( "MISSING sound %s\n", sfx->soundName );
 			return 0;
 		}
 		return sfx - s_knownSfx;
@@ -378,7 +378,7 @@ static sfxHandle_t	S_Base_RegisterSound( const char *name, bool compressed ) {
   sfx->memoryLoad();
 
 	if ( sfx->defaultSound ) {
-		Common::printf( S_COLOR_YELLOW "WARNING: could not find %s - using default\n", sfx->soundName );
+		Common::printf( "MISSING sound %s\n", sfx->soundName );
 		return 0;
 	}
 

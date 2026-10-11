@@ -21,6 +21,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // common.c -- misc functions used in client and server
 
+#include <set>
+#include <string>
 #include "../game/q_shared.h"
 #include "qcommon.h"
 #include <csetjmp>
@@ -160,6 +162,28 @@ to the appropriate place.
 A raw string should NEVER be passed as fmt, because of "%f" type crashers.
 =============
 */
+// A resource that failed to load is reported in one form everywhere, a line starting "MISSING ": the image, model,
+// sound or skin entry, and what asked for it. Each such line also goes, once, into resources.log in the player's
+// data folder, so that what a map or a vehicle lacks can be read off a file after any run instead of being looked
+// for on screen.
+static void noteMissingResource( const char* line )
+{
+	static std::set<std::string> told;
+	static bool writing = false;
+	// (the renderer's warnings arrive with a colour code in front)
+	const char* text = line[0] == '^' && line[1] ? line + 2 : line;
+	if( strncmp( text, "MISSING ", 8 ) != 0 || writing || !FileSystem::initialized() || !told.insert( text ).second )
+		return;
+	writing = true;
+	const fileHandle_t f = FileSystem::fOpenFileAppend_HomeData( "resources.log" );
+	if( f )
+	{
+		FileSystem::write( text, static_cast<int>( strlen( text ) ), f );
+		FileSystem::fCloseFile( f );
+	}
+	writing = false;
+}
+
 void QDECL Common::printf( const char *fmt, ... ) {
 	va_list		argptr;
 	char		msg[MAXPRINTMSG];
@@ -169,6 +193,8 @@ void QDECL Common::printf( const char *fmt, ... ) {
 	va_start (argptr,fmt);
 	Q_vsnprintf (msg, sizeof(msg), fmt, argptr);
 	va_end (argptr);
+
+	noteMissingResource( msg );
 
 	if ( rd_buffer ) {
 		if ((strlen (msg) + strlen(rd_buffer)) > (rd_buffersize - 1)) {

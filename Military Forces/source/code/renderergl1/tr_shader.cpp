@@ -649,7 +649,7 @@ static bool ParseStage( shaderStage_t *stage, char **text )
 
 				if ( !stage->bundle[0].image[0] )
 				{
-					ri.Printf( PRINT_WARNING, "WARNING: R_FindImageFile could not find '%s' in shader '%s'\n", token, shader.name );
+					ri.Printf( PRINT_WARNING, "MISSING image %s (named by shader %s)\n", token, shader.name );
 					return false;
 				}
 			}
@@ -678,7 +678,7 @@ static bool ParseStage( shaderStage_t *stage, char **text )
 			stage->bundle[0].image[0] = R_FindImageFile( token, type, flags );
 			if ( !stage->bundle[0].image[0] )
 			{
-				ri.Printf( PRINT_WARNING, "WARNING: R_FindImageFile could not find '%s' in shader '%s'\n", token, shader.name );
+				ri.Printf( PRINT_WARNING, "MISSING image %s (named by shader %s)\n", token, shader.name );
 				return false;
 			}
 		}
@@ -718,7 +718,7 @@ static bool ParseStage( shaderStage_t *stage, char **text )
 					stage->bundle[0].image[num] = R_FindImageFile( token, IMGTYPE_COLORALPHA, flags );
 					if ( !stage->bundle[0].image[num] )
 					{
-						ri.Printf( PRINT_WARNING, "WARNING: R_FindImageFile could not find '%s' in shader '%s'\n", token, shader.name );
+						ri.Printf( PRINT_WARNING, "MISSING image %s (named by shader %s)\n", token, shader.name );
 						return false;
 					}
 					stage->bundle[0].numImageAnimations++;
@@ -2597,7 +2597,7 @@ shader_t *R_FindShader( const char *name, int lightmapIndex, bool mipRawImage ) 
 
 		image = R_FindImageFile( name, IMGTYPE_COLORALPHA, flags );
 		if ( !image ) {
-			ri.Printf( PRINT_DEVELOPER, "Couldn't find image file for shader %s\n", name );
+			ri.Printf( PRINT_WARNING, "MISSING image %s (no image and no shader script of that name)\n", name );
 			shader.defaultShader = true;
 			return FinishShader();
 		}
