@@ -355,7 +355,7 @@ Draws large numbers
 //	l = strlen(num);
 //	if (l > width)
 //		l = width;
-//	x += 2 + CHAR_WIDTH*(width - l);
+//	x += 2 + HUDCHAR_WIDTH*(width - l);
 //
 //	ptr = num;
 //	while (*ptr && l)
@@ -365,8 +365,8 @@ Draws large numbers
 //		else
 //			frame = *ptr -'0';
 //
-//		CGame::drawPic( x,y, CHAR_WIDTH, CHAR_HEIGHT, cgs.media.numberShaders[frame] );
-//		x += CHAR_WIDTH;
+//		CGame::drawPic( x,y, HUDCHAR_WIDTH, HUDCHAR_HEIGHT, cgs.media.numberShaders[frame] );
+//		x += HUDCHAR_WIDTH;
 //		ptr++;
 //		l--;
 //	}

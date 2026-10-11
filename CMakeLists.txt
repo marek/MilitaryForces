@@ -18,6 +18,9 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS ON)
 
+# the renderers are shared modules that link the internal static libraries (jpeg and the rest)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
 include(utils/arch)
 include(compilers/all)
 include(platforms/all)

@@ -82,8 +82,8 @@ inline constexpr int HUDNUM_WIDTH = 8;
 inline constexpr int HUDNUM_HEIGHT = 8;
 
 inline constexpr int ICON_SIZE = 48;
-inline constexpr int CHAR_WIDTH = 32;
-inline constexpr int CHAR_HEIGHT = 48;
+inline constexpr int HUDCHAR_WIDTH = 32;
+inline constexpr int HUDCHAR_HEIGHT = 48;
 inline constexpr int TEXT_ICON_SPACE = 4;
 
 inline constexpr int TEAMCHAT_WIDTH = 80;

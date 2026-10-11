@@ -12,6 +12,14 @@ list(APPEND SYSTEM_PLATFORM_SOURCES ${SOURCE_DIR}/sys/sys_osx.mm)
 list(APPEND CLIENT_DEFINITIONS GL_SILENCE_DEPRECATION)
 list(APPEND COMMON_LIBRARIES "-framework Cocoa")
 
+# the static libraries come in more than once (ogg through vorbis and opus, zlib through minizip);
+# the Xcode 15 linker warns about each repeat, which is harmless
+include(CheckLinkerFlag)
+check_linker_flag(CXX "-Wl,-no_warn_duplicate_libraries" HAVE_NO_WARN_DUPLICATE_LIBRARIES)
+if(HAVE_NO_WARN_DUPLICATE_LIBRARIES)
+    add_link_options("-Wl,-no_warn_duplicate_libraries")
+endif()
+
 option(BUILD_MACOS_APP "Deploy as a macOS .app" ON)
 
 set(MACOS_ICON_PATH ${CMAKE_SOURCE_DIR}/misc/macos/mfq3.icns)

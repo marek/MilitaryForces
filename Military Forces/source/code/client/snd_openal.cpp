@@ -58,7 +58,6 @@ static bool capture_ext = false;
 S_AL_Format
 =================
 */
-static
 static ALuint S_AL_Format(int width, int channels)
 {
 	ALuint format = AL_FORMAT_MONO16;
@@ -457,7 +456,6 @@ static void S_AL_BufferLoad(sfxHandle_t sfx, bool cache)
 S_AL_BufferUse
 =================
 */
-static
 static void S_AL_BufferUse(sfxHandle_t sfx)
 {
 	if(knownSfx[sfx].filename[0] == '\0')
@@ -473,7 +471,6 @@ static void S_AL_BufferUse(sfxHandle_t sfx)
 S_AL_BufferInit
 =================
 */
-static
 static bool S_AL_BufferInit( )
 {
 	if(alBuffersInitialised)
@@ -498,7 +495,6 @@ static bool S_AL_BufferInit( )
 S_AL_BufferShutdown
 =================
 */
-static
 static void S_AL_BufferShutdown( )
 {
 	int i;
@@ -525,7 +521,6 @@ static void S_AL_BufferShutdown( )
 S_AL_RegisterSound
 =================
 */
-static
 static sfxHandle_t S_AL_RegisterSound( const char *sample, bool compressed )
 {
 	sfxHandle_t sfx = S_AL_BufferFind(sample);
@@ -548,7 +543,6 @@ S_AL_BufferGet
 Return's a sfx's buffer
 =================
 */
-static
 static ALuint S_AL_BufferGet(sfxHandle_t sfx)
 {
 	return knownSfx[sfx].buffer;
@@ -760,7 +754,6 @@ static bool S_AL_HearingThroughEntity( int entityNum )
 S_AL_SrcInit
 =================
 */
-static
 static bool S_AL_SrcInit( )
 {
 	int i;
@@ -799,7 +792,6 @@ static bool S_AL_SrcInit( )
 S_AL_SrcShutdown
 =================
 */
-static
 static void S_AL_SrcShutdown( )
 {
 	int i;
@@ -1067,7 +1059,6 @@ static void S_AL_SrcKill(srcHandle_t src)
 S_AL_SrcAlloc
 =================
 */
-static
 // a loop asking for a source may take it from a loop of its own kind that is this much farther from the listener;
 // the margin keeps two loops at similar range from trading the source back and forth
 static constexpr float loopTakeover = 1.5f;
@@ -1183,7 +1174,6 @@ Returns -1 if there isn't one
 =================
 */
 #if 0
-static
 static srcHandle_t S_AL_SrcFind(int entnum, int channel)
 {
 	int i;
@@ -1205,7 +1195,6 @@ S_AL_SrcLock
 Locked sources will not be automatically reallocated or managed
 =================
 */
-static
 static void S_AL_SrcLock(srcHandle_t src)
 {
 	srcList[src].isLocked = true;
@@ -1218,7 +1207,6 @@ S_AL_SrcUnlock
 Once unlocked, the source may be reallocated again
 =================
 */
-static
 static void S_AL_SrcUnlock(srcHandle_t src)
 {
 	srcList[src].isLocked = false;
@@ -1229,7 +1217,6 @@ static void S_AL_SrcUnlock(srcHandle_t src)
 S_AL_UpdateEntityPosition
 =================
 */
-static
 static void S_AL_UpdateEntityPosition( int entityNum, const vec3_t origin )
 {
 	vec3_t sanOrigin;
@@ -1269,7 +1256,6 @@ S_AL_StartLocalSound
 Play a local (non-spatialized) sound effect
 =================
 */
-static
 static void S_AL_StartLocalSound(sfxHandle_t sfx, int channel)
 {
 	srcHandle_t src;
@@ -1401,7 +1387,6 @@ static void S_AL_StartSound( vec3_t origin, int entnum, int entchannel, sfxHandl
 S_AL_ClearLoopingSounds
 =================
 */
-static
 static void S_AL_ClearLoopingSounds( bool killall )
 {
 	int i;
@@ -1532,7 +1517,6 @@ static void S_AL_AddRealLoopingSound(int entityNum, const vec3_t origin, const v
 S_AL_StopLoopingSound
 =================
 */
-static
 static void S_AL_StopLoopingSound(int entityNum )
 {
 	if(entityList[entityNum].srcAllocated)
@@ -1546,7 +1530,6 @@ S_AL_SrcUpdate
 Update state (move things around, manage sources, and so on)
 =================
 */
-static
 static void S_AL_SrcUpdate( )
 {
 	int i;
@@ -1745,7 +1728,6 @@ static void S_AL_SrcUpdate( )
 S_AL_SrcShutup
 =================
 */
-static
 static void S_AL_SrcShutup( )
 {
 	int i;
@@ -1758,7 +1740,6 @@ static void S_AL_SrcShutup( )
 S_AL_SrcGet
 =================
 */
-static
 static ALuint S_AL_SrcGet(srcHandle_t src)
 {
 	return srcList[src].alSource;
@@ -1869,7 +1850,6 @@ static void S_AL_FreeStreamChannel( int stream )
 S_AL_RawSamples
 =================
 */
-static
 static void S_AL_RawSamples(int stream, int samples, int rate, int width, int channels, const byte *data, float volume, int entityNum)
 {
 	int numBuffers;
@@ -1952,7 +1932,6 @@ static void S_AL_RawSamples(int stream, int samples, int rate, int width, int ch
 S_AL_StreamUpdate
 =================
 */
-static
 static void S_AL_StreamUpdate( int stream )
 {
 	int		numBuffers;
@@ -1997,7 +1976,6 @@ static void S_AL_StreamUpdate( int stream )
 S_AL_StreamDie
 =================
 */
-static
 static void S_AL_StreamDie( int stream )
 {
 	if ((stream < 0) || (stream >= MAX_RAW_STREAMS))
@@ -2097,7 +2075,6 @@ static void S_AL_CloseMusicFiles()
 S_AL_StopBackgroundTrack
 =================
 */
-static
 static void S_AL_StopBackgroundTrack( )
 {
 	if(!musicPlaying)
@@ -2126,7 +2103,6 @@ static void S_AL_StopBackgroundTrack( )
 S_AL_MusicProcess
 =================
 */
-static
 static void S_AL_MusicProcess(ALuint b)
 {
 	ALenum error;
@@ -2195,7 +2171,6 @@ static void S_AL_MusicProcess(ALuint b)
 S_AL_StartBackgroundTrack
 =================
 */
-static
 static void S_AL_StartBackgroundTrack( const char *intro, const char *loop )
 {
 	int i;
@@ -2268,7 +2243,6 @@ static void S_AL_StartBackgroundTrack( const char *intro, const char *loop )
 S_AL_MusicUpdate
 =================
 */
-static
 static void S_AL_MusicUpdate( )
 {
 	int		numBuffers;
@@ -2334,7 +2308,6 @@ static cvar_t *s_alCapture;
 S_AL_StopAllSounds
 =================
 */
-static
 static void S_AL_StopAllSounds( )
 {
 	int i;
@@ -2349,7 +2322,6 @@ static void S_AL_StopAllSounds( )
 S_AL_Respatialize
 =================
 */
-static
 static void S_AL_Respatialize( int entityNum, const vec3_t origin, vec3_t axis[3], int inwater )
 {
 	float		orientation[6];
@@ -2379,7 +2351,6 @@ static void S_AL_Respatialize( int entityNum, const vec3_t origin, vec3_t axis[3
 S_AL_Update
 =================
 */
-static
 static void S_AL_Update( )
 {
 	int i;
@@ -2460,7 +2431,6 @@ static void S_AL_Update( )
 S_AL_DisableSounds
 =================
 */
-static
 static void S_AL_DisableSounds( )
 {
 	S_AL_StopAllSounds();
@@ -2471,7 +2441,6 @@ static void S_AL_DisableSounds( )
 S_AL_BeginRegistration
 =================
 */
-static
 static void S_AL_BeginRegistration( )
 {
 	if(!numSfx)
@@ -2483,7 +2452,6 @@ static void S_AL_BeginRegistration( )
 S_AL_ClearSoundBuffer
 =================
 */
-static
 static void S_AL_ClearSoundBuffer( )
 {
 }
@@ -2493,7 +2461,6 @@ static void S_AL_ClearSoundBuffer( )
 S_AL_SoundList
 =================
 */
-static
 static void S_AL_SoundList( )
 {
 	int		i;
@@ -2516,7 +2483,6 @@ static void S_AL_SoundList( )
 static bool alCaptureDeferred = false;
 static char alCaptureDeviceName[256] = "";
 
-static
 static void S_AL_OpenCapture( )
 {
 	alCaptureDeferred = false;
@@ -2531,7 +2497,6 @@ static void S_AL_OpenCapture( )
 		    (alCaptureDevice == nullptr) ? "failed to open" : "opened");
 }
 
-static
 static void S_AL_StartCapture( )
 {
 	if (alCaptureDevice == nullptr && alCaptureDeferred)
@@ -2540,7 +2505,6 @@ static void S_AL_StartCapture( )
 		qalcCaptureStart(alCaptureDevice);
 }
 
-static
 static int S_AL_AvailableCaptureSamples( )
 {
 	int retval = 0;
@@ -2553,7 +2517,6 @@ static int S_AL_AvailableCaptureSamples( )
 	return retval;
 }
 
-static
 static void S_AL_Capture( int samples, byte *data )
 {
 	if (alCaptureDevice != nullptr)
@@ -2611,7 +2574,6 @@ static void S_AL_SoundInfo()
 S_AL_Shutdown
 =================
 */
-static
 static void S_AL_Shutdown( )
 {
 	// Shut down everything

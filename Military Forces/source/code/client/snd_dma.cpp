@@ -117,31 +117,26 @@ static void S_Base_SoundInfo() {
 
 
 #ifdef USE_VOIP
-static
 static void S_Base_StartCapture( )
 {
 	SNDDMA_StartCapture();
 }
 
-static
 static int S_Base_AvailableCaptureSamples( )
 {
 	return SNDDMA_AvailableCaptureSamples();
 }
 
-static
 static void S_Base_Capture( int samples, byte *data )
 {
 	SNDDMA_Capture(samples, data);
 }
 
-static
 static void S_Base_StopCapture( )
 {
 	SNDDMA_StopCapture();
 }
 
-static
 static void S_Base_MasterGain( float val )
 {
 	SNDDMA_MasterGain(val);

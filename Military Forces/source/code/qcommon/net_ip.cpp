@@ -1299,7 +1299,8 @@ void Network::getLocalAddress()
 	}
 }
 #else
-void Network::NET_GetLocalAddress( void ) {
+void Network::getLocalAddress()
+{
 	char				hostname[256];
 	struct addrinfo	hint;
 	struct addrinfo	*res = NULL;
