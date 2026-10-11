@@ -26,32 +26,47 @@ This edition is still being worked on. Here is what it brings so far.
 
 ### Gameplay
 
-- **Full vehicle combat** in the air, on land and at sea, with new helicopters (the Hind and the Comanche) and stealth aircraft that stay off radar until they fire.
+- **Full vehicle combat** in the air, on land and at sea: fighters, bombers, tanks, vehicles, infantry
+- **Multiple Gamesets** WW2, WW2 & Modern combat
+- **Stealth** dynamics
 - **Soldiers on foot** who can leave a vehicle, fight, and climb into another one.
 - **Vehicle theft.** Take any empty vehicle, including the enemy's. A stolen one keeps its paint, so its old team may not notice until it is too late.
 - **Crews.** One player flies or drives while team mates ride along as gunners or passengers.
-- **New bots.** Computer players now behave like people: each has its own personality, sets its own goals, finds its way around the map, lands to refuel, and flies in a way its aircraft can actually manage.
+- **Advanced bots.** Computer players now behave like people: each has its own personality, sets its own goals and decision making.
+  - Bots explore the map and learn as they go.
+  - Team strategy, organization and defensive / offensive thinking.
+  - Adjust their process to their human players
+  - Fully support landing to refuel & resarm, supply delivery and passenger pick-up.
+- **Mission editor** has been further enhanced.
 
 ### Engine
 
 - Rebuilt as one modern C++ program instead of the original collection of separate parts.
 - Brought up to date with ioquake3: years of security, stability and performance fixes, plus modern sound, music formats, voice chat, game controllers and in-game downloads.
-- Stands on its own: you do not need Quake III Arena to play.
+- Stand-alone: you do not need Quake III Arena to play.
 - Runs as a 64-bit program, with a dedicated server for hosting games.
 
 ### Graphics
 
-- A modern renderer by default, with the classic one still available.
-- Proper widescreen: you see more of the world instead of a stretched picture, and the HUD keeps its shape.
+- A modern OpenGL2 renderer by default, with the OpenGL1 still available.
+- Proper widescreen support and HUD scaling
 
 ### Network
 
-- Overhauled to carry more players, more vehicles and more detail at once, while using less bandwidth on a busy battlefield.
-- Everyone sees the same crews, turrets and weapon loads on every vehicle.
+- Completely overhauled to carry more players, more vehicles and more detail at once
+- Larger client state payload:  Crews, turrets and weapon loads, rotation all tracked/transmited 
+- Improved entity prediction
+- Tuned to use signficantly less bandwidth on a busy battlefield than vanilla Quake 3
+
+### Physics
+
+- Rigid Body simulations
+- Simulated vehicle suspension and ground friction
+
 
 ### Performance
 
-- Collision checks, the work behind every movement and every shot, are up to 18 times faster on large outdoor maps.
+- Collision checks are up to 18x faster on large outdoor maps.
 
 ## Building
 
