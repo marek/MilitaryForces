@@ -1297,6 +1297,10 @@ static void CG_Parse_Reticle_Target( reticle_t * pR )
 			pText = va( "^7%s", availableGroundInstallations[pR->pTarget->currentState.modelindex2].tinyName );
 		else
 			pText = va( "^2Drone ^3%s", availableVehicles[pR->pTarget->currentState.modelindex].tinyName );//"^7Drone";
+		// a mission objective says how much of it is left
+		const int told = pR->pTarget->currentState.otherEntityNum2;
+		if( told != OBJECTIVE_HEALTH_UNTOLD )
+			pText = va( "%s ^7%d%%", pText, told - 1 );
 	}
 	else
 	{

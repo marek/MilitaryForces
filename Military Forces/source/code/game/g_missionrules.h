@@ -3,7 +3,17 @@
 
 #include "bg_public.h"
 
+#include <vector>
+
 class GameEntity;
+
+// one mission file found on disk or in a pak
+struct MissionListing
+{
+	char				id[MAX_QPATH];		// <map>/<file name>, what the mission command takes
+	mission_overview_t	overview;
+	bool				done;
+};
 
 // what makes a mission something to play: where players start, the objectives, the checkpoints, how it ends
 class MissionRules
@@ -18,6 +28,7 @@ public:
 	static void placedDestroyed( const GameEntity* ent );
 	static void playerDestroyed( const GameEntity* ent );
 	static void runFrame();
+	static std::vector<MissionListing> listAll();
 	static void listCommand();
 	static void startCommand();
 };

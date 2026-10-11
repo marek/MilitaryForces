@@ -293,23 +293,49 @@ void MissionHud::addToScene()
 {
 	if( !shown.next.shown )
 		return;
-	const std::array<byte, 3>& colour = kindColour[static_cast<int>( shown.next.kind )];
+	mission_checkpoint_t next = {};
+	VectorCopy( shown.next.origin, next.origin );
+	next.radius = shown.next.radius;
+	next.kind = shown.next.kind;
+	addCheckpointMarker( next, shown.next.yaw );
+}
+
+void MissionHud::addCheckpointMarker( const mission_checkpoint_t& checkpoint, float yaw )
+{
+	const std::array<byte, 3>& colour = kindColour[static_cast<int>( checkpoint.kind )];
 	const byte alpha = static_cast<byte>( 150 + 80 * std::sin( cg.time * pulseRate ) );
 	constexpr vec3_t up = { 0, 0, 1 };
-	if( shown.next.kind == CheckpointKind::Air )
+	if( checkpoint.kind == CheckpointKind::Air )
 	{
 		// upright, across the line a player comes in along
 		vec3_t forward, right;
-		const vec3_t angles = { 0, shown.next.yaw, 0 };
+		const vec3_t angles = { 0, yaw, 0 };
 		AngleVectors( angles, forward, right, nullptr );
-		addRing( shown.next.origin, right, up, shown.next.radius, colour, alpha );
+		addRing( checkpoint.origin, right, up, checkpoint.radius, colour, alpha );
 	}
 	else
 	{
 		constexpr vec3_t east = { 1, 0, 0 }, north = { 0, 1, 0 };
-		addRing( shown.next.origin, east, north, shown.next.radius, colour, alpha );
-		addPost( shown.next.origin, shown.next.radius, colour, alpha );
+		addRing( checkpoint.origin, east, north, checkpoint.radius, colour, alpha );
+		addPost( checkpoint.origin, checkpoint.radius, colour, alpha );
 	}
+}
+
+// the editor's mark for a player start: a post with a bar pointing the way the player will face
+void MissionHud::addStartMarker( const vec3_t origin, float yaw )
+{
+	constexpr std::array<byte, 3> white = { 255, 255, 255 };
+	constexpr byte alpha = 220;
+	constexpr float size = 80.0f, barWidth = 6.0f;
+	addPost( origin, size, white, alpha );
+	vec3_t forward, right, a, b, c, d;
+	const vec3_t angles = { 0, yaw, 0 };
+	AngleVectors( angles, forward, right, nullptr );
+	VectorMA( origin, -barWidth, right, a );
+	VectorMA( origin, barWidth, right, b );
+	VectorMA( b, size, forward, c );
+	VectorMA( a, size, forward, d );
+	addQuad( a, b, c, d, white, alpha );
 }
 
 void MissionHud::draw()
@@ -335,7 +361,7 @@ void MissionHud::draw()
 	const bool complete = shown.state == MissionState::Complete;
 	drawCentred( bannerY, complete ? "MISSION COMPLETE" : "MISSION FAILED", complete ? good : bad, true );
 	const int y = drawWrapped( textY, text, white );
-	drawCentred( y + lineHeight, "Fire to fly it again", white, false );
+	drawCentred( y + lineHeight, "Fire to try again", white, false );
 }
 
 // prints where the caller is, in the form a mission file takes

@@ -10,6 +10,7 @@ USER INTERFACE MAIN
 */
 
 #include "ui_local.h"
+#include "ui_missions.h"
 #include "ui_utils.h"
 #include "ui_controls.h"
 #include "ui_precomp.h"
@@ -3811,6 +3812,14 @@ void Menus::runMenuScript(char **args)
 			}
 			CommandBuffer::executeText( EXEC_APPEND, va("cinematic %s.roq 2\n", uiInfo.movieList[uiInfo.movieIndex]));
 		} 
+		else if (Q_stricmp(name, "LoadMissions") == 0) 
+		{
+			MissionMenu::load();
+		} 
+		else if (Q_stricmp(name, "RunMission") == 0) 
+		{
+			MissionMenu::run();
+		} 
 		else if (Q_stricmp(name, "RunDemo") == 0) 
 		{
 			CommandBuffer::executeText( EXEC_APPEND, va("demo %s\n", uiInfo.demoList[uiInfo.demoIndex]));
@@ -4926,6 +4935,8 @@ int Menus::feederCount(float feederID)
 		return uiInfo.modCount;
 	} else if (feederID == FEEDER_DEMOS) {
 		return uiInfo.demoCount;
+	} else if (feederID == FEEDER_MISSIONS) {
+		return MissionMenu::count();
 	}
 	return 0;
 }
@@ -5161,6 +5172,8 @@ const char *Menus::feederItemText(float feederID, int index, int column, qhandle
 		if (index >= 0 && index < uiInfo.demoCount) {
 			return uiInfo.demoList[index];
 		}
+	} else if (feederID == FEEDER_MISSIONS) {
+		return MissionMenu::itemText( index );
 	}
 	return "";
 }
@@ -5276,6 +5289,8 @@ void Menus::feederSelection(float feederID, int index)
 		uiInfo.previewMovie = -1;
   } else if (feederID == FEEDER_DEMOS) {
 		uiInfo.demoIndex = index;
+	} else if (feederID == FEEDER_MISSIONS) {
+		MissionMenu::select( index );
 	}
 }
 

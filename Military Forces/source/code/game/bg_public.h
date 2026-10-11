@@ -1200,6 +1200,10 @@ inline constexpr int MISSION_MAX_OBJECTIVES = 8;
 inline constexpr char MISSION_LIST_SEPARATOR = '|';
 
 enum class MissionState { None, Running, Complete, Failed };
+
+// A placed vehicle or installation that a mission objective names tells clients its health in otherEntityNum2, as a
+// percentage plus one; nothing else placed says anything, and reads as this
+inline constexpr int OBJECTIVE_HEALTH_UNTOLD = 0;
 enum class ObjectiveState { Open, Done, Failed };
 enum class ObjectiveType { Destroy, Checkpoints, Survive, Protect };
 enum class CheckpointKind { Air, Land, Sea };

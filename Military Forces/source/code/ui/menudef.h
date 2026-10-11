@@ -73,6 +73,7 @@ inline constexpr int FEEDER_SERVERSTATUS = 0x0d; // server status
 inline constexpr int FEEDER_FINDPLAYER = 0x0e; // find player
 inline constexpr int FEEDER_CINEMATICS = 0x0f; // cinematics
 inline constexpr int FEEDER_SPECTATOR_LIST = 0x10; // spectators
+inline constexpr int FEEDER_MISSIONS = 0x11; // mission files
 
 // display flags
 inline constexpr int CG_SHOW_BLUE_TEAM_HAS_REDFLAG = 0x00000001;

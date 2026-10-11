@@ -26,7 +26,7 @@ list(TRANSFORM GAME_SOURCES PREPEND "${SOURCE_DIR}/game/")
 set(CGAME_SOURCES
     cg.cpp vehicles/boat.cpp vehicles/ground.cpp vehicles/helo.cpp vehicles/infantry.cpp vehicles/installation.cpp vehicles/plane.cpp vehicles/shared.cpp vehicles/unmanned.cpp cg_consolecmds.cpp cg_draw.cpp cg_drawnewhud.cpp
     cg_drawtools.cpp cg_effects.cpp cg_ents.cpp cg_event.cpp cg_info.cpp
-    cg_localents.cpp cg_main.cpp cg_marks.cpp cg_mission.cpp cg_missioneditor.cpp
+    cg_localents.cpp cg_main.cpp cg_marks.cpp cg_mission.cpp cg_missionedit.cpp cg_missioneditor.cpp
     cg_particles.cpp cg_players.cpp cg_playerstate.cpp cg_predict.cpp cg_scoreboard.cpp
     cg_servercmds.cpp cg_snapshot.cpp cg_testmodel.cpp cg_util.cpp 
     cg_view.cpp cg_weapons.cpp ui_displaycontext_cg.cpp ui_utils_cg.cpp)
@@ -35,7 +35,7 @@ list(TRANSFORM CGAME_SOURCES PREPEND "${SOURCE_DIR}/cgame/")
 set(UI_SOURCES
     ui.cpp ui_atoms.cpp ui_commanddef.cpp ui_controls.cpp ui_displaycontext.cpp
     ui_displaycontext_ui.cpp ui_gameinfo.cpp ui_hashutils.cpp ui_itemcapture.cpp
-    ui_keywordhash.cpp ui_main.cpp ui_memtools.cpp ui_precomp.cpp ui_util.cpp ui_utils.cpp
+    ui_keywordhash.cpp ui_main.cpp ui_missions.cpp ui_memtools.cpp ui_precomp.cpp ui_util.cpp ui_utils.cpp
     ui_utils_ui.cpp)
 list(TRANSFORM UI_SOURCES PREPEND "${SOURCE_DIR}/ui/")
 

@@ -19,6 +19,8 @@ namespace
 		int		team;
 		char	tag[MAX_NAME_LENGTH];
 		bool	destroyed;
+		int		fullHealth;
+		bool	objective;		// some objective names it: its health is told to clients
 	};
 
 	struct Objective
@@ -290,6 +292,19 @@ namespace
 		}
 	}
 
+	void tellObjectiveHealth()
+	{
+		constexpr int wholePercent = 100;
+		for( const Placed& placed : mission.placed )
+		{
+			if( !placed.objective || placed.destroyed || placed.fullHealth <= 0 )
+				continue;
+			GameEntity* ent = theLevel.getEntity( placed.entityNum );
+			if( ent && ent->inuse_ )
+				ent->s.otherEntityNum2 = 1 + std::clamp( ent->health_ * wholePercent / placed.fullHealth, 0, wholePercent );
+		}
+	}
+
 	float distanceToSegment( const vec3_t point, const vec3_t from, const vec3_t to, bool level )
 	{
 		vec3_t along, toPoint;
@@ -368,15 +383,9 @@ namespace
 		return true;
 	}
 
-	struct Listed
+	std::vector<MissionListing> findMissions()
 	{
-		char				id[MAX_QPATH];
-		mission_overview_t	overview;
-	};
-
-	std::vector<Listed> findMissions()
-	{
-		std::vector<Listed> found;
+		std::vector<MissionListing> found;
 		// by map, not by folder: a pak lists its files, not the folders they are in
 		int numMaps = 0;
 		char** maps = FileSystem::listFiles( "maps", ".bsp", &numMaps );
@@ -388,7 +397,7 @@ namespace
 			char** files = FileSystem::listFiles( va( "missions/%s", map ), ".mis", &numFiles );
 			for( int f = 0; f < numFiles; ++f )
 			{
-				Listed listed = {};
+				MissionListing listed = {};
 				char name[MAX_QPATH];
 				COM_StripExtension( files[f], name, sizeof( name ) );
 				Com_sprintf( listed.id, sizeof( listed.id ), "%s/%s", map, name );
@@ -398,13 +407,20 @@ namespace
 			FileSystem::freeFileList( files );
 		}
 		FileSystem::freeFileList( maps );
-		std::sort( found.begin(), found.end(), []( const Listed& a, const Listed& b ) {
+		std::sort( found.begin(), found.end(), []( const MissionListing& a, const MissionListing& b ) {
 			if( a.overview.order != b.overview.order )
 				return a.overview.order < b.overview.order;
 			return Q_stricmp( a.id, b.id ) < 0;
 		} );
+		for( MissionListing& listed : found )
+			listed.done = isDone( listed.id );
 		return found;
 	}
+}
+
+std::vector<MissionListing> MissionRules::listAll()
+{
+	return findMissions();
 }
 
 void MissionRules::clear()
@@ -425,6 +441,7 @@ void MissionRules::notePlaced( const GameEntity* ent, const char* tag )
 	Placed placed = {};
 	placed.entityNum = ent->s.number;
 	placed.team = ent->s.generic1;
+	placed.fullHealth = ent->health_;
 	Q_strncpyz( placed.tag, tag, sizeof( placed.tag ) );
 	mission.placed.push_back( placed );
 }
@@ -460,6 +477,14 @@ void MissionRules::begin( const char* id, const mission_overview_t& overview, co
 			continue;
 		}
 		mission.objectives.push_back( objective );
+	}
+
+	for( Placed& placed : mission.placed )
+	{
+		placed.objective = std::any_of( mission.objectives.begin(), mission.objectives.end(), [&]( const Objective& objective ) {
+			const ObjectiveType type = objective.rule.type;
+			return (type == ObjectiveType::Destroy || type == ObjectiveType::Protect) && matches( placed, objective.rule );
+		} );
 	}
 
 	if( rules.numStarts || rules.numCheckpoints || !mission.objectives.empty() )
@@ -566,6 +591,8 @@ void MissionRules::runFrame()
 			return;
 	}
 
+	tellObjectiveHealth();
+
 	passCheckpoints();
 	if( mission.state != MissionState::Running )
 		return;
@@ -583,10 +610,10 @@ void MissionRules::runFrame()
 
 void MissionRules::listCommand()
 {
-	const std::vector<Listed> found = findMissions();
-	for( const Listed& listed : found )
+	const std::vector<MissionListing> found = findMissions();
+	for( const MissionListing& listed : found )
 	{
-		Common::printf( "%s %-32s %s%s%s\n", isDone( listed.id ) ? "done" : "    ", listed.id,
+		Common::printf( "%s %-32s %s%s%s\n", listed.done ? "done" : "    ", listed.id,
 			listed.overview.missionname, listed.overview.description[0] ? ": " : "", listed.overview.description );
 	}
 	Common::printf( "%i missions. Start one with: mission <map>/<name>\n", static_cast<int>( found.size() ) );

@@ -9,6 +9,7 @@
 
 #include "cg_local.h"
 #include "cg_mission.h"
+#include "cg_missionedit.h"
 
 static char* cycleCvars[] =
 {
@@ -788,6 +789,17 @@ static consoleCommand_t	commands[] = {
 	{ "me_export_to_script", CGame::exportToScript_f },
 	{ "me_import_script", CGame::importScript_f },
 	{ "me_side", CGame::setSide_f },
+	{ "me_start", MissionEdit::start_f },
+	{ "me_start_move", MissionEdit::startMove_f },
+	{ "me_start_delete", MissionEdit::startDelete_f },
+	{ "me_checkpoint", MissionEdit::checkpoint_f },
+	{ "me_checkpoint_move", MissionEdit::checkpointMove_f },
+	{ "me_checkpoint_delete", MissionEdit::checkpointDelete_f },
+	{ "me_tag", MissionEdit::tag_f },
+	{ "me_objective", MissionEdit::objective_f },
+	{ "me_objective_delete", MissionEdit::objectiveDelete_f },
+	{ "me_overview", MissionEdit::overview_f },
+	{ "me_mission", MissionEdit::show_f },
 };
 
 /*

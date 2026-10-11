@@ -329,6 +329,15 @@ bool Menus::consoleCommand( int realTime ) {
 		return true;
 	}
 
+	// any menu page by name, for a key binding or a scripted look at a page
+	if( Q_stricmp (cmd, "ui_open") == 0 ) 
+	{
+		Key_SetCatcher( ( KEYCATCH_UI ) | ( Key_GetCatcher( ) & KEYCATCH_CONSOLE ) );
+		uiInfo.uiUtils.menu_CloseAll();
+		uiInfo.uiUtils.menu_ActivateByName( CommandSystem::argv( 1 ) );
+		return true;
+	}
+
 	// MFQ3: bring up the 'team selection' dialog (i.e. bind command to key)
 	if( Q_stricmp (cmd, "teamselect") == 0 ) 
 	{
