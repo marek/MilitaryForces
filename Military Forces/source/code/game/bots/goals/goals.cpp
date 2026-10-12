@@ -4,6 +4,7 @@
 #include "../core/local.h"
 #include "../team/team.h"
 #include <span>
+#include "../core/telemetry.h"
 #include <algorithm>
 #include <cmath>
 
@@ -262,7 +263,7 @@ namespace
 		float score = 0.0f;
 		for( const Term& term : entry.terms )
 		{
-			const float value = term.value( situation );
+			const float value = term.value( situation ) * (term.combine == Combine::Add ? BotTelemetry::weight( term.name ) : 1.0f);
 			score = term.combine == Combine::Add ? score + value : score * value;
 		}
 		return score;

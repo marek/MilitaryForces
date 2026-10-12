@@ -11,6 +11,7 @@
 #include "bots/team/team.h"
 #include "g_level.h"
 #include "bots/bot.h"
+#include "bots/core/telemetry.h"
 
 /*
 ==============================================================================
@@ -470,6 +471,11 @@ bool ConsoleCommand()
 	if( Q_stricmp( cmd, "botlist" ) == 0 ) 
 	{
 		Bots::listCommand();
+		return true;
+	}
+	if( Q_stricmp( cmd, "botstats" ) == 0 ) 
+	{
+		BotTelemetry::print();
 		return true;
 	}
 	if( Q_stricmp( cmd, "bottree" ) == 0 ) 

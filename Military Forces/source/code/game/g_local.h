@@ -961,6 +961,7 @@ extern	vmCvar_t	g_ruseReset;
 #ifdef MF_BOT_DEBUG
 extern	vmCvar_t	g_botDebug;
 extern	vmCvar_t	g_botPeaceful;
+extern	vmCvar_t	g_botWeights;
 #endif
 extern	vmCvar_t	g_botLanding;
 extern	vmCvar_t	g_botStrategy;

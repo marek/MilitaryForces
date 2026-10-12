@@ -14,7 +14,7 @@ set(GAME_SOURCES
     g_spawn.cpp g_svcmds.cpp g_target.cpp g_team.cpp g_trigger.cpp g_utils.cpp g_vehicle.cpp
     g_waypoint.cpp g_weapon.cpp g_world.cpp game.cpp mf_client.cpp mf_vehiclespawn.cpp)
 list(APPEND GAME_SOURCES
-    bots/core/manager.cpp bots/core/characters.cpp bots/core/debug.cpp bots/core/lod.cpp
+    bots/core/manager.cpp bots/core/characters.cpp bots/core/debug.cpp bots/core/lod.cpp bots/core/telemetry.cpp
     bots/goals/goals.cpp bots/goals/capabilities.cpp
     bots/senses/senses.cpp
     bots/world/world.cpp bots/world/threat.cpp bots/world/query.cpp bots/world/hints.cpp

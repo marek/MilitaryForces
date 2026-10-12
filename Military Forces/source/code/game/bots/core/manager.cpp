@@ -8,6 +8,7 @@
 #include "../world/threat.h"
 #include "../world/hints.h"
 #include "../team/orders.h"
+#include "telemetry.h"
 #include <algorithm>
 #include <cmath>
 
@@ -32,6 +33,7 @@ void Bots::reset()
 	ThreatMap::reset();
 	BotHints::reset();
 	BotOrders::reset();
+	BotTelemetry::reset();
 	characters_.clear();
 	kindLives_.fill( 0 );
 	kindCrashes_.fill( 0 );

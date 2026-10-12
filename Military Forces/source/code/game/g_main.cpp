@@ -41,6 +41,7 @@ vmCvar_t	g_ruseReset;
 #ifdef MF_BOT_DEBUG
 vmCvar_t	g_botDebug;
 vmCvar_t	g_botPeaceful;
+vmCvar_t	g_botWeights;
 #endif
 vmCvar_t	g_botLanding;
 vmCvar_t	g_botStrategy;
@@ -149,6 +150,7 @@ cvarTable_t		gameCvarTable[] = {
 #ifdef MF_BOT_DEBUG
 	{ &g_botDebug, "g_botDebug", "0", 0, 0, false  },
 	{ &g_botPeaceful, "g_botPeaceful", "0", 0, 0, false  },
+	{ &g_botWeights, "g_botWeights", "", 0, 0, false  },
 #endif
 	{ &g_botLanding, "g_botLanding", "1", 0, 0, false  },
 	// bots in a team game plan and work as a team (1) or each follow their own goals (0)
