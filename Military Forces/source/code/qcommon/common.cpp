@@ -2228,6 +2228,9 @@ int Common::eventLoop( ) {
 			case SE_MOUSE:
 				ClientLoop::mouseEvent( ev.evValue, ev.evValue2, ev.evTime );
 			break;
+			case SE_MOUSE_ABS:
+				ClientLoop::mousePosition( ev.evValue, ev.evValue2 );
+			break;
 			case SE_JOYSTICK_AXIS:
 				ClientLoop::joystickEvent( ev.evValue, ev.evValue2, ev.evTime );
 			break;

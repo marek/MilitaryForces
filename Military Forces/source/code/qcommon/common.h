@@ -7,6 +7,7 @@ enum sysEventType_t {
 	SE_KEY,			// evValue is a key code, evValue2 is the down flag
 	SE_CHAR,		// evValue is an ascii char
 	SE_MOUSE,		// evValue and evValue2 are relative signed x / y moves
+	SE_MOUSE_ABS,		// evValue and evValue2 are a menu position, in the 640x480 space
 	SE_JOYSTICK_AXIS,	// evValue is an axis number and evValue2 is the current state (-127 to 127)
 	SE_CONSOLE		// evPtr is a char*
 };

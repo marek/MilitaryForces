@@ -36,6 +36,9 @@ void ClientLoop::init() {
 void ClientLoop::mouseEvent( int dx, int dy, int time ) {
 }
 
+void ClientLoop::mousePosition( int x, int y ) {
+}
+
 void Keys::writeBindings( fileHandle_t f ) {
 }
 

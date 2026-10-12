@@ -50,6 +50,12 @@ UserInterface::mouseEvent( int dx, int dy ) const
 }
 
 void
+UserInterface::mousePosition( int x, int y ) const
+{
+	_UI_MousePosition( x, y );
+}
+
+void
 UserInterface::refresh( int realTime ) const
 {
 	_UI_Refresh( realTime );

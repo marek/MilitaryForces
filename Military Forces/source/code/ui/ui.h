@@ -29,6 +29,8 @@ struct UserInterface
 
 	void						mouseEvent( int dx, int dy ) const;
 
+	void						mousePosition( int x, int y ) const;
+
 	void						refresh( int realTime ) const;
 
 	bool						isFullScreen() const;

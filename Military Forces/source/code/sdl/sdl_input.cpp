@@ -1027,6 +1027,33 @@ static void IN_JoyMove( )
 	stick_state.oldaxes = axes;
 }
 
+// the menu's 640x480 space, inverse of the uniform scale the menus are drawn with
+static void IN_QueueMenuPosition( int windowX, int windowY )
+{
+	int windowW = 0, windowH = 0;
+	float scale, px, py, vx, vy;
+
+	if( !SDL_window || cls.glconfig.vidWidth <= 0 || cls.glconfig.vidHeight <= 0 )
+		return;
+
+	SDL_GetWindowSize( SDL_window, &windowW, &windowH );
+	if( windowW <= 0 || windowH <= 0 )
+		return;
+
+	px = windowX * static_cast<float>(cls.glconfig.vidWidth) / windowW;
+	py = windowY * static_cast<float>(cls.glconfig.vidHeight) / windowH;
+
+	scale = cls.glconfig.vidWidth / 640.0f;
+	if( cls.glconfig.vidHeight / 480.0f < scale )
+		scale = cls.glconfig.vidHeight / 480.0f;
+	if( scale <= 0.0f )
+		return;
+
+	vx = ( px - 0.5f * ( cls.glconfig.vidWidth - 640.0f * scale ) ) / scale;
+	vy = ( py - 0.5f * ( cls.glconfig.vidHeight - 480.0f * scale ) ) / scale;
+	Common::queueEvent( in_eventTime, SE_MOUSE_ABS, static_cast<int>(vx), static_cast<int>(vy), 0, nullptr );
+}
+
 /*
 ===============
 IN_ProcessEvents
@@ -1124,12 +1151,16 @@ static void IN_ProcessEvents( )
 						break;
 					Common::queueEvent( in_eventTime, SE_MOUSE, e.motion.xrel, e.motion.yrel, 0, nullptr );
 				}
+				else if( Key_GetCatcher( ) & KEYCATCH_UI )
+					IN_QueueMenuPosition( e.motion.x, e.motion.y );
 				break;
 
 			case SDL_MOUSEBUTTONDOWN:
 			case SDL_MOUSEBUTTONUP:
 				{
 					int b;
+					if( !mouseActive && ( Key_GetCatcher( ) & KEYCATCH_UI ) )
+						IN_QueueMenuPosition( e.button.x, e.button.y );
 					switch( e.button.button )
 					{
 						case SDL_BUTTON_LEFT:   b = K_MOUSE1;     break;
@@ -1261,9 +1292,9 @@ void IN_Frame( )
 	// update isFullscreen since it might of changed since the last vid_restart
 	cls.glconfig.isFullscreen = CvarSystem::variableIntegerValue( "r_fullscreen" ) != 0;
 
-	if( !cls.glconfig.isFullscreen && ( Key_GetCatcher( ) & KEYCATCH_CONSOLE ) )
+	if( !cls.glconfig.isFullscreen && ( Key_GetCatcher( ) & ( KEYCATCH_CONSOLE | KEYCATCH_UI ) ) )
 	{
-		// Console is down in windowed mode
+		// a grabbed pointer never reaches the title bar
 		IN_DeactivateMouse( cls.glconfig.isFullscreen );
 	}
 	else if( !cls.glconfig.isFullscreen && loading )

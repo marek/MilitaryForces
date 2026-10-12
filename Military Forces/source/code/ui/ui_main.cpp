@@ -604,8 +604,9 @@ void Menus::drawMouse( )
 		break;
 	}
 
-	// draw cursor (not during loading/chat)
-	if( uiInfo.uiUtils.menu_Count() > 0 && cstate.connState != CA_LOADING && !uiInfo.customChat.active )
+	// draw cursor (not during loading/chat). A windowed menu uses the system pointer, so the window can be dragged
+	if( uiInfo.uiUtils.menu_Count() > 0 && cstate.connState != CA_LOADING && !uiInfo.customChat.active
+		&& CvarSystem::variableIntegerValue( "r_fullscreen" ) )
 	{
 		Menus::drawHandlePic( uiInfo.uiUtils.dc_->cursorX_ + offsetX, uiInfo.uiUtils.dc_->cursorY_ + offsetY, 32, 32, cursorHandle );
 	}
@@ -5846,6 +5847,25 @@ void _UI_MouseEvent( int dx, int dy )
 		uiInfo.uiUtils.display_MouseMove(nullptr, uiInfo.uiUtils.dc_->cursorX_, uiInfo.uiUtils.dc_->cursorY_);
   }
 
+}
+
+void _UI_MousePosition( int x, int y )
+{
+	if ( x < 0 )
+		x = 0;
+	else if ( x > SCREEN_WIDTH )
+		x = SCREEN_WIDTH;
+
+	if ( y < 0 )
+		y = 0;
+	else if ( y > SCREEN_HEIGHT )
+		y = SCREEN_HEIGHT;
+
+	uiInfo.uiUtils.dc_->cursorX_ = x;
+	uiInfo.uiUtils.dc_->cursorY_ = y;
+
+	if ( uiInfo.uiUtils.menu_Count() > 0 )
+		uiInfo.uiUtils.display_MouseMove( nullptr, x, y );
 }
 
 void Menus::loadNonIngame() {

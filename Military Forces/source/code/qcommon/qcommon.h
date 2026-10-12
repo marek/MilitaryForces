@@ -764,6 +764,7 @@ public:
 	static void keyEvent (int key, bool down, unsigned time);
 	static void charEvent( int key );
 	static void mouseEvent( int dx, int dy, int time );
+	static void mousePosition( int x, int y );
 	static void joystickEvent( int axis, int value, int time );
 	static void packetEvent( netadr_t from, Message *msg );
 	static void consolePrint( char *text );
