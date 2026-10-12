@@ -2,6 +2,7 @@
 #include "../../g_level.h"
 #include "../bot.h"
 #include "../core/local.h"
+#include "envelope.h"
 #include <algorithm>
 #include <cmath>
 
@@ -31,46 +32,36 @@ int BotWeapons::findWeaponSlot( int vehicle, const playerState_t& ps, bool air, 
 		if( !weapon || ps.ammo[slot] <= 0 )
 			continue;
 		const completeWeaponData_t& data = availableWeapons[weapon];
-		const float range = data.range > 0 ? static_cast<float>( data.range ) : 3000.0f;
-		bool lock = false;
+		const Envelope zone = Envelope::of( weapon );
+		if( !(air ? zone.air : zone.surface) )
+			continue;
+		const float range = zone.maxRange;
 		float score = 0;
 		switch( data.type )
 		{
 		case WT_ANTIAIRMISSILE:
-			if( !air )
-				continue;
-			lock = true;
-			score = dist <= range ? 10000.0f - range : 2000.0f + range * 0.01f;
-			// too close for a missile to arm and turn
-			if( dist < 500 )
-				score = 500.0f;
+			score = dist < zone.minRange ? 500.0f : dist <= range ? 10000.0f - range : 2000.0f + range * 0.01f;
 			break;
 		case WT_ANTIGROUNDMISSILE:
 		case WT_ANTIRADARMISSILE:
-			if( air )
-				continue;
-			lock = true;
 			score = dist <= range ? 9000.0f - range * 0.1f : 2000.0f;
 			break;
 		case WT_ROCKET:
-			if( air )
-				continue;
-			score = dist < 3000 ? 6000.0f : 1000.0f;
+			score = zone.reaches( dist, air ) ? 6000.0f : 1000.0f;
 			break;
 		case WT_BALLISTICGUN:
-			if( air )
-				continue;
-			score = dist < 5000 ? 9500.0f : 7000.0f;
+			score = zone.reaches( dist, air ) ? 9500.0f : 7000.0f;
 			break;
 		case WT_MACHINEGUN:
 			// only guns that are main weapons: a turret or a gun pod. The fixed gun has its own trigger
 			if( !data.turret && !(data.fitsPylon & PF_GUNPOD) )
 				continue;
-			score = dist < 2500 ? 3000.0f : 800.0f;
+			score = zone.reaches( dist, air ) ? 3000.0f : 800.0f;
 			break;
 		default:
 			continue;
 		}
+		const bool lock = zone.guided;
 		if( best < 0 || score > bestScore )
 		{
 			best = slot;
@@ -147,11 +138,7 @@ void BotWeapons::fireWeapons( GameEntity* ent, Bots::State& bot, const Bots::Sen
 
 	// a fixed gun fires when the nose is on the target; a turret gun as far round as the turret reaches
 	const int gun = veh.weapons[WP_MACHINEGUN];
-	constexpr float fixedGunCone = 3.0f;
-	float gunCone = fixedGunCone;
-	if( gun && availableWeapons[gun].turret )
-		gunCone = availableWeapons[gun].maxturns[YAW] > availableWeapons[gun].minturns[YAW] ? std::clamp( availableWeapons[gun].maxturns[YAW], fixedGunCone, 90.0f ) : 90.0f;
-	if( gun && ps.ammo[WP_MACHINEGUN] > 0 && aimError < gunCone && sense.enemyDist < gunRange )
+	if( gun && ps.ammo[WP_MACHINEGUN] > 0 && Envelope::of( gun ).contains( sense.enemyDist, aimError, sense.enemyAir ) )
 		cmd.buttons |= BUTTON_ATTACK;
 
 	// the selection takes a moment to change: nothing is fired from the old one
@@ -165,13 +152,11 @@ void BotWeapons::fireWeapons( GameEntity* ent, Bots::State& bot, const Bots::Sen
 		return;
 	}
 
-	const int type = availableWeapons[veh.weapons[slot]].type;
-	const float range = type == WT_BALLISTICGUN ? 6000.0f : 3000.0f;
 	// rockets and shells splash: hold them when a team mate is next to the target
 	const float splash = static_cast<float>( availableWeapons[veh.weapons[slot]].damageRadius );
 	if( splash > 0 && BotWeapons::friendlyNear( ent, sense.enemy->r.currentOrigin, splash + 60.0f ) )
 		return;
-	if( aimError < (type == WT_ROCKET ? 4.0f : 2.0f) && sense.enemyDist < range )
+	if( Envelope::of( veh.weapons[slot] ).contains( sense.enemyDist, aimError, sense.enemyAir ) )
 		cmd.buttons |= BUTTON_ATTACK_MAIN;
 }
 

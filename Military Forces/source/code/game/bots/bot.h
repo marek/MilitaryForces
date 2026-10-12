@@ -263,6 +263,7 @@ public:
 		float		missileTime = 0;	// seconds until it does
 		float		missileYaw = 0;	// the direction it comes from
 		bool	duel = false;	// one enemy aircraft and nobody else near
+		bool	outranged = false;	// the enemy's weapons reach it here and its own do not reach back
 	};
 
 	friend struct LandingSteps;
@@ -385,6 +386,7 @@ class BotSenses
 {
 public:
 	static GameEntity* findEnemy( GameEntity* ent, Bots::State& bot, const Capabilities& can );
+	static bool outranged( GameEntity* ent, const Bots::Sense& out );
 	static void chooseLeader( GameEntity* ent, Bots::State& bot );
 	static GameEntity* leaderOf( const Bots::State& bot );
 	static int targetOf( GameEntity* leader );
