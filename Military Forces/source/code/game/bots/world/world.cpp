@@ -229,26 +229,33 @@ namespace
 
 namespace
 {
+	// one pass over every pair of touching pieces in different fields, joining each pair into the lower field
+	bool joinTouching( const std::vector<GameEntity*>& pieces, std::vector<int>& field )
+	{
+		constexpr float touching = 16.0f;
+		bool joined = false;
+		for( size_t a = 0; a < pieces.size(); a++ )
+		{
+			for( size_t b = a + 1; b < pieces.size(); b++ )
+			{
+				if( field[a] == field[b] || !boxesTouch( pieces[a], pieces[b], touching ) )
+					continue;
+				const int from = std::max( field[a], field[b] ), to = std::min( field[a], field[b] );
+				std::replace( field.begin(), field.end(), from, to );
+				joined = true;
+			}
+		}
+		return joined;
+	}
+
 	// runway pieces that touch are one airfield: each piece's field number, the lowest of the pieces it touches
 	std::vector<int> groupPieces( const std::vector<GameEntity*>& pieces )
 	{
-		constexpr float touching = 16.0f;
 		std::vector<int> field( pieces.size() );
 		for( size_t i = 0; i < pieces.size(); i++ )
 			field[i] = static_cast<int>( i );
 		for( bool joined = true; joined; )
-		{
-			joined = false;
-			for( size_t a = 0; a < pieces.size(); a++ )
-				for( size_t b = a + 1; b < pieces.size(); b++ )
-				{
-					if( field[a] == field[b] || !boxesTouch( pieces[a], pieces[b], touching ) )
-						continue;
-					const int from = std::max( field[a], field[b] ), to = std::min( field[a], field[b] );
-					std::replace( field.begin(), field.end(), from, to );
-					joined = true;
-				}
-		}
+			joined = joinTouching( pieces, field );
 		return field;
 	}
 
@@ -272,23 +279,28 @@ namespace
 		}
 	}
 
+	// the runs through a grid of points over one runway piece
+	void measurePiece( const GameEntity* piece, Airfield& airfield )
+	{
+		constexpr float grid = 128.0f;
+		for( float x = piece->r.absmin[0] + grid * 0.5f; x < piece->r.absmax[0]; x += grid )
+		{
+			for( float y = piece->r.absmin[1] + grid * 0.5f; y < piece->r.absmax[1]; y += grid )
+			{
+				const Vec3 spot = { x, y, piece->r.absmax[2] };
+				float surface = 0;
+				if( BotWorld::runwayAt( spot, &surface ) )
+					measureSpot( spot, surface, airfield );
+			}
+		}
+	}
+
 	// the longest straight run on each airfield, looked for from a grid of points over every piece: a piece is often
 	// many brushes in one entity, an apron and a strip together, so its middle says nothing
 	void measureRuns( const std::vector<GameEntity*>& pieces, const std::vector<int>& field, std::vector<Airfield>& fields )
 	{
-		constexpr float grid = 128.0f;
 		for( size_t i = 0; i < pieces.size(); i++ )
-		{
-			const GameEntity* piece = pieces[i];
-			for( float x = piece->r.absmin[0] + grid * 0.5f; x < piece->r.absmax[0]; x += grid )
-				for( float y = piece->r.absmin[1] + grid * 0.5f; y < piece->r.absmax[1]; y += grid )
-				{
-					const Vec3 spot = { x, y, piece->r.absmax[2] };
-					float surface = 0;
-					if( BotWorld::runwayAt( spot, &surface ) )
-						measureSpot( spot, surface, fields[field[i]] );
-				}
-		}
+			measurePiece( pieces[i], fields[field[i]] );
 	}
 
 	// nothing may stand on a run: aprons have hangars and stores on them that a rolling plane would hit
