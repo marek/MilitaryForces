@@ -5,6 +5,27 @@
 
 using behavior::Status;
 
+// someone is on or just over the runway, or a bot with a lower number is already on final for it
+bool Bots::runwayBusy( int padIndex, GameEntity* self )
+{
+	const BotWorld::Pad& pad = BotWorld::pads_[padIndex];
+	for( int i = 1; i <= theLevel.maxclients_; i++ )
+	{
+		GameEntity* other = theLevel.getEntity( i );
+		if( other == self || !alive( other ) || other->client_->sess_.ridingClient_ >= 0 )
+			continue;
+		Vec3 rel;
+		VectorSubtract( other->r.currentOrigin, pad.center, rel );
+		const float along = rel[0] * pad.axis[0] + rel[1] * pad.axis[1];
+		const float side = rel[1] * pad.axis[0] - rel[0] * pad.axis[1];
+		if( fabs( along ) < pad.halfLength + 150 && fabs( side ) < 220 && fabs( rel[2] ) < 160 )
+			return true;
+		if( isBot( i ) && i < self->s.number && states_[i].rearm.phase == 2 && states_[i].rearm.pad >= 0 && Distance( BotWorld::pads_[states_[i].rearm.pad].center, pad.center ) < 400 )
+			return true;
+	}
+	return false;
+}
+
 // Landing as a sequence of steps: look the runway over, fly out and line up, come down the slope,
 // roll out, taxi to the parking spot, sit until refuelled and rearmed, then give the runway back.
 
