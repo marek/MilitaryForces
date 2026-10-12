@@ -371,6 +371,11 @@ void ClientLoop::mouseEvent( int dx, int dy, int time ) {
 	}
 }
 
+void ClientLoop::mousePosition( int x, int y ) {
+	if ( Key_GetCatcher( ) & KEYCATCH_UI )
+		theUI.mousePosition( x, y );
+}
+
 /*
 =================
 ClientLoop::joystickEvent

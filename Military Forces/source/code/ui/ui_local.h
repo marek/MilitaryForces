@@ -277,6 +277,7 @@ void _UI_Init( bool inGameLoad );
 void _UI_Shutdown();
 void _UI_KeyEvent( int key, bool down );
 void _UI_MouseEvent( int dx, int dy );
+void _UI_MousePosition( int x, int y );
 void _UI_Refresh( int realtime );
 bool _UI_IsFullscreen();
 void _UI_SetActiveMenu( UserInterface::MenuCommand menu );
