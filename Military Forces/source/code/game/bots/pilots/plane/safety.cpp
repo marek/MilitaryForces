@@ -65,88 +65,117 @@ bool PlaneTasks::trafficAt( const Mind& c, const vec3_t point, float seconds )
 	return false;
 }
 
-// flies an arc of turnDegrees at the given radius and then straight on, returns the free distance up to horizon
-float PlaneTasks::sweepFrom( const Mind& c, const Pose& start, float radius, float turnDegrees, float slope, float horizon, float halfWidth, Pose* finish )
+namespace
 {
-	Vec3 flat = { 0, start.yaw, 0 }, forward, right, from;
-	AngleVectors( flat, forward, right, nullptr );
-	const float side = turnDegrees > 0 ? -1.0f : 1.0f;
-	const float total = fabs( turnDegrees );
-	const float airspeed = std::max( c.airspeed, 1.0f );
-	float travelled = 0;
-	VectorCopy( start.origin, from );
-	const auto leg = [&]( const vec3_t to ) -> bool
+	// one sweep along a flight path, leg by leg: where it has got to and how far it has come clear
+	struct Sweep
 	{
-		Vec3 dir;
-		trace_t tr;
-		VectorSubtract( to, from, dir );
-		const float length = VectorNormalize( dir );
-		if( length < 1 )
-			return true;
-		// no trace needed while the leg stays inside one empty cell of the air navigation tree
-		if( !AirNav::segmentKnownFree( Vec3( from ), Vec3( to ), halfWidth + 8.0f ) )
+		const PlaneTasks::Mind&		c;
+		const PlaneTasks::Pose&		start;
+		float						halfWidth;
+		float						airspeed;
+		Vec3						from;
+		float						travelled = 0;
+
+		Sweep( const PlaneTasks::Mind& c, const PlaneTasks::Pose& start, float halfWidth ) :
+			c( c ), start( start ), halfWidth( halfWidth ), airspeed( std::max( c.airspeed, 1.0f ) ), from( start.origin ) {}
+
+		// one straight leg: false when the world or traffic is met on it, with travelled up to there
+		bool leg( const vec3_t to )
 		{
+			Vec3 dir;
+			VectorSubtract( to, from, dir );
+			const float length = VectorNormalize( dir );
+			if( length < 1 )
+				return true;
+			if( worldOnLeg( dir, length ) || trafficOnLeg( dir, length ) )
+				return false;
+			travelled += length;
+			VectorCopy( to, from );
+			return true;
+		}
+
+		// No trace while the leg stays inside one empty cell of the air navigation tree. Already within the corridor's
+		// width of a wall: look along a narrower one, and only then along a bare line, so that hugging the wall does
+		// not make every heading look open. Other vehicles are left to the traffic check
+		bool worldOnLeg( const Vec3& dir, float length )
+		{
+			Vec3 to = from + dir * length;
+			if( AirNav::segmentKnownFree( from, to, halfWidth + 8.0f ) )
+				return false;
+			trace_t tr;
 			BotWorld::pathBlocked( from, dir, length, c.ent->s.number, tr, halfWidth );
-			// already within the corridor's width of a wall: look along a narrower one, and only then along a bare
-			// line, so that hugging the wall does not make every heading look open
-			if( tr.startsolid && travelled <= 0 && start.seconds <= 0 )
+			const bool atStart = travelled <= 0 && start.seconds <= 0;
+			if( tr.startsolid && atStart )
 				BotWorld::pathBlocked( from, dir, length, c.ent->s.number, tr, halfWidth * 0.4f );
-			if( tr.startsolid && travelled <= 0 && start.seconds <= 0 )
+			if( tr.startsolid && atStart )
 				BotWorld::pathBlocked( from, dir, length, c.ent->s.number, tr );
 			const bool vehicle = tr.entityNum >= 1 && tr.entityNum <= theLevel.maxclients_;
 			if( tr.startsolid )
 				tr.fraction = 0;
-			if( tr.fraction < 1.0f && !vehicle )
-			{
-				travelled += tr.fraction * length;
+			if( tr.fraction >= 1.0f || vehicle )
 				return false;
-			}
+			travelled += tr.fraction * length;
+			return true;
 		}
-		// look for traffic at points along the leg, not only at its end
-		constexpr float trafficStep = 150.0f;
-		const int steps = std::max( 1, static_cast<int>( ceil( length / trafficStep ) ) );
-		for( int step = 1; step <= steps; step++ )
+
+		// traffic at points along the leg, not only at its end
+		bool trafficOnLeg( const Vec3& dir, float length )
 		{
-			const float along = length * step / steps;
-			Vec3 point;
-			VectorMA( from, along, dir, point );
-			if( trafficAt( c, point, start.seconds + (travelled + along) / airspeed ) )
+			constexpr float trafficStep = 150.0f;
+			const int steps = std::max( 1, static_cast<int>( ceil( length / trafficStep ) ) );
+			for( int step = 1; step <= steps; step++ )
 			{
-				travelled += along - length / steps;
-				return false;
+				const float along = length * step / steps;
+				Vec3 point;
+				VectorMA( from, along, dir, point );
+				if( PlaneTasks::trafficAt( c, point, start.seconds + (travelled + along) / airspeed ) )
+				{
+					travelled += along - length / steps;
+					return true;
+				}
 			}
+			return false;
 		}
-		travelled += length;
-		VectorCopy( to, from );
-		return true;
 	};
-	for( float swept = std::min( 30.0f, total ); swept > 0 && travelled < horizon; swept += 30.0f )
+}
+
+// flies an arc of turnDegrees at the given radius and then straight on, returns the free distance up to horizon
+float PlaneTasks::sweepFrom( const Mind& c, const Pose& start, float radius, float turnDegrees, float slope, float horizon, float halfWidth, Pose* finish )
+{
+	Vec3 flat = { 0, start.yaw, 0 }, forward, right;
+	AngleVectors( flat, forward, right, nullptr );
+	const float side = turnDegrees > 0 ? -1.0f : 1.0f;
+	const float total = fabs( turnDegrees );
+	Sweep sweep( c, start, halfWidth );
+	// the arc in pieces of thirty degrees, then the straight on to the horizon
+	for( float swept = std::min( 30.0f, total ); swept > 0 && sweep.travelled < horizon; swept += 30.0f )
 	{
 		const float angle = std::min( swept, total ) * std::numbers::pi_v<float> / 180.0f;
 		Vec3 point;
 		VectorMA( start.origin, radius * sin( angle ), forward, point );
 		VectorMA( point, side * radius * (1.0f - cos( angle )), right, point );
 		point[2] += slope * radius * angle;
-		if( !leg( point ) )
-			return travelled;
+		if( !sweep.leg( point ) )
+			return sweep.travelled;
 		if( swept >= total )
 			break;
 	}
-	if( travelled < horizon )
+	if( sweep.travelled < horizon )
 	{
-		Vec3 out = { 0, start.yaw + turnDegrees, 0 }, dir, end;
+		Vec3 out = { 0, start.yaw + turnDegrees, 0 }, dir;
 		AngleVectors( out, dir, nullptr, nullptr );
 		dir[2] = slope;
-		end = from + dir * ( horizon - travelled );
-		leg( end );
+		const Vec3 end = sweep.from + dir * (horizon - sweep.travelled);
+		sweep.leg( end );
 	}
 	if( finish )
 	{
-		VectorCopy( from, finish->origin );
+		VectorCopy( sweep.from, finish->origin );
 		finish->yaw = start.yaw + turnDegrees;
-		finish->seconds = start.seconds + travelled / airspeed;
+		finish->seconds = start.seconds + sweep.travelled / sweep.airspeed;
 	}
-	return std::min( travelled, horizon );
+	return std::min( sweep.travelled, horizon );
 }
 
 // how far the aircraft gets from where it is now along a turn of that radius and slope before meeting something
