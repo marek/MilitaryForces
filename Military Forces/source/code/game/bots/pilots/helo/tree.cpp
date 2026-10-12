@@ -9,19 +9,20 @@ behavior::Tree<Bots::Mind> HeloTasks::build()
 		t.when( "above the pad", abovePad, t.action( "descend to pad", descendToPad ) ),
 		t.action( "fly to pad", flyToPad ) } );
 
+	// in cover between pop-ups, the gunship and the stealth strike alike
+	const auto* cover = t.when( "hiding", inCover, t.selector( "cover", {
+		t.when( "knows cover", hasCover, t.action( "move to cover", moveToCover ) ),
+		t.action( "sink into cover", sinkIntoCover ) } ) );
+
 	const auto* popAndCover = t.selector( "pop up and cover", {
-		t.when( "hiding", inCover, t.selector( "cover", {
-			t.when( "knows cover", hasCover, t.action( "move to cover", moveToCover ) ),
-			t.action( "sink into cover", sinkIntoCover ) } ) ),
+		cover,
 		t.when( "exposed", exposed, t.action( "fire exposed", fireExposed ) ),
 		t.when( "sees the enemy", seesEnemy, t.action( "expose", expose ) ),
 		t.action( "pop up", popUp ) } );
 
 	const auto* stealthStrike = t.selector( "stealth strike", {
 		t.when( "at close quarters", tooClose, t.action( "break off", breakOff ) ),
-		t.when( "hiding", inCover, t.selector( "cover", {
-			t.when( "knows cover", hasCover, t.action( "move to cover", moveToCover ) ),
-			t.action( "sink into cover", sinkIntoCover ) } ) ),
+		cover,
 		t.when( "exposed", exposed, t.action( "strike exposed", strikeExposed ) ),
 		t.when( "out of missile range", outOfStrikeRange, t.action( "stalk", stalk ) ),
 		t.when( "sees the enemy", seesEnemy, t.action( "expose for strike", exposeForStrike ) ),
