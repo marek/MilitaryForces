@@ -847,6 +847,15 @@ void Game::on_target_lost( GameEntity *missile )
 	missile->nextthink_ = missile->wait_ + 50;
 }
 
+// a radar-guided missile's seeker does not see a stealth vehicle that is hidden from it
+static bool hiddenFromSeeker( const GameEntity* missile, float dist )
+{
+	const GameEntity* target = missile->tracktarget_;
+	return (availableWeapons[missile->s.weaponIndex].flags & WF_RADAR_GUIDED) && target->client_ &&
+		VehicleData::stealthHidden( target->client_->vehicle_, target->client_->ps_.timers[TIMER_REVEAL], theLevel.time_, dist,
+			availableWeapons[missile->s.weaponIndex].range );
+}
+
 /*
 ================
 follow your target
@@ -896,9 +905,7 @@ struct Think_FollowTarget : public GameEntity::EntityFunc_Think
 			return;
 		}
 
-		if( (availableWeapons[self->s.weaponIndex].flags & WF_RADAR_GUIDED) && self->tracktarget_->client_ &&
-			VehicleData::stealthHidden( self->tracktarget_->client_->vehicle_, self->tracktarget_->client_->ps_.timers[TIMER_REVEAL],
-				theLevel.time_, dist, availableWeapons[self->s.weaponIndex].range ) )
+		if( hiddenFromSeeker( self, dist ) )
 		{
 			Game::on_target_lost(self);
 			return;
@@ -989,6 +996,14 @@ struct Think_FollowTarget : public GameEntity::EntityFunc_Think
 	}
 };
 
+// A missile falls clear of its rail at the launcher's own speed, and at no less than this along the rail: from a
+// hovering helicopter it would otherwise have no direction at all when its motor lights
+static float launchDropSpeed( const GameEntity* launcher )
+{
+	constexpr float leastDropSpeed = 10.0f;
+	return std::max( launcher->client_->ps_.speed / 10.0f, leastDropSpeed );
+}
+
 struct Think_DropToNormalTransition : public GameEntity::EntityFunc_Think
 {
 	void execute() override
@@ -1000,6 +1015,11 @@ struct Think_DropToNormalTransition : public GameEntity::EntityFunc_Think
 		self->s.pos.trDuration = 500;
 
 		VectorCopy( self->r.currentOrigin, self->s.pos.trBase );
+		// A locked missile turns onto its target as its motor lights. It left along the launcher's nose, which a
+		// hovering helicopter does not point at what it attacks, and has fallen since: close in, either puts the target
+		// outside its seeker's cone before it has steered at all
+		if( self->tracktarget_ && !hiddenFromSeeker( self, Distance( lockPoint( self->tracktarget_ ), self->r.currentOrigin ) ) )
+			VectorSubtract( lockPoint( self->tracktarget_ ), self->r.currentOrigin, self->s.pos.trDelta );
 		VectorNormalize( self->s.pos.trDelta );
 		VectorScale( self->s.pos.trDelta, self->speed_, self->s.pos.trDelta );
 		if( self->tracktarget_ )
@@ -1090,7 +1110,7 @@ void fire_antiair (GameEntity *self)
 		bolt->setThink( std::make_unique<Think_DropToNormalTransition>());
 		bolt->nextthink_ = theLevel.time_ + 400;
 		bolt->s.pos.trType = TR_GRAVITY;
-		VectorScale( dir, self->client_->ps_.speed/10, bolt->s.pos.trDelta );
+		VectorScale( dir, launchDropSpeed( self ), bolt->s.pos.trDelta );
 	}
 	bolt->s.eType = ET_MISSILE;
 	bolt->r.svFlags = SVF_USE_CURRENT_ORIGIN;
@@ -1193,7 +1213,7 @@ void fire_antiground( GameEntity *self )
 		bolt->setThink( std::make_unique<Think_DropToNormalTransition>());
 		bolt->nextthink_ = theLevel.time_ + 400;
 		bolt->s.pos.trType = TR_GRAVITY;
-		VectorScale( dir, self->client_->ps_.speed/10, bolt->s.pos.trDelta );
+		VectorScale( dir, launchDropSpeed( self ), bolt->s.pos.trDelta );
 	}
 
 	bolt->s.eType = ET_MISSILE;
