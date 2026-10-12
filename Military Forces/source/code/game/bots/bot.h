@@ -50,11 +50,16 @@ public:
 		float		reaction;
 	};
 
-	// where and when another player was last seen
+	// how far a bot has noticed another player: not at all, something that gives it away, or seen and watched
+	enum class Awareness { Unaware, Suspicious, Aware };
+
+	// where and when another player was last seen, and how aware of it the bot is
 	struct Seen
 	{
-		vec3_t	position = { 0, 0, 0 };
-		int		time = 0;
+		vec3_t		position = { 0, 0, 0 };
+		int			time = 0;
+		Awareness	level = Awareness::Unaware;
+		int			awareTime = 0;	// when it was last seen while watched
 	};
 
 	// one bot's thinking for one frame (core/mind.h)
@@ -395,6 +400,33 @@ public:
 	static GameEntity* walkerNear( GameEntity* ent, Bots::State& bot, float range );
 	static int ridersOf( GameEntity* ent );
 	static void sense( GameEntity* ent, Bots::State& bot, Bots::Sense& out );
+
+private:
+	// a contact stays watched this long after it was last seen
+	static constexpr int trackingTime = 3000;
+	// the contacts a bot is keeping its eyes on
+	struct Attention
+	{
+		int		tracked = 0;
+		int		limit = 3;
+		float	furthest = 0;
+	};
+	// what one opponent is to the bot this frame
+	struct Contact
+	{
+		float	dist = 0;
+		bool	attackedBy = false;
+		bool	harassing = false;
+	};
+	static void findHarassers( GameEntity* ent, const Capabilities& can, bool* harassing );
+	static bool isOpponent( GameEntity* ent, GameEntity* other );
+	static Attention attentionOf( GameEntity* ent, const Bots::State& bot );
+	static bool locate( GameEntity* ent, Bots::State& bot, GameEntity* other, const Attention& attention, Contact& contact );
+	static bool inSight( GameEntity* ent, GameEntity* other, float dist );
+	static bool noticed( GameEntity* ent, const Bots::State& bot, const Bots::Seen& seen, const vec3_t where, float dist, const Attention& attention );
+	static bool ahead( GameEntity* ent, const vec3_t point );
+	static bool lookingRound( GameEntity* ent, const Bots::State& bot );
+	static float targetScore( GameEntity* ent, Bots::State& bot, const Capabilities& can, GameEntity* other, const Contact& contact );
 };
 
 #endif

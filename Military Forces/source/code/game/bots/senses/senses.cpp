@@ -224,142 +224,230 @@ namespace
 // it, by the leader's target and by the flag. An enemy out of sight is fought from memory for a while.
 GameEntity* BotSenses::findEnemy( GameEntity* ent, Bots::State& bot, const Capabilities& can )
 {
-	GameClient* client = ent->client_;
-	const completeVehicleData_t& veh = availableVehicles[client->vehicle_];
-	const bool flyer = (veh.cat & (CAT_PLANE|CAT_HELO)) != 0;
-	const float maxRange = flyer ? planeEnemyRange : surfaceEnemyRange;
-	const float radarRange = veh.radarRange > 0 ? static_cast<float>( veh.radarRange ) : 8000.0f;
-	const bool antiAir = BotWeapons::hasWeaponType( client->vehicle_, client->ps_, WT_ANTIAIRMISSILE );
-
-	GameEntity* leader = BotSenses::leaderOf( bot );
-	const int leaderTarget = leader ? BotSenses::targetOf( leader ) : -1;
-
-	// Who is shooting up the team's vehicles on the ground near here: an aircraft with nothing more pressing goes
-	// to their help. A team mate under fire gives its attacker away, so the aircraft knows where to look
-	constexpr int underFireTime = 6000;
-	constexpr float planeHelpReach = 7000.0f, heloHelpReach = 4500.0f;
 	bool harassing[MAX_CLIENTS + 1] = {};
-	if( flyer && g_gametype.integer >= GT_TEAM && ( (can.runway && !can.groundStrike) || can.gunship ) )
-	{
-		const float reach = (veh.cat & CAT_PLANE) ? planeHelpReach : heloHelpReach;
-		for( int i = 1; i <= theLevel.maxclients_; i++ )
-		{
-			GameEntity* mate = theLevel.getEntity( i );
-			if( mate == ent || !alive( mate ) || !OnSameTeam( ent, mate ) || mate->client_->vehicle_ < 0 )
-				continue;
-			if( !(availableVehicles[mate->client_->vehicle_].cat & (CAT_GROUND|CAT_BOAT|CAT_LQM)) )
-				continue;
-			const int by = mate->client_->lasthurt_client_;
-			if( by < 1 || by > MAX_CLIENTS || theLevel.time_ > mate->client_->lastEnemyHitTime_ + underFireTime )
-				continue;
-			if( Distance( ent->r.currentOrigin, mate->r.currentOrigin ) <= reach )
-				harassing[by] = true;
-		}
-	}
-
-	const BotTeam::Assignment& teamJob = BotTeam::of( ent->s.number );
+	if( (can.runway || can.hovers) && g_gametype.integer >= GT_TEAM && ((can.runway && !can.groundStrike) || can.gunship) )
+		findHarassers( ent, can, harassing );
+	const Attention attention = attentionOf( ent, bot );
 	GameEntity* best = nullptr;
 	float bestScore = 0;
 	for( int i = 1; i <= theLevel.maxclients_; i++ )
 	{
 		GameEntity* other = theLevel.getEntity( i );
-		if( other == ent || !alive( other ) )
+		if( !isOpponent( ent, other ) )
 			continue;
-		GameClient* oc = other->client_;
-		if( oc->sess_.ridingClient_ >= 0 )
+		Contact contact;
+		contact.harassing = harassing[i];
+		if( !locate( ent, bot, other, attention, contact ) )
 			continue;
-		if( g_gametype.integer >= GT_TEAM && OnSameTeam( ent, other ) )
-			continue;
-		// a stolen vehicle still in our paint passes as one of ours until it gives itself away
-		if( g_gametype.integer >= GT_TEAM && oc->sess_.paintTeam_ == client->sess_.sessionTeam_ && !oc->ruseBlown_ )
-			continue;
-
-		float dist = Distance( ent->r.currentOrigin, other->r.currentOrigin );
-		Bots::Seen& seen = bot.seen[i];
-		// being shot gives the shooter away: the bot knows roughly where its attacker is, seen or not
-		constexpr int grudgeTime = 8000;
-		const bool attackedBy = client->lasthurt_client_ == i && theLevel.time_ < bot.hitTime + grudgeTime;
-		if( attackedBy || harassing[i] )
-		{
-			VectorCopy( other->r.currentOrigin, seen.position );
-			seen.time = theLevel.time_;
-		}
-		const bool sees = dist <= maxRange &&
-			!VehicleData::stealthHidden( oc->vehicle_, oc->ps_.timers[TIMER_REVEAL], theLevel.time_, dist, radarRange ) &&
-			BotWorld::visible( ent, ent->r.currentOrigin, other );
-		if( sees )
-		{
-			VectorCopy( other->r.currentOrigin, seen.position );
-			seen.time = theLevel.time_;
-			BotTeam::report( client->sess_.sessionTeam_, i, other->r.currentOrigin );
-		}
-		else
-		{
-			// what a team mate saw, once word of it has got round
-			vec3_t told;
-			int toldTime;
-			if( BotTeam::known( client->sess_.sessionTeam_, i, told, toldTime ) && toldTime > seen.time )
-			{
-				VectorCopy( told, seen.position );
-				seen.time = toldTime;
-			}
-			if( !seen.time || theLevel.time_ > seen.time + Bots::memoryTime( bot ) )
-				continue;
-			// remembered, not seen: counts as further away, and is forgotten once the bot gets there and finds nothing
-			dist = Distance( ent->r.currentOrigin, seen.position ) * 1.5f;
-			if( dist < 300 )
-			{
-				seen.time = 0;
-				continue;
-			}
-		}
-
-		const completeVehicleData_t& ov = availableVehicles[oc->vehicle_];
-		const bool air = (ov.cat & (CAT_PLANE|CAT_HELO)) != 0 && !(oc->ps_.ONOFF & OO_LANDED);
-		float score = dist;
-		const float preference = targetWeight( preferenceOf( can ), ov, air, antiAir, dist );
-		if( preference < 0.0f )
-			continue;
-		score *= preference;
-		// stay with the current target unless another is clearly better
-		if( i == bot.enemy )
-			score *= 0.7f;
-		// whoever is shooting at it pulls hard, unless that means giving up a fight that is nearly won
-		if( attackedBy )
-			score *= BotSenses::turnOnAttacker( ent, bot, i );
-		// fight what the leader is fighting
-		if( leaderTarget == i )
-			score *= 0.35f;
-		// whoever is shooting up the team's vehicles on the ground nearby: the better the team player, the sooner
-		// it drops what it was doing for them
-		if( harassing[i] )
-			score *= 0.7f - 0.4f * Bots::character( bot ).teamwork;
-		// the team's plan: the enemy it was sent for; for a guard or an escort, whoever is near what it guards and
-		// nobody far from it; for air cover, aircraft over the place it covers
-		if( teamJob.job != BotTeam::Job::None )
-		{
-			constexpr float guardedNear = 2500.0f, guardedFar = 5000.0f;
-			if( teamJob.target == i )
-				score *= 0.3f;
-			if( teamJob.hasPlace && (teamJob.job == BotTeam::Job::Defend || teamJob.job == BotTeam::Job::Escort || teamJob.job == BotTeam::Job::AirCover) )
-			{
-				const float from = Distance( other->r.currentOrigin, teamJob.place );
-				if( from < guardedNear && (teamJob.job != BotTeam::Job::AirCover || air) )
-					score *= 0.5f;
-				else if( from > guardedFar )
-					score *= 2.0f;
-			}
-		}
-		// whoever carries our flag comes before everyone
-		if( g_gametype.integer == GT_CTF && (oc->ps_.objectives & (client->sess_.sessionTeam_ == ClientBase::TEAM_RED ? OB_REDFLAG : OB_BLUEFLAG)) )
-			score *= 0.15f;
-		if( !best || score < bestScore )
+		const float score = targetScore( ent, bot, can, other, contact );
+		if( score >= 0.0f && (!best || score < bestScore) )
 		{
 			best = other;
 			bestScore = score;
 		}
 	}
 	return best;
+}
+
+// Who is shooting up the team's vehicles on the ground near here: an aircraft with nothing more pressing goes to
+// their help. A team mate under fire gives its attacker away, so the aircraft knows where to look
+void BotSenses::findHarassers( GameEntity* ent, const Capabilities& can, bool* harassing )
+{
+	constexpr int underFireTime = 6000;
+	constexpr float planeHelpReach = 7000.0f, heloHelpReach = 4500.0f;
+	const float reach = can.runway ? planeHelpReach : heloHelpReach;
+	for( int i = 1; i <= theLevel.maxclients_; i++ )
+	{
+		GameEntity* mate = theLevel.getEntity( i );
+		if( mate == ent || !alive( mate ) || !OnSameTeam( ent, mate ) || mate->client_->vehicle_ < 0 )
+			continue;
+		if( !(availableVehicles[mate->client_->vehicle_].cat & (CAT_GROUND|CAT_BOAT|CAT_LQM)) )
+			continue;
+		const int by = mate->client_->lasthurt_client_;
+		if( by < 1 || by > MAX_CLIENTS || theLevel.time_ > mate->client_->lastEnemyHitTime_ + underFireTime )
+			continue;
+		if( Distance( ent->r.currentOrigin, mate->r.currentOrigin ) <= reach )
+			harassing[by] = true;
+	}
+}
+
+// someone this bot could fight: alive, in a vehicle of its own, not on its team, and not passing as one of its team
+// in a stolen vehicle still in its paint
+bool BotSenses::isOpponent( GameEntity* ent, GameEntity* other )
+{
+	if( other == ent || !alive( other ) || other->client_->sess_.ridingClient_ >= 0 )
+		return false;
+	if( g_gametype.integer < GT_TEAM )
+		return true;
+	if( OnSameTeam( ent, other ) )
+		return false;
+	return !(other->client_->sess_.paintTeam_ == ent->client_->sess_.sessionTeam_ && !other->client_->ruseBlown_);
+}
+
+// How many contacts the bot is keeping its eyes on, and the furthest of them. A bot keeps track of a few at once;
+// a new one past that is noticed only when nearer than the furthest it is tracking
+BotSenses::Attention BotSenses::attentionOf( GameEntity* ent, const Bots::State& bot )
+{
+	constexpr float patientWatcher = 0.6f;
+	Attention attention;
+	attention.limit = Bots::character( bot ).patience > patientWatcher ? 5 : 3;
+	for( int i = 1; i <= theLevel.maxclients_ && i <= MAX_CLIENTS; i++ )
+	{
+		const Bots::Seen& seen = bot.seen[i];
+		if( seen.level != Bots::Awareness::Aware || theLevel.time_ - seen.awareTime >= trackingTime )
+			continue;
+		attention.tracked++;
+		attention.furthest = std::max( attention.furthest, Distance( ent->r.currentOrigin, seen.position ) );
+	}
+	return attention;
+}
+
+// Where an opponent is, as far as this bot knows: seen now, given away by shooting, told by the team, or remembered.
+// False when it knows nothing of it. Each contact's awareness rises with what gives it away and fades with time
+bool BotSenses::locate( GameEntity* ent, Bots::State& bot, GameEntity* other, const Attention& attention, Contact& contact )
+{
+	GameClient* client = ent->client_;
+	const int i = other->s.number;
+	Bots::Seen& seen = bot.seen[i];
+	contact.dist = Distance( ent->r.currentOrigin, other->r.currentOrigin );
+	// being shot gives the shooter away: the bot knows roughly where its attacker is, seen or not
+	constexpr int grudgeTime = 8000;
+	contact.attackedBy = client->lasthurt_client_ == i && theLevel.time_ < bot.hitTime + grudgeTime;
+	if( contact.attackedBy || contact.harassing )
+	{
+		VectorCopy( other->r.currentOrigin, seen.position );
+		seen.time = theLevel.time_;
+		seen.level = std::max( seen.level, Bots::Awareness::Suspicious );
+	}
+	if( inSight( ent, other, contact.dist ) && noticed( ent, bot, seen, other->r.currentOrigin, contact.dist, attention ) )
+	{
+		VectorCopy( other->r.currentOrigin, seen.position );
+		seen.time = seen.awareTime = theLevel.time_;
+		seen.level = Bots::Awareness::Aware;
+		BotTeam::report( client->sess_.sessionTeam_, i, other->r.currentOrigin );
+		return true;
+	}
+	if( seen.level == Bots::Awareness::Aware && theLevel.time_ - seen.awareTime >= trackingTime )
+		seen.level = Bots::Awareness::Suspicious;
+	// what a team mate saw, once word of it has got round
+	vec3_t told;
+	int toldTime;
+	if( BotTeam::known( client->sess_.sessionTeam_, i, told, toldTime ) && toldTime > seen.time )
+	{
+		VectorCopy( told, seen.position );
+		seen.time = toldTime;
+		seen.level = std::max( seen.level, Bots::Awareness::Suspicious );
+	}
+	if( !seen.time || theLevel.time_ > seen.time + Bots::memoryTime( bot ) )
+	{
+		seen.level = Bots::Awareness::Unaware;
+		return false;
+	}
+	// remembered, not seen: counts as further away, and is forgotten once the bot gets there and finds nothing
+	contact.dist = Distance( ent->r.currentOrigin, seen.position ) * 1.5f;
+	if( contact.dist < 300 )
+	{
+		seen.time = 0;
+		seen.level = Bots::Awareness::Unaware;
+		return false;
+	}
+	return true;
+}
+
+// within range, not hidden by stealth, and nothing in the way
+bool BotSenses::inSight( GameEntity* ent, GameEntity* other, float dist )
+{
+	const completeVehicleData_t& veh = availableVehicles[ent->client_->vehicle_];
+	const bool flyer = (veh.cat & (CAT_PLANE|CAT_HELO)) != 0;
+	const float maxRange = flyer ? planeEnemyRange : surfaceEnemyRange;
+	const float radarRange = veh.radarRange > 0 ? static_cast<float>( veh.radarRange ) : 8000.0f;
+	GameClient* oc = other->client_;
+	return dist <= maxRange && !VehicleData::stealthHidden( oc->vehicle_, oc->ps_.timers[TIMER_REVEAL], theLevel.time_, dist, radarRange ) &&
+		BotWorld::visible( ent, ent->r.currentOrigin, other );
+}
+
+// In sight is not yet noticed. A contact already watched stays watched; one ahead is noticed; one behind only when the
+// bot looks round, which it does now and then, the better pilots more often. Past the few it can keep track of, a new
+// one is noticed only when nearer than the furthest it is tracking
+bool BotSenses::noticed( GameEntity* ent, const Bots::State& bot, const Bots::Seen& seen, const vec3_t where, float dist, const Attention& attention )
+{
+	if( seen.level == Bots::Awareness::Aware && theLevel.time_ - seen.awareTime < trackingTime )
+		return true;
+	if( !ahead( ent, where ) && !lookingRound( ent, bot ) )
+		return false;
+	return attention.tracked < attention.limit || dist < attention.furthest;
+}
+
+// within about a hundred degrees either side of the nose
+bool BotSenses::ahead( GameEntity* ent, const vec3_t point )
+{
+	constexpr float sideLimit = -0.2f;
+	vec3_t forward, to;
+	AngleVectors( ent->client_->ps_.vehicleAngles, forward, nullptr, nullptr );
+	VectorSubtract( point, ent->r.currentOrigin, to );
+	VectorNormalize( to );
+	return DotProduct( forward, to ) > sideLimit;
+}
+
+// a look round behind: part of every few seconds, more often for the more skilled
+bool BotSenses::lookingRound( GameEntity* ent, const Bots::State& bot )
+{
+	constexpr int slowestScan = 3000, fastestGain = 1500, lookFor = 700;
+	const int period = slowestScan - static_cast<int>( fastestGain * Bots::skill( bot ) );
+	return (theLevel.time_ + ent->s.number * 397) % period < lookFor;
+}
+
+// how much this opponent is worth fighting, as a distance shortened by everything that makes it the one to go for;
+// below zero when this vehicle cannot fight it
+float BotSenses::targetScore( GameEntity* ent, Bots::State& bot, const Capabilities& can, GameEntity* other, const Contact& contact )
+{
+	GameClient* client = ent->client_;
+	GameClient* oc = other->client_;
+	const int i = other->s.number;
+	const completeVehicleData_t& ov = availableVehicles[oc->vehicle_];
+	const bool air = (ov.cat & (CAT_PLANE|CAT_HELO)) != 0 && !(oc->ps_.ONOFF & OO_LANDED);
+	const bool antiAir = BotWeapons::hasWeaponType( client->vehicle_, client->ps_, WT_ANTIAIRMISSILE );
+	const float preference = targetWeight( preferenceOf( can ), ov, air, antiAir, contact.dist );
+	if( preference < 0.0f )
+		return -1.0f;
+	GameEntity* leader = BotSenses::leaderOf( bot );
+	const int leaderTarget = leader ? BotSenses::targetOf( leader ) : -1;
+	const BotTeam::Assignment& teamJob = BotTeam::of( ent->s.number );
+	const bool attackedBy = contact.attackedBy;
+	float score = contact.dist * preference;
+	// stay with the current target unless another is clearly better
+	if( i == bot.enemy )
+		score *= 0.7f;
+	// whoever is shooting at it pulls hard, unless that means giving up a fight that is nearly won
+	if( attackedBy )
+		score *= BotSenses::turnOnAttacker( ent, bot, i );
+	// fight what the leader is fighting
+	if( leaderTarget == i )
+		score *= 0.35f;
+	// whoever is shooting up the team's vehicles on the ground nearby: the better the team player, the sooner
+	// it drops what it was doing for them
+	if( contact.harassing )
+		score *= 0.7f - 0.4f * Bots::character( bot ).teamwork;
+	// the team's plan: the enemy it was sent for; for a guard or an escort, whoever is near what it guards and
+	// nobody far from it; for air cover, aircraft over the place it covers
+	if( teamJob.job != BotTeam::Job::None )
+	{
+		constexpr float guardedNear = 2500.0f, guardedFar = 5000.0f;
+		if( teamJob.target == i )
+			score *= 0.3f;
+		if( teamJob.hasPlace && (teamJob.job == BotTeam::Job::Defend || teamJob.job == BotTeam::Job::Escort || teamJob.job == BotTeam::Job::AirCover) )
+		{
+			const float from = Distance( other->r.currentOrigin, teamJob.place );
+			if( from < guardedNear && (teamJob.job != BotTeam::Job::AirCover || air) )
+				score *= 0.5f;
+			else if( from > guardedFar )
+				score *= 2.0f;
+		}
+	}
+	// whoever carries our flag comes before everyone
+	if( g_gametype.integer == GT_CTF && (oc->ps_.objectives & (client->sess_.sessionTeam_ == ClientBase::TEAM_RED ? OB_REDFLAG : OB_BLUEFLAG)) )
+		score *= 0.15f;
+	return score;
 }
 
 // everything a bot knows this frame: its enemy and where to aim, its own state, missiles, aircraft about, and its goal
