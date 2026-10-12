@@ -199,7 +199,7 @@ void PlaneTasks::lookAhead( Mind& c )
 {
 	State& bot = c.bot;
 	// look more often when something is in the way
-	bot.avoid.probeTime = theLevel.time_ + (bot.avoid.confined || bot.avoid.probeBlocked ? 150 : 300);
+	bot.avoid.probeTime = theLevel.time_ + (bot.avoid.confined || bot.avoid.probeBlocked ? 150 : 300) + ThinkRate::stagger( c.ent->s.number, 50 );
 	bot.avoid.confined = confinedHere( c );
 	const Probe probe = probeFor( c );
 	const bool wasBlocked = bot.avoid.probeBlocked;

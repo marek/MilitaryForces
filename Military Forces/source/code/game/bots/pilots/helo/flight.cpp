@@ -18,7 +18,7 @@ behavior::Status HeloTasks::navigate( Mind& c )
 	{
 		AirNav::findPath( here, c.steer.dest, bot.path.points );
 		bot.path.index = 0;
-		bot.path.searchTime = theLevel.time_ + 2000;
+		bot.path.searchTime = theLevel.time_ + 2000 + ThinkRate::stagger( c.ent->s.number, 300 );
 	}
 	// on to the next waypoint once this one is reached or the one after can be flown to directly
 	while( bot.path.index + 1 < bot.path.points.size() &&

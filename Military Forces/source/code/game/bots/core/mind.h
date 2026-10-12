@@ -6,6 +6,7 @@
 #include "../bot.h"
 #include "local.h"
 #include "../navigation/groundnav.h"
+#include "lod.h"
 #include <algorithm>
 #include <cmath>
 
@@ -110,7 +111,7 @@ struct Bots::Mind
 		{
 			GroundNav::findPath( here, steer.dest, water, bot.path.points );
 			bot.path.index = 0;
-			bot.path.searchTime = theLevel.time_ + 2000;
+			bot.path.searchTime = theLevel.time_ + 2000 + ThinkRate::stagger( ent->s.number, 300 );
 		}
 		while( bot.path.index + 1 < bot.path.points.size() )
 		{
