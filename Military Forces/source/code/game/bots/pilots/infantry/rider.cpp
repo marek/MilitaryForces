@@ -11,7 +11,9 @@ void Bots::thinkRider( GameEntity* ent, State& bot, usercmd_t& cmd, vec3_t view 
 	VectorCopy( pilot->client_->ps_.vehicleAngles, view );
 	view[ROLL] = 0;
 	const bool gunner = client->sess_.seat_ == 1 && VehicleData::vehicleHasTurret( pilot->client_->vehicle_ );
-	if( !gunner && leaveStoppedRide( ent, bot, pilot ) )
+	if( gunner )
+		bot.liftTime = 0;
+	else if( leaveStoppedRide( ent, bot, pilot ) )
 		return;
 	// passengers shoot only from open vehicles
 	if( !gunner && !(availableVehicles[pilot->client_->vehicle_].cat & (CAT_HELO|CAT_BOAT)) )
