@@ -367,6 +367,8 @@ void Bots::select( GameEntity* ent, State& bot )
 	ClientUserinfoChanged( clientNum );
 }
 
+// One bot's frame: settle a life that has ended, choose a vehicle and spawn, start a new life, then the wishes that
+// come before the pilot (a flag thief, the team's plan, fuel), the pilot, and the aim as steadily as skill allows
 void Bots::think( GameEntity* ent, State& bot, usercmd_t& cmd )
 {
 	GameClient* client = ent->client_;
@@ -379,54 +381,9 @@ void Bots::think( GameEntity* ent, State& bot, usercmd_t& cmd )
 	const bool selecting = client->sess_.sessionTeam_ == ClientBase::TEAM_SPECTATOR || client->vehicle_ < 0 || (ps.pm_flags & PMF_VEHICLESELECT);
 	if( bot.wasAlive && (selecting || ent->health_ <= 0) && client->sess_.sessionTeam_ != ClientBase::TEAM_SPECTATOR && (client->vehicle_ >= 0 || bot.vehicle >= 0) )
 	{
-		const int score = ps.persistant[PERS_SCORE];
-		const int flown = client->vehicle_ >= 0 ? client->vehicle_ : bot.vehicle;
-		const int kind = kindOf( flown );
-		const bool failed = score <= bot.lifeScore;
-		bot.badLives = failed ? bot.badLives + 1 : 0;
-		bot.ownLives[kind]++;
-		if( failed )
-			bot.ownFailures[kind]++;
-		// nobody sits out life after life in an aircraft the map keeps killing
-		bool reconsider = random() < switchDesire( bot, kind ) || unfitHere( flown );
-		// a supply pilot whose supplies nobody used in a long life gets bored, the impatient first;
-		// one who scored with them stays (a scoring life is not a failed one)
-		constexpr int longLife = 120000;
-		const bool supplier = BotWeapons::carriesSupplies( flown );
-		if( supplier && failed && theLevel.time_ - bot.spawnTime > longLife && random() < 0.6f * (1.0f - character( bot ).patience) )
-			reconsider = true;
-		// every death is a chance to notice that the team has nobody flying supplies
-		const bool teamGame = g_gametype.integer >= GT_TEAM;
-		const bool fillSupply = teamGame && !supplier && !reconsider && !teamHasSupplier( client->sess_.sessionTeam_, ent ) &&
-			random() < 0.35f * character( bot ).teamwork;
-		// the team's make-up: the bot that respawns next takes the kind the team is shortest of
-		BotTeam::Kind teamKind;
-		const bool refit = BotTeam::wantedKind( ent, teamKind ) && teamKind != BotTeam::kindOf( flown );
-		if( reconsider || fillSupply || refit )
-		{
-			int teamFlag = MF_TEAM_ANY;
-			if( g_gametype.integer >= GT_TEAM )
-				teamFlag = client->sess_.sessionTeam_ == ClientBase::TEAM_RED ? MF_TEAM_1 : MF_TEAM_2;
-			int vehicle = refit ? pickVehicle( teamFlag, false, &character( bot ), &bot, static_cast<int>( teamKind ) ) : -1;
-			if( vehicle < 0 && (reconsider || fillSupply) )
-				vehicle = pickVehicle( teamFlag, false, &character( bot ), &bot );
-			if( fillSupply && vehicle >= 0 && !BotWeapons::carriesSupplies( vehicle ) )
-				vehicle = -1;
-			if( vehicle >= 0 )
-			{
-				bot.vehicle = vehicle;
-				bot.badLives = 0;
-				char userinfo[MAX_INFO_STRING];
-				GameHost::getUserinfo( ent->s.number, userinfo, sizeof( userinfo ) );
-				Info::setValueForKey( userinfo, "cg_nextVehicle", va( "%d", vehicle ) );
-				GameHost::setUserinfo( ent->s.number, userinfo );
-				bot.wasAlive = false;
-				ClientUserinfoChanged( ent->s.number );
-				return;
-			}
-		}
+		if( settleLife( ent, bot ) )
+			return;
 	}
-
 	// in the menus: choose, then tap fire to spawn
 	if( selecting )
 	{
@@ -445,160 +402,20 @@ void Bots::think( GameEntity* ent, State& bot, usercmd_t& cmd )
 			cmd.buttons |= BUTTON_ATTACK;
 		return;
 	}
-	// first frame of a new life
 	if( !bot.wasAlive )
-	{
-		bot.wasAlive = true;
-		bot.spawnTime = theLevel.time_;
-		bot.lifeScore = ps.persistant[PERS_SCORE];
-		bot.goalTime = 0;
-		bot.enemy = -1;
-		bot.enemyTime = 0;
-		// what each behaviour kept belongs to the last life and its vehicle
-		bot.pursuit.reset();
-		bot.avoid.reset();
-		bot.stuck.reset();
-		bot.stuck.checkTime = theLevel.time_ + 3000;
-		bot.path.reset();
-		bot.cover.reset();
-		bot.takeoff.reset();
-		bot.rearm.letGo();
-		bot.desire = Goal::Roam;
-		bot.commitTime = 0;
-		bot.tree = behavior::Memory{};
-		// some lives are played as a team player, more often by team-minded characters
-		// (and more readily when a real player is on the team)
-		bool humanOnTeam = false;
-		for( int i = 1; i <= theLevel.maxclients_ && g_gametype.integer >= GT_TEAM; i++ )
-		{
-			GameEntity* other = theLevel.getEntity( i );
-			if( other != ent && other && other->inuse_ && other->client_ && !isBot( i ) && OnSameTeam( ent, other ) )
-				humanOnTeam = true;
-		}
-		// tanks and helicopters hunt in packs for safety: about two lives in five; planes about one in five
-		const Capabilities can = Capabilities::of( client->vehicle_ );
-		const bool packHunter = can.armoured || can.hovers;
-		const float keenness = (packHunter ? 0.68f : 0.35f) + (humanOnTeam ? 0.3f : 0.0f);
-		bot.teamPlayer = random() < keenness * character( bot ).teamwork;
-		bot.leader = -1;
-		bot.leaderTime = 0;
-		bot.takeoff.groundTime = 0;
-		bot.avoid.probeBlocked = false;
-		bot.avoid.brakeTime = 0;
-		bot.path.points.clear();
-		bot.path.searchTime = 0;
-		bot.path.following = false;
-		bot.path.cornerAhead = false;
-		bot.takeoff.planTime = 0;
-		bot.takeoff.taxiTime = 0;
-		bot.takeoff.holdTime = 0;
-		bot.takeoff.holds = 0;
-		bot.hitTime = 0;
-		bot.lastHealth = ent->health_;
-		bot.cover.exposed = false;
-		bot.cover.has = false;
-		VectorCopy( ent->r.currentOrigin, bot.stuck.lastOrigin );
-		if( !bot.hasHome )
-		{
-			VectorCopy( ent->r.currentOrigin, bot.home );
-			bot.hasHome = true;
-		}
-	}
+		startLife( ent, bot );
 
 	cmd.weapon = ps.weaponNum;
-
-	// someone has our flag: go where they were last seen, or to their base where they are taking it
-	if( g_gametype.integer == GT_CTF && bot.desire != Goal::Rearm && !(ps.objectives & (OB_REDFLAG|OB_BLUEFLAG)) )
-	{
-		const int own = client->sess_.sessionTeam_;
-		const int ownFlag = own == ClientBase::TEAM_RED ? OB_REDFLAG : OB_BLUEFLAG;
-		for( int i = 1; i <= theLevel.maxclients_; i++ )
-		{
-			GameEntity* other = theLevel.getEntity( i );
-			if( other == ent || !alive( other ) || !(other->client_->ps_.objectives & ownFlag) )
-				continue;
-			Vec3 intercept;
-			const Seen& seen = bot.seen[i];
-			if( seen.time && theLevel.time_ < seen.time + memoryTime( bot ) )
-				VectorCopy( seen.position, intercept );
-			else if( !BotWorld::flagPosition( own == ClientBase::TEAM_RED ? ClientBase::TEAM_BLUE : ClientBase::TEAM_RED, intercept ) )
-				break;
-			VectorCopy( intercept, bot.goal );
-			bot.goalTime = theLevel.time_ + 3000;
-			if( bot.desire == Goal::Capture )
-				bot.desire = Goal::Roam;
-			break;
-		}
-	}
-
-	// the team's plan: where this bot is asked to be. It goes there when it has nothing more pressing, which a fight,
-	// an empty tank and a missile all are
-	const BotTeam::Assignment& job = BotTeam::of( ent->s.number );
-	const bool ordered = BotOrders::assignmentOf( ent->s.number ) != nullptr;
-	const bool obeys = job.job != BotTeam::Job::None && (ordered || character( bot ).teamwork >= (BotTeam::level() >= 2 ? 0.15f : 0.3f));
-	if( obeys && job.hasPlace && (bot.desire == Goal::Roam || bot.desire == Goal::Capture) )
-	{
-		VectorCopy( job.place, bot.goal );
-		bot.goalTime = theLevel.time_ + 3000;
-	}
-	// capturing: to their flag, and with it back to ours; an attacker told to gather first goes to the flag when the push does
-	else if( bot.desire == Goal::Capture )
-	{
-		const bool carrying = (ps.objectives & (OB_REDFLAG|OB_BLUEFLAG)) != 0;
-		const int own = client->sess_.sessionTeam_;
-		const int other = own == ClientBase::TEAM_RED ? ClientBase::TEAM_BLUE : ClientBase::TEAM_RED;
-		Vec3 flag;
-		if( BotWorld::flagPosition( carrying ? own : other, flag ) )
-		{
-			VectorCopy( flag, bot.goal );
-			bot.goalTime = theLevel.time_ + 3000;
-		}
-	}
-
-	// Fuel (Marek, 2026-10-08): a plane with no pad it can land on on this map keeps a quarter tank, since it
-	// cannot refuel there and no plane can pick up a supply drop. Nothing else gets free fuel: a plane that can
-	// land does, ground vehicles and helicopters go back to a pad or are supplied by helicopter, boats are supplied.
-	constexpr int padCheckInterval = 2000;
-	if( availableVehicles[client->vehicle_].cat & CAT_PLANE )
-	{
-		if( theLevel.time_ >= bot.landing.padCheckTime )
-		{
-			bot.landing.padCheckTime = theLevel.time_ + padCheckInterval;
-			bot.landing.canLand = g_botLanding.integer && theLevel.time_ >= bot.landing.giveUp &&
-				BotWorld::findPad( ent, theLevel.time_ < bot.rearm.badPadTime ? bot.rearm.badPad : -1 ) >= 0;
-		}
-		if( !bot.landing.canLand && bot.rearm.pad < 0 && ps.stats[STAT_FUEL] < ps.stats[STAT_MAX_FUEL] / 4 )
-			ps.stats[STAT_FUEL] = ps.stats[STAT_MAX_FUEL] / 4;
-	}
-
-	if( client->sess_.ridingClient_ >= 0 )
-	{
-		thinkRider( ent, bot, cmd, view );
-	}
-	else
-	{
-		if( theLevel.time_ >= bot.leaderTime )
-			BotSenses::chooseLeader( ent, bot );
-		Sense s;
-		BotSenses::sense( ent, bot, s );
-		BotOrders::report( ent, bot, s );
-		const unsigned int cat = availableVehicles[client->vehicle_].cat;
-		if( cat & CAT_PLANE )
-			thinkPlane( ent, bot, s, cmd, view );
-		else if( cat & CAT_HELO )
-			thinkHelo( ent, bot, s, cmd, view );
-		else if( cat & (CAT_GROUND|CAT_BOAT) )
-			thinkSurface( ent, bot, s, cmd, view );
-		else
-			thinkInfantry( ent, bot, s, cmd, view );
-	}
+	chaseFlagThief( ent, bot );
+	followPlan( ent, bot );
+	keepPlaneFuel( ent, bot );
+	pilot( ent, bot, cmd, view );
 
 	// less skilled characters hold the aim less steadily; not while landing
 	const float wobble = bot.desire == Goal::Rearm ? 0.0f : handicap( bot ).aimWobble;
 	bot.aimPhase += 0.11f;
 	view[YAW] += sin( bot.aimPhase ) * wobble;
 	view[PITCH] += cos( bot.aimPhase * 0.7f ) * wobble * 0.6f;
-
 	for( int i = 0; i < 3; i++ )
 		cmd.angles[i] = ANGLE2SHORT( view[i] ) - ps.delta_angles[i];
 
@@ -606,6 +423,199 @@ void Bots::think( GameEntity* ent, State& bot, usercmd_t& cmd )
 	if( g_botDebug.integer >= 3 && theLevel.time_ >= bot.logTime )
 		logState( ent, bot, cmd, view );
 #endif
+}
+
+// A life has ended: its record, and whether the next life is in another vehicle. True when the bot has just been
+// sent to a new vehicle
+bool Bots::settleLife( GameEntity* ent, State& bot )
+{
+	GameClient* client = ent->client_;
+	const int score = client->ps_.persistant[PERS_SCORE];
+	const int flown = client->vehicle_ >= 0 ? client->vehicle_ : bot.vehicle;
+	const int kind = kindOf( flown );
+	const bool failed = score <= bot.lifeScore;
+	bot.badLives = failed ? bot.badLives + 1 : 0;
+	bot.ownLives[kind]++;
+	if( failed )
+		bot.ownFailures[kind]++;
+	// nobody sits out life after life in an aircraft the map keeps killing
+	bool reconsider = random() < switchDesire( bot, kind ) || unfitHere( flown );
+	// a supply pilot whose supplies nobody used in a long life gets bored, the impatient first;
+	// one who scored with them stays (a scoring life is not a failed one)
+	constexpr int longLife = 120000;
+	const bool supplier = BotWeapons::carriesSupplies( flown );
+	if( supplier && failed && theLevel.time_ - bot.spawnTime > longLife && random() < 0.6f * (1.0f - character( bot ).patience) )
+		reconsider = true;
+	// every death is a chance to notice that the team has nobody flying supplies
+	const bool teamGame = g_gametype.integer >= GT_TEAM;
+	const bool fillSupply = teamGame && !supplier && !reconsider && !teamHasSupplier( client->sess_.sessionTeam_, ent ) &&
+		random() < 0.35f * character( bot ).teamwork;
+	// the team's make-up: the bot that respawns next takes the kind the team is shortest of
+	BotTeam::Kind teamKind;
+	const bool refit = BotTeam::wantedKind( ent, teamKind ) && teamKind != BotTeam::kindOf( flown );
+	if( !reconsider && !fillSupply && !refit )
+		return false;
+	int teamFlag = MF_TEAM_ANY;
+	if( teamGame )
+		teamFlag = client->sess_.sessionTeam_ == ClientBase::TEAM_RED ? MF_TEAM_1 : MF_TEAM_2;
+	int vehicle = refit ? pickVehicle( teamFlag, false, &character( bot ), &bot, static_cast<int>( teamKind ) ) : -1;
+	if( vehicle < 0 && (reconsider || fillSupply) )
+		vehicle = pickVehicle( teamFlag, false, &character( bot ), &bot );
+	if( fillSupply && vehicle >= 0 && !BotWeapons::carriesSupplies( vehicle ) )
+		vehicle = -1;
+	if( vehicle < 0 )
+		return false;
+	bot.vehicle = vehicle;
+	bot.badLives = 0;
+	char userinfo[MAX_INFO_STRING];
+	GameHost::getUserinfo( ent->s.number, userinfo, sizeof( userinfo ) );
+	Info::setValueForKey( userinfo, "cg_nextVehicle", va( "%d", vehicle ) );
+	GameHost::setUserinfo( ent->s.number, userinfo );
+	bot.wasAlive = false;
+	ClientUserinfoChanged( ent->s.number );
+	return true;
+}
+
+// The first frame of a new life: what each behaviour kept belongs to the last life and its vehicle. Some lives are
+// played as a team player, more often by team-minded characters and more readily with a real player on the team;
+// tanks and helicopters hunt in packs for safety, about two lives in five, planes about one in five
+void Bots::startLife( GameEntity* ent, State& bot )
+{
+	bot.wasAlive = true;
+	bot.spawnTime = theLevel.time_;
+	bot.lifeScore = ent->client_->ps_.persistant[PERS_SCORE];
+	bot.goalTime = 0;
+	bot.enemy = -1;
+	bot.enemyTime = 0;
+	bot.pursuit.reset();
+	bot.avoid.reset();
+	bot.stuck.reset();
+	bot.stuck.checkTime = theLevel.time_ + 3000;
+	VectorCopy( ent->r.currentOrigin, bot.stuck.lastOrigin );
+	bot.path.reset();
+	bot.cover.reset();
+	bot.takeoff.reset();
+	bot.rearm.letGo();
+	bot.desire = Goal::Roam;
+	bot.commitTime = 0;
+	bot.tree = behavior::Memory{};
+	bot.hitTime = 0;
+	bot.lastHealth = ent->health_;
+	bool humanOnTeam = false;
+	for( int i = 1; i <= theLevel.maxclients_ && g_gametype.integer >= GT_TEAM; i++ )
+	{
+		GameEntity* other = theLevel.getEntity( i );
+		if( other != ent && other && other->inuse_ && other->client_ && !isBot( i ) && OnSameTeam( ent, other ) )
+			humanOnTeam = true;
+	}
+	const Capabilities can = Capabilities::of( ent->client_->vehicle_ );
+	const bool packHunter = can.armoured || can.hovers;
+	const float keenness = (packHunter ? 0.68f : 0.35f) + (humanOnTeam ? 0.3f : 0.0f);
+	bot.teamPlayer = random() < keenness * character( bot ).teamwork;
+	bot.leader = -1;
+	bot.leaderTime = 0;
+	if( !bot.hasHome )
+	{
+		VectorCopy( ent->r.currentOrigin, bot.home );
+		bot.hasHome = true;
+	}
+}
+
+// someone has our flag: go where they were last seen, or to their base where they are taking it
+void Bots::chaseFlagThief( GameEntity* ent, State& bot )
+{
+	const playerState_t& ps = ent->client_->ps_;
+	if( g_gametype.integer != GT_CTF || bot.desire == Goal::Rearm || (ps.objectives & (OB_REDFLAG|OB_BLUEFLAG)) )
+		return;
+	const int own = ent->client_->sess_.sessionTeam_;
+	const int ownFlag = own == ClientBase::TEAM_RED ? OB_REDFLAG : OB_BLUEFLAG;
+	for( int i = 1; i <= theLevel.maxclients_; i++ )
+	{
+		GameEntity* other = theLevel.getEntity( i );
+		if( other == ent || !alive( other ) || !(other->client_->ps_.objectives & ownFlag) )
+			continue;
+		Vec3 intercept;
+		const Seen& seen = bot.seen[i];
+		if( seen.time && theLevel.time_ < seen.time + memoryTime( bot ) )
+			VectorCopy( seen.position, intercept );
+		else if( !BotWorld::flagPosition( own == ClientBase::TEAM_RED ? ClientBase::TEAM_BLUE : ClientBase::TEAM_RED, intercept ) )
+			return;
+		VectorCopy( intercept, bot.goal );
+		bot.goalTime = theLevel.time_ + 3000;
+		if( bot.desire == Goal::Capture )
+			bot.desire = Goal::Roam;
+		return;
+	}
+}
+
+// The team's plan, or a player's order: where this bot is asked to be. It goes there when it has nothing more
+// pressing, which a fight, an empty tank and a missile all are. Capturing: to their flag, and with it back to ours
+void Bots::followPlan( GameEntity* ent, State& bot )
+{
+	const BotTeam::Assignment& job = BotTeam::of( ent->s.number );
+	const bool ordered = BotOrders::assignmentOf( ent->s.number ) != nullptr;
+	const bool obeys = job.job != BotTeam::Job::None && (ordered || character( bot ).teamwork >= (BotTeam::level() >= 2 ? 0.15f : 0.3f));
+	if( obeys && job.hasPlace && (bot.desire == Goal::Roam || bot.desire == Goal::Capture) )
+	{
+		VectorCopy( job.place, bot.goal );
+		bot.goalTime = theLevel.time_ + 3000;
+		return;
+	}
+	if( bot.desire != Goal::Capture )
+		return;
+	const bool carrying = (ent->client_->ps_.objectives & (OB_REDFLAG|OB_BLUEFLAG)) != 0;
+	const int own = ent->client_->sess_.sessionTeam_;
+	const int other = own == ClientBase::TEAM_RED ? ClientBase::TEAM_BLUE : ClientBase::TEAM_RED;
+	Vec3 flag;
+	if( BotWorld::flagPosition( carrying ? own : other, flag ) )
+	{
+		VectorCopy( flag, bot.goal );
+		bot.goalTime = theLevel.time_ + 3000;
+	}
+}
+
+// Fuel (Marek, 2026-10-08): a plane with no pad it can land on on this map keeps a quarter tank, since it cannot
+// refuel there and no plane can pick up a supply drop. Nothing else gets free fuel: a plane that can land does,
+// ground vehicles and helicopters go back to a pad or are supplied by helicopter, boats are supplied.
+void Bots::keepPlaneFuel( GameEntity* ent, State& bot )
+{
+	constexpr int padCheckInterval = 2000;
+	playerState_t& ps = ent->client_->ps_;
+	if( !(availableVehicles[ent->client_->vehicle_].cat & CAT_PLANE) )
+		return;
+	if( theLevel.time_ >= bot.landing.padCheckTime )
+	{
+		bot.landing.padCheckTime = theLevel.time_ + padCheckInterval;
+		bot.landing.canLand = g_botLanding.integer && theLevel.time_ >= bot.landing.giveUp &&
+			BotWorld::findPad( ent, theLevel.time_ < bot.rearm.badPadTime ? bot.rearm.badPad : -1 ) >= 0;
+	}
+	if( !bot.landing.canLand && bot.rearm.pad < 0 && ps.stats[STAT_FUEL] < ps.stats[STAT_MAX_FUEL] / 4 )
+		ps.stats[STAT_FUEL] = ps.stats[STAT_MAX_FUEL] / 4;
+}
+
+// a rider works its seat; otherwise it senses, and the pilot or driver for its kind of vehicle flies
+void Bots::pilot( GameEntity* ent, State& bot, usercmd_t& cmd, vec3_t view )
+{
+	GameClient* client = ent->client_;
+	if( client->sess_.ridingClient_ >= 0 )
+	{
+		thinkRider( ent, bot, cmd, view );
+		return;
+	}
+	if( theLevel.time_ >= bot.leaderTime )
+		BotSenses::chooseLeader( ent, bot );
+	Sense s;
+	BotSenses::sense( ent, bot, s );
+	BotOrders::report( ent, bot, s );
+	const unsigned int cat = availableVehicles[client->vehicle_].cat;
+	if( cat & CAT_PLANE )
+		thinkPlane( ent, bot, s, cmd, view );
+	else if( cat & CAT_HELO )
+		thinkHelo( ent, bot, s, cmd, view );
+	else if( cat & (CAT_GROUND|CAT_BOAT) )
+		thinkSurface( ent, bot, s, cmd, view );
+	else
+		thinkInfantry( ent, bot, s, cmd, view );
 }
 
 void Bots::runFrame()

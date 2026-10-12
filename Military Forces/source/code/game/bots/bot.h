@@ -288,6 +288,12 @@ public:
 private:
 	// one bot's frame, and the pilot or driver for the kind of vehicle it is in
 	static void think( GameEntity* ent, State& bot, usercmd_t& cmd );
+	static bool settleLife( GameEntity* ent, State& bot );
+	static void startLife( GameEntity* ent, State& bot );
+	static void chaseFlagThief( GameEntity* ent, State& bot );
+	static void followPlan( GameEntity* ent, State& bot );
+	static void keepPlaneFuel( GameEntity* ent, State& bot );
+	static void pilot( GameEntity* ent, State& bot, usercmd_t& cmd, vec3_t view );
 	static void thinkPlane( GameEntity* ent, State& bot, const Sense& sense, usercmd_t& cmd, vec3_t view );
 	static void thinkHelo( GameEntity* ent, State& bot, const Sense& sense, usercmd_t& cmd, vec3_t view );
 	static void thinkSurface( GameEntity* ent, State& bot, const Sense& sense, usercmd_t& cmd, vec3_t view );
