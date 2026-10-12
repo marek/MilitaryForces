@@ -1,0 +1,254 @@
+#ifndef __BOT_PLANE_H__
+#define __BOT_PLANE_H__
+
+#include "../../core/mind.h"
+#include "../../navigation/airnav.h"
+#include <algorithm>
+#include <cmath>
+
+using behavior::Status;
+
+// What a plane's pilot does: the conditions and steps of the plane tree. The steps choose where to point the nose;
+// navigation, the manoeuvre planner and the safety steps at the end may overrule them to keep the aircraft flying.
+// The conditions are here; the steps of each branch are in the file named after it, and the tree in tree.cpp.
+struct PlaneTasks
+{
+	using Mind = Bots::Mind;
+
+	using Goal = Bots::Goal;
+
+	using Role = Bots::Role;
+
+	static bool bomber( const Mind& c ) { return c.sense.role == Role::Bomber; }
+
+	static bool hasBombs( const Mind& c )
+	{
+		return BotWeapons::hasWeaponType( c.client->vehicle_, c.ps, WT_IRONBOMB ) || BotWeapons::hasWeaponType( c.client->vehicle_, c.ps, WT_GUIDEDBOMB );
+	}
+
+	// how far the nose must turn to point at the enemy, signed
+	static float enemyTurn( const Mind& c ) { return AngleSubtract( c.sense.enemyAngles[YAW], c.ps.vehicleAngles[YAW] ); }
+
+	// free flight: not in a step that works the controls itself (take-off, final, roll-out)
+	static bool flying( Mind& c ) { return !c.controls.claimed(); }
+
+	static bool landing( Mind& c ) { return c.bot.desire == Goal::Rearm && c.bot.rearm.pad >= 0; }
+
+	static bool onGround( Mind& c ) { return c.landed(); }
+
+	static bool onApproach( Mind& c ) { return c.bot.desire == Goal::Rearm && c.bot.rearm.phase == 1; }
+	// a missile within six seconds; not acted on once committed to a final approach
+
+	static bool missileInbound( Mind& c )
+	{
+		return c.sense.missile && c.sense.missileTime <= 6.0f && !c.landed() && !(c.bot.desire == Goal::Rearm && c.bot.rearm.phase >= 2);
+	}
+
+	static bool evading( Mind& c ) { return c.bot.desire == Goal::Evade && (c.sense.blindsided || c.sense.enemy); }
+
+	static bool blindsided( Mind& c ) { return c.sense.blindsided; }
+	// attacking, and not just leaving after a pass
+
+	static bool enemyHasTurrets( Mind& c ) { return c.sense.enemy && (availableVehicles[c.sense.enemy->client_->vehicle_].flags & VF_GUNSTATIONS); }
+	// just through a firing pass on an aircraft: on out before coming round. From one with turrets, until clear of them
+
+	static bool extending( Mind& c )
+	{
+		if( !c.sense.enemy || !c.sense.enemyAir || c.bot.desire != Goal::Attack || theLevel.time_ > c.bot.pursuit.egressTime )
+			return false;
+		return !enemyHasTurrets( c ) || Distance( c.sense.enemy->r.currentOrigin, c.ent->r.currentOrigin ) < turretClear;
+	}
+
+	// an air enemy is turned back on as soon as the fighter is clear, whatever is left of the time allowed for it
+	static bool engaging( Mind& c )
+	{
+		return c.sense.enemy && c.bot.desire == Goal::Attack && (theLevel.time_ > c.bot.pursuit.egressTime || (c.sense.enemyAir && !extending( c )));
+	}
+
+	static bool canLevelBomb( Mind& c ) { return bomber( c ) && !c.sense.enemyAir && hasBombs( c ); }
+	// bold or cunning bomber pilots dive on a ground target when high and close enough
+
+	static bool canDiveBomb( Mind& c )
+	{
+		const bool diver = c.who().aggression > 0.8f || c.who().cunning > 0.75f;
+		return canLevelBomb( c ) && diver && c.sense.height > 900 && c.sense.enemyDist < c.sense.height * 2.2f;
+	}
+
+	// a stealth aircraft not yet seen closes in without showing itself
+	static bool stalking( Mind& c ) { return c.sense.stealth && !c.sense.revealed && c.sense.enemyDist > 2500; }
+
+	static bool onNose( Mind& c ) { return fabs( enemyTurn( c ) ) < 20.0f; }
+	// in tight terrain, nothing of the world between the nose and the enemy
+
+	static bool fireLineClear( Mind& c )
+	{
+		if( !c.bot.avoid.confined || theLevel.time_ < c.bot.pursuit.chaseTime )
+			return true;
+		trace_t line;
+		Vec3 toEnemy;
+		VectorCopy( c.sense.enemyDir, toEnemy );
+		return !(BotWorld::pathBlocked( c.ent->r.currentOrigin, toEnemy, std::min( c.sense.enemyDist, 1500.0f ), c.ent->s.number, line, 60.0f ) &&
+			line.entityNum == ENTITYNUM_WORLD && !line.startsolid);
+	}
+
+	// a turn chosen a moment ago is flown out before another is chosen
+	static bool arcCommitted( Mind& c ) { return theLevel.time_ < c.bot.pursuit.chaseTime; }
+
+	static bool climbing( Mind& c ) { return c.bot.desire == Goal::Climb; }
+	// a bomber with nothing to fight, bombs left and height in hand
+
+	static bool canBombStructure( Mind& c )
+	{
+		return bomber( c ) && c.bot.desire == Goal::Roam && theLevel.time_ > c.bot.pursuit.egressTime && c.sense.height > 700.0f && hasBombs( c );
+	}
+
+	static bool wantsWingman( Mind& c )
+	{
+		return c.bot.leader >= 0 && !c.sense.enemy;
+	}
+
+	// the nose comes up at this multiple of the stall speed
+	static constexpr float rotateSpeed = 1.12f;
+
+	// the first seconds after the wheels leave the ground
+	static bool departing( Mind& c )
+	{
+		constexpr int departTime = 4000;
+		return !c.landed() && theLevel.time_ < c.bot.takeoff.groundTime + departTime;
+	}
+
+	// towards the roaming goal at the present height, a new goal when near it or when it is stale
+	static void roam( Mind& c );
+
+	// nose on the enemy; near the ground only in heading, and gently in tight terrain
+	static void aimAtEnemy( Mind& c );
+
+	// weapons free and closing; after a close pass the plane flies on out before coming round
+	static void engage( Mind& c );
+
+	// keep flying the turn and the climb or dive that the arc choice settled on
+	static void flyChosenArc( Mind& c );
+
+	// parked where no heading has enough runway: find the nearest spot along the taxiway that has
+	static bool findTaxiSpot( Mind& c, const vec3_t origin, float wanted );
+
+	// Chooses the take-off heading: enough runway to reach flying speed, nothing standing on it, and from the lift-off
+	// point a climb, straight or turning, that fits the terrain and leads somewhere.
+	static void planDeparture( Mind& c );
+
+	// On the ground: wait when told to hold, plan a departure, taxi to a spot with enough runway if needed, then roll
+	// and lift off. Slow, it stops for anyone ahead and keeps off the path of an aircraft on its roll
+	static Status takeOff( Mind& c );
+
+	// follow the departure that was planned on the ground; the manoeuvre check still vets it
+	static Status depart( Mind& c );
+
+	// across the missile's path, then at the last moment a hard pull the other way; the skilled wait longer for it
+	static Status defendMissile( Mind& c );
+
+	// hit by someone unseen: turn hard to the side chosen when the hit came
+	static Status breakAway( Mind& c );
+
+	// directly away from the enemy
+	static Status flee( Mind& c );
+
+	// nose on the target, release when lined up and close with no team mate in the blast, then pull out
+	static Status diveBomb( Mind& c );
+
+	// fly over the target at height and let the bombing step choose the release
+	static Status levelBomb( Mind& c );
+
+	// towards the enemy at the present height
+	static Status stalk( Mind& c );
+
+	// the enemy is ahead and the way is clear: straight at it
+	static Status pressAttack( Mind& c );
+
+	// on with the chosen turn
+	static Status flyArc( Mind& c );
+
+	// the enemy is off the nose: the short way round, level, climbing or diving, then the long way round, taking the
+	// first that is clear of the ground
+	static Status chooseArc( Mind& c );
+
+	// no turn towards the enemy is clear: fly on, shooting only if it crosses the nose
+	static Status holdCourse( Mind& c );
+
+	// straight on at full power, at the height it has: distance is what gets it out of the guns it has just flown past
+	static Status extend( Mind& c );
+
+	// roam; the height itself comes from the wanted altitude
+	static Status gainHeight( Mind& c );
+
+	// level-bomb a building
+	static Status bombStructure( Mind& c );
+
+	static Status wingman( Mind& c );
+
+	// nothing to do: roam
+	static Status patrol( Mind& c );
+
+	// flares against a missile
+	static Status countermeasures( Mind& c );
+
+	// when the straight line to the destination is blocked, follow the air path round the obstacle, allowing for the turn radius
+	static Status navigate( Mind& c );
+
+	// lining up to land: hold the approach height and come back to approach speed
+	static Status approachProfile( Mind& c );
+
+	// keep to a height lane where there is little room between floor and ceiling
+	static Status midChannel( Mind& c );
+
+	// where another aircraft will be: straight on, or round its turn when it is banked hard
+	static void predictAircraft( GameEntity* other, float seconds, vec3_t out );
+
+	// true when another aircraft is predicted to be near this point at that time
+	static bool trafficAt( const Mind& c, const vec3_t point, float seconds );
+
+	struct Pose
+	{
+		Vec3	origin;
+		float	yaw;
+		float	seconds;
+	};
+
+	// flies an arc of turnDegrees at the given radius and then straight on, returns the free distance up to horizon
+	static float sweepFrom( const Mind& c, const Pose& start, float radius, float turnDegrees, float slope, float horizon, float halfWidth, Pose* finish = nullptr );
+
+	// how far the aircraft gets from where it is now along a turn of that radius and slope before meeting something
+	static float sweep( const Mind& c, float radius, float turnDegrees, float slope, float horizon, float halfWidth, Pose* finish = nullptr );
+
+	// a manoeuvre is only worth flying if there is a way on from where it ends: straight ahead, over the top, or a turn back
+	static bool wayOut( const Mind& c, const Pose& end, float brakedRadius, float horizon );
+
+	// Plans the next second or two of flight. The heading the pilot wants is flown ahead as an arc at the aircraft's turn
+	// radius followed by a straight; if that does not fit, other manoeuvres are tried in order of preference.
+	static Status probeTerrain( Mind& c );
+
+	// slow down, with the air brake if need be, where the plane has to turn tighter than its speed allows
+	static Status cornerSpeed( Mind& c );
+
+	// pull up below the least height, push down under a low ceiling
+	static Status floorAndCeiling( Mind& c );
+
+	// too slow: nose down for speed where there is height to spend, no steep climbs, and out of a stall before anything else
+	static Status keepEnergy( Mind& c );
+
+	// the enemy this plane is after has its team's flag, or is close to a team mate who carries the other one
+	static bool flagEmergency( const Mind& c );
+
+	// The afterburner drinks fuel and makes the aircraft fast where fast is dangerous, so it is a decision, not a
+	// reflex. Getting off the ground always has it; so does a moment's recovery from a stall or a slow pull-up, and
+	// a climb that a fight makes urgent. Beyond that it needs open air and a reason.
+	static bool wantsAfterburner( Mind& c );
+
+	// shoot when attacking or when the enemy crosses the nose; a step that needs one particular weapon keeps it selected
+	static Status fire( Mind& c );
+
+	using State = Bots::State;
+
+	static behavior::Tree<Mind> build();
+};
+
+#endif

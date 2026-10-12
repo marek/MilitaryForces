@@ -21,7 +21,8 @@ list(APPEND GAME_SOURCES
     bots/navigation/airnav.cpp bots/navigation/groundnav.cpp
     bots/weapons/weapons.cpp
     bots/team/team.cpp
-    bots/pilots/plane/plane.cpp bots/pilots/plane/landing.cpp
+    bots/pilots/plane/tree.cpp bots/pilots/plane/takeoff.cpp bots/pilots/plane/combat.cpp bots/pilots/plane/bombing.cpp
+    bots/pilots/plane/patrol.cpp bots/pilots/plane/flight.cpp bots/pilots/plane/safety.cpp bots/pilots/plane/landing.cpp
     bots/pilots/helo/helo.cpp
     bots/pilots/surface/surface.cpp
     bots/pilots/infantry/infantry.cpp)
