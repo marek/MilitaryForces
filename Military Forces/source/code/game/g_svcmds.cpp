@@ -472,6 +472,11 @@ bool ConsoleCommand()
 		Bots::listCommand();
 		return true;
 	}
+	if( Q_stricmp( cmd, "bottree" ) == 0 ) 
+	{
+		Bots::treeCommand();
+		return true;
+	}
 #endif
 
 	if (Q_stricmp (cmd, "addip") == 0) 

@@ -5,19 +5,29 @@
 #include <cstddef>
 #include <initializer_list>
 #include <memory>
+#include <string>
 #include <vector>
 
 namespace behavior
 {
-	enum class Status { Running, Success, Failure };
+	enum class Status : unsigned char { Running, Success, Failure };
 
-	constexpr std::size_t maxNodes = 128;
+	constexpr std::size_t maxNodes = 256;
 
+	// what one bot's tree remembers between frames: where each composite is, each decorator's clock, and what every
+	// node returned the last time it was ticked, for the tree dump
 	struct Memory
 	{
-		std::array<short, maxNodes>	cursor = {};
-		int							leaf = -1;
-		int							previousLeaf = -1;
+		std::array<short, maxNodes>		cursor = {};
+		std::array<int, maxNodes>		clock = {};	// a decorator's time: when it started, or until when it holds
+		std::array<int, maxNodes>		stamp = {};	// the frame each node was last ticked in
+		std::array<Status, maxNodes>	status = {};	// and what it returned then
+		int								frame = 0;
+		int								now = 0;	// the game time of this frame, in milliseconds
+		int								leaf = -1;
+		int								previousLeaf = -1;
+
+		bool tickedThisFrame( int id ) const { return stamp[id] == frame; }
 	};
 
 	template<typename Context>
@@ -27,15 +37,41 @@ namespace behavior
 		explicit Node( const char* name ) : name_( name ) {}
 		virtual ~Node() = default;
 
-		virtual Status tick( Context& context, Memory& memory ) const = 0;
+		Status tick( Context& context, Memory& memory ) const
+		{
+			memory.stamp[id_] = memory.frame;
+			const Status status = run( context, memory );
+			memory.status[id_] = status;
+			return status;
+		}
 		virtual void reset( Memory& memory ) const { memory.cursor[id_] = 0; }
+		// the nodes under this one, for the tree dump
+		virtual void children( std::vector<const Node*>& out ) const { static_cast<void>( out ); }
+		// what kind of node, for the tree dump
+		virtual const char* kind() const = 0;
 
 		const char*	name_;
 		int			id_ = 0;
+
+	protected:
+		virtual Status run( Context& context, Memory& memory ) const = 0;
 	};
 
 	template<typename Context>
 	using Children = std::vector<const Node<Context>*>;
+
+	// a length of time, fixed or worked out from the context (a patient character waits longer)
+	template<typename Context>
+	struct Duration
+	{
+		using Function = int (*)( const Context& );
+		Duration( int milliseconds ) : fixed( milliseconds ) {}
+		Duration( Function function ) : function( function ) {}
+		int of( const Context& context ) const { return function ? function( context ) : fixed; }
+
+		int			fixed = 0;
+		Function	function = nullptr;
+	};
 
 	template<typename Context>
 	class Action : public Node<Context>
@@ -43,8 +79,10 @@ namespace behavior
 	public:
 		using Function = Status (*)( Context& );
 		Action( const char* name, Function function ) : Node<Context>( name ), function_( function ) {}
+		const char* kind() const override { return "action"; }
 
-		Status tick( Context& context, Memory& memory ) const override
+	protected:
+		Status run( Context& context, Memory& memory ) const override
 		{
 			memory.leaf = this->id_;
 			return function_( context );
@@ -54,18 +92,41 @@ namespace behavior
 		Function function_;
 	};
 
+	// a composite: holds children and resets them with itself
 	template<typename Context>
-	class Sequence : public Node<Context>
+	class Composite : public Node<Context>
 	{
 	public:
-		Sequence( const char* name, Children<Context> children ) : Node<Context>( name ), children_( std::move( children ) ) {}
+		Composite( const char* name, Children<Context> children ) : Node<Context>( name ), children_( std::move( children ) ) {}
 
-		Status tick( Context& context, Memory& memory ) const override
+		void reset( Memory& memory ) const override
 		{
+			memory.cursor[this->id_] = 0;
+			for( const Node<Context>* child : children_ )
+				child->reset( memory );
+		}
+		void children( std::vector<const Node<Context>*>& out ) const override { out.insert( out.end(), children_.begin(), children_.end() ); }
+
+	protected:
+		Children<Context> children_;
+	};
+
+	// the children in order until one fails; running resumes where it left off
+	template<typename Context>
+	class Sequence : public Composite<Context>
+	{
+	public:
+		using Composite<Context>::Composite;
+		const char* kind() const override { return "sequence"; }
+
+	protected:
+		Status run( Context& context, Memory& memory ) const override
+		{
+			const auto& children = this->children_;
 			std::size_t index = static_cast<std::size_t>( memory.cursor[this->id_] );
-			while( index < children_.size() )
+			while( index < children.size() )
 			{
-				const Status status = children_[index]->tick( context, memory );
+				const Status status = children[index]->tick( context, memory );
 				if( status == Status::Running )
 				{
 					memory.cursor[this->id_] = static_cast<short>( index );
@@ -73,178 +134,284 @@ namespace behavior
 				}
 				if( status == Status::Failure )
 				{
-					reset( memory );
+					this->reset( memory );
 					return status;
 				}
 				index++;
 			}
-			reset( memory );
+			this->reset( memory );
 			return Status::Success;
 		}
-
-		void reset( Memory& memory ) const override
-		{
-			memory.cursor[this->id_] = 0;
-			for( const Node<Context>* child : children_ )
-				child->reset( memory );
-		}
-
-	private:
-		Children<Context> children_;
 	};
 
+	// the first child that does not fail, tried in order every frame
 	template<typename Context>
-	class Selector : public Node<Context>
+	class Selector : public Composite<Context>
 	{
 	public:
-		Selector( const char* name, Children<Context> children ) : Node<Context>( name ), children_( std::move( children ) ) {}
+		using Composite<Context>::Composite;
+		const char* kind() const override { return "selector"; }
 
-		Status tick( Context& context, Memory& memory ) const override
+	protected:
+		Status run( Context& context, Memory& memory ) const override
 		{
-			for( std::size_t index = 0; index < children_.size(); index++ )
+			const auto& children = this->children_;
+			for( std::size_t index = 0; index < children.size(); index++ )
 			{
-				const Status status = children_[index]->tick( context, memory );
+				const Status status = children[index]->tick( context, memory );
 				if( status == Status::Failure )
 					continue;
 				const std::size_t previous = static_cast<std::size_t>( memory.cursor[this->id_] );
-				if( previous != index + 1 && previous > 0 && previous <= children_.size() )
-					children_[previous - 1]->reset( memory );
+				if( previous != index + 1 && previous > 0 && previous <= children.size() )
+					children[previous - 1]->reset( memory );
 				memory.cursor[this->id_] = static_cast<short>( index + 1 );
 				return status;
 			}
 			memory.cursor[this->id_] = 0;
 			return Status::Failure;
 		}
-
-		void reset( Memory& memory ) const override
-		{
-			memory.cursor[this->id_] = 0;
-			for( const Node<Context>* child : children_ )
-				child->reset( memory );
-		}
-
-	private:
-		Children<Context> children_;
 	};
 
+	// the child a function names
 	template<typename Context>
-	class Chooser : public Node<Context>
+	class Chooser : public Composite<Context>
 	{
 	public:
 		using Choice = int (*)( Context& );
 		Chooser( const char* name, Choice choice, Children<Context> children ) :
-			Node<Context>( name ), choice_( choice ), children_( std::move( children ) ) {}
+			Composite<Context>( name, std::move( children ) ), choice_( choice ) {}
+		const char* kind() const override { return "chooser"; }
 
-		Status tick( Context& context, Memory& memory ) const override
+	protected:
+		Status run( Context& context, Memory& memory ) const override
 		{
+			const auto& children = this->children_;
 			const int wanted = choice_( context );
-			if( wanted < 0 || static_cast<std::size_t>( wanted ) >= children_.size() )
+			if( wanted < 0 || static_cast<std::size_t>( wanted ) >= children.size() )
 				return Status::Failure;
 			const int previous = memory.cursor[this->id_] - 1;
 			if( previous >= 0 && previous != wanted )
-				children_[previous]->reset( memory );
+				children[previous]->reset( memory );
 			memory.cursor[this->id_] = static_cast<short>( wanted + 1 );
-			return children_[wanted]->tick( context, memory );
+			return children[wanted]->tick( context, memory );
 		}
+
+	private:
+		Choice choice_;
+	};
+
+	// the first child, then the others every frame whatever the first returned: things a pilot does alongside
+	template<typename Context>
+	class Always : public Composite<Context>
+	{
+	public:
+		Always( const char* name, const Node<Context>* child, Children<Context> after ) :
+			Composite<Context>( name, withFirst( child, std::move( after ) ) ) {}
+		const char* kind() const override { return "always"; }
+
+	protected:
+		Status run( Context& context, Memory& memory ) const override
+		{
+			const auto& children = this->children_;
+			const Status status = children[0]->tick( context, memory );
+			const int leaf = memory.leaf;
+			for( std::size_t index = 1; index < children.size(); index++ )
+				children[index]->tick( context, memory );
+			memory.leaf = leaf;
+			return status;
+		}
+
+	private:
+		static Children<Context> withFirst( const Node<Context>* child, Children<Context> after )
+		{
+			after.insert( after.begin(), child );
+			return after;
+		}
+	};
+
+	// a decorator: one child
+	template<typename Context>
+	class Decorator : public Node<Context>
+	{
+	public:
+		Decorator( const char* name, const Node<Context>* child ) : Node<Context>( name ), child_( child ) {}
 
 		void reset( Memory& memory ) const override
 		{
 			memory.cursor[this->id_] = 0;
-			for( const Node<Context>* child : children_ )
-				child->reset( memory );
+			child_->reset( memory );
 		}
+		void children( std::vector<const Node<Context>*>& out ) const override { out.push_back( child_ ); }
 
-	private:
-		Choice				choice_;
-		Children<Context>	children_;
+	protected:
+		const Node<Context>* child_;
 	};
 
+	// the child while a condition holds
 	template<typename Context>
-	class When : public Node<Context>
+	class When : public Decorator<Context>
 	{
 	public:
 		using Predicate = bool (*)( Context& );
-		When( const char* name, Predicate predicate, const Node<Context>* child ) :
-			Node<Context>( name ), predicate_( predicate ), child_( child ) {}
+		When( const char* name, Predicate predicate, const Node<Context>* child ) : Decorator<Context>( name, child ), predicate_( predicate ) {}
+		const char* kind() const override { return "when"; }
 
-		Status tick( Context& context, Memory& memory ) const override
+	protected:
+		Status run( Context& context, Memory& memory ) const override
 		{
 			if( !predicate_( context ) )
+			{
+				if( memory.cursor[this->id_] )
+					this->reset( memory );
+				return Status::Failure;
+			}
+			memory.cursor[this->id_] = 1;
+			return this->child_->tick( context, memory );
+		}
+
+	private:
+		Predicate predicate_;
+	};
+
+	// the child again whenever it fails
+	template<typename Context>
+	class RetryUntilSuccess : public Decorator<Context>
+	{
+	public:
+		using Decorator<Context>::Decorator;
+		const char* kind() const override { return "retry"; }
+
+	protected:
+		Status run( Context& context, Memory& memory ) const override
+		{
+			const Status status = this->child_->tick( context, memory );
+			if( status == Status::Failure )
+			{
+				this->child_->reset( memory );
+				return Status::Running;
+			}
+			return status;
+		}
+	};
+
+	// once the child has finished, it is not tried again until some time has passed. The wait outlives a reset of the
+	// branch: a cooldown that a reset cleared would never cool anything
+	template<typename Context>
+	class Cooldown : public Decorator<Context>
+	{
+	public:
+		Cooldown( const char* name, Duration<Context> wait, const Node<Context>* child ) : Decorator<Context>( name, child ), wait_( wait ) {}
+		const char* kind() const override { return "cooldown"; }
+
+	protected:
+		Status run( Context& context, Memory& memory ) const override
+		{
+			if( memory.now < memory.clock[this->id_] )
+				return Status::Failure;
+			const Status status = this->child_->tick( context, memory );
+			if( status != Status::Running )
+				memory.clock[this->id_] = memory.now + wait_.of( context );
+			return status;
+		}
+
+	private:
+		Duration<Context> wait_;
+	};
+
+	// the child may run this long before it is given up on
+	template<typename Context>
+	class TimeLimit : public Decorator<Context>
+	{
+	public:
+		TimeLimit( const char* name, Duration<Context> limit, const Node<Context>* child ) : Decorator<Context>( name, child ), limit_( limit ) {}
+		const char* kind() const override { return "time limit"; }
+
+		void reset( Memory& memory ) const override
+		{
+			memory.clock[this->id_] = 0;
+			Decorator<Context>::reset( memory );
+		}
+
+	protected:
+		Status run( Context& context, Memory& memory ) const override
+		{
+			if( !memory.clock[this->id_] )
+				memory.clock[this->id_] = memory.now;
+			else if( memory.now - memory.clock[this->id_] > limit_.of( context ) )
+			{
+				reset( memory );
+				return Status::Failure;
+			}
+			const Status status = this->child_->tick( context, memory );
+			if( status != Status::Running )
+				memory.clock[this->id_] = 0;
+			return status;
+		}
+
+	private:
+		Duration<Context> limit_;
+	};
+
+	// a condition that, once true, is held true for some time after it last was: a choice is not dropped the moment
+	// its reason flickers
+	template<typename Context>
+	class HoldFor : public Decorator<Context>
+	{
+	public:
+		using Predicate = bool (*)( Context& );
+		HoldFor( const char* name, Predicate predicate, Duration<Context> hold, const Node<Context>* child ) :
+			Decorator<Context>( name, child ), predicate_( predicate ), hold_( hold ) {}
+		const char* kind() const override { return "hold for"; }
+
+		void reset( Memory& memory ) const override
+		{
+			memory.clock[this->id_] = 0;
+			Decorator<Context>::reset( memory );
+		}
+
+	protected:
+		Status run( Context& context, Memory& memory ) const override
+		{
+			if( predicate_( context ) )
+				memory.clock[this->id_] = memory.now + hold_.of( context );
+			else if( memory.now >= memory.clock[this->id_] )
 			{
 				if( memory.cursor[this->id_] )
 					reset( memory );
 				return Status::Failure;
 			}
 			memory.cursor[this->id_] = 1;
-			return child_->tick( context, memory );
-		}
-
-		void reset( Memory& memory ) const override
-		{
-			memory.cursor[this->id_] = 0;
-			child_->reset( memory );
+			return this->child_->tick( context, memory );
 		}
 
 	private:
 		Predicate			predicate_;
-		const Node<Context>*	child_;
+		Duration<Context>	hold_;
 	};
 
+	// entered when a condition holds, then kept until the child finishes whatever the condition does meanwhile
 	template<typename Context>
-	class RetryUntilSuccess : public Node<Context>
+	class Latch : public Decorator<Context>
 	{
 	public:
-		RetryUntilSuccess( const char* name, const Node<Context>* child ) : Node<Context>( name ), child_( child ) {}
+		using Predicate = bool (*)( Context& );
+		Latch( const char* name, Predicate predicate, const Node<Context>* child ) : Decorator<Context>( name, child ), predicate_( predicate ) {}
+		const char* kind() const override { return "latch"; }
 
-		Status tick( Context& context, Memory& memory ) const override
+	protected:
+		Status run( Context& context, Memory& memory ) const override
 		{
-			const Status status = child_->tick( context, memory );
-			if( status == Status::Failure )
-			{
-				child_->reset( memory );
-				return Status::Running;
-			}
+			if( !memory.cursor[this->id_] && !predicate_( context ) )
+				return Status::Failure;
+			memory.cursor[this->id_] = 1;
+			const Status status = this->child_->tick( context, memory );
+			if( status != Status::Running )
+				memory.cursor[this->id_] = 0;
 			return status;
 		}
 
-		void reset( Memory& memory ) const override
-		{
-			memory.cursor[this->id_] = 0;
-			child_->reset( memory );
-		}
-
 	private:
-		const Node<Context>* child_;
-	};
-
-	template<typename Context>
-	class Always : public Node<Context>
-	{
-	public:
-		Always( const char* name, const Node<Context>* child, Children<Context> after ) :
-			Node<Context>( name ), child_( child ), after_( std::move( after ) ) {}
-
-		Status tick( Context& context, Memory& memory ) const override
-		{
-			const Status status = child_->tick( context, memory );
-			const int leaf = memory.leaf;
-			for( const Node<Context>* node : after_ )
-				node->tick( context, memory );
-			memory.leaf = leaf;
-			return status;
-		}
-
-		void reset( Memory& memory ) const override
-		{
-			memory.cursor[this->id_] = 0;
-			child_->reset( memory );
-			for( const Node<Context>* node : after_ )
-				node->reset( memory );
-		}
-
-	private:
-		const Node<Context>*	child_;
-		Children<Context>	after_;
+		Predicate predicate_;
 	};
 
 	template<typename Context>
@@ -288,19 +455,60 @@ namespace behavior
 		{
 			return add<Always<Context>>( name, child, Children<Context>( after ) );
 		}
+		const Node<Context>* cooldown( const char* name, Duration<Context> wait, const Node<Context>* child )
+		{
+			return add<Cooldown<Context>>( name, wait, child );
+		}
+		const Node<Context>* timeLimit( const char* name, Duration<Context> limit, const Node<Context>* child )
+		{
+			return add<TimeLimit<Context>>( name, limit, child );
+		}
+		const Node<Context>* holdFor( const char* name, typename HoldFor<Context>::Predicate predicate, Duration<Context> hold, const Node<Context>* child )
+		{
+			return add<HoldFor<Context>>( name, predicate, hold, child );
+		}
+		const Node<Context>* latch( const char* name, typename Latch<Context>::Predicate predicate, const Node<Context>* child )
+		{
+			return add<Latch<Context>>( name, predicate, child );
+		}
 
 		void setRoot( const Node<Context>* root ) { root_ = root; }
 		std::size_t size() const { return nodes_.size(); }
 		const char* nameOf( int id ) const { return id >= 0 && static_cast<std::size_t>( id ) < nodes_.size() ? nodes_[id]->name_ : "-"; }
 
-		Status tick( Context& context, Memory& memory ) const
+		Status tick( Context& context, Memory& memory, int now ) const
 		{
+			memory.frame++;
+			memory.now = now;
 			memory.previousLeaf = memory.leaf;
 			memory.leaf = -1;
 			return root_->tick( context, memory );
 		}
 
+		// the tree as indented lines, each node marked with what it returned in the last frame: '>' running,
+		// '+' succeeded, '-' failed, blank when not reached. The failed nodes ahead of the running one say why a
+		// selector went past them
+		template<typename Print>
+		void dump( const Memory& memory, Print print ) const
+		{
+			if( root_ )
+				dumpNode( root_, memory, 0, print );
+		}
+
 	private:
+		template<typename Print>
+		void dumpNode( const Node<Context>* node, const Memory& memory, int depth, Print& print ) const
+		{
+			char mark = ' ';
+			if( memory.tickedThisFrame( node->id_ ) )
+				mark = memory.status[node->id_] == Status::Running ? '>' : memory.status[node->id_] == Status::Success ? '+' : '-';
+			print( std::string( static_cast<std::size_t>( depth ) * 2, ' ' ) + mark + ' ' + node->name_ + " (" + node->kind() + ")" );
+			std::vector<const Node<Context>*> children;
+			node->children( children );
+			for( const Node<Context>* child : children )
+				dumpNode( child, memory, depth + 1, print );
+		}
+
 		std::vector<std::unique_ptr<Node<Context>>>	nodes_;
 		const Node<Context>*							root_ = nullptr;
 	};

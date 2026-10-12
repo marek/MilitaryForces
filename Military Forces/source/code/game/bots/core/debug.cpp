@@ -109,4 +109,19 @@ void Bots::listCommand()
 	}
 }
 
+// bottree <client>: that bot's behaviour tree, marked with what each node did in its last frame
+void Bots::treeCommand()
+{
+	char arg[MAX_TOKEN_CHARS];
+	CommandSystem::argvBuffer( 1, arg, sizeof( arg ) );
+	const int i = atoi( arg );
+	if( i < 1 || i > MAX_CLIENTS || !states_[i].active || !states_[i].treeUsed )
+	{
+		Common::printf( "bottree <client>: no bot with a tree there\n" );
+		return;
+	}
+	Common::printf( "BOTTREE bot %d t %d (> running, + succeeded, - failed)\n", i, theLevel.time_ );
+	states_[i].treeUsed->dump( states_[i].tree, []( const std::string& line ) { Common::printf( "%s\n", line.c_str() ); } );
+}
+
 #endif

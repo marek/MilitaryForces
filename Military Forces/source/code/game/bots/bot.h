@@ -28,6 +28,7 @@ public:
 	static void addCommand();
 	static void kickCommand();
 	static void listCommand();
+	static void treeCommand();
 
 	// what a vehicle is for, and what a bot is trying to do at the moment
 	enum class Role { Fighter, Bomber, AttackHelo, TransportHelo, Tank, AirDefence, Boat, Infantry };
@@ -54,6 +55,9 @@ public:
 		vec3_t	position = { 0, 0, 0 };
 		int		time = 0;
 	};
+
+	// one bot's thinking for one frame (core/mind.h)
+	struct Mind;
 
 	// everything one bot remembers from frame to frame. Times are level times in milliseconds
 	struct State
@@ -130,6 +134,7 @@ public:
 		bool	following = false;	// flying or driving that path now
 		bool	cornerAhead = false;	// the path turns sharply soon
 		behavior::Memory tree;	// what the behaviour tree remembers between frames
+		const behavior::Tree<Mind>* treeUsed = nullptr;	// the tree that memory belongs to
 		float	chaseTurn = 0;	// the turn chosen towards the enemy
 		float	chasePitch = 0;	// and its climb or dive
 		int		badPadTime = 0;	// and until when it is avoided
@@ -187,7 +192,6 @@ public:
 		bool		duel = false;	// one enemy aircraft and nobody else near
 	};
 
-	struct Mind;
 	friend struct LandingSteps;
 	friend struct PlaneTasks;
 	friend struct HeloTasks;

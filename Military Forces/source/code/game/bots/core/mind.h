@@ -144,7 +144,8 @@ struct LandingSteps
 // run a behaviour tree for one frame; the debug build reports each change of step
 inline void runTree( const behavior::Tree<Bots::Mind>& tree, Bots::Mind& mind, const char* kind )
 {
-	tree.tick( mind, mind.bot.tree );
+	tree.tick( mind, mind.bot.tree, theLevel.time_ );
+	mind.bot.treeUsed = &tree;
 #ifdef MF_BOT_DEBUG
 	if( g_botDebug.integer >= 2 && mind.bot.tree.leaf != mind.bot.tree.previousLeaf )
 		Common::printf( "BOTNODE t %d bot %d %s: %s\n", theLevel.time_, mind.ent->s.number, kind, tree.nameOf( mind.bot.tree.leaf ) );
