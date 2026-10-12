@@ -4,6 +4,7 @@
 #include "../core/local.h"
 #include "threat.h"
 #include "query.h"
+#include "hints.h"
 #include <algorithm>
 #include <cmath>
 #include <cstring>
@@ -495,10 +496,13 @@ void Bots::pickGoal( GameEntity* ent, State& bot, float radius )
 		quarry = nearestQuarry( ent, cat );
 	if( quarry )
 		goalNear( ent, bot, quarry, cat );
-	else if( (cat & (CAT_PLANE|CAT_HELO)) && !BotWorld::roamPoints_.empty() && radius > 3500 )
-		goalAtRoamPoint( ent, bot );
-	else
-		goalAroundHome( ent, bot, radius, cat );
+	else if( !goalAtHint( ent, bot, cat ) )
+	{
+		if( (cat & (CAT_PLANE|CAT_HELO)) && !BotWorld::roamPoints_.empty() && radius > 3500 )
+			goalAtRoamPoint( ent, bot );
+		else
+			goalAroundHome( ent, bot, radius, cat );
+	}
 	bot.goalTime = theLevel.time_ + 20000;
 }
 
@@ -565,6 +569,29 @@ void Bots::goalAtRoamPoint( GameEntity* ent, State& bot )
 	best->copyTo( bot.goal );
 	bot.goal[0] += crandom() * scatter;
 	bot.goal[1] += crandom() * scatter;
+}
+
+// Now and then, by cunning, a bot goes to a place worth knowing: a gunship to a spot to lie in wait, a pilot along a
+// low corridor, armour to a choke on the way between the bases
+bool Bots::goalAtHint( GameEntity* ent, State& bot, unsigned int cat )
+{
+	constexpr float hintShare = 0.4f;
+	if( random() > hintShare * character( bot ).cunning )
+		return false;
+	const Capabilities can = Capabilities::of( ent->client_->vehicle_ );
+	const BotHints::Hint* hint = nullptr;
+	if( can.gunship )
+		hint = BotHints::any( BotHints::Kind::Ambush );
+	else if( can.runway )
+		hint = BotHints::any( BotHints::Kind::Corridor );
+	else if( can.armoured && !can.antiAirVehicle )
+		hint = BotHints::any( BotHints::Kind::Choke );
+	if( !hint )
+		return false;
+	hint->at.copyTo( bot.goal );
+	if( !(cat & (CAT_PLANE|CAT_HELO)) )
+		bot.goal[2] = ent->r.currentOrigin[2];
+	return true;
 }
 
 // somewhere within the radius of where it first appeared; a boat's goal is moved until it is on water

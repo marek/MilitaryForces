@@ -6,6 +6,7 @@
 #include "../navigation/airnav.h"
 #include "../navigation/groundnav.h"
 #include "../world/threat.h"
+#include "../world/hints.h"
 #include <algorithm>
 #include <cmath>
 
@@ -28,6 +29,7 @@ void Bots::reset()
 	BotWorld::padsBuilt_ = false;
 	BotWorld::roamPoints_.clear();
 	ThreatMap::reset();
+	BotHints::reset();
 	characters_.clear();
 	kindLives_.fill( 0 );
 	kindCrashes_.fill( 0 );
