@@ -282,6 +282,7 @@ public:
 	friend class BotWeapons;
 	friend class BotSenses;
 	friend class BotTeam;
+	friend class BotOrders;
 
 private:
 	// one bot's frame, and the pilot or driver for the kind of vehicle it is in

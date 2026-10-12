@@ -7,6 +7,7 @@
 #include "../navigation/groundnav.h"
 #include "../world/threat.h"
 #include "../world/hints.h"
+#include "../team/orders.h"
 #include <algorithm>
 #include <cmath>
 
@@ -30,6 +31,7 @@ void Bots::reset()
 	BotWorld::roamPoints_.clear();
 	ThreatMap::reset();
 	BotHints::reset();
+	BotOrders::reset();
 	characters_.clear();
 	kindLives_.fill( 0 );
 	kindCrashes_.fill( 0 );
@@ -530,7 +532,8 @@ void Bots::think( GameEntity* ent, State& bot, usercmd_t& cmd )
 	// the team's plan: where this bot is asked to be. It goes there when it has nothing more pressing, which a fight,
 	// an empty tank and a missile all are
 	const BotTeam::Assignment& job = BotTeam::of( ent->s.number );
-	const bool obeys = job.job != BotTeam::Job::None && character( bot ).teamwork >= (BotTeam::level() >= 2 ? 0.15f : 0.3f);
+	const bool ordered = BotOrders::assignmentOf( ent->s.number ) != nullptr;
+	const bool obeys = job.job != BotTeam::Job::None && (ordered || character( bot ).teamwork >= (BotTeam::level() >= 2 ? 0.15f : 0.3f));
 	if( obeys && job.hasPlace && (bot.desire == Goal::Roam || bot.desire == Goal::Capture) )
 	{
 		VectorCopy( job.place, bot.goal );
@@ -576,6 +579,7 @@ void Bots::think( GameEntity* ent, State& bot, usercmd_t& cmd )
 			BotSenses::chooseLeader( ent, bot );
 		Sense s;
 		BotSenses::sense( ent, bot, s );
+		BotOrders::report( ent, bot, s );
 		const unsigned int cat = availableVehicles[client->vehicle_].cat;
 		if( cat & CAT_PLANE )
 			thinkPlane( ent, bot, s, cmd, view );

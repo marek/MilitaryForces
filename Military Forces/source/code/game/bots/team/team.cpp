@@ -4,6 +4,7 @@
 #include "../bot.h"
 #include "../core/local.h"
 #include "team.h"
+#include "orders.h"
 #include "../navigation/groundnav.h"
 #include <algorithm>
 #include <array>
@@ -627,6 +628,9 @@ int BotTeam::level()
 const BotTeam::Assignment& BotTeam::of( int clientNum )
 {
 	static const Assignment none;
+	// a player's order comes before the plan, and stands in a game without one
+	if( const Assignment* ordered = BotOrders::assignmentOf( clientNum ) )
+		return *ordered;
 	return level() && clientNum >= 1 && clientNum <= MAX_CLIENTS ? assignments[clientNum] : none;
 }
 
