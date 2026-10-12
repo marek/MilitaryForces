@@ -312,6 +312,7 @@ private:
 	static GameEntity* nearestQuarry( GameEntity* ent, unsigned int cat );
 	static void goalNear( GameEntity* ent, State& bot, GameEntity* quarry, unsigned int cat );
 	static void goalAtRoamPoint( GameEntity* ent, State& bot );
+	static bool goalAtHint( GameEntity* ent, State& bot, unsigned int cat );
 	static void goalAroundHome( GameEntity* ent, State& bot, float radius, unsigned int cat );
 	static int pickVehicle( int teamFlag, bool allowInfantry = true, const Character* who = nullptr, const State* memory = nullptr, int teamKind = -1 );
 	static float failureSensitivity( const Character& who );

@@ -192,6 +192,7 @@ void SP_target_location (GameEntity *ent);
 
 void SP_light (GameEntity *self);
 void SP_info_null (GameEntity *self);
+void SP_bot_hint( GameEntity* self );
 void SP_info_notnull (GameEntity *self);
 void SP_info_camp (GameEntity *self);
 void SP_path_corner (GameEntity *self);
@@ -215,6 +216,7 @@ spawn_t	spawns[] = {
 	{"info_player_deathmatch", SP_info_player_deathmatch},
 	{"info_player_intermission", SP_info_player_intermission},
 	{"info_null", SP_info_null},
+	{"bot_hint", SP_bot_hint},
 	{"info_notnull", SP_info_notnull},		// use target_position instead
 	{"info_camp", SP_info_camp},
 

@@ -9,6 +9,7 @@
 #include "g_local.h"
 #include "g_entity.h"
 #include "g_level.h"
+#include "bots/world/hints.h"
 
 /*QUAKED func_group (0 0 0) ?
 Used to group brushes together just for editor convenience.  They are turned into normal brushes by the utilities.
@@ -29,6 +30,19 @@ Used as a positional target for calculations in the utilities (spotlights, etc),
 */
 void SP_info_null( GameEntity *self ) 
 {
+	self->freeUp();
+}
+
+
+/*QUAKED bot_hint (0 0.5 0.5) (-8 -8 -8) (8 8 8)
+A place bots should know of. "kind": ambush, corridor, station or choke. Bots work these out themselves on a map
+that has none.
+*/
+void SP_bot_hint( GameEntity* self )
+{
+	char* kind;
+	Game::spawnString( "kind", "station", &kind );
+	BotHints::fromEntity( self->s.origin, kind );
 	self->freeUp();
 }
 
