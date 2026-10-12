@@ -129,37 +129,63 @@ namespace
 		}
 	}
 
-	// the empty cubes that touch this one, found by sampling points just outside each of its faces
-	void findLinks( int index )
+	// the empty cubes beyond one face of a cube, sampled on a grid over the face, added once each
+	void linkFace( int index, int axis, float side, int samples, int start )
 	{
 		const Vec3 centre = nodes[index].centre;
 		const float half = nodes[index].half;
+		const int u = (axis + 1) % 3, v = (axis + 2) % 3;
+		for( int i = 0; i < samples; i++ )
+		{
+			for( int j = 0; j < samples; j++ )
+			{
+				Vec3 point = centre;
+				point.v[axis] += side * (half + leafHalf * 0.5f);
+				point.v[u] += ((i + 0.5f) / samples * 2.0f - 1.0f) * half;
+				point.v[v] += ((j + 0.5f) / samples * 2.0f - 1.0f) * half;
+				const int other = leafAt( point );
+				if( other >= 0 && nodes[other].fill == Free && std::find( links.begin() + start, links.end(), other ) == links.end() )
+					links.push_back( other );
+			}
+		}
+	}
+
+	// the empty cubes that touch this one, found by sampling points just outside each of its faces
+	void findLinks( int index )
+	{
 		const int start = static_cast<int>( links.size() );
-		const int samples = std::clamp( static_cast<int>( half / leafHalf ), 1, maxFaceSamples );
+		const int samples = std::clamp( static_cast<int>( nodes[index].half / leafHalf ), 1, maxFaceSamples );
 		for( int axis = 0; axis < 3; axis++ )
 		{
-			const int u = (axis + 1) % 3, v = (axis + 2) % 3;
 			for( float side : { -1.0f, 1.0f } )
-			{
-				for( int i = 0; i < samples; i++ )
-				{
-					for( int j = 0; j < samples; j++ )
-					{
-						Vec3 point = centre;
-						point.v[axis] += side * (half + leafHalf * 0.5f);
-						point.v[u] += ((i + 0.5f) / samples * 2.0f - 1.0f) * half;
-						point.v[v] += ((j + 0.5f) / samples * 2.0f - 1.0f) * half;
-						const int other = leafAt( point );
-						if( other < 0 || nodes[other].fill != Free )
-							continue;
-						if( std::find( links.begin() + start, links.end(), other ) == links.end() )
-							links.push_back( other );
-					}
-				}
-			}
+				linkFace( index, axis, side, samples, start );
 		}
 		nodes[index].linkStart = start;
 		nodes[index].linkCount = static_cast<int>( links.size() ) - start;
+	}
+
+	// the nearest empty cube among the twenty-six a ring's step away round a point, or -1
+	int nearestOnRing( const Vec3& point, int ring )
+	{
+		const float reach = ring * leafHalf * 2.0f;
+		int best = -1;
+		float bestDist = 0;
+		for( int n = 0; n < 27; n++ )
+		{
+			const int dx = n % 3 - 1, dy = n / 3 % 3 - 1, dz = n / 9 - 1;
+			if( !dx && !dy && !dz )
+				continue;
+			const int other = leafAt( point + Vec3( dx * reach, dy * reach, dz * reach ) );
+			if( other < 0 || nodes[other].fill != Free )
+				continue;
+			const float dist = (nodes[other].centre - point).lengthSquared();
+			if( best < 0 || dist < bestDist )
+			{
+				best = other;
+				bestDist = dist;
+			}
+		}
+		return best;
 	}
 
 	// the empty cube at a point, or the nearest one within a few cubes of it
@@ -170,29 +196,7 @@ namespace
 			return leaf;
 		for( int ring = 1; ring <= 4; ring++ )
 		{
-			int best = -1;
-			float bestDist = 0;
-			for( int dz = -1; dz <= 1; dz++ )
-			{
-				for( int dy = -1; dy <= 1; dy++ )
-				{
-					for( int dx = -1; dx <= 1; dx++ )
-					{
-						if( !dx && !dy && !dz )
-							continue;
-						const float reach = ring * leafHalf * 2.0f;
-						const int other = leafAt( point + Vec3( dx * reach, dy * reach, dz * reach ) );
-						if( other < 0 || nodes[other].fill != Free )
-							continue;
-						const float dist = (nodes[other].centre - point).lengthSquared();
-						if( best < 0 || dist < bestDist )
-						{
-							best = other;
-							bestDist = dist;
-						}
-					}
-				}
-			}
+			const int best = nearestOnRing( point, ring );
 			if( best >= 0 )
 				return best;
 		}
@@ -255,6 +259,134 @@ bool AirNav::clearLine( const Vec3& a, const Vec3& b, float halfWidth )
 	return tr.fraction >= 1.0f || tr.entityNum != ENTITYNUM_WORLD;
 }
 
+namespace
+{
+	// the empty cube at the goal; a goal inside something solid: the nearest free point on the way back from it
+	int goalCell( const Vec3& from, const Vec3& to )
+	{
+		int goal = nearestFree( to );
+		const Vec3 back = from - to;
+		const float span = back.length();
+		for( float along = leafHalf * 4.0f; goal < 0 && along < span; along += leafHalf * 4.0f )
+		{
+			const int leaf = leafAt( to + back * (along / span) );
+			if( leaf >= 0 && nodes[leaf].fill == Free )
+				goal = leaf;
+		}
+		return goal;
+	}
+
+	// what it costs to go on from a cube into the next: the distance, more in tight places than in open air, and with a
+	// turn radius given, more for a turn, far more where there is no room to turn
+	float stepCost( const Node& here, const Node& next, const Vec3& move, const Vec3& leaving, float turnRadius )
+	{
+		float step = std::max( move.length(), leafHalf ) + fabs( move.z() ) * 0.3f;
+		if( next.half <= leafHalf )
+			step *= 1.8f;
+		else if( next.half <= leafHalf * 2.0f )
+			step *= 1.35f;
+		if( turnRadius > 0.0f )
+		{
+			const float turn = 1.0f - here.heading.dot( leaving );
+			if( turn > 0.3f )
+				step += turnRadius * turn * (std::min( here.half, next.half ) < turnRadius ? 6.0f : 1.5f);
+		}
+		return step;
+	}
+
+	using Entry = std::pair<float, int>;
+	bool later( const Entry& a, const Entry& b ) { return a.first > b.first; }
+
+	// every empty cube next to this one, queued when this way to it is cheaper than any found before
+	void expand( int cell, const Vec3& to, float turnRadius )
+	{
+		if( nodes[cell].linkStart < 0 )
+			findLinks( cell );
+		const Vec3 here = nodes[cell].entry;
+		const float soFar = nodes[cell].cost;
+		for( int i = 0; i < nodes[cell].linkCount; i++ )
+		{
+			const int other = links[nodes[cell].linkStart + i];
+			Node& next = nodes[other];
+			const Vec3 entry = entryInto( next, here );
+			const Vec3 move = entry - here;
+			const Vec3 leaving = move.normalized();
+			const float total = soFar + stepCost( nodes[cell], next, move, leaving, turnRadius );
+			if( next.stamp == generation && total >= next.cost )
+				continue;
+			next.stamp = generation;
+			next.cost = total;
+			next.parent = cell;
+			next.entry = entry;
+			next.heading = leaving;
+			openHeap.push_back( { total + (entry - to).length(), other } );
+			std::push_heap( openHeap.begin(), openHeap.end(), later );
+		}
+	}
+
+	// from each point keep the furthest of the next few that can be flown to directly
+	void straighten( const Vec3& from, const std::vector<Vec3>& raw, std::vector<Vec3>& out )
+	{
+		Vec3 anchor = from;
+		size_t i = 0;
+		while( i < raw.size() )
+		{
+			size_t furthest = i;
+			for( size_t j = std::min( raw.size() - 1, i + 8 ); j > i; j-- )
+			{
+				if( AirNav::clearLine( anchor, raw[j], 80.0f ) )
+				{
+					furthest = j;
+					break;
+				}
+			}
+			out.push_back( raw[furthest] );
+			anchor = raw[furthest];
+			i = furthest + 1;
+		}
+	}
+
+	// A* over the cubes; reached is the goal when found, otherwise the cube that came nearest to it
+	bool search( int start, int goal, const Vec3& from, const Vec3& to, const Vec3& heading, float turnRadius, int& reached )
+	{
+		generation++;
+		openHeap.clear();
+		nodes[start].stamp = generation;
+		nodes[start].cost = 0;
+		nodes[start].parent = -1;
+		nodes[start].entry = from;
+		nodes[start].heading = heading;
+		openHeap.push_back( { (from - to).length(), start } );
+		int expansions = 0;
+		reached = start;
+		float closestDistance = (from - to).length();
+		while( !openHeap.empty() && expansions < maxExpansions )
+		{
+			std::pop_heap( openHeap.begin(), openHeap.end(), later );
+			const int cell = openHeap.back().second;
+			const float queued = openHeap.back().first;
+			openHeap.pop_back();
+			const Vec3 here = nodes[cell].entry;
+			if( queued > nodes[cell].cost + (here - to).length() + 1.0f )
+				continue;
+			if( cell == goal )
+			{
+				reached = goal;
+				return true;
+			}
+			const float remaining = (here - to).length();
+			if( remaining < closestDistance )
+			{
+				closestDistance = remaining;
+				reached = cell;
+			}
+			expansions++;
+			expand( cell, to, turnRadius );
+		}
+		return false;
+	}
+}
+
 // A* from one point to another. With a turn radius given, turns cost more, and far more in cubes too small to
 // turn in, so a fast aircraft is routed where it can fly. Returns false with a path towards the nearest point
 // reached when the goal is not
@@ -263,18 +395,8 @@ bool AirNav::findPath( const Vec3& from, const Vec3& to, std::vector<Vec3>& out,
 	out.clear();
 	if( nodes.empty() )
 		build();
-
 	const int start = nearestFree( from );
-	int goal = nearestFree( to );
-	const Vec3 back = from - to;
-	const float span = back.length();
-	// a goal inside something solid: the nearest free point on the way back from it
-	for( float along = leafHalf * 4.0f; goal < 0 && along < span; along += leafHalf * 4.0f )
-	{
-		const int leaf = leafAt( to + back * (along / span) );
-		if( leaf >= 0 && nodes[leaf].fill == Free )
-			goal = leaf;
-	}
+	const int goal = goalCell( from, to );
 	if( start < 0 || goal < 0 )
 		return false;
 	if( start == goal )
@@ -282,111 +404,17 @@ bool AirNav::findPath( const Vec3& from, const Vec3& to, std::vector<Vec3>& out,
 		out.push_back( to );
 		return true;
 	}
-
-	generation++;
-	using Entry = std::pair<float, int>;
-	const auto later = []( const Entry& a, const Entry& b ) { return a.first > b.first; };
-	std::vector<Entry>& open = openHeap;
-	open.clear();
-	nodes[start].stamp = generation;
-	nodes[start].cost = 0;
-	nodes[start].parent = -1;
-	nodes[start].entry = from;
-	nodes[start].heading = heading;
-	open.push_back( { (from - to).length(), start } );
-
-	bool found = false;
-	int expansions = 0;
-	int closest = start;
-	float closestDistance = (from - to).length();
-	while( !open.empty() && expansions < maxExpansions )
-	{
-		std::pop_heap( open.begin(), open.end(), later );
-		const int cell = open.back().second;
-		const float queued = open.back().first;
-		open.pop_back();
-		const Vec3 here = nodes[cell].entry;
-		const float soFar = nodes[cell].cost;
-		if( queued > soFar + (here - to).length() + 1.0f )
-			continue;
-		if( cell == goal )
-		{
-			found = true;
-			break;
-		}
-		const float remaining = (here - to).length();
-		if( remaining < closestDistance )
-		{
-			closestDistance = remaining;
-			closest = cell;
-		}
-		expansions++;
-		const Vec3 arriving = nodes[cell].heading;
-		const float roomHere = nodes[cell].half;
-
-		if( nodes[cell].linkStart < 0 )
-			findLinks( cell );
-		const int linkStart = nodes[cell].linkStart;
-		const int linkCount = nodes[cell].linkCount;
-		for( int i = 0; i < linkCount; i++ )
-		{
-			const int other = links[linkStart + i];
-			Node& next = nodes[other];
-			const Vec3 entry = entryInto( next, here );
-			const Vec3 move = entry - here;
-			float step = std::max( move.length(), leafHalf ) + fabs( move.z() ) * 0.3f;
-			// tight places cost more than open air
-			if( next.half <= leafHalf )
-				step *= 1.8f;
-			else if( next.half <= leafHalf * 2.0f )
-				step *= 1.35f;
-			const Vec3 leaving = move.normalized();
-			if( turnRadius > 0.0f )
-			{
-				const float turn = 1.0f - arriving.dot( leaving );
-				if( turn > 0.3f )
-					step += turnRadius * turn * (std::min( roomHere, next.half ) < turnRadius ? 6.0f : 1.5f);
-			}
-			const float total = soFar + step;
-			if( next.stamp == generation && total >= next.cost )
-				continue;
-			next.stamp = generation;
-			next.cost = total;
-			next.parent = cell;
-			next.entry = entry;
-			next.heading = leaving;
-			open.push_back( { total + (entry - to).length(), other } );
-			std::push_heap( open.begin(), open.end(), later );
-		}
-	}
-	if( !found && closest == start )
+	int reached = start;
+	const bool found = search( start, goal, from, to, heading, turnRadius, reached );
+	if( !found && reached == start )
 		return false;
-
 	std::vector<Vec3>& raw = rawPath;
 	raw.clear();
 	if( found )
 		raw.push_back( to );
-	for( int cell = found ? goal : closest; cell >= 0 && cell != start; cell = nodes[cell].parent )
+	for( int cell = reached; cell >= 0 && cell != start; cell = nodes[cell].parent )
 		raw.push_back( nodes[cell].entry );
 	std::reverse( raw.begin(), raw.end() );
-
-	// straighten: from each point keep the furthest of the next few that can be flown to directly
-	Vec3 anchor = from;
-	size_t i = 0;
-	while( i < raw.size() )
-	{
-		size_t furthest = i;
-		for( size_t j = std::min( raw.size() - 1, i + 8 ); j > i; j-- )
-		{
-			if( clearLine( anchor, raw[j], 80.0f ) )
-			{
-				furthest = j;
-				break;
-			}
-		}
-		out.push_back( raw[furthest] );
-		anchor = raw[furthest];
-		i = furthest + 1;
-	}
+	straighten( from, raw, out );
 	return found;
 }
