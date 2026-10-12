@@ -299,6 +299,8 @@ private:
 	static void thinkSurface( GameEntity* ent, State& bot, const Sense& sense, usercmd_t& cmd, vec3_t view );
 	static void thinkInfantry( GameEntity* ent, State& bot, const Sense& sense, usercmd_t& cmd, vec3_t view );
 	static void thinkRider( GameEntity* ent, State& bot, usercmd_t& cmd, vec3_t view );
+	static bool leaveStoppedRide( GameEntity* ent, State& bot, GameEntity* pilot );
+	static GameEntity* nearestFromSeat( GameEntity* ent, GameEntity* pilot, float reach );
 
 	// senses, weapons, world knowledge and vehicle choice; each is described where it is defined
 	static Goal chooseGoal( GameEntity* ent, State& bot, const Sense& sense );
