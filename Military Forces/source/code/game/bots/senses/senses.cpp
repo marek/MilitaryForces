@@ -4,6 +4,7 @@
 #include "../core/local.h"
 #include "../team/team.h"
 #include "../weapons/envelope.h"
+#include "../navigation/intercept.h"
 #include <algorithm>
 #include <bit>
 #include <cmath>
@@ -497,7 +498,7 @@ void BotSenses::sense( GameEntity* ent, Bots::State& bot, Bots::Sense& out )
 		const int weapon = availableVehicles[ent->client_->vehicle_].weapons[0];
 		const float shotSpeed = weapon && availableWeapons[weapon].muzzleVelocity > 0 ? static_cast<float>( availableWeapons[weapon].muzzleVelocity ) : 2500.0f;
 		if( out.enemyVisible )
-			VectorMA( target, std::min( dist / shotSpeed, 1.5f ), out.enemy->client_->ps_.velocity, target );
+			target = Intercept::lead( ent->r.currentOrigin, target, out.enemy->client_->ps_.velocity, shotSpeed, 1.5f );
 		const unsigned int enemyCat = availableVehicles[out.enemy->client_->vehicle_].cat;
 		// An aircraft with gun turrets is approached from where the fewest of them can bear: each turret only covers
 		// its own field. That choice is made out of gun range, where it costs nothing: the fighter flies for a point

@@ -1,4 +1,5 @@
 #include "crew.h"
+#include "../navigation/intercept.h"
 #include <cmath>
 
 // turrets: look at a nearby enemy aircraft and hold the trigger, as a player does with free look held, flying
@@ -18,10 +19,9 @@ behavior::Status Crew::gunner( Bots::Mind& c )
 		if( theLevel.time_ < c.bot.turretTime + turretBurst && theLevel.time_ >= c.bot.avoid.time )
 		{
 			// lead the target by the bullets' flight time
-			const float flight = c.sense.airThreatDist / std::max( 1.0f, static_cast<float>( availableWeapons[c.veh.weapons[WP_MACHINEGUN]].muzzleVelocity ) );
-			Vec3 raiderVelocity;
-			VectorCopy( raider->s.pos.trDelta, raiderVelocity );
-			const Vec3 aimAt = Vec3( raider->r.currentOrigin ) + raiderVelocity * flight - Vec3( c.ent->r.currentOrigin );
+			constexpr float noLimit = 1e6f;
+			const float shotSpeed = static_cast<float>( availableWeapons[c.veh.weapons[WP_MACHINEGUN]].muzzleVelocity );
+			const Vec3 aimAt = Intercept::lead( c.ent->r.currentOrigin, raider->r.currentOrigin, raider->s.pos.trDelta, shotSpeed, noLimit ) - Vec3( c.ent->r.currentOrigin );
 			Vec3 aim;
 			vectoangles( aimAt, aim );
 			// a gunner in a bucking bomber is no marksman: his aim wanders about the target, a few degrees for a

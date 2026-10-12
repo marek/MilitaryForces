@@ -17,11 +17,18 @@ void PlaneTasks::engage( Mind& c )
 {
 	c.weapons.attacking = true;
 	c.weapons.free = true;
-	c.travelTo( c.enemyPosition() );
+	c.travelTo( c.sense.enemyVisible && c.sense.enemyAir && c.sense.enemyDist > interceptFrom ? interceptPoint( c ) : c.enemyPosition() );
 	if( !c.sense.enemyAir && c.sense.enemyDist < 900 )
 		c.bot.pursuit.egressTime = theLevel.time_ + 5000;
 	if( c.sense.enemyAir && c.sense.enemyDist < passEnds )
 		c.bot.pursuit.egressTime = theLevel.time_ + (enemyHasTurrets( c ) ? 6000 : 2500);
+}
+
+// a distant aircraft in sight is met where it will be, not chased to where it was
+Vec3 PlaneTasks::interceptPoint( const Mind& c )
+{
+	constexpr float lookAhead = 20.0f;
+	return Intercept::course( c.ent->r.currentOrigin, std::max( c.airspeed, 1.0f ), c.sense.enemy->r.currentOrigin, c.sense.enemy->client_->ps_.velocity, lookAhead );
 }
 
 // keep flying the turn and the climb or dive that the arc choice settled on

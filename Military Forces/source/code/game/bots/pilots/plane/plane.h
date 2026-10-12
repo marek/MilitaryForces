@@ -5,6 +5,7 @@
 #include "../../navigation/airnav.h"
 #include "../../crew/crew.h"
 #include "../../world/query.h"
+#include "../../navigation/intercept.h"
 #include <algorithm>
 #include <cmath>
 
@@ -131,6 +132,8 @@ struct PlaneTasks
 
 	// weapons free and closing; after a close pass the plane flies on out before coming round
 	static void engage( Mind& c );
+	static constexpr float interceptFrom = 3000.0f;	// an aircraft further off than this is intercepted
+	static Vec3 interceptPoint( const Mind& c );
 
 	// keep flying the turn and the climb or dive that the arc choice settled on
 	static void flyChosenArc( Mind& c );
@@ -213,8 +216,6 @@ struct PlaneTasks
 	// keep to a height lane where there is little room between floor and ceiling
 	static Status midChannel( Mind& c );
 
-	// where another aircraft will be: straight on, or round its turn when it is banked hard
-	static void predictAircraft( GameEntity* other, float seconds, vec3_t out );
 
 	// true when another aircraft is predicted to be near this point at that time
 	static bool trafficAt( const Mind& c, const vec3_t point, float seconds );
