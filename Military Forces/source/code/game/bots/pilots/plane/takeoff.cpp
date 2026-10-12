@@ -1,48 +1,62 @@
 #include "plane.h"
 
-// parked where no heading has enough runway: find the nearest spot along the taxiway that has
+// parked where no heading has enough runway: the nearest spot along the taxiway that has, reached straight along the
+// runway and not on its very edge, where the aircraft has to stop and turn
 bool PlaneTasks::findTaxiSpot( Mind& c, const vec3_t origin, float wanted )
 {
 	constexpr float taxiStep = 100.0f, taxiMax = 800.0f, edgeRoom = 50.0f;
-	for( float dist = taxiStep; dist <= taxiMax; dist += taxiStep )
+	const Vec3 from( origin );
+	PlaceQuery query;
+	query.centre = from;
+	query.firstRing = taxiStep;
+	query.ringStep = taxiStep;
+	query.rings = static_cast<int>( taxiMax / taxiStep );
+	query.around = 24;
+	query.onGround = false;
+	query.filters.push_back( [from]( const Vec3& spot )
 	{
-		float best = 0;
-		for( int step = 0; step < 24; step++ )
+		const Vec3 way = spot - from;
+		return BotWorld::runwayRun( from, yawOf( way ), way.length() ) >= way.length() - 0.5f;
+	} );
+	query.filters.push_back( []( const Vec3& spot )
+	{
+		for( int side = 0; side < 4; side++ )
 		{
-			const float yaw = step * 15.0f;
-			if( BotWorld::runwayRun( origin, yaw, dist ) < dist )
-				continue;
-			Vec3 level = { 0, yaw, 0 }, dir, spot;
-			AngleVectors( level, dir, nullptr, nullptr );
-			VectorMA( origin, dist, dir, spot );
-			// not a spot on the very edge: the aircraft has to stop and turn there
-			bool room = true;
-			for( int side = 0; side < 4 && room; side++ )
-				room = BotWorld::runwayRun( spot, side * 90.0f, edgeRoom ) >= edgeRoom;
-			if( !room )
-				continue;
-			for( int turn = 0; turn < 12; turn++ )
-			{
-				const float run = BotWorld::runwayRun( spot, turn * 30.0f, wanted + 25.0f );
-				if( run >= wanted && run > best )
-				{
-					best = run;
-					VectorCopy( spot, c.bot.takeoff.taxiSpot );
-				}
-			}
+			if( BotWorld::runwayRun( spot, side * 90.0f, edgeRoom ) < edgeRoom )
+				return false;
 		}
-		if( best > 0 )
-		{
-			c.bot.takeoff.taxiTime = theLevel.time_ + 20000;
-			c.bot.takeoff.planTime = 0;
+		return true;
+	} );
+	query.filters.push_back( [wanted]( const Vec3& spot ) { return longestRun( spot, wanted ) >= wanted; } );
+	query.scorers.push_back( [wanted]( const Vec3& spot ) { return longestRun( spot, wanted ); } );
+	Vec3 spot;
+	if( !query.find( spot ) )
+		return false;
+	spot.copyTo( c.bot.takeoff.taxiSpot );
+	c.bot.takeoff.taxiTime = theLevel.time_ + 20000;
+	c.bot.takeoff.planTime = 0;
 #ifdef MF_BOT_DEBUG
-			if( g_botDebug.integer >= 2 )
-				Common::printf( "BOTTAKEOFF t %d bot %d taxi %.0f to %.0f %.0f run %.0f\n", theLevel.time_, c.ent->s.number, dist, c.bot.takeoff.taxiSpot[0], c.bot.takeoff.taxiSpot[1], best );
+	if( g_botDebug.integer >= 2 )
+		Common::printf( "BOTTAKEOFF t %d bot %d taxi to %.0f %.0f run %.0f\n", theLevel.time_, c.ent->s.number, spot[0], spot[1], longestRun( spot, wanted ) );
 #endif
-			return true;
-		}
-	}
-	return false;
+	return true;
+}
+
+// the longest run from a spot in any of twelve headings, looked for a little beyond the length wanted
+float PlaneTasks::longestRun( const Vec3& spot, float wanted )
+{
+	float best = 0.0f;
+	for( int turn = 0; turn < 12; turn++ )
+		best = std::max( best, BotWorld::runwayRun( spot, turn * 30.0f, wanted + 25.0f ) );
+	return best;
+}
+
+// the heading of a direction over the ground
+float PlaneTasks::yawOf( const Vec3& dir )
+{
+	Vec3 angles;
+	vectoangles( dir, angles );
+	return angles[YAW];
 }
 
 // Chooses the take-off heading: enough runway to reach flying speed, nothing standing on it, and from the lift-off

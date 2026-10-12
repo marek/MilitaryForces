@@ -3,6 +3,7 @@
 #include "../bot.h"
 #include "../core/local.h"
 #include "threat.h"
+#include "query.h"
 #include <algorithm>
 #include <cmath>
 #include <cstring>
@@ -399,51 +400,18 @@ int BotWorld::findPad( GameEntity* ent, int skip )
 // gun still can see the threat
 bool Bots::findHidePoint( GameEntity* ent, State& bot, GameEntity* threat, bool hullDown )
 {
-	float bestDist = 0;
-	bool found = false;
-	for( int ring = 0; ring < 3; ring++ )
-	{
-		const float radius = 350.0f + ring * 450.0f;
-		for( int step = 0; step < 12; step++ )
-		{
-			const float angle = step * (2.0f * std::numbers::pi_v<float> / 12.0f);
-			Vec3 point, down;
-			point = ent->r.currentOrigin;
-			point[0] += cos( angle ) * radius;
-			point[1] += sin( angle ) * radius;
-			point[2] += 300;
-			down = point;
-			down[2] -= 2000;
-			trace_t tr;
-			GameHost::trace( &tr, point, nullptr, nullptr, down, ent->s.number, MASK_SOLID|MASK_WATER, false );
-			if( tr.startsolid || tr.fraction >= 1.0f || (tr.contents & MASK_WATER) )
-				continue;
-			VectorCopy( tr.endpos, point );
-			point[2] += 20;
-			if( fabs( point[2] - ent->r.currentOrigin[2] ) > radius * 0.5f )
-				continue;
-			if( BotWorld::visible( ent, point, threat ) )
-				continue;
-			if( hullDown )
-			{
-				Vec3 top;
-				top = point;
-				top[2] += availableVehicles[ent->client_->vehicle_].maxs[2] + 12;
-				if( !BotWorld::visible( ent, top, threat ) )
-					continue;
-			}
-			const float dist = Distance( ent->r.currentOrigin, point );
-			if( !found || dist < bestDist )
-			{
-				VectorCopy( point, bot.cover.point );
-				bestDist = dist;
-				found = true;
-			}
-		}
-		if( found )
-			break;
-	}
-	return found;
+	PlaceQuery query;
+	query.centre = Vec3( ent->r.currentOrigin );
+	query.passEntity = ent->s.number;
+	query.filters.push_back( PlaceQuery::hiddenFrom( ent, threat ) );
+	if( hullDown )
+		query.filters.push_back( PlaceQuery::seenOverFrom( ent, threat, availableVehicles[ent->client_->vehicle_].maxs[2] + 12 ) );
+	query.scorers.push_back( PlaceQuery::nearer( query.centre ) );
+	Vec3 place;
+	if( !query.find( place ) )
+		return false;
+	place.copyTo( bot.cover.point );
+	return true;
 }
 
 // a building to bomb: the nearest that can be destroyed, those by the enemy's pads first and never one by the
