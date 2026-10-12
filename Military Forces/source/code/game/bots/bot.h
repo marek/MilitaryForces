@@ -301,6 +301,10 @@ private:
 	static void logDeath( GameEntity* self, GameEntity* attacker, int meansOfDeath );
 	static void logState( GameEntity* ent, State& bot, const usercmd_t& cmd, const vec3_t view );
 	static void pickGoal( GameEntity* ent, State& bot, float radius );
+	static GameEntity* nearestQuarry( GameEntity* ent, unsigned int cat );
+	static void goalNear( GameEntity* ent, State& bot, GameEntity* quarry, unsigned int cat );
+	static void goalAtRoamPoint( GameEntity* ent, State& bot );
+	static void goalAroundHome( GameEntity* ent, State& bot, float radius, unsigned int cat );
 	static int pickVehicle( int teamFlag, bool allowInfantry = true, const Character* who = nullptr, const State* memory = nullptr, int teamKind = -1 );
 	static float failureSensitivity( const Character& who );
 	static float switchDesire( const State& bot, int kind );

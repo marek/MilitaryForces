@@ -6,6 +6,7 @@
 #include "../../crew/crew.h"
 #include "../../control/control.h"
 #include "../../navigation/context.h"
+#include "../../world/threat.h"
 
 using behavior::Status;
 
@@ -229,6 +230,7 @@ struct HeloTasks
 	};
 	static Travel wantedTravel( const Mind& c );
 	static void findOpenDirection( Mind& c, Travel& travel );
+	static void avoidThreats( const Mind& c, ContextMap& map, float reach );
 	static void stopBeforeDrift( const Mind& c, Travel& travel );
 	static void easeAwayFromWalls( const Mind& c, Travel& travel );
 

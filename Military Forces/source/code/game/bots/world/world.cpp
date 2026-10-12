@@ -2,6 +2,7 @@
 #include "../../g_level.h"
 #include "../bot.h"
 #include "../core/local.h"
+#include "threat.h"
 #include <algorithm>
 #include <cmath>
 #include <cstring>
@@ -502,7 +503,6 @@ GameEntity* Bots::findStructure( GameEntity* ent, State& bot )
 	return best;
 }
 
-// somewhere to go: towards the nearest opponent it could fight, a roam point, or a random place within the radius
 void Bots::pickGoal( GameEntity* ent, State& bot, float radius )
 {
 	if( !bot.hasHome )
@@ -520,71 +520,105 @@ void Bots::pickGoal( GameEntity* ent, State& bot, float radius )
 	if( BotWorld::roamPoints_.empty() )
 		BotWorld::buildRoamPoints();
 	const unsigned int cat = ent->client_->vehicle_ >= 0 ? availableVehicles[ent->client_->vehicle_].cat : 0;
-
+	GameEntity* quarry = nullptr;
 	// Everyone has a rough idea where the enemy is. Part of the time a bot goes looking for the nearest opponent
 	// it could fight, the aggressive ones more often, so nobody is left alone for long.
-	GameEntity* quarry = nullptr;
 	if( !(cat & CAT_LQM) && random() < 0.3f + 0.4f * character( bot ).aggression )
+		quarry = nearestQuarry( ent, cat );
+	if( quarry )
+		goalNear( ent, bot, quarry, cat );
+	else if( (cat & (CAT_PLANE|CAT_HELO)) && !BotWorld::roamPoints_.empty() && radius > 3500 )
+		goalAtRoamPoint( ent, bot );
+	else
+		goalAroundHome( ent, bot, radius, cat );
+	bot.goalTime = theLevel.time_ + 20000;
+}
+
+// the nearest opponent this vehicle could go after: a boat cannot go after someone inland, nor a ground vehicle after
+// someone at sea or in the air
+GameEntity* Bots::nearestQuarry( GameEntity* ent, unsigned int cat )
+{
+	GameEntity* quarry = nullptr;
+	float nearest = 0;
+	for( int i = 1; i <= theLevel.maxclients_; i++ )
 	{
-		float nearest = 0;
-		for( int i = 1; i <= theLevel.maxclients_; i++ )
+		GameEntity* other = theLevel.getEntity( i );
+		if( other == ent || !alive( other ) || other->client_->sess_.ridingClient_ >= 0 )
+			continue;
+		if( g_gametype.integer >= GT_TEAM && OnSameTeam( ent, other ) )
+			continue;
+		const unsigned int otherCat = availableVehicles[other->client_->vehicle_].cat;
+		const bool otherFlying = (otherCat & (CAT_PLANE|CAT_HELO)) && !(other->client_->ps_.ONOFF & OO_LANDED);
+		if( (cat & (CAT_GROUND|CAT_BOAT)) && (otherFlying || ((cat & CAT_BOAT) != 0) != ((otherCat & CAT_BOAT) != 0)) )
+			continue;
+		const float dist = Distance( ent->r.currentOrigin, other->r.currentOrigin );
+		if( !quarry || dist < nearest )
 		{
-			GameEntity* other = theLevel.getEntity( i );
-			if( other == ent || !alive( other ) || other->client_->sess_.ridingClient_ >= 0 )
-				continue;
-			if( g_gametype.integer >= GT_TEAM && OnSameTeam( ent, other ) )
-				continue;
-			// a boat cannot go after someone inland, nor a ground vehicle after someone at sea or in the air
-			const unsigned int otherCat = availableVehicles[other->client_->vehicle_].cat;
-			const bool otherFlying = (otherCat & (CAT_PLANE|CAT_HELO)) && !(other->client_->ps_.ONOFF & OO_LANDED);
-			if( (cat & (CAT_GROUND|CAT_BOAT)) && (otherFlying || ((cat & CAT_BOAT) != 0) != ((otherCat & CAT_BOAT) != 0)) )
-				continue;
-			const float dist = Distance( ent->r.currentOrigin, other->r.currentOrigin );
-			if( !quarry || dist < nearest )
-			{
-				quarry = other;
-				nearest = dist;
-			}
+			quarry = other;
+			nearest = dist;
 		}
 	}
-	if( quarry )
-	{
-		constexpr float vagueness = 900.0f;
-		VectorCopy( quarry->r.currentOrigin, bot.goal );
-		bot.goal[0] += crandom() * vagueness;
-		bot.goal[1] += crandom() * vagueness;
-		if( !(cat & (CAT_PLANE|CAT_HELO)) )
-			bot.goal[2] = ent->r.currentOrigin[2];
-	}
-	else if( (cat & (CAT_PLANE|CAT_HELO)) && !BotWorld::roamPoints_.empty() && radius > 3500 )
+	return quarry;
+}
+
+// roughly where the quarry is: a rough idea, not a fix
+void Bots::goalNear( GameEntity* ent, State& bot, GameEntity* quarry, unsigned int cat )
+{
+	constexpr float vagueness = 900.0f;
+	VectorCopy( quarry->r.currentOrigin, bot.goal );
+	bot.goal[0] += crandom() * vagueness;
+	bot.goal[1] += crandom() * vagueness;
+	if( !(cat & (CAT_PLANE|CAT_HELO)) )
+		bot.goal[2] = ent->r.currentOrigin[2];
+}
+
+// one of a few roam points drawn at random, the least dangerous of them by the team's threat map: a cautious pilot
+// weighs the danger more, and none of them refuses to go where the fighting is
+void Bots::goalAtRoamPoint( GameEntity* ent, State& bot )
+{
+	constexpr int drawn = 4;
+	constexpr float scatter = 800.0f;
+	const int team = ent->client_->sess_.sessionTeam_;
+	const float caution = character( bot ).caution;
+	const Vec3* best = nullptr;
+	float bestScore = 0.0f;
+	for( int i = 0; i < drawn; i++ )
 	{
 		const Vec3& point = BotWorld::roamPoints_[rand() % BotWorld::roamPoints_.size()];
-		point.copyTo( bot.goal );
-		bot.goal[0] += crandom() * 800.0f;
-		bot.goal[1] += crandom() * 800.0f;
-	}
-	else
-	{
-		const float angle = random() * 2.0f * std::numbers::pi_v<float>;
-		const float dist = radius * (0.3f + 0.7f * random());
-		bot.goal[0] = bot.home[0] + cos( angle ) * dist;
-		bot.goal[1] = bot.home[1] + sin( angle ) * dist;
-		bot.goal[2] = bot.home[2];
-		if( cat & CAT_BOAT )
+		vec3_t at;
+		point.copyTo( at );
+		const float score = caution * ThreatMap::danger( team, at, true ) + random() * 0.3f;
+		if( !best || score < bestScore )
 		{
-			for( int tries = 0; tries < 8; tries++ )
-			{
-				Vec3 probe;
-				VectorCopy( bot.goal, probe );
-				probe[2] = ent->r.currentOrigin[2] - 6;
-				if( GameHost::pointContents( probe, ent->s.number ) & MASK_WATER )
-					break;
-				const float a = random() * 2.0f * std::numbers::pi_v<float>;
-				const float d = radius * (0.2f + 0.8f * random());
-				bot.goal[0] = ent->r.currentOrigin[0] + cos( a ) * d;
-				bot.goal[1] = ent->r.currentOrigin[1] + sin( a ) * d;
-			}
+			best = &point;
+			bestScore = score;
 		}
 	}
-	bot.goalTime = theLevel.time_ + 20000;
+	best->copyTo( bot.goal );
+	bot.goal[0] += crandom() * scatter;
+	bot.goal[1] += crandom() * scatter;
+}
+
+// somewhere within the radius of where it first appeared; a boat's goal is moved until it is on water
+void Bots::goalAroundHome( GameEntity* ent, State& bot, float radius, unsigned int cat )
+{
+	const float angle = random() * 2.0f * std::numbers::pi_v<float>;
+	const float dist = radius * (0.3f + 0.7f * random());
+	bot.goal[0] = bot.home[0] + cos( angle ) * dist;
+	bot.goal[1] = bot.home[1] + sin( angle ) * dist;
+	bot.goal[2] = bot.home[2];
+	if( !(cat & CAT_BOAT) )
+		return;
+	for( int tries = 0; tries < 8; tries++ )
+	{
+		Vec3 probe;
+		VectorCopy( bot.goal, probe );
+		probe[2] = ent->r.currentOrigin[2] - 6;
+		if( GameHost::pointContents( probe, ent->s.number ) & MASK_WATER )
+			return;
+		const float a = random() * 2.0f * std::numbers::pi_v<float>;
+		const float d = radius * (0.2f + 0.8f * random());
+		bot.goal[0] = ent->r.currentOrigin[0] + cos( a ) * d;
+		bot.goal[1] = ent->r.currentOrigin[1] + sin( a ) * d;
+	}
 }

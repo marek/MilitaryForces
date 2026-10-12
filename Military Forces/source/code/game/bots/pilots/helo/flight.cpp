@@ -150,6 +150,7 @@ void HeloTasks::findOpenDirection( Mind& c, Travel& travel )
 	const float reach = 200.0f + travel.speed * 2.0f;
 	ContextMap map( travel.yaw, 8 );
 	map.want( travel.yaw, 1.0f );
+	avoidThreats( c, map, reach );
 	std::array<bool, ContextMap::maxSlots> mustClimb = {};
 	const int slot = map.resolve( [&]( int s )
 	{
@@ -177,6 +178,22 @@ void HeloTasks::findOpenDirection( Mind& c, Travel& travel )
 	{
 		travel.speed *= 0.6f;
 		c.steer.wantHeight = std::max( c.steer.wantHeight, std::min( c.sense.height + reach * climbSlope, highest ) );
+	}
+}
+
+// the team's threat map as danger in each direction, by the pilot's caution: a cautious pilot goes round a SAM
+// site's reach where the way round is open
+void HeloTasks::avoidThreats( const Mind& c, ContextMap& map, float reach )
+{
+	constexpr float lookFurther = 4.0f, cautionWeight = 0.5f;
+	const int team = c.client->sess_.sessionTeam_;
+	const float caution = c.who().caution * cautionWeight;
+	for( int s = 0; s < map.slots(); s++ )
+	{
+		Vec3 angles = { 0, map.yawOf( s ), 0 }, dir, at;
+		AngleVectors( angles, dir, nullptr, nullptr );
+		VectorMA( c.ent->r.currentOrigin, reach * lookFurther, dir, at );
+		map.addDanger( s, caution * ThreatMap::danger( team, at, true ) );
 	}
 }
 
