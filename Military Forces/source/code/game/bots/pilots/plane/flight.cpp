@@ -1,12 +1,5 @@
 #include "plane.h"
 
-// flares against a missile
-behavior::Status PlaneTasks::countermeasures( Mind& c )
-{
-	BotWeapons::flares( c.ent, c.bot, c.sense, c.cmd );
-	return Status::Success;
-}
-
 // when the straight line to the destination is blocked, follow the air path round the obstacle, allowing for the turn radius
 behavior::Status PlaneTasks::navigate( Mind& c )
 {
@@ -164,6 +157,13 @@ bool PlaneTasks::flagEmergency( const Mind& c )
 			return true;
 	}
 	return false;
+}
+
+// the pilot's wish for the afterburner, which the engine acts on
+behavior::Status PlaneTasks::decideAfterburner( Mind& c )
+{
+	c.steer.afterburner = wantsAfterburner( c );
+	return Status::Success;
 }
 
 // The afterburner drinks fuel and makes the aircraft fast where fast is dangerous, so it is a decision, not a
