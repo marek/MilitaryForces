@@ -156,7 +156,8 @@ void BotWeapons::fireWeapons( GameEntity* ent, Bots::State& bot, const Bots::Sen
 	const float splash = static_cast<float>( availableWeapons[veh.weapons[slot]].damageRadius );
 	if( splash > 0 && BotWeapons::friendlyNear( ent, sense.enemy->r.currentOrigin, splash + 60.0f ) )
 		return;
-	if( Envelope::of( veh.weapons[slot] ).contains( sense.enemyDist, aimError, sense.enemyAir ) )
+	// a poor shot fires a little before the aim is on
+	if( Envelope::of( veh.weapons[slot] ).contains( sense.enemyDist, aimError / Bots::mistakes( bot ).earlyFire, sense.enemyAir ) )
 		cmd.buttons |= BUTTON_ATTACK_MAIN;
 }
 
@@ -165,7 +166,7 @@ void BotWeapons::flares( GameEntity* ent, Bots::State& bot, const Bots::Sense& s
 {
 	if( !sense.launched || ent->client_->ps_.ammo[WP_FLARE] <= 0 || theLevel.time_ < bot.flareTime )
 		return;
-	if( sense.missile && sense.missileDist > 1800 && sense.missileTime > 2.0f )
+	if( sense.missile && sense.missileDist > 1800 && sense.missileTime > Bots::mistakes( bot ).flareWait )
 		return;
 	if( random() > Bots::handicap( bot ).flareChance )
 	{

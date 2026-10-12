@@ -7,6 +7,7 @@
 #include "behavior/behavior.h"
 #include "goals/capabilities.h"
 #include "core/skill.h"
+#include "core/mistakes.h"
 
 struct GameEntity;
 struct GameClient;
@@ -298,6 +299,7 @@ private:
 	static const Character& character( const State& bot );
 	static float skill( const State& bot );
 	static Handicap handicap( const State& bot );
+	static Mistakes mistakes( const State& bot );
 	static int memoryTime( const State& bot );
 	static bool findHidePoint( GameEntity* ent, State& bot, GameEntity* threat, bool hullDown = false );
 	static GameEntity* findStructure( GameEntity* ent, State& bot );

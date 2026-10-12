@@ -3,7 +3,9 @@
 // nose on the enemy; near the ground only in heading, and gently in tight terrain
 void PlaneTasks::aimAtEnemy( Mind& c )
 {
-	c.view[YAW] = c.sense.enemyAngles[YAW];
+	// a poor shot swings past a target it is turning onto
+	const float turn = enemyTurn( c );
+	c.view[YAW] = c.sense.enemyAngles[YAW] + (fabs( turn ) > 5.0f ? (turn > 0 ? 1.0f : -1.0f) * Bots::mistakes( c.bot ).overshoot : 0.0f);
 	if( c.sense.enemyAir || c.sense.height > planeMinHeight * 1.5f )
 		c.view[PITCH] = std::clamp( c.sense.enemyAngles[PITCH], -50.0f, 35.0f );
 	else

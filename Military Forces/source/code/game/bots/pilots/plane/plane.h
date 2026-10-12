@@ -80,7 +80,7 @@ struct PlaneTasks
 	// a stealth aircraft not yet seen closes in without showing itself
 	static bool stalking( Mind& c ) { return c.sense.stealth && !c.sense.revealed && c.sense.enemyDist > 2500; }
 
-	static bool onNose( Mind& c ) { return fabs( enemyTurn( c ) ) < 20.0f; }
+	static bool onNose( Mind& c ) { return fabs( enemyTurn( c ) ) < Bots::mistakes( c.bot ).pressAngle; }
 	// in tight terrain, nothing of the world between the nose and the enemy
 
 	static bool fireLineClear( Mind& c )

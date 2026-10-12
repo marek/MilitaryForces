@@ -106,7 +106,9 @@ behavior::Status PlaneTasks::cornerSpeed( Mind& c )
 behavior::Status PlaneTasks::floorAndCeiling( Mind& c )
 {
 	// a plane lining up to land flies lower than the cruising floor, or it never gets down to the runway
-	const float floor = onApproach( c ) ? std::min( c.minHeight, approachFloor ) : c.minHeight;
+	// a bold pilot fixed on a ground target follows it lower than is wise
+	const float fixation = c.weapons.attacking && !c.sense.enemyAir ? Bots::mistakes( c.bot ).fixationFloor : 1.0f;
+	const float floor = onApproach( c ) ? std::min( c.minHeight, approachFloor ) : c.minHeight * fixation;
 	if( c.sense.height < floor )
 		c.view[PITCH] = std::min( c.view[PITCH], -35.0f );
 	else if( c.ceiling < 250 )

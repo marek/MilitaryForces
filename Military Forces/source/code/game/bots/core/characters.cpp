@@ -93,6 +93,26 @@ Handicap Bots::handicap( const State& bot )
 	return h;
 }
 
+// a trait well off the middle shows as its mistake; a character near the middle makes none of them
+Mistakes Bots::mistakes( const State& bot )
+{
+	constexpr float bold = 0.8f, poorAim = 0.4f, careless = 0.3f, hasty = 0.3f;
+	const Character& who = character( bot );
+	Mistakes m;
+	if( who.aggression > bold )
+		m.fixationFloor = 0.75f;
+	if( who.aim < poorAim )
+	{
+		m.overshoot = (poorAim - who.aim) * 15.0f;
+		m.earlyFire = 1.5f;
+	}
+	if( who.caution < careless )
+		m.flareWait = 1.2f;
+	if( who.patience < hasty )
+		m.pressAngle = 30.0f;
+	return m;
+}
+
 int Bots::memoryTime( const State& bot )
 {
 	return 12000 + static_cast<int>( 30000 * character( bot ).patience );
