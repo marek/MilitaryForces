@@ -138,117 +138,137 @@ void PlaneTasks::planDeparture( Mind& c )
 		c.bot.takeoff.planTime = theLevel.time_ + 30000;
 }
 
-// On the ground: wait when told to hold, plan a departure, taxi to a spot with enough runway if needed, then roll
-// and lift off. Slow, it stops for anyone ahead and keeps off the path of an aircraft on its roll
-behavior::Status PlaneTasks::takeOff( Mind& c )
+// on the ground the controls are the take-off's; a heading is planned once the aircraft is stopped and nothing holds
+// it or sends it taxiing
+void PlaneTasks::prepareTakeOff( Mind& c )
 {
 	c.controls.claim();
 	c.bot.takeoff.groundTime = theLevel.time_;
-	if( theLevel.time_ < c.bot.takeoff.holdTime )
-	{
-		c.view[YAW] = c.ps.vehicleAngles[YAW];
-		c.cmd.forwardmove = c.speed > 1 ? -moveFull : moveNone;
-		return Status::Running;
-	}
-	if( theLevel.time_ >= c.bot.takeoff.taxiTime && theLevel.time_ >= c.bot.takeoff.planTime && c.speed < 20 )
+	if( !holdingShort( c ) && !taxiing( c ) && theLevel.time_ >= c.bot.takeoff.planTime && c.speed < 20 )
 		planDeparture( c );
-	if( theLevel.time_ < c.bot.takeoff.holdTime )
+}
+
+// stopped short of the run, nose where it is
+behavior::Status PlaneTasks::holdShort( Mind& c )
+{
+	c.view[YAW] = c.ps.vehicleAngles[YAW];
+	c.cmd.forwardmove = c.speed > 1 ? -moveFull : moveNone;
+	return Status::Running;
+}
+
+// to the spot with enough runway, at walking pace; stopped on it, the next plan starts from there
+behavior::Status PlaneTasks::taxiToSpot( Mind& c )
+{
+	constexpr float taxiSpeed = 35.0f, onTheSpot = 40.0f;
+	Vec3 toSpot;
+	VectorSubtract( c.bot.takeoff.taxiSpot, c.ent->r.currentOrigin, toSpot );
+	toSpot[2] = 0;
+	c.headFor( c.bot.takeoff.taxiSpot );
+	c.view[PITCH] = 0.0f;
+	if( VectorLength( toSpot ) >= onTheSpot )
+	{
+		c.cmd.forwardmove = c.speed < taxiSpeed ? moveFull : c.speed > taxiSpeed * 1.5f ? -moveFull : moveNone;
 		return Status::Running;
-	if( theLevel.time_ < c.bot.takeoff.taxiTime )
-	{
-		constexpr float taxiSpeed = 35.0f;
-		Vec3 toSpot;
-		VectorSubtract( c.bot.takeoff.taxiSpot, c.ent->r.currentOrigin, toSpot );
-		toSpot[2] = 0;
-		c.headFor( c.bot.takeoff.taxiSpot );
-		c.view[PITCH] = 0.0f;
-		if( VectorLength( toSpot ) < 40 )
-		{
-			c.cmd.forwardmove = -moveFull;
-			// stopped on the spot: the next plan starts from here
-			if( c.speed <= 1 )
-				c.bot.takeoff.taxiTime = 0;
-		}
-		else
-			c.cmd.forwardmove = c.speed < taxiSpeed ? moveFull : c.speed > taxiSpeed * 1.5f ? -moveFull : moveNone;
 	}
-	else
-	{
-		c.view[YAW] = theLevel.time_ < c.bot.takeoff.planTime ? c.bot.takeoff.yaw : c.ps.vehicleAngles[YAW];
-		// leave the ground with speed in hand: lifting off right at the stall drops the aircraft back
-		c.view[PITCH] = c.speed > c.veh.stallspeed * rotateSpeed ? -8.0f : 0.0f;
-		if( fabs( AngleSubtract( c.view[YAW], c.ps.vehicleAngles[YAW] ) ) > 6 )
-			c.cmd.forwardmove = c.speed < 12 ? moveFull : -moveFull;
-	}
-	bool waiting = false;
-	if( c.speed < c.veh.stallspeed * 0.5f )
-	{
-		vec3_t flat = { 0, c.ps.vehicleAngles[YAW], 0 }, forward;
-		AngleVectors( flat, forward, nullptr, nullptr );
-		for( int i = 1; i <= theLevel.maxclients_; i++ )
-		{
-			GameEntity* other = theLevel.getEntity( i );
-			if( other == c.ent || !alive( other ) || other->client_->sess_.ridingClient_ >= 0 )
-				continue;
-			Vec3 rel;
-			rel = other->r.currentOrigin - c.ent->r.currentOrigin;
-			const float dist = VectorNormalize( rel );
-			if( dist < 320 && fabs( rel[2] * dist ) < 120 && DotProduct( rel, forward ) > 0.4f )
-			{
-				// taxiing round one that will not move: only what is right under the nose stops it
-				constexpr float underNose = 110.0f;
-				if( theLevel.time_ < c.bot.takeoff.sidestepTime && dist > underNose )
-					continue;
-				c.cmd.forwardmove = c.speed > 1 ? -moveFull : moveNone;
-				waiting = true;
-				// Two aircraft that each wait for the other would stand there for the rest of the game. After
-				// a few seconds of waiting on one that stands still, taxi round it, to the right as traffic
-				// does (to the left where the right is not clear)
-				constexpr int patience = 5000, sidestepFor = 9000;
-				constexpr float sidestep = 220.0f, aheadOfIt = 120.0f;
-				const bool standing = VectorLength( other->client_->ps_.velocity ) < 5.0f;
-				if( standing && c.bot.takeoff.heldSince && theLevel.time_ - c.bot.takeoff.heldSince > patience )
-				{
-					vec3_t right;
-					AngleVectors( flat, nullptr, right, nullptr );
-					for( float side : { 1.0f, -1.0f } )
-					{
-						Vec3 spot;
-						VectorMA( c.ent->r.currentOrigin, side * sidestep, right, spot );
-						VectorMA( spot, aheadOfIt, forward, spot );
-						trace_t way;
-						GameHost::trace( &way, c.ent->r.currentOrigin, nullptr, nullptr, spot, c.ent->s.number, MASK_PLAYERSOLID, false );
-						if( way.fraction < 1.0f )
-							continue;
-						VectorCopy( spot, c.bot.takeoff.taxiSpot );
-						c.bot.takeoff.taxiTime = c.bot.takeoff.sidestepTime = theLevel.time_ + sidestepFor;
-						c.bot.takeoff.heldSince = 0;
-						break;
-					}
-				}
-				break;
-			}
-			// stay off the path of an aircraft on its take-off roll, unless already standing in it
-			constexpr float rollSpeed = 60.0f, rollAhead = 1500.0f, rollWidth = 250.0f, onTheLine = 60.0f;
-			Vec3 track;
-			VectorCopy( other->client_->ps_.velocity, track );
-			track[2] = 0;
-			if( !(other->client_->ps_.ONOFF & OO_LANDED) || VectorNormalize( track ) < rollSpeed )
-				continue;
-			const float along = -DotProduct( rel, track ) * dist;
-			const float aside = sqrt( std::max( 0.0f, dist * dist - along * along ) );
-			if( along > 0 && along < rollAhead && aside < rollWidth && aside > onTheLine )
-			{
-				c.cmd.forwardmove = c.speed > 1 ? -moveFull : moveNone;
-				break;
-			}
-		}
-	}
+	c.cmd.forwardmove = -moveFull;
+	if( c.speed <= 1 )
+		c.bot.takeoff.taxiTime = 0;
+	return Status::Running;
+}
+
+// along the planned heading; the nose comes up with speed in hand, since lifting off right at the stall drops the
+// aircraft back
+behavior::Status PlaneTasks::lineUpAndRoll( Mind& c )
+{
+	c.view[YAW] = theLevel.time_ < c.bot.takeoff.planTime ? c.bot.takeoff.yaw : c.ps.vehicleAngles[YAW];
+	c.view[PITCH] = c.speed > c.veh.stallspeed * rotateSpeed ? -8.0f : 0.0f;
+	if( fabs( AngleSubtract( c.view[YAW], c.ps.vehicleAngles[YAW] ) ) > 6 )
+		c.cmd.forwardmove = c.speed < 12 ? moveFull : -moveFull;
+	return Status::Running;
+}
+
+// slow on the ground: stop for what is in front, and keep off another aircraft's take-off roll
+behavior::Status PlaneTasks::giveWay( Mind& c )
+{
+	const bool waiting = c.speed < c.veh.stallspeed * 0.5f && waitForTraffic( c );
 	if( !waiting )
 		c.bot.takeoff.heldSince = 0;
 	else if( !c.bot.takeoff.heldSince )
 		c.bot.takeoff.heldSince = theLevel.time_;
 	return Status::Running;
+}
+
+// true while waiting on an aircraft ahead; brakes for one on its take-off roll without counting as waiting
+bool PlaneTasks::waitForTraffic( Mind& c )
+{
+	// taxiing round one that will not move: only what is right under the nose stops it
+	constexpr float underNose = 110.0f;
+	vec3_t flat = { 0, c.ps.vehicleAngles[YAW], 0 }, forward;
+	AngleVectors( flat, forward, nullptr, nullptr );
+	for( int i = 1; i <= theLevel.maxclients_; i++ )
+	{
+		GameEntity* other = theLevel.getEntity( i );
+		if( other == c.ent || !alive( other ) || other->client_->sess_.ridingClient_ >= 0 )
+			continue;
+		Vec3 rel = other->r.currentOrigin - c.ent->r.currentOrigin;
+		const float dist = VectorNormalize( rel );
+		if( dist < 320 && fabs( rel[2] * dist ) < 120 && DotProduct( rel, forward ) > 0.4f )
+		{
+			if( theLevel.time_ < c.bot.takeoff.sidestepTime && dist > underNose )
+				continue;
+			c.cmd.forwardmove = c.speed > 1 ? -moveFull : moveNone;
+			sidestepIfStuck( c, other, flat, forward );
+			return true;
+		}
+		if( onTakeOffRollTowards( other, rel, dist ) )
+		{
+			c.cmd.forwardmove = c.speed > 1 ? -moveFull : moveNone;
+			return false;
+		}
+	}
+	return false;
+}
+
+// Two aircraft that each wait for the other would stand there for the rest of the game. After a few seconds of
+// waiting on one that stands still, taxi round it, to the right as traffic does (to the left where the right is not
+// clear)
+void PlaneTasks::sidestepIfStuck( Mind& c, const GameEntity* other, const vec3_t flat, const vec3_t forward )
+{
+	constexpr int patience = 5000, sidestepFor = 9000;
+	constexpr float sidestep = 220.0f, aheadOfIt = 120.0f;
+	const bool standing = VectorLength( other->client_->ps_.velocity ) < 5.0f;
+	if( !standing || !c.bot.takeoff.heldSince || theLevel.time_ - c.bot.takeoff.heldSince <= patience )
+		return;
+	vec3_t right;
+	AngleVectors( flat, nullptr, right, nullptr );
+	for( float side : { 1.0f, -1.0f } )
+	{
+		Vec3 spot;
+		VectorMA( c.ent->r.currentOrigin, side * sidestep, right, spot );
+		VectorMA( spot, aheadOfIt, forward, spot );
+		trace_t way;
+		GameHost::trace( &way, c.ent->r.currentOrigin, nullptr, nullptr, spot, c.ent->s.number, MASK_PLAYERSOLID, false );
+		if( way.fraction < 1.0f )
+			continue;
+		VectorCopy( spot, c.bot.takeoff.taxiSpot );
+		c.bot.takeoff.taxiTime = c.bot.takeoff.sidestepTime = theLevel.time_ + sidestepFor;
+		c.bot.takeoff.heldSince = 0;
+		return;
+	}
+}
+
+// another aircraft rolling for take-off with this one in its path ahead, unless already standing on its line
+bool PlaneTasks::onTakeOffRollTowards( const GameEntity* other, const Vec3& rel, float dist )
+{
+	constexpr float rollSpeed = 60.0f, rollAhead = 1500.0f, rollWidth = 250.0f, onTheLine = 60.0f;
+	Vec3 track;
+	VectorCopy( other->client_->ps_.velocity, track );
+	track[2] = 0;
+	if( !(other->client_->ps_.ONOFF & OO_LANDED) || VectorNormalize( track ) < rollSpeed )
+		return false;
+	const float along = -DotProduct( rel, track ) * dist;
+	const float aside = sqrt( std::max( 0.0f, dist * dist - along * along ) );
+	return along > 0 && along < rollAhead && aside < rollWidth && aside > onTheLine;
 }
 
 // follow the departure that was planned on the ground; the manoeuvre check still vets it

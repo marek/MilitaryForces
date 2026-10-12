@@ -110,6 +110,10 @@ struct PlaneTasks
 	// the nose comes up at this multiple of the stall speed
 	static constexpr float rotateSpeed = 1.12f;
 
+	// holding short of the run for a moment, and taxiing to a spot with more runway
+	static bool holdingShort( Mind& c ) { return theLevel.time_ < c.bot.takeoff.holdTime; }
+	static bool taxiing( Mind& c ) { return theLevel.time_ < c.bot.takeoff.taxiTime; }
+
 	// the first seconds after the wheels leave the ground
 	static bool departing( Mind& c )
 	{
@@ -138,7 +142,14 @@ struct PlaneTasks
 
 	// On the ground: wait when told to hold, plan a departure, taxi to a spot with enough runway if needed, then roll
 	// and lift off. Slow, it stops for anyone ahead and keeps off the path of an aircraft on its roll
-	static Status takeOff( Mind& c );
+	static void prepareTakeOff( Mind& c );
+	static Status holdShort( Mind& c );
+	static Status taxiToSpot( Mind& c );
+	static Status lineUpAndRoll( Mind& c );
+	static Status giveWay( Mind& c );
+	static bool waitForTraffic( Mind& c );
+	static void sidestepIfStuck( Mind& c, const GameEntity* other, const vec3_t flat, const vec3_t forward );
+	static bool onTakeOffRollTowards( const GameEntity* other, const Vec3& rel, float dist );
 
 	// follow the departure that was planned on the ground; the manoeuvre check still vets it
 	static Status depart( Mind& c );

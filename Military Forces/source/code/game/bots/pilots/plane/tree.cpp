@@ -5,6 +5,13 @@ behavior::Tree<Bots::Mind> PlaneTasks::build()
 	behavior::Tree<Mind> t;
 	const auto* hold = t.action( "hold course", holdCourse );
 
+	const auto* takeOff = t.setup( "take off", prepareTakeOff, t.selector( "roll", {
+		t.when( "holding short", holdingShort, t.action( "hold short", holdShort ) ),
+		t.always( "move", t.selector( "where to", {
+			t.when( "taxiing to a spot", taxiing, t.action( "taxi to spot", taxiToSpot ) ),
+			t.action( "line up and roll", lineUpAndRoll ) } ), {
+			t.action( "give way", giveWay ) } ) } ) );
+
 	const auto* land = t.sequence( "land and rearm", {
 		t.action( "survey runway", LandingSteps::survey ),
 		t.retry( "circuit", t.sequence( "approach and final", {
@@ -32,7 +39,7 @@ behavior::Tree<Bots::Mind> PlaneTasks::build()
 	const auto* act = t.selector( "plane", {
 		t.when( "missile inbound", missileInbound, t.action( "defend missile", defendMissile ) ),
 		t.when( "wants to rearm", landing, land ),
-		t.when( "on the ground", onGround, t.action( "take off", takeOff ) ),
+		t.when( "on the ground", onGround, takeOff ),
 		t.when( "just airborne", departing, t.action( "depart", depart ) ),
 		t.when( "evading", evading, t.selector( "evade", {
 			t.when( "blindsided", blindsided, t.action( "break away", breakAway ) ),

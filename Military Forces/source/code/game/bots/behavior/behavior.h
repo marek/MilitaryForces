@@ -273,6 +273,27 @@ namespace behavior
 		Predicate predicate_;
 	};
 
+	// a step that readies every frame for the child (claims the controls, makes a plan when one is due), then the
+	// child, whose status and leaf are the node's
+	template<typename Context>
+	class Setup : public Decorator<Context>
+	{
+	public:
+		using Function = void (*)( Context& );
+		Setup( const char* name, Function function, const Node<Context>* child ) : Decorator<Context>( name, child ), function_( function ) {}
+		const char* kind() const override { return "setup"; }
+
+	protected:
+		Status run( Context& context, Memory& memory ) const override
+		{
+			function_( context );
+			return this->child_->tick( context, memory );
+		}
+
+	private:
+		Function function_;
+	};
+
 	// the child again whenever it fails
 	template<typename Context>
 	class RetryUntilSuccess : public Decorator<Context>
@@ -454,6 +475,10 @@ namespace behavior
 		const Node<Context>* always( const char* name, const Node<Context>* child, std::initializer_list<const Node<Context>*> after )
 		{
 			return add<Always<Context>>( name, child, Children<Context>( after ) );
+		}
+		const Node<Context>* setup( const char* name, typename Setup<Context>::Function function, const Node<Context>* child )
+		{
+			return add<Setup<Context>>( name, function, child );
 		}
 		const Node<Context>* cooldown( const char* name, Duration<Context> wait, const Node<Context>* child )
 		{
