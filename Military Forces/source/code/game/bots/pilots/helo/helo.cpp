@@ -42,21 +42,21 @@ struct HeloTasks
 	static Status pickUpWalker( Mind& c )
 	{
 		flyTo( c, c.target->r.currentOrigin );
-		c.standoff = -300.0f;
-		c.cover = true;
-		if( c.dist < 140 )
+		c.steer.standoff = -300.0f;
+		c.weapons.cover = true;
+		if( c.steer.dist < 140 )
 		{
-			c.hasDest = false;
-			c.mode = Hover;
-			c.hold = true;
-			c.wantHeight = -200.0f;
+			c.steer.hasDest = false;
+			c.steer.mode = Hover;
+			c.steer.hold = true;
+			c.steer.wantHeight = -200.0f;
 			if( !(c.ps.ONOFF & OO_GEAR) )
 				c.cmd.buttons |= BUTTON_GEAR;
 			if( c.landed() )
-				c.wait = true;
+				c.steer.wait = true;
 		}
 		else
-			c.wantHeight = std::clamp( c.dist * 0.3f, 60.0f, heloLowHeight );
+			c.steer.wantHeight = std::clamp( c.steer.dist * 0.3f, 60.0f, heloLowHeight );
 		return Status::Running;
 	}
 
@@ -97,9 +97,9 @@ struct HeloTasks
 	static void faceEnemy( Mind& c )
 	{
 		c.view[YAW] = c.sense.enemyAngles[YAW];
-		c.dist = c.sense.enemyDist;
-		c.standoff = c.sense.enemyAir ? 500.0f : 1200.0f;
-		c.mode = Cruise;
+		c.steer.dist = c.sense.enemyDist;
+		c.steer.standoff = c.sense.enemyAir ? 500.0f : 1200.0f;
+		c.steer.mode = Cruise;
 	}
 
 	// head for a point at the present height
@@ -108,19 +108,19 @@ struct HeloTasks
 		Vec3 dir;
 		VectorSubtract( point, c.ent->r.currentOrigin, dir );
 		dir[2] = 0;
-		c.dist = VectorLength( dir );
+		c.steer.dist = VectorLength( dir );
 		c.headFor( point );
 		c.travelTo( Vec3( point[0], point[1], c.ent->r.currentOrigin[2] ) );
-		c.mode = Cruise;
+		c.steer.mode = Cruise;
 	}
 
 	// sit on the pad, collective down, until full
 	static Status rearmOnPad( Mind& c )
 	{
-		c.wait = true;
-		c.cover = true;
-		c.mode = Hover;
-		c.wantHeight = -200.0f;
+		c.steer.wait = true;
+		c.weapons.cover = true;
+		c.steer.mode = Hover;
+		c.steer.wantHeight = -200.0f;
 		if( Bots::replenished( c.ent ) )
 		{
 			Bots::finishRearm( c.ent, c.bot );
@@ -133,11 +133,11 @@ struct HeloTasks
 	static Status descendToPad( Mind& c )
 	{
 		flyTo( c, BotWorld::pads_[c.bot.pad].center );
-		c.hasDest = false;
-		c.cover = true;
-		c.hold = true;
-		c.mode = Hover;
-		c.wantHeight = -200.0f;
+		c.steer.hasDest = false;
+		c.weapons.cover = true;
+		c.steer.hold = true;
+		c.steer.mode = Hover;
+		c.steer.wantHeight = -200.0f;
 		if( !(c.ps.ONOFF & OO_GEAR) )
 			c.cmd.buttons |= BUTTON_GEAR;
 		return Status::Running;
@@ -147,9 +147,9 @@ struct HeloTasks
 	static Status flyToPad( Mind& c )
 	{
 		flyTo( c, BotWorld::pads_[c.bot.pad].center );
-		c.cover = true;
-		c.mode = ToPad;
-		c.wantHeight = heloCruiseHeight * 0.6f;
+		c.weapons.cover = true;
+		c.steer.mode = ToPad;
+		c.steer.wantHeight = heloCruiseHeight * 0.6f;
 		return Status::Running;
 	}
 
@@ -157,16 +157,16 @@ struct HeloTasks
 	static Status dodgeMissile( Mind& c )
 	{
 		c.view[YAW] = c.sense.missileYaw + 90.0f;
-		c.cover = true;
-		c.defending = true;
-		c.wantHeight = 60.0f;
-		c.mode = Run;
+		c.weapons.cover = true;
+		c.steer.evading = true;
+		c.steer.wantHeight = 60.0f;
+		c.steer.mode = Run;
 		return Status::Running;
 	}
 
 	static Status waitForPassengers( Mind& c )
 	{
-		c.wait = true;
+		c.steer.wait = true;
 		return Status::Running;
 	}
 
@@ -174,8 +174,8 @@ struct HeloTasks
 	static Status evade( Mind& c )
 	{
 		c.view[YAW] = c.sense.blindsided ? c.bot.breakYaw : c.sense.enemyAngles[YAW] + 180.0f;
-		c.defending = true;
-		c.mode = Run;
+		c.steer.evading = true;
+		c.steer.mode = Run;
 		return Status::Running;
 	}
 
@@ -183,8 +183,8 @@ struct HeloTasks
 	static Status goToFlag( Mind& c )
 	{
 		flyTo( c, c.bot.goal );
-		if( c.dist < 500 )
-			c.wantHeight = 25.0f;
+		if( c.steer.dist < 500 )
+			c.steer.wantHeight = 25.0f;
 		return Status::Running;
 	}
 
@@ -195,11 +195,11 @@ struct HeloTasks
 		Vec3 toCover;
 		VectorSubtract( c.bot.hidePoint, c.ent->r.currentOrigin, toCover );
 		toCover[2] = 0;
-		c.dist = VectorLength( toCover );
+		c.steer.dist = VectorLength( toCover );
 		c.headFor( c.bot.hidePoint );
-		c.cover = true;
-		c.wantHeight = 110.0f;
-		c.mode = MoveToCover;
+		c.weapons.cover = true;
+		c.steer.wantHeight = 110.0f;
+		c.steer.mode = MoveToCover;
 		return Status::Running;
 	}
 
@@ -207,9 +207,9 @@ struct HeloTasks
 	static Status sinkIntoCover( Mind& c )
 	{
 		faceEnemy( c );
-		c.cover = true;
-		c.wantHeight = 110.0f;
-		c.mode = BackOff;
+		c.weapons.cover = true;
+		c.steer.wantHeight = 110.0f;
+		c.steer.mode = BackOff;
 		return Status::Running;
 	}
 
@@ -217,7 +217,7 @@ struct HeloTasks
 	static Status fireExposed( Mind& c )
 	{
 		faceEnemy( c );
-		c.wantHeight = std::max( c.sense.height, heloLowHeight );
+		c.steer.wantHeight = std::max( c.sense.height, heloLowHeight );
 		if( theLevel.time_ > c.bot.popTime )
 		{
 			c.bot.exposed = false;
@@ -239,7 +239,7 @@ struct HeloTasks
 	static Status popUp( Mind& c )
 	{
 		faceEnemy( c );
-		c.wantHeight = std::min( c.sense.height + 300.0f, 900.0f );
+		c.steer.wantHeight = std::min( c.sense.height + 300.0f, 900.0f );
 		return Status::Running;
 	}
 
@@ -295,10 +295,10 @@ struct HeloTasks
 	{
 		c.view[YAW] = c.sense.enemyAngles[YAW] + 180.0f;
 		c.bot.exposed = false;
-		c.cover = true;
-		c.defending = true;
-		c.wantHeight = 90.0f;
-		c.mode = Run;
+		c.weapons.cover = true;
+		c.steer.evading = true;
+		c.steer.wantHeight = 90.0f;
+		c.steer.mode = Run;
 		return Status::Running;
 	}
 
@@ -306,8 +306,8 @@ struct HeloTasks
 	static Status stalk( Mind& c )
 	{
 		closeOnEnemy( c );
-		c.cover = true;
-		c.wantHeight = 90.0f;
+		c.weapons.cover = true;
+		c.steer.wantHeight = 90.0f;
 		return Status::Running;
 	}
 
@@ -315,8 +315,8 @@ struct HeloTasks
 	static Status strikeExposed( Mind& c )
 	{
 		faceEnemy( c );
-		c.standoff = c.sense.enemyDist;
-		c.wantHeight = std::max( c.sense.height, heloLowHeight );
+		c.steer.standoff = c.sense.enemyDist;
+		c.steer.wantHeight = std::max( c.sense.height, heloLowHeight );
 		if( guidedAmmo( c ) < c.bot.strikeAmmo || theLevel.time_ > c.bot.popTime )
 		{
 			c.bot.exposed = false;
@@ -408,12 +408,12 @@ struct HeloTasks
 			return Status::Failure;
 
 		flyTo( c, needy->r.currentOrigin );
-		c.standoff = -300.0f;
-		c.wantHeight = std::max( dropHeight, heloLowHeight );
+		c.steer.standoff = -300.0f;
+		c.steer.wantHeight = std::max( dropHeight, heloLowHeight );
 		c.cmd.weapon = slot;
-		if( c.dist < 120 )
+		if( c.steer.dist < 120 )
 		{
-			c.mode = Hover;
+			c.steer.mode = Hover;
 			if( c.ps.weaponNum == slot && c.sense.height > dropHeight * 0.6f )
 			{
 				c.cmd.buttons |= BUTTON_ATTACK_MAIN;
@@ -436,9 +436,9 @@ struct HeloTasks
 		AngleVectors( flat, nullptr, right, nullptr );
 		VectorMA( leader->r.currentOrigin, (c.ent->s.number & 1) ? 350.0f : -350.0f, right, spot );
 		flyTo( c, spot );
-		c.standoff = -200.0f;
-		if( c.dist < 150 )
-			c.mode = Hover;
+		c.steer.standoff = -200.0f;
+		if( c.steer.dist < 150 )
+			c.steer.mode = Hover;
 		return Status::Running;
 	}
 
@@ -462,10 +462,10 @@ struct HeloTasks
 	{
 		Bots::State& bot = c.bot;
 		const Vec3 here( c.ent->r.currentOrigin );
-		const Vec3 toDest = c.dest - here;
+		const Vec3 toDest = c.steer.dest - here;
 		const float range = toDest.length();
-		const Vec3 probeEnd = range > 1500.0f ? here + toDest * (1500.0f / range) : c.dest;
-		if( !c.hasDest || c.landed() || range <= 600.0f || AirNav::clearLine( here, probeEnd, 60.0f ) )
+		const Vec3 probeEnd = range > 1500.0f ? here + toDest * (1500.0f / range) : c.steer.dest;
+		if( !c.steer.hasDest || c.landed() || range <= 600.0f || AirNav::clearLine( here, probeEnd, 60.0f ) )
 		{
 			bot.path.clear();
 			bot.following = false;
@@ -473,7 +473,7 @@ struct HeloTasks
 		}
 		if( theLevel.time_ >= bot.pathTime )
 		{
-			AirNav::findPath( here, c.dest, bot.path );
+			AirNav::findPath( here, c.steer.dest, bot.path );
 			bot.pathIndex = 0;
 			bot.pathTime = theLevel.time_ + 2000;
 		}
@@ -488,8 +488,8 @@ struct HeloTasks
 		Vec3 point;
 		waypoint.copyTo( point );
 		c.headFor( point );
-		c.wantHeight = std::clamp( c.sense.height + (waypoint.z() - here.z()), 60.0f, 1500.0f );
-		c.dist = std::max( c.dist, c.standoff + 400.0f );
+		c.steer.wantHeight = std::clamp( c.sense.height + (waypoint.z() - here.z()), 60.0f, 1500.0f );
+		c.steer.dist = std::max( c.steer.dist, c.steer.standoff + 400.0f );
 		return Status::Success;
 	}
 
@@ -501,16 +501,16 @@ struct HeloTasks
 		if( !c.landed() )
 		{
 			const float highest = c.sense.height + BotWorld::ceilingAbove( c.ent->r.currentOrigin, c.ent->s.number ) - headroom;
-			c.wantHeight = std::min( c.wantHeight, std::max( highest, 40.0f ) );
+			c.steer.wantHeight = std::min( c.steer.wantHeight, std::max( highest, 40.0f ) );
 		}
 		const float throttle = signedThrottle( c.ps, c.client->vehicle_ );
-		float wantThrottle = std::clamp( (c.wantHeight - c.sense.height) / 60.0f, -3.0f, static_cast<float>( c.veh.maxthrottle ) );
-		if( c.wait )
+		float wantThrottle = std::clamp( (c.steer.wantHeight - c.sense.height) / 60.0f, -3.0f, static_cast<float>( c.veh.maxthrottle ) );
+		if( c.steer.wait )
 			wantThrottle = 0;
 		else if( c.landed() )
 			wantThrottle = std::max( wantThrottle, c.veh.maxthrottle * 0.6f );
 		// setting down: a steady gentle sink for the last stretch
-		if( c.hold && c.sense.height < 150 )
+		if( c.steer.hold && c.sense.height < 150 )
 			wantThrottle = -1.0f;
 		if( throttle < floor( wantThrottle ) )
 			c.cmd.buttons |= BUTTON_INCREASE;
@@ -544,23 +544,23 @@ struct HeloTasks
 		constexpr float maxPitch = 30.0f;
 		constexpr float maxRoll = 40.0f;
 		constexpr float levelling = 0.75f;
-		c.yawError = fabs( AngleSubtract( c.view[YAW], c.ps.vehicleAngles[YAW] ) );
+		c.steer.yawError = fabs( AngleSubtract( c.view[YAW], c.ps.vehicleAngles[YAW] ) );
 
 		// how hard to push in the wanted direction, as forward tilt in degrees (negative backs away)
 		float push = 0;
 		bool orbit = false;
 		if( c.sense.height > 60 )
 		{
-			switch( c.mode )
+			switch( c.steer.mode )
 			{
 			case Run:
 				push = 14.0f;
 				break;
 			case ToPad:
-				push = std::clamp( c.dist / 60.0f, 3.0f, 14.0f );
+				push = std::clamp( c.steer.dist / 60.0f, 3.0f, 14.0f );
 				break;
 			case MoveToCover:
-				push = c.dist > 150 ? 12.0f : 0.0f;
+				push = c.steer.dist > 150 ? 12.0f : 0.0f;
 				break;
 			case BackOff:
 				push = -5.0f;
@@ -568,7 +568,7 @@ struct HeloTasks
 			case Hover:
 				break;
 			default:
-				if( c.dist > c.standoff + 300 )
+				if( c.steer.dist > c.steer.standoff + 300 )
 					push = c.sense.height > 300 ? 14.0f : 9.0f;
 				else if( c.sense.enemy )
 					orbit = true;
@@ -585,11 +585,11 @@ struct HeloTasks
 			// direction now and then, and opening the range when too close
 			constexpr int orbitPeriod = 6000;
 			const float side = (((theLevel.time_ / orbitPeriod) + c.ent->s.number) & 1) ? 1.0f : -1.0f;
-			travelYaw = c.view[YAW] + side * (c.dist < c.standoff ? 125.0f : 90.0f);
+			travelYaw = c.view[YAW] + side * (c.steer.dist < c.steer.standoff ? 125.0f : 90.0f);
 			push = 9.0f;
 		}
 		float speed = fabs( push ) / maxPitch * maxSpeed;
-		c.blocked = false;
+		c.steer.blocked = false;
 		constexpr float climbSlope = 0.4f;
 		if( speed > 1.0f )
 		{
@@ -605,7 +605,7 @@ struct HeloTasks
 				rising[2] = climbSlope;
 				const bool level = clearAlong( c, dir, reach ) >= reach;
 				if( !level && offset == 0.0f )
-					c.blocked = true;
+					c.steer.blocked = true;
 				if( !level && clearAlong( c, rising, reach ) < reach )
 					continue;
 				travelYaw += offset;
@@ -614,7 +614,7 @@ struct HeloTasks
 				if( !level )
 				{
 					speed *= 0.6f;
-					c.wantHeight = std::max( c.wantHeight, std::min( c.sense.height + reach * climbSlope, 1500.0f ) );
+					c.steer.wantHeight = std::max( c.steer.wantHeight, std::min( c.sense.height + reach * climbSlope, 1500.0f ) );
 				}
 				found = true;
 				break;
@@ -622,7 +622,7 @@ struct HeloTasks
 			if( !found )
 			{
 				speed = 0;
-				c.wantHeight = std::max( c.wantHeight, std::min( c.sense.height + 300.0f, 1500.0f ) );
+				c.steer.wantHeight = std::max( c.steer.wantHeight, std::min( c.sense.height + 300.0f, 1500.0f ) );
 			}
 		}
 
@@ -683,8 +683,8 @@ struct HeloTasks
 	// shoot unless hiding, dodging or flying a path round something
 	static Status fire( Mind& c )
 	{
-		if( c.sense.enemy && !c.cover && !c.defending && !c.bot.following )
-			BotWeapons::fireWeapons( c.ent, c.bot, c.sense, c.cmd, c.yawError );
+		if( c.sense.enemy && !c.weapons.cover && !c.steer.evading && !c.bot.following )
+			BotWeapons::fireWeapons( c.ent, c.bot, c.sense, c.cmd, c.steer.yawError );
 		return Status::Success;
 	}
 
@@ -747,7 +747,7 @@ void Bots::thinkHelo( GameEntity* ent, State& bot, const Sense& sense, usercmd_t
 	Mind mind{ ent, client, bot, sense, cmd, view, ps, availableVehicles[client->vehicle_], static_cast<float>( ps.speed ) / 10.0f };
 
 	// attack helicopters fly low by default, transports higher; the steps change it as they need
-	mind.wantHeight = sense.role == Role::AttackHelo ? heloLowHeight : heloCruiseHeight * 0.6f;
+	mind.steer.wantHeight = sense.role == Role::AttackHelo ? heloLowHeight : heloCruiseHeight * 0.6f;
 	if( !HeloTasks::fighting( mind ) && !HeloTasks::stealthStriking( mind ) )
 		bot.exposed = false;
 	view[YAW] = ps.vehicleAngles[YAW];

@@ -52,7 +52,7 @@ struct SurfaceTasks
 	// stop once the place steered for is this close
 	static void holdNear( Mind& c, float radius )
 	{
-		c.hold = fabs( c.course[0] ) + fabs( c.course[1] ) < radius;
+		c.steer.hold = fabs( c.steer.course[0] ) + fabs( c.steer.course[1] ) < radius;
 	}
 
 	// a spot out of the aircraft's sight, looked for again every few seconds
@@ -73,7 +73,7 @@ struct SurfaceTasks
 	// no cover known: straight away from it
 	static Status runFromAircraft( Mind& c )
 	{
-		VectorSubtract( c.ent->r.currentOrigin, c.sense.airThreat->r.currentOrigin, c.course );
+		VectorSubtract( c.ent->r.currentOrigin, c.sense.airThreat->r.currentOrigin, c.steer.course );
 		return Status::Running;
 	}
 
@@ -97,7 +97,7 @@ struct SurfaceTasks
 	{
 		c.courseTo( BotWorld::pads_[c.bot.pad].spot );
 		holdNear( c, 80 );
-		if( c.hold && Bots::replenished( c.ent ) )
+		if( c.steer.hold && Bots::replenished( c.ent ) )
 		{
 			Bots::finishRearm( c.ent, c.bot );
 			return Status::Success;
@@ -121,8 +121,8 @@ struct SurfaceTasks
 	static Status shellAirfield( Mind& c )
 	{
 		c.bot.hasHide = false;
-		VectorCopy( c.sense.enemyDir, c.course );
-		c.hold = true;
+		VectorCopy( c.sense.enemyDir, c.steer.course );
+		c.steer.hold = true;
 		return Status::Running;
 	}
 
@@ -130,7 +130,7 @@ struct SurfaceTasks
 	static Status withdraw( Mind& c )
 	{
 		c.bot.hasHide = false;
-		VectorNegate( c.sense.enemyDir, c.course );
+		VectorNegate( c.sense.enemyDir, c.steer.course );
 		return Status::Running;
 	}
 
@@ -138,9 +138,9 @@ struct SurfaceTasks
 	static Status engage( Mind& c )
 	{
 		c.bot.hasHide = false;
-		VectorCopy( c.sense.enemyDir, c.course );
+		VectorCopy( c.sense.enemyDir, c.steer.course );
 		c.travelTo( c.enemyPosition() );
-		c.hold = c.sense.enemyDist < 1500;
+		c.steer.hold = c.sense.enemyDist < 1500;
 		return Status::Running;
 	}
 
@@ -269,35 +269,35 @@ struct SurfaceTasks
 		VectorCopy( c.ent->r.currentOrigin, start );
 		start[2] += c.veh.maxs[2] * 0.5f + 8;
 		// a slope gentle enough to drive up is not an obstacle
-		c.blocked = BotWorld::pathBlocked( start, forward, 260, c.ent->s.number, tr ) && tr.plane.normal[2] < 0.6f;
-		if( !c.boat && !c.blocked )
+		c.steer.blocked = BotWorld::pathBlocked( start, forward, 260, c.ent->s.number, tr ) && tr.plane.normal[2] < 0.6f;
+		if( !c.boat && !c.steer.blocked )
 		{
 			for( float reach : { 160.0f, 380.0f } )
 			{
 				bool drop;
 				if( waterAt( c, forward, reach, drop ) || drop )
-					c.blocked = true;
+					c.steer.blocked = true;
 			}
 		}
 		// a boat stays where there is water under the bow
-		if( c.boat && !c.blocked )
+		if( c.boat && !c.steer.blocked )
 		{
 			Vec3 ahead;
 			VectorMA( c.ent->r.currentOrigin, 500, forward, ahead );
 			ahead[2] = c.ent->r.currentOrigin[2] - 6;
 			if( !(GameHost::pointContents( ahead, c.ent->s.number ) & MASK_WATER) )
-				c.blocked = true;
+				c.steer.blocked = true;
 		}
 		// stuck: meant to be moving and has not covered 40 units since the last check
 		if( theLevel.time_ > bot.stuckCheckTime )
 		{
-			if( !c.hold && theLevel.time_ > bot.spawnTime + 4000 && theLevel.time_ > bot.reverseTime + 2000 &&
+			if( !c.steer.hold && theLevel.time_ > bot.spawnTime + 4000 && theLevel.time_ > bot.reverseTime + 2000 &&
 				Distance( c.ent->r.currentOrigin, bot.lastOrigin ) < 40 )
-				c.blocked = true;
+				c.steer.blocked = true;
 			VectorCopy( c.ent->r.currentOrigin, bot.lastOrigin );
 			bot.stuckCheckTime = theLevel.time_ + 2500;
 		}
-		if( c.blocked && theLevel.time_ > bot.reverseTime )
+		if( c.steer.blocked && theLevel.time_ > bot.reverseTime )
 		{
 			// the path led into something the path finder did not see: it learns that this way is shut
 			if( bot.following && bot.pathIndex < bot.path.size() )
@@ -315,7 +315,7 @@ struct SurfaceTasks
 	// water behind: forward again if the way is open, turning as it was while backing
 	static Status creepForward( Mind& c )
 	{
-		c.cmd.forwardmove = c.blocked ? moveNone : moveFull;
+		c.cmd.forwardmove = c.steer.blocked ? moveNone : moveFull;
 		c.cmd.rightmove = static_cast<signed char>( c.bot.reverseTurn );
 		return Status::Running;
 	}
@@ -331,14 +331,14 @@ struct SurfaceTasks
 	static Status steer( Mind& c )
 	{
 		Vec3 angles;
-		c.course[2] = 0;
-		vectoangles( c.course, angles );
+		c.steer.course[2] = 0;
+		vectoangles( c.steer.course, angles );
 		const float yawError = AngleSubtract( angles[YAW], c.ps.vehicleAngles[YAW] );
 		if( yawError < -6 )
 			c.cmd.rightmove = moveFull;
 		else if( yawError > 6 )
 			c.cmd.rightmove = -moveFull;
-		if( !c.hold )
+		if( !c.steer.hold )
 			c.cmd.forwardmove = moveFull;
 		return Status::Running;
 	}

@@ -70,7 +70,7 @@ struct PlaneTasks
 	static float enemyTurn( const Mind& c ) { return AngleSubtract( c.sense.enemyAngles[YAW], c.ps.vehicleAngles[YAW] ); }
 
 	// free flight: not in a step that works the controls itself (take-off, final, roll-out)
-	static bool flying( Mind& c ) { return !c.direct; }
+	static bool flying( Mind& c ) { return !c.controls.claimed(); }
 	static bool landing( Mind& c ) { return c.bot.desire == Goal::Rearm && c.bot.pad >= 0; }
 	static bool onGround( Mind& c ) { return c.landed(); }
 	static bool onApproach( Mind& c ) { return c.bot.desire == Goal::Rearm && c.bot.landPhase == 1; }
@@ -163,8 +163,8 @@ struct PlaneTasks
 	// weapons free and closing; after a close pass the plane flies on out before coming round
 	static void engage( Mind& c )
 	{
-		c.attacking = true;
-		c.weaponsFree = true;
+		c.weapons.attacking = true;
+		c.weapons.free = true;
 		c.travelTo( c.enemyPosition() );
 		if( !c.sense.enemyAir && c.sense.enemyDist < 900 )
 			c.bot.egressTime = theLevel.time_ + 5000;
@@ -325,7 +325,7 @@ struct PlaneTasks
 	// and lift off. Slow, it stops for anyone ahead and keeps off the path of an aircraft on its roll
 	static Status takeOff( Mind& c )
 	{
-		c.direct = true;
+		c.controls.claim();
 		c.bot.groundTime = theLevel.time_;
 		if( theLevel.time_ < c.bot.holdTime )
 		{
@@ -460,7 +460,7 @@ struct PlaneTasks
 			c.view[PITCH] = -28.0f;
 		}
 		c.cmd.forwardmove = moveFull;
-		c.defending = true;
+		c.steer.evading = true;
 		return Status::Running;
 	}
 
@@ -483,8 +483,8 @@ struct PlaneTasks
 	// nose on the target, release when lined up and close with no team mate in the blast, then pull out
 	static Status diveBomb( Mind& c )
 	{
-		c.attacking = true;
-		c.weaponsFree = true;
+		c.weapons.attacking = true;
+		c.weapons.free = true;
 		c.travelTo( c.enemyPosition() );
 		aimAtEnemy( c );
 		for( int slot : secondaryWeaponSlots )
@@ -492,7 +492,7 @@ struct PlaneTasks
 			const int weapon = c.veh.weapons[slot];
 			if( weapon && c.ps.ammo[slot] > 0 && (availableWeapons[weapon].type == WT_IRONBOMB || availableWeapons[weapon].type == WT_GUIDEDBOMB) )
 			{
-				c.forcedWeapon = slot;
+				c.weapons.keep = slot;
 				Vec3 nose;
 				AngleVectors( c.ps.vehicleAngles, nose, nullptr, nullptr );
 				const float blast = static_cast<float>( availableWeapons[weapon].damageRadius );
@@ -511,8 +511,8 @@ struct PlaneTasks
 	static Status levelBomb( Mind& c )
 	{
 		roam( c );
-		c.hasDest = false;
-		c.bombing = true;
+		c.steer.hasDest = false;
+		c.steer.headingFixed = true;
 		BotWeapons::bomb( c.ent, c.bot, c.sense.enemy->r.currentOrigin, c.cmd, c.view );
 		return Status::Running;
 	}
@@ -582,8 +582,8 @@ struct PlaneTasks
 	static Status holdCourse( Mind& c )
 	{
 		engage( c );
-		c.attacking = false;
-		c.snapShot = fabs( enemyTurn( c ) ) < 6.0f;
+		c.weapons.attacking = false;
+		c.weapons.snapShot = fabs( enemyTurn( c ) ) < 6.0f;
 		c.view[YAW] = c.ps.vehicleAngles[YAW];
 		c.holdAltitude();
 		return Status::Running;
@@ -654,15 +654,15 @@ struct PlaneTasks
 	static Status navigate( Mind& c )
 	{
 		State& bot = c.bot;
-		if( c.bombing || c.defending )
+		if( c.steer.headingFixed || c.steer.evading )
 			return Status::Success;
 		if( bot.desire == Goal::Rearm && bot.landPhase == 1 )
 			c.travelTo( Vec3( bot.goal[0], bot.goal[1], bot.approachHeight ) );
 		const Vec3 here( c.ent->r.currentOrigin );
-		const Vec3 toDest = c.dest - here;
+		const Vec3 toDest = c.steer.dest - here;
 		const float range = toDest.length();
-		const Vec3 probeEnd = range > 2500.0f ? here + toDest * (2500.0f / range) : c.dest;
-		if( !c.hasDest || range <= 300.0f || (!bot.confined && AirNav::clearLine( here, probeEnd, 70.0f )) )
+		const Vec3 probeEnd = range > 2500.0f ? here + toDest * (2500.0f / range) : c.steer.dest;
+		if( !c.steer.hasDest || range <= 300.0f || (!bot.confined && AirNav::clearLine( here, probeEnd, 70.0f )) )
 		{
 			bot.path.clear();
 			bot.following = false;
@@ -672,7 +672,7 @@ struct PlaneTasks
 		const float radius = c.turnRadius();
 		if( theLevel.time_ >= bot.pathTime )
 		{
-			AirNav::findPath( here, c.dest, bot.path, Vec3( c.ps.velocity ).normalized(), radius );
+			AirNav::findPath( here, c.steer.dest, bot.path, Vec3( c.ps.velocity ).normalized(), radius );
 			bot.pathIndex = 0;
 			bot.pathTime = theLevel.time_ + 1500;
 		}
@@ -691,8 +691,8 @@ struct PlaneTasks
 		leg.copyTo( legDir );
 		vectoangles( legDir, legAngles );
 		const float aimAt = c.sense.enemy ? fabs( enemyTurn( c ) ) : 180.0f;
-		c.snapShot = c.attacking && aimAt < 6.0f;
-		c.attacking = false;
+		c.weapons.snapShot = c.weapons.attacking && aimAt < 6.0f;
+		c.weapons.attacking = false;
 		c.view[YAW] = legAngles[YAW];
 		c.view[PITCH] = std::clamp( AngleSubtract( legAngles[PITCH], 0 ), -20.0f, 20.0f );
 		bot.following = true;
@@ -729,7 +729,7 @@ struct PlaneTasks
 		// in a corridor, traffic one way flies above the middle and traffic the other way below it
 		constexpr float laneOffset = 0.17f;
 		const float lane = cos( c.ps.vehicleAngles[YAW] * std::numbers::pi_v<float> / 180.0f ) >= 0.0f ? 0.5f + laneOffset : 0.5f - laneOffset;
-		if( c.room < c.cruise * 2.0f && !(c.attacking && c.sense.enemyAir) && !onApproach( c ) )
+		if( c.room < c.steer.cruise * 2.0f && !(c.weapons.attacking && c.sense.enemyAir) && !onApproach( c ) )
 			c.view[PITCH] = std::clamp( (c.sense.height - c.room * lane) / 20.0f, -25.0f, 20.0f );
 		return Status::Success;
 	}
@@ -1154,7 +1154,7 @@ struct PlaneTasks
 		if( c.sense.height <= c.minHeight * 1.5f || c.ceiling <= 600.0f )
 			return false;
 		// a missile on its way
-		if( c.defending || c.sense.missile || c.sense.launched )
+		if( c.steer.evading || c.sense.missile || c.sense.launched )
 			return true;
 		// running away from someone near enough to matter
 		constexpr float chased = 4000.0f;
@@ -1181,14 +1181,14 @@ struct PlaneTasks
 	// shoot when attacking or when the enemy crosses the nose; a step that needs one particular weapon keeps it selected
 	static Status fire( Mind& c )
 	{
-		if( !c.attacking && !c.snapShot && !c.weaponsFree )
+		if( !c.weapons.attacking && !c.weapons.snapShot && !c.weapons.free )
 			return Status::Success;
 		Vec3 fwd;
 		AngleVectors( c.ps.vehicleAngles, fwd, nullptr, nullptr );
 		const float aimError = acos( std::clamp( DotProduct( fwd, c.sense.enemyDir ), -1.0f, 1.0f ) ) * 180.0f / std::numbers::pi_v<float>;
 		BotWeapons::fireWeapons( c.ent, c.bot, c.sense, c.cmd, aimError );
-		if( c.forcedWeapon >= 0 )
-			c.cmd.weapon = c.forcedWeapon;
+		if( c.weapons.keep >= 0 )
+			c.cmd.weapon = c.weapons.keep;
 		return Status::Success;
 	}
 
@@ -1263,13 +1263,13 @@ void Bots::thinkPlane( GameEntity* ent, State& bot, const Sense& sense, usercmd_
 	const playerState_t& ps = client->ps_;
 	Mind mind{ ent, client, bot, sense, cmd, view, ps, availableVehicles[client->vehicle_], static_cast<float>( ps.speed ) / 10.0f };
 
-	mind.cruise = planeCruiseHeight;
+	mind.steer.cruise = planeCruiseHeight;
 	if( sense.role == Role::Bomber )
-		mind.cruise = bomberRunHeight( sense.height, BotWorld::ceilingAbove( ent->r.currentOrigin, ent->s.number ) );
+		mind.steer.cruise = bomberRunHeight( sense.height, BotWorld::ceilingAbove( ent->r.currentOrigin, ent->s.number ) );
 	else if( bot.desire == Goal::Climb )
-		mind.cruise = sense.height + 500.0f;
+		mind.steer.cruise = sense.height + 500.0f;
 	else if( !sense.enemy || !sense.enemyAir )
-		mind.cruise = planeCruiseHeight - 800.0f * character( bot ).cunning;
+		mind.steer.cruise = planeCruiseHeight - 800.0f * character( bot ).cunning;
 	mind.airspeed = VectorLength( ps.velocity );
 	mind.ceiling = BotWorld::ceilingAbove( ent->r.currentOrigin, ent->s.number );
 	mind.room = sense.height + mind.ceiling;

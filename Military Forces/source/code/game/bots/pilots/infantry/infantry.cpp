@@ -68,20 +68,20 @@ struct InfantryTasks
 		return theLevel.time_ > c.bot.spawnTime + patience || (c.nearPad < 0 && theLevel.time_ > c.bot.spawnTime + 8000) || c.nearPadDist > 6000;
 	}
 	static bool padAway( Mind& c ) { return c.nearPad >= 0 && c.nearPadDist > 150; }
-	static bool moving( Mind& c ) { return !c.direct; }
+	static bool moving( Mind& c ) { return !c.controls.claimed(); }
 
 	// the enter key
 	static Status board( Mind& c )
 	{
 		c.bot.commandTime = theLevel.time_ + 1500;
-		c.direct = true;
+		c.controls.claim();
 		Cmd_Eject_f( c.ent );
 		return Status::Success;
 	}
 
 	static Status shoot( Mind& c )
 	{
-		c.direct = true;
+		c.controls.claim();
 		c.view[YAW] = c.sense.enemyAngles[YAW];
 		c.view[PITCH] = std::clamp( AngleSubtract( c.sense.enemyAngles[PITCH], 0 ), -60.0f, 60.0f );
 		if( c.client->ps_.ammo[WP_MACHINEGUN] > 0 )
@@ -108,7 +108,7 @@ struct InfantryTasks
 			return Status::Failure;
 		c.bot.commandTime = theLevel.time_ + 2000;
 		c.bot.vehicle = vehicle;
-		c.direct = true;
+		c.controls.claim();
 		char userinfo[MAX_INFO_STRING];
 		GameHost::getUserinfo( c.ent->s.number, userinfo, sizeof( userinfo ) );
 		Info::setValueForKey( userinfo, "cg_nextVehicle", va( "%d", vehicle ) );
@@ -144,8 +144,8 @@ struct InfantryTasks
 	{
 		Bots::State& bot = c.bot;
 		Vec3 angles;
-		c.course[2] = 0;
-		vectoangles( c.course, angles );
+		c.steer.course[2] = 0;
+		vectoangles( c.steer.course, angles );
 		c.view[YAW] = angles[YAW];
 		c.view[PITCH] = 0;
 		c.cmd.forwardmove = moveFull;
