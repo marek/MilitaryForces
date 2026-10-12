@@ -80,7 +80,7 @@ void Bots::thinkPlane( GameEntity* ent, State& bot, const Sense& sense, usercmd_
 	Mind mind{ ent, client, bot, sense, cmd, view, ps, availableVehicles[client->vehicle_], static_cast<float>( ps.speed ) / 10.0f };
 
 	mind.steer.cruise = planeCruiseHeight;
-	if( sense.role == Role::Bomber )
+	if( sense.can.groundStrike )
 		mind.steer.cruise = bomberRunHeight( sense.height, BotWorld::ceilingAbove( ent->r.currentOrigin, ent->s.number ) );
 	else if( bot.desire == Goal::Climb )
 		mind.steer.cruise = sense.height + 500.0f;
