@@ -66,6 +66,17 @@ if(WIN32 AND TARGET SDL2::SDL2)
         COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:SDL2::SDL2> $<TARGET_FILE_DIR:${CLIENT_NAME}>)
 endif()
 
+# OpenAL Soft is opened by name at run time (OpenAL64.dll); it is not linked, so copy it from the
+# git-ignored deps tree when present. A clean builds/ wipe does not remove deps/windows/.
+if(WIN32)
+    set(MF_OPENAL_DLL "${CMAKE_SOURCE_DIR}/deps/windows/OpenAL64.dll")
+    if(EXISTS "${MF_OPENAL_DLL}")
+        add_custom_command(TARGET ${CLIENT_NAME} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different "${MF_OPENAL_DLL}" $<TARGET_FILE_DIR:${CLIENT_NAME}>
+            COMMENT "Copy OpenAL64.dll from deps/windows")
+    endif()
+endif()
+
 foreach(RENDERER IN LISTS MF_RENDERERS)
     add_dependencies(${CLIENT_NAME} ${RENDERER})
     # copied next to the client when the renderer itself is rebuilt, not only when the client relinks

@@ -102,7 +102,8 @@ cmake --build --preset windows
 ```
 
 Output is `builds/windows/`. SDL2 is copied beside the executable. OpenAL Soft is opened at run time as
-`OpenAL64.dll` in that same folder (rename Soft's `soft_oal.dll` if needed).
+`OpenAL64.dll`: put Soft's DLL there as that name (rename `soft_oal.dll` if needed), and keep a copy in
+`deps/windows/OpenAL64.dll` (git-ignored) so a clean rebuild copies it back next to the exe.
 
 Presets: `darwin-x86`, `darwin-arm`, `linux-x86`, `linux-arm`, `windows`. Each builds into `builds/<preset>`, and
 `cpack` writes `dist/militaryforces-<version>-<preset>.zip` together with `dist/RELEASE_NOTES.md`. Linux also gets a

@@ -3285,6 +3285,9 @@ UI_Utils::menu_ActivateByName( const char *p )
 			menus_[i].window.flags &= ~WINDOW_HASFOCUS;
 		}
 	}
+	if( CvarSystem::variableIntegerValue( "ui_debugMouse" ) )
+		Common::printf( "ui_debugMouse: open \"%s\" -> %s (cursor %d,%d)\n",
+			p, m ? "ok" : "NOT FOUND", dc_->cursorX_, dc_->cursorY_ );
 	display_CloseCinematics();
 	return m;
 }
@@ -3647,6 +3650,14 @@ UI_Utils::menu_HandleKey( menuDef_t *menu, int key, int down )
 		case K_MOUSE2:
 			if (item) 
 			{
+				if( CvarSystem::variableIntegerValue( "ui_debugMouse" ) )
+					Common::printf( "ui_debugMouse: click key=%d item=\"%s\" cursor=%d,%d rect=%.0f,%.0f %.0fx%.0f hit=%d\n",
+						key,
+						item->window.name ? item->window.name : "?",
+						dc_->cursorX_, dc_->cursorY_,
+						item->window.rect.x, item->window.rect.y,
+						item->window.rect.w, item->window.rect.h,
+						rect_ContainsPoint( &item->window.rect, dc_->cursorX_, dc_->cursorY_ ) ? 1 : 0 );
 				if (item->type == ITEM_TYPE_TEXT) 
 				{
 					if (rect_ContainsPoint(item_CorrectedTextRect(item), dc_->cursorX_, dc_->cursorY_)) 
@@ -3671,6 +3682,9 @@ UI_Utils::menu_HandleKey( menuDef_t *menu, int key, int down )
 					}
 				}
 			}
+			else if( CvarSystem::variableIntegerValue( "ui_debugMouse" ) )
+				Common::printf( "ui_debugMouse: click key=%d with no focused item (cursor %d,%d)\n",
+					key, dc_->cursorX_, dc_->cursorY_ );
 			break;
 
 		case K_JOY1:
@@ -4307,10 +4321,22 @@ UI_Utils::adjustFrom640( float *x, float *y, float *w, float *h )
 {
 	float scale = dc_->xScale_ < dc_->yScale_ ? dc_->xScale_ : dc_->yScale_;
 
+	// Corner chips (anniversary banner): touch the right/left of the 640 box and sit
+	// in that half so they pin to the screen edge; the centred menu block is unchanged.
 	if( *x <= 0 && *x + *w >= 640 )
 	{
 		*x *= dc_->xScale_;
 		*w *= dc_->xScale_;
+	}
+	else if( *x + *w >= 640 && *x >= 480 )
+	{
+		*x = dc_->glConfig_.vidWidth - ( 640.0f - *x ) * scale;
+		*w *= scale;
+	}
+	else if( *x <= 0 && *x + *w <= 160 )
+	{
+		*x *= scale;
+		*w *= scale;
 	}
 	else
 	{
@@ -4322,6 +4348,16 @@ UI_Utils::adjustFrom640( float *x, float *y, float *w, float *h )
 	{
 		*y *= dc_->yScale_;
 		*h *= dc_->yScale_;
+	}
+	else if( *y + *h >= 480 && *y >= 360 )
+	{
+		*y = dc_->glConfig_.vidHeight - ( 480.0f - *y ) * scale;
+		*h *= scale;
+	}
+	else if( *y <= 0 && *y + *h <= 160 )
+	{
+		*y *= scale;
+		*h *= scale;
 	}
 	else
 	{
