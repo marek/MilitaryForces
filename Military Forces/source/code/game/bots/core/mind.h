@@ -9,8 +9,50 @@
 #include <algorithm>
 #include <cmath>
 
-// One bot's thinking for one frame: what it is, what it senses, the command being built, and the wishes that the
-// steps of its behaviour tree leave for the steps after them.
+// Where and how the active step wants to move. The step names the place and the manner; navigation turns it into a
+// path, the safety steps may overrule it, and the controller turns it into stick, pedals and throttle.
+struct Steering
+{
+	bool	hasDest = false;
+	Vec3	dest;	// where the step wants to get to; navigation finds the way
+	float	dist = 0;	// to the place steered for
+	float	cruise = 0;	// the height a plane wants to fly at
+	float	wantHeight = 0;	// a helicopter's height above ground; negative means set down
+	float	standoff = 0;	// the distance to keep from the place steered for
+	vec3_t	course = { 0, 0, 0 };	// the direction a surface vehicle or a soldier wants to go
+	int		mode = 0;	// a helicopter's manner of moving
+	bool	hold = false;	// stop here
+	bool	wait = false;	// sit on the ground
+	bool	headingFixed = false;	// on a bomb run: the heading is not to be changed
+	bool	evading = false;	// dodging a missile or breaking away
+	bool	blocked = false;	// found by the controller: something is in the way ahead
+	float	yawError = 0;	// found by the controller: how far the nose is off the wanted heading
+};
+
+// Which step drives the controls this frame. Take-off, the last of a landing, and a soldier boarding or riding work
+// the controls themselves; then the flying and driving steps stay out of it.
+struct Controls
+{
+	void claim() { claimed_ = true; }
+	void release() { claimed_ = false; }
+	bool claimed() const { return claimed_; }
+
+private:
+	bool claimed_ = false;
+};
+
+// What the weapons may do this frame. A hold beats a wish to fire.
+struct Weapons
+{
+	bool	attacking = false;	// pressing an attack: guns and missiles as they bear
+	bool	snapShot = false;	// not attacking, but the enemy is crossing the nose
+	bool	free = false;	// may shoot whenever the aim allows
+	int		keep = -1;	// a step needs this weapon kept selected
+	bool	cover = false;	// hiding: do not shoot
+};
+
+// One bot's thinking for one frame: what it is and what it senses, read only; the command being built; and the three
+// channels the steps of its behaviour tree fill in for the steps after them.
 struct Bots::Mind
 {
 	GameEntity*						ent;
@@ -22,32 +64,13 @@ struct Bots::Mind
 	const playerState_t&			ps;
 	const completeVehicleData_t&	veh;
 	float							speed;	// as the instruments show it
-	float							cruise = 0;	// the height a plane wants to fly at
-	bool							attacking = false;	// pressing an attack: guns and missiles as they bear
-	bool							snapShot = false;	// not attacking, but the enemy is crossing the nose
-	bool							bombing = false;	// on a bomb run: the heading is not to be changed
-	bool							direct = false;	// this step works the controls itself; the flying steps stay out of it
-	int								forcedWeapon = -1;	// a step needs this weapon kept selected
-	bool							defending = false;	// dodging a missile or breaking away
-	bool							weaponsFree = false;	// may shoot whenever the aim allows
-	bool							hasDest = false;
-	Vec3							dest;	// where the step wants to get to; navigation finds the way
+	Steering						steer;
+	Controls						controls;
+	Weapons							weapons;
 	float							airspeed = 0;	// speed through the air, for turn radius and timing
 	float							ceiling = 0;	// room above
 	float							room = 0;	// floor to ceiling
 	float							minHeight = 0;	// the least height above ground to fly at here
-	float							dist = 0;	// to the place steered for
-	float							wantHeight = 0;	// a helicopter's height above ground; negative means set down
-	float							wantPitch = 0;
-	float							yawError = 0;	// how far the nose is off the wanted heading
-	bool							cover = false;	// hiding: do not shoot
-	bool							wait = false;	// sit on the ground
-	bool							hold = false;	// stop here
-	bool							blocked = false;	// something is in the way ahead
-	bool							firing = false;
-	vec3_t							course = { 0, 0, 0 };	// the direction a surface vehicle or a soldier wants to go
-	int								mode = 0;	// a helicopter's manner of moving
-	float							standoff = 0;	// the distance to keep from the place steered for
 	bool							boat = false;
 	GameEntity*						target = nullptr;	// a vehicle to board, or a walker to pick up
 	float							targetDist = 0;
@@ -59,14 +82,14 @@ struct Bots::Mind
 	// name the place to get to
 	void travelTo( const Vec3& point )
 	{
-		dest = point;
-		hasDest = true;
+		steer.dest = point;
+		steer.hasDest = true;
 	}
 	// head straight for a point on the ground and name it as the place to get to
 	void courseTo( const vec3_t point )
 	{
-		VectorSubtract( point, ent->r.currentOrigin, course );
-		course[2] = 0;
+		VectorSubtract( point, ent->r.currentOrigin, steer.course );
+		steer.course[2] = 0;
 		travelTo( Vec3( point ) );
 	}
 	// turn the course onto the ground path to the destination, searching again every two seconds; false when
@@ -76,7 +99,7 @@ struct Bots::Mind
 	bool followGround( bool water, float reach, float finish = -1.0f )
 	{
 		const Vec3 here( ent->r.currentOrigin );
-		if( !hasDest || hold || (dest - here).length() < (finish >= 0.0f ? finish : reach * 2.0f) )
+		if( !steer.hasDest || steer.hold || (steer.dest - here).length() < (finish >= 0.0f ? finish : reach * 2.0f) )
 		{
 			bot.path.clear();
 			bot.following = false;
@@ -84,7 +107,7 @@ struct Bots::Mind
 		}
 		if( theLevel.time_ >= bot.pathTime )
 		{
-			GroundNav::findPath( here, dest, water, bot.path );
+			GroundNav::findPath( here, steer.dest, water, bot.path );
 			bot.pathIndex = 0;
 			bot.pathTime = theLevel.time_ + 2000;
 		}
@@ -99,7 +122,7 @@ struct Bots::Mind
 		if( !bot.following )
 			return false;
 		const Vec3 leg = bot.path[bot.pathIndex] - here;
-		VectorSet( course, leg.x(), leg.y(), 0 );
+		VectorSet( steer.course, leg.x(), leg.y(), 0 );
 		return true;
 	}
 	// where the enemy is, or was last seen
@@ -116,7 +139,7 @@ struct Bots::Mind
 	// pitch to come back to the cruising height
 	void holdAltitude()
 	{
-		view[PITCH] = std::clamp( (sense.height - cruise) / 30.0f, -30.0f, 20.0f );
+		view[PITCH] = std::clamp( (sense.height - steer.cruise) / 30.0f, -30.0f, 20.0f );
 	}
 	// turn towards a point
 	void headFor( const vec3_t point )

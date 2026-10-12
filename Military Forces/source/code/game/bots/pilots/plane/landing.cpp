@@ -252,7 +252,7 @@ Status LandingSteps::final( Bots::Mind& c )
 
 	const Geometry g( BotWorld::pads_[c.bot.pad], c );
 	c.bot.landPhase = Final;
-	c.direct = true;
+	c.controls.claim();
 	// go around: still high past the threshold, far off to the side, or someone is on the runway
 	// still flying with too little strip left to stop on is a go-around too: better than rolling off the far end
 	const float left = g.pad.halfLength - g.pos;
@@ -263,7 +263,7 @@ Status LandingSteps::final( Bots::Mind& c )
 			Common::printf( "BOTGOAROUND t %d bot %d veh %d before %.0f above %.0f side %.0f half %.0f busy %d speed %.0f fuel %d\n", theLevel.time_, c.ent->s.number,
 				c.ent->client_->vehicle_, g.before, g.above, g.side, g.pad.halfLength, Bots::runwayBusy( c.bot.pad, c.ent ), c.speed, c.ps.stats[STAT_FUEL] );
 #endif
-		c.direct = false;
+		c.controls.release();
 		return Status::Failure;
 	}
 
@@ -323,7 +323,7 @@ Status LandingSteps::rollOut( Bots::Mind& c )
 	if( c.bot.pad < 0 || liftedOff( c ) )
 		return Status::Failure;
 	c.bot.landPhase = Ground;
-	c.direct = true;
+	c.controls.claim();
 	c.view[YAW] = c.ps.vehicleAngles[YAW];
 	c.view[PITCH] = groundPitch;
 	if( c.speed <= taxiSpeed )
@@ -340,7 +340,7 @@ Status LandingSteps::taxi( Bots::Mind& c )
 		return Status::Failure;
 	const BotWorld::Pad& pad = BotWorld::pads_[c.bot.pad];
 	c.bot.landPhase = Ground;
-	c.direct = true;
+	c.controls.claim();
 
 	Vec3 toSpot;
 	toSpot = pad.spot - c.ent->r.currentOrigin;
@@ -385,7 +385,7 @@ Status LandingSteps::refuel( Bots::Mind& c )
 	if( c.bot.pad < 0 || liftedOff( c ) )
 		return Status::Failure;
 	c.bot.landPhase = Ground;
-	c.direct = true;
+	c.controls.claim();
 	c.view[YAW] = c.ps.vehicleAngles[YAW];
 	c.view[PITCH] = groundPitch;
 	c.cmd.forwardmove = moveNone;
@@ -396,7 +396,7 @@ Status LandingSteps::refuel( Bots::Mind& c )
 // done: hand the bot back to its goals
 Status LandingSteps::leaveRunway( Bots::Mind& c )
 {
-	c.direct = true;
+	c.controls.claim();
 	c.cmd.forwardmove = moveNone;
 	Bots::finishRearm( c.ent, c.bot );
 	return Status::Success;
