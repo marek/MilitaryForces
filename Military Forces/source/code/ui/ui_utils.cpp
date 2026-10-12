@@ -27,31 +27,31 @@ UI_Utils::UI_Utils() :
 	strPoolIndex_(0),
 	strHandleCount_(0)
 {
-	UI_CaptureBase::setUtils(this);
-	UI_HashUtils::setUtils(this);
+	bindStatics();
 	hashUtils_ = std::make_unique<UI_HashUtils>();
-	ControlUtils::setUtils(this);
 	controlUtils_ = std::make_unique<ControlUtils>();
-	Command::setUtils(this);
-	commands_.emplace( "setfocus", std::make_unique<Command_SetFocus>() );
-	commands_.emplace( "fadein", std::make_unique<Command_FadeIn>() );
-	commands_.emplace( "fadeout", std::make_unique<Command_FadeOut>() );
-	commands_.emplace( "show", std::make_unique<Command_Show>() );
-	commands_.emplace( "hide", std::make_unique<Command_Hide>() );
-	commands_.emplace( "setcolor", std::make_unique<Command_SetColor>() );
-	commands_.emplace( "open", std::make_unique<Command_Open>() );
-	commands_.emplace( "close", std::make_unique<Command_Close>() );
-	commands_.emplace( "setasset", std::make_unique<Command_SetAsset>() );
-	commands_.emplace( "setbackground", std::make_unique<Command_SetBackground>() );
-	commands_.emplace( "setitemcolor", std::make_unique<Command_SetItemColor>() );
-	commands_.emplace( "setplayermodel", std::make_unique<Command_SetPlayerModel>() );
-	commands_.emplace( "setplayerhead", std::make_unique<Command_SetPlayerHead>() );
-	commands_.emplace( "transition", std::make_unique<Command_Transition>() );
-	commands_.emplace( "setcvar", std::make_unique<Command_SetCvar>() );
-	commands_.emplace( "exec", std::make_unique<Command_Exec>() );
-	commands_.emplace( "play", std::make_unique<Command_Play>() );
-	commands_.emplace( "playlooped", std::make_unique<Command_PlayLooped>() );
-	commands_.emplace( "orbit", std::make_unique<Command_Orbit>() );
+	// Each command keeps its owning UI_Utils: UI and cgame each have one
+	// instance, and a process-wide static would resolve against whichever
+	// constructed last (platform-dependent).
+	commands_.emplace( "setfocus", std::make_unique<Command_SetFocus>( this ) );
+	commands_.emplace( "fadein", std::make_unique<Command_FadeIn>( this ) );
+	commands_.emplace( "fadeout", std::make_unique<Command_FadeOut>( this ) );
+	commands_.emplace( "show", std::make_unique<Command_Show>( this ) );
+	commands_.emplace( "hide", std::make_unique<Command_Hide>( this ) );
+	commands_.emplace( "setcolor", std::make_unique<Command_SetColor>( this ) );
+	commands_.emplace( "open", std::make_unique<Command_Open>( this ) );
+	commands_.emplace( "close", std::make_unique<Command_Close>( this ) );
+	commands_.emplace( "setasset", std::make_unique<Command_SetAsset>( this ) );
+	commands_.emplace( "setbackground", std::make_unique<Command_SetBackground>( this ) );
+	commands_.emplace( "setitemcolor", std::make_unique<Command_SetItemColor>( this ) );
+	commands_.emplace( "setplayermodel", std::make_unique<Command_SetPlayerModel>( this ) );
+	commands_.emplace( "setplayerhead", std::make_unique<Command_SetPlayerHead>( this ) );
+	commands_.emplace( "transition", std::make_unique<Command_Transition>( this ) );
+	commands_.emplace( "setcvar", std::make_unique<Command_SetCvar>( this ) );
+	commands_.emplace( "exec", std::make_unique<Command_Exec>( this ) );
+	commands_.emplace( "play", std::make_unique<Command_Play>( this ) );
+	commands_.emplace( "playlooped", std::make_unique<Command_PlayLooped>( this ) );
+	commands_.emplace( "orbit", std::make_unique<Command_Orbit>( this ) );
 
 	Vector4Set( colourVector_, 1, 1, 1, 1 );
 	colourCharArray_[0] = colourCharArray_[1] = colourCharArray_[2] = colourCharArray_[3] = 255;
@@ -63,6 +63,14 @@ UI_Utils::~UI_Utils()
 {
 
 	//delete precomp_;
+}
+
+void
+UI_Utils::bindStatics()
+{
+	UI_CaptureBase::setUtils( this );
+	UI_HashUtils::setUtils( this );
+	ControlUtils::setUtils( this );
 }
 
 //void 
@@ -487,8 +495,10 @@ UI_Utils::item_CorrectedTextRect(itemDef_t *item)
 }
 
 bool 
-UI_Utils::item_Parse( int handle, itemDef_t *item ) 
+UI_Utils::item_Parse( int handle, itemDef_t *item )
 {
+	bindStatics();
+
 	UI_PrecompilerTools::PC_Token token;
 //	keywordHash_t *key;
 
@@ -3342,6 +3352,8 @@ UI_Utils::menu_Init(menuDef_t *menu)
 bool 
 UI_Utils::menu_Parse( int handle, menuDef_t *menu ) 
 {
+	bindStatics();
+
 	UI_PrecompilerTools::PC_Token  token;
 //	keywordHash_t *key;
 
@@ -3534,6 +3546,8 @@ UI_Utils::menu_HandleKey( menuDef_t *menu, int key, int down )
 	int i;
 	itemDef_t *item = nullptr;
 	bool inHandler = false;
+
+	bindStatics();
 
 	if (inHandler) 
 		return;
@@ -3997,6 +4011,8 @@ UI_Utils::display_MouseMove( void *p, int x, int y )
 {
 	int i;
 	menuDef_t *menu = reinterpret_cast<menuDef_t*>(p);
+
+	bindStatics();
 
 	if (menu == nullptr) 
 	{

@@ -4,16 +4,6 @@
 
 
 
-UI_Utils* UI_Utils::Command::utils_ = nullptr;
-
-void
-UI_Utils::Command::setUtils( UI_Utils* utils )
-{
-	utils_ = utils;
-}
-
-
-
 void
 UI_Utils::Command_SetFocus::handler( itemDef_t *item, char** args )
 {
