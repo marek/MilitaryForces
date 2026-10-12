@@ -43,6 +43,11 @@ public:
 	static void onDeath( GameEntity* self, GameEntity* attacker );
 	static void listCommand();
 	static const Bots::State& stateOf( int clientNum );
+
+private:
+	static constexpr std::size_t kindCount = static_cast<std::size_t>( Kind::Count );
+	static std::array<bool, kindCount> fieldable( int team, unsigned long gameset );
+	static void countTeam( GameEntity* ent, int team, std::array<int, kindCount>& have, int& size, int& own );
 };
 
 #endif

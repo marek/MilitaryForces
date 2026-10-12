@@ -771,36 +771,11 @@ bool BotTeam::wantedKind( GameEntity* ent, Kind& kind )
 	const int team = ent->client_->sess_.sessionTeam_;
 	if( !level() || !isTeam( team ) )
 		return false;
-
-	// what this team may field here
-	const unsigned int cats = Bots::spawnCategories();
 	const unsigned long gameset = Game::getGameset();
-	const int teamFlag = team == ClientBase::TEAM_RED ? MF_TEAM_1 : MF_TEAM_2;
-	std::array<bool, kinds> possible = {};
-	for( int i = 0; i < bg_numberOfVehicles; i++ )
-	{
-		const completeVehicleData_t& veh = availableVehicles[i];
-		if( (veh.gameset & gameset) && (veh.team & teamFlag) && (veh.cat & cats) && !(veh.cat & CAT_LQM) && VehicleData::selectable( i ) && !Bots::unfitHere( i ) )
-			possible[static_cast<int>( kindOf( i ) )] = true;
-	}
-
+	const std::array<bool, kinds> possible = fieldable( team, gameset );
 	std::array<int, kinds> have = {};
 	int size = 0, own = -1;
-	for( int i = 1; i <= theLevel.maxclients_ && i <= MAX_CLIENTS; i++ )
-	{
-		GameEntity* mate = theLevel.getEntity( i );
-		if( !mate || !mate->inuse_ || !mate->client_ || mate->client_->pers_.connected_ != GameClient::ClientPersistant::CON_CONNECTED ||
-			mate->client_->sess_.sessionTeam_ != team )
-			continue;
-		size++;
-		// a bot counts as what it has chosen, a person as what he is in or about to take
-		const int vehicle = Bots::isBot( i ) ? Bots::states_[i].vehicle : mate->client_->vehicle_ >= 0 ? mate->client_->vehicle_ : mate->client_->nextVehicle_;
-		if( mate == ent )
-			own = vehicle >= 0 ? static_cast<int>( kindOf( vehicle ) ) : -1;
-		else if( vehicle >= 0 )
-			have[static_cast<int>( kindOf( vehicle ) )]++;
-	}
-
+	countTeam( ent, team, have, size, own );
 	const std::array<float, kinds>& shares = (gameset & MF_GAMESET_MODERN) ? modernShares : ww2Shares;
 	float total = 0;
 	for( int k = 0; k < kinds; k++ )
@@ -831,6 +806,40 @@ bool BotTeam::wantedKind( GameEntity* ent, Kind& kind )
 		return false;
 	kind = static_cast<Kind>( best );
 	return true;
+}
+
+// the kinds of vehicle this team may field here
+std::array<bool, kinds> BotTeam::fieldable( int team, unsigned long gameset )
+{
+	const unsigned int cats = Bots::spawnCategories();
+	const int teamFlag = team == ClientBase::TEAM_RED ? MF_TEAM_1 : MF_TEAM_2;
+	std::array<bool, kinds> possible = {};
+	for( int i = 0; i < bg_numberOfVehicles; i++ )
+	{
+		const completeVehicleData_t& veh = availableVehicles[i];
+		if( (veh.gameset & gameset) && (veh.team & teamFlag) && (veh.cat & cats) && !(veh.cat & CAT_LQM) && VehicleData::selectable( i ) && !Bots::unfitHere( i ) )
+			possible[static_cast<int>( kindOf( i ) )] = true;
+	}
+	return possible;
+}
+
+// what the team has, by kind, apart from the one asking: a bot counts as what it has chosen, a person as what they
+// are in or about to take
+void BotTeam::countTeam( GameEntity* ent, int team, std::array<int, kinds>& have, int& size, int& own )
+{
+	for( int i = 1; i <= theLevel.maxclients_ && i <= MAX_CLIENTS; i++ )
+	{
+		GameEntity* mate = theLevel.getEntity( i );
+		if( !mate || !mate->inuse_ || !mate->client_ || mate->client_->pers_.connected_ != GameClient::ClientPersistant::CON_CONNECTED ||
+			mate->client_->sess_.sessionTeam_ != team )
+			continue;
+		size++;
+		const int vehicle = Bots::isBot( i ) ? Bots::states_[i].vehicle : mate->client_->vehicle_ >= 0 ? mate->client_->vehicle_ : mate->client_->nextVehicle_;
+		if( mate == ent )
+			own = vehicle >= 0 ? static_cast<int>( kindOf( vehicle ) ) : -1;
+		else if( vehicle >= 0 )
+			have[static_cast<int>( kindOf( vehicle ) )]++;
+	}
 }
 
 // the same number on both sides, and where the numbers are level the side whose bots are the weaker shots
