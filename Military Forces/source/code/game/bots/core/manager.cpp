@@ -5,6 +5,7 @@
 #include "../team/team.h"
 #include "../navigation/airnav.h"
 #include "../navigation/groundnav.h"
+#include "../world/threat.h"
 #include <algorithm>
 #include <cmath>
 
@@ -26,6 +27,7 @@ void Bots::reset()
 	BotWorld::pads_.clear();
 	BotWorld::padsBuilt_ = false;
 	BotWorld::roamPoints_.clear();
+	ThreatMap::reset();
 	characters_.clear();
 	kindLives_.fill( 0 );
 	kindCrashes_.fill( 0 );
@@ -68,6 +70,8 @@ bool Bots::unfitHere( int type )
 void Bots::onDeath( GameEntity* self, GameEntity* attacker, int meansOfDeath )
 {
 	BotTeam::onDeath( self, attacker );
+	if( self && self->client_ )
+		ThreatMap::noteDeath( self->client_->sess_.sessionTeam_, self->r.currentOrigin );
 	if( !self || !self->client_ || !isBot( self->s.number ) || self->client_->vehicle_ < 0 )
 		return;
 
