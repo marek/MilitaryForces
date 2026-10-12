@@ -299,6 +299,13 @@ struct PlaneTasks
 	using State = Bots::State;
 
 	static behavior::Tree<Mind> build();
+	using Tree = behavior::Tree<Mind>;
+	using Node = behavior::Node<Mind>;
+	static const Node* decide( Tree& t );
+	static const Node* takeOffRoll( Tree& t );
+	static const Node* landAndRearm( Tree& t );
+	static const Node* attack( Tree& t );
+	static const Node* freeFlight( Tree& t );
 };
 
 #endif
