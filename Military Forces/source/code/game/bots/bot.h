@@ -4,7 +4,7 @@
 #include "../q_shared.h"
 #include <array>
 #include <vector>
-#include "bot_behavior.h"
+#include "behavior/behavior.h"
 
 struct GameEntity;
 struct GameClient;

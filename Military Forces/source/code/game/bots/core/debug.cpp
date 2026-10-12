@@ -1,9 +1,9 @@
-#include "../g_local.h"
-#include "../g_level.h"
-#include "bot.h"
-#include "bot_local.h"
-#include "bot_airnav.h"
-#include "bot_groundnav.h"
+#include "../../g_local.h"
+#include "../../g_level.h"
+#include "../bot.h"
+#include "local.h"
+#include "../navigation/airnav.h"
+#include "../navigation/groundnav.h"
 
 #ifdef MF_BOT_DEBUG
 

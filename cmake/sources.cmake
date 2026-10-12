@@ -7,12 +7,24 @@ set(GAME_SOURCES
     vehicles/planes/a10.cpp vehicles/planes/b-2.cpp vehicles/planes/b17g.cpp vehicles/planes/bf-109g.cpp vehicles/planes/camel.cpp vehicles/planes/dr1.cpp
     vehicles/planes/f-14.cpp vehicles/planes/f-15.cpp vehicles/planes/f-16.cpp vehicles/planes/f-18.cpp vehicles/planes/f-5.cpp vehicles/planes/fw190a8.cpp
     vehicles/planes/jas-39.cpp vehicles/planes/p-51d.cpp vehicles/planes/spitfire_mk5b.cpp vehicles/registry.cpp
-    bg_weapondata.cpp g_active.cpp g_arenas.cpp g_boat.cpp bots/bot_manager.cpp bots/bot_team.cpp bots/bot_characters.cpp bots/bot_world.cpp bots/bot_airnav.cpp bots/bot_groundnav.cpp bots/bot_senses.cpp bots/bot_goals.cpp bots/bot_weapons.cpp bots/bot_plane.cpp bots/bot_debug.cpp bots/bot_landing.cpp bots/bot_helo.cpp bots/bot_surface.cpp bots/bot_infantry.cpp g_client.cpp g_cmds.cpp
+    bg_weapondata.cpp g_active.cpp g_arenas.cpp g_boat.cpp g_client.cpp g_cmds.cpp
     g_combat.cpp g_entity.cpp g_groundinstallation.cpp g_groundvehicle.cpp g_helo.cpp g_items.cpp
     g_level.cpp g_lqm.cpp g_main.cpp g_mem.cpp g_mfq3ents.cpp g_mfq3util.cpp g_misc.cpp
     g_basedefence.cpp g_miscvehicle.cpp g_missile.cpp g_missionrules.cpp g_missions.cpp g_mover.cpp g_plane.cpp g_scripts.cpp g_session.cpp
     g_spawn.cpp g_svcmds.cpp g_target.cpp g_team.cpp g_trigger.cpp g_utils.cpp g_vehicle.cpp
     g_waypoint.cpp g_weapon.cpp g_world.cpp game.cpp mf_client.cpp mf_vehiclespawn.cpp)
+list(APPEND GAME_SOURCES
+    bots/core/manager.cpp bots/core/characters.cpp bots/core/debug.cpp
+    bots/goals/goals.cpp
+    bots/senses/senses.cpp
+    bots/world/world.cpp
+    bots/navigation/airnav.cpp bots/navigation/groundnav.cpp
+    bots/weapons/weapons.cpp
+    bots/team/team.cpp
+    bots/pilots/plane/plane.cpp bots/pilots/plane/landing.cpp
+    bots/pilots/helo/helo.cpp
+    bots/pilots/surface/surface.cpp
+    bots/pilots/infantry/infantry.cpp)
 list(TRANSFORM GAME_SOURCES PREPEND "${SOURCE_DIR}/game/")
 
 set(CGAME_SOURCES

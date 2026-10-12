@@ -1,7 +1,7 @@
-#include "../g_local.h"
-#include "../g_level.h"
-#include "bot.h"
-#include "bot_local.h"
+#include "../../g_local.h"
+#include "../../g_level.h"
+#include "../bot.h"
+#include "../core/local.h"
 #include <algorithm>
 #include <cmath>
 #include <cstring>

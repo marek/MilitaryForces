@@ -1,4 +1,4 @@
-#include "bot_mind.h"
+#include "../../core/mind.h"
 
 using behavior::Status;
 

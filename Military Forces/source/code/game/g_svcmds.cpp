@@ -8,7 +8,7 @@
 // this file holds commands that can be executed by the server console, but not remote clients
 
 #include "g_local.h"
-#include "bots/bot_team.h"
+#include "bots/team/team.h"
 #include "g_level.h"
 #include "bots/bot.h"
 

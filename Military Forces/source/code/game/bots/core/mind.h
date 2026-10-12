@@ -1,11 +1,11 @@
 #ifndef __BOT_MIND_H__
 #define __BOT_MIND_H__
 
-#include "../g_local.h"
-#include "../g_level.h"
-#include "bot.h"
-#include "bot_local.h"
-#include "bot_groundnav.h"
+#include "../../g_local.h"
+#include "../../g_level.h"
+#include "../bot.h"
+#include "local.h"
+#include "../navigation/groundnav.h"
 #include <algorithm>
 #include <cmath>
 
