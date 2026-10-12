@@ -4,6 +4,8 @@
 #include "../../core/mind.h"
 #include "../../navigation/airnav.h"
 #include "../../crew/crew.h"
+#include "../../control/control.h"
+#include "../../navigation/context.h"
 
 using behavior::Status;
 
@@ -218,6 +220,17 @@ struct HeloTasks
 	// A helicopter goes where it tilts, in any direction, and stops when it levels. The pilot keeps the nose on what it
 	// is looking at and tilts toward the clear direction nearest to where it wants to go.
 	static Status steer( Mind& c );
+
+	// where to move this frame, and how fast over the ground
+	struct Travel
+	{
+		float	yaw = 0;
+		float	speed = 0;
+	};
+	static Travel wantedTravel( const Mind& c );
+	static void findOpenDirection( Mind& c, Travel& travel );
+	static void stopBeforeDrift( const Mind& c, Travel& travel );
+	static void easeAwayFromWalls( const Mind& c, Travel& travel );
 
 	// shoot unless hiding, dodging or flying a path round something
 	static Status fire( Mind& c );
