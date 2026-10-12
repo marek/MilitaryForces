@@ -25,6 +25,7 @@ struct Steering
 	bool	wait = false;	// sit on the ground
 	bool	headingFixed = false;	// on a bomb run: the heading is not to be changed
 	bool	evading = false;	// dodging a missile or breaking away
+	bool	afterburner = false;	// the pilot wants the afterburner
 	bool	blocked = false;	// found by the controller: something is in the way ahead
 	float	yawError = 0;	// found by the controller: how far the nose is off the wanted heading
 };

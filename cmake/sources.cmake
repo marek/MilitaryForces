@@ -19,6 +19,7 @@ list(APPEND GAME_SOURCES
     bots/senses/senses.cpp
     bots/world/world.cpp
     bots/navigation/airnav.cpp bots/navigation/groundnav.cpp
+    bots/crew/gunner.cpp bots/crew/engine.cpp bots/crew/countermeasures.cpp bots/crew/weaponbay.cpp
     bots/weapons/weapons.cpp
     bots/team/team.cpp
     bots/pilots/plane/tree.cpp bots/pilots/plane/takeoff.cpp bots/pilots/plane/combat.cpp bots/pilots/plane/bombing.cpp

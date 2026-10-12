@@ -55,7 +55,7 @@ behavior::Tree<Bots::Mind> PlaneTasks::build()
 		t.action( "corner speed", cornerSpeed ),
 		t.action( "floor and ceiling", floorAndCeiling ) } );
 
-	const auto* flight = t.when( "in free flight", flying, t.always( "fly", t.action( "countermeasures", countermeasures ), {
+	const auto* flight = t.when( "in free flight", flying, t.always( "fly", t.action( "countermeasures", Crew::countermeasures ), {
 		t.action( "navigate", navigate ),
 		t.when( "on approach", onApproach, t.action( "approach profile", approachProfile ) ),
 		t.action( "mid channel", midChannel ),
@@ -63,7 +63,11 @@ behavior::Tree<Bots::Mind> PlaneTasks::build()
 		t.action( "keep energy", keepEnergy ),
 		t.action( "fire", fire ) } ) );
 
-	t.setRoot( t.always( "pilot", act, { flight } ) );
+	t.setRoot( t.always( "pilot", act, {
+		flight,
+		t.action( "gunner", Crew::gunner ),
+		t.action( "afterburner", decideAfterburner ),
+		t.action( "engine", Crew::engine ) } ) );
 	return t;
 }
 
@@ -92,63 +96,4 @@ void Bots::thinkPlane( GameEntity* ent, State& bot, const Sense& sense, usercmd_
 	mind.holdAltitude();
 
 	runTree( tree, mind, "plane" );
-
-	// turrets: look at a nearby enemy aircraft and hold the trigger, as a player does with free look held, flying
-	// straight meanwhile. The positions swing round at their own rate and one that has not arrived does not fire,
-	// so the look has to last: four seconds is the longest any position needs to come right round. Then a second
-	// to steer in. Never while there is something to fly round, nor while landing, taking off or low
-	constexpr int turretBurst = 4000, turretPause = 1000;
-	// the target is the nearest enemy aircraft, whatever the bomber itself is after: a bomber's own enemy is on the ground
-	GameEntity* raider = sense.airThreat && sense.airThreatDist < turretRange ? sense.airThreat : nullptr;
-	if( (mind.veh.flags & VF_GUNSTATIONS) && raider && !(ps.ONOFF & OO_LANDED) && bot.desire != Goal::Rearm &&
-		sense.height > mind.minHeight && ps.ammo[WP_MACHINEGUN] > 0 && BotWorld::visible( ent, ent->r.currentOrigin, raider ) )
-	{
-		if( theLevel.time_ > bot.turretTime + turretBurst + turretPause )
-			bot.turretTime = theLevel.time_;
-		if( theLevel.time_ < bot.turretTime + turretBurst && theLevel.time_ >= bot.avoid.time )
-		{
-			// lead the target by the bullets' flight time
-			const float flight = sense.airThreatDist / std::max( 1.0f, static_cast<float>( availableWeapons[mind.veh.weapons[WP_MACHINEGUN]].muzzleVelocity ) );
-			Vec3 raiderVelocity;
-			VectorCopy( raider->s.pos.trDelta, raiderVelocity );
-			const Vec3 aimAt = Vec3( raider->r.currentOrigin ) + raiderVelocity * flight - Vec3( ent->r.currentOrigin );
-			Vec3 aim;
-			vectoangles( aimAt, aim );
-			// a gunner in a bucking bomber is no marksman: his aim wanders about the target, a few degrees for a
-			// poor gunner and under one for the best, so that the fire walks across the target and off it again
-			// rather than a whole burst going wide
-			constexpr float poorGunner = 4.0f, bestGunner = 0.6f;
-			constexpr float wanderYawMsec = 230.0f, wanderPitchMsec = 310.0f;
-			const float spread = bestGunner + (poorGunner - bestGunner) * (1.0f - std::clamp( skill( bot ), 0.0f, 1.0f ));
-			const float phase = static_cast<float>( ent->s.number ) * 1.7f;
-			aim[YAW] += spread * sin( theLevel.time_ / wanderYawMsec + phase );
-			aim[PITCH] += spread * sin( theLevel.time_ / wanderPitchMsec + phase * 2.0f );
-			if( VehicleData::gunStationsBearing( client->vehicle_, ps.vehicleAngles, aim ) )
-			{
-				VectorCopy( aim, view );
-				cmd.buttons |= BUTTON_FREELOOK | BUTTON_ATTACK;
-			}
-		}
-	}
-
-	// full power is asked for all over the tree; in the air it means military power unless the afterburner is earned
-	constexpr int militaryPower = 10;
-	const float throttle = signedThrottle( ps, client->vehicle_ );
-	if( mind.veh.maxthrottle > militaryPower && (ps.ONOFF & OO_LANDED) )
-	{
-		// the cruise setting must not push a landed aircraft along
-		if( cmd.forwardmove != moveFull && throttle > 0 )
-			cmd.buttons |= BUTTON_DECREASE;
-	}
-	else if( mind.veh.maxthrottle > militaryPower && cmd.forwardmove == moveFull )
-	{
-		if( !PlaneTasks::wantsAfterburner( mind ) )
-			cmd.forwardmove = moveNone;
-		// the afterburner key only overrides the set throttle. That is brought to military power underneath, so that
-		// letting the afterburner go leaves the engine there and not at wherever it was set on the ground
-		if( throttle < militaryPower )
-			cmd.buttons |= BUTTON_INCREASE;
-		else if( throttle > militaryPower )
-			cmd.buttons |= BUTTON_DECREASE;
-	}
 }

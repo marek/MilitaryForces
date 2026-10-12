@@ -3,6 +3,7 @@
 
 #include "../../core/mind.h"
 #include "../../navigation/airnav.h"
+#include "../../crew/crew.h"
 #include <algorithm>
 #include <cmath>
 
@@ -199,8 +200,6 @@ struct PlaneTasks
 	// nothing to do: roam
 	static Status patrol( Mind& c );
 
-	// flares against a missile
-	static Status countermeasures( Mind& c );
 
 	// when the straight line to the destination is blocked, follow the air path round the obstacle, allowing for the turn radius
 	static Status navigate( Mind& c );
@@ -288,6 +287,7 @@ struct PlaneTasks
 	// reflex. Getting off the ground always has it; so does a moment's recovery from a stall or a slow pull-up, and
 	// a climb that a fight makes urgent. Beyond that it needs open air and a reason.
 	static bool wantsAfterburner( Mind& c );
+	static Status decideAfterburner( Mind& c );
 
 	// shoot when attacking or when the enemy crosses the nose; a step that needs one particular weapon keeps it selected
 	static Status fire( Mind& c );

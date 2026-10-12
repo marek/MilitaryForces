@@ -1,5 +1,6 @@
 #include "../../core/mind.h"
 #include "../../navigation/airnav.h"
+#include "../../crew/crew.h"
 
 using behavior::Status;
 
@@ -451,12 +452,6 @@ struct HeloTasks
 		return Status::Running;
 	}
 
-	static Status countermeasures( Mind& c )
-	{
-		BotWeapons::flares( c.ent, c.bot, c.sense, c.cmd );
-		return Status::Success;
-	}
-
 	// when the straight line to the destination is blocked, follow the air path round the obstacle instead
 	static Status navigate( Mind& c )
 	{
@@ -730,10 +725,11 @@ struct HeloTasks
 			t.action( "patrol", patrol ) } );
 
 		t.setRoot( t.always( "pilot", act, {
-			t.action( "countermeasures", countermeasures ),
+			t.action( "countermeasures", Crew::countermeasures ),
 			t.action( "navigate", navigate ),
 			t.when( "airborne", airborne, t.always( "fly", t.action( "steer", steer ), { t.action( "fire", fire ) } ) ),
-			t.action( "collective", collective ) } ) );
+			t.action( "collective", collective ),
+			t.action( "weapon bay", Crew::weaponBay ) } ) );
 		return t;
 	}
 };
@@ -754,9 +750,4 @@ void Bots::thinkHelo( GameEntity* ent, State& bot, const Sense& sense, usercmd_t
 	view[PITCH] = sense.enemy ? std::clamp( AngleSubtract( sense.enemyAngles[PITCH], 0 ), -30.0f, 45.0f ) : 0.0f;
 
 	runTree( tree, mind, "helo" );
-
-	// an open bay shows a stealth helicopter to everyone: it is shut again as soon as nothing is about to leave it
-	constexpr int bayTap = 400;
-	if( sense.stealth && (ps.ONOFF & OO_WEAPONBAY) && !bot.cover.exposed && (theLevel.time_ / bayTap) % 2 )
-		cmd.buttons |= BUTTON_WEAPONBAY;
 }

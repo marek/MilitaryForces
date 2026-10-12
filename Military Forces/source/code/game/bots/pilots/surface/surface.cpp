@@ -1,4 +1,5 @@
 #include "../../core/mind.h"
+#include "../../crew/crew.h"
 
 using behavior::Status;
 
@@ -244,12 +245,6 @@ struct SurfaceTasks
 		return Status::Running;
 	}
 
-	static Status countermeasures( Mind& c )
-	{
-		BotWeapons::flares( c.ent, c.bot, c.sense, c.cmd );
-		return Status::Success;
-	}
-
 	// turn the wished course into one that follows the ground path round obstacles
 	static Status navigate( Mind& c )
 	{
@@ -394,7 +389,7 @@ struct SurfaceTasks
 			t.action( "steer", steer ) } );
 
 		t.setRoot( t.always( "crew", act, {
-			t.action( "countermeasures", countermeasures ),
+			t.action( "countermeasures", Crew::countermeasures ),
 			t.action( "navigate", navigate ),
 			t.action( "watch ahead", watchAhead ),
 			drive,

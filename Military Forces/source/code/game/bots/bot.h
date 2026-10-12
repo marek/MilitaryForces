@@ -269,6 +269,7 @@ public:
 	friend struct SurfaceTasks;
 	friend struct InfantryTasks;
 	friend struct GoalScoring;
+	friend struct Crew;
 	friend class BotWeapons;
 	friend class BotSenses;
 	friend class BotTeam;
