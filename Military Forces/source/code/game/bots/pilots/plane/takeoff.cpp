@@ -60,12 +60,10 @@ float PlaneTasks::yawOf( const Vec3& dir )
 }
 
 // Chooses the take-off heading: enough runway to reach flying speed, nothing standing on it, and from the lift-off
-// point a climb, straight or turning, that fits the terrain and leads somewhere.
+// point a climb, straight or turning, that fits the terrain and leads somewhere. With less than a comfortable length
+// it taxis to a better place; with someone standing on the run it gives them a moment to move
 void PlaneTasks::planDeparture( Mind& c )
 {
-	constexpr float groundAcceleration = 85.0f;
-	constexpr float climbSlope = 0.14f;
-	constexpr float departure = 900.0f;
 	Vec3 origin;
 	VectorCopy( c.ent->r.currentOrigin, origin );
 	origin[2] -= c.sense.height;
@@ -77,78 +75,110 @@ void PlaneTasks::planDeparture( Mind& c )
 #endif
 		return;
 	}
-	const float stall = static_cast<float>( c.veh.stallspeed );
-	const float groundRun = stall * rotateSpeed * stall * rotateSpeed / (2.0f * groundAcceleration) * 1.15f;
-	const float turnRate = std::max( 10.0f, c.veh.turnspeed[YAW] ) * std::numbers::pi_v<float> / 180.0f;
-	const float radius = stall * 1.15f / turnRate;
-	// the run estimate is rough and a runway end is unforgiving: a comfortable length is half as much again
-	const float comfortable = groundRun * 1.5f + 150.0f;
-	float best = 0, bestRun = 0, longest = 0;
-	bool bestClear = false;
+	const Roll roll = rollFor( c );
+	Heading best;
+	float longest = 0;
 	for( int step = 0; step < 24; step++ )
 	{
-		const float yaw = step * 15.0f;
-		const float run = BotWorld::runwayRun( origin, yaw, 4000 );
-		longest = std::max( longest, run );
-		if( run < 150 )
-			continue;
-		Vec3 level = { 0, yaw, 0 }, dir, start;
-		trace_t ground;
-		AngleVectors( level, dir, nullptr, nullptr );
-		VectorCopy( origin, start );
-		start[2] += 14;
-		const float roll = std::min( run, groundRun + 100.0f );
-		BotWorld::pathBlocked( start, dir, roll, c.ent->s.number, ground, 30.0f );
-		const bool rollClear = ground.startsolid || ground.fraction >= 1.0f;
-
-		Pose liftOff;
-		VectorMA( origin, std::min( run, groundRun ), dir, liftOff.origin );
-		liftOff.origin[2] += 30;
-		liftOff.yaw = yaw;
-		liftOff.seconds = 3.0f;
-		float departTurn = 0;
-		bool departClear = false;
-		for( float turn : { 0.0f, 30.0f, -30.0f, 60.0f, -60.0f, 90.0f, -90.0f } )
-		{
-			Pose end;
-			if( sweepFrom( c, liftOff, radius, turn, climbSlope, departure, 60.0f, &end ) >= departure && wayOut( c, end, radius, departure ) )
-			{
-				departTurn = turn;
-				departClear = true;
-				break;
-			}
-		}
-		const float score = (run >= groundRun ? 5000.0f : 0.0f) + (rollClear ? 3000.0f : 0.0f) + (departClear ? 4000.0f - fabs( departTurn ) * 5.0f : 0.0f) +
-			// more runway is better up to twice a comfortable length: with the credit stopping at the bare
-			// need, the first short heading tied with the long one, was chosen, was then found too short to
-			// be comfortable, and the aircraft taxied about looking for a better place for the rest of the game
-			std::min( run, comfortable * 2.0f ) * 2.0f;
-		if( score > best )
-		{
-			best = score;
-			bestRun = run;
-			bestClear = rollClear;
-			c.bot.takeoff.yaw = yaw;
-			c.bot.takeoff.departYaw = yaw + departTurn;
-		}
+		const Heading heading = scoreHeading( c, origin, step * 15.0f, roll );
+		longest = std::max( longest, heading.run );
+		if( heading.score > best.score )
+			best = heading;
+	}
+	if( best.score > 0 )
+	{
+		c.bot.takeoff.yaw = best.yaw;
+		c.bot.takeoff.departYaw = best.yaw + best.departTurn;
 	}
 #ifdef MF_BOT_DEBUG
 	if( g_botDebug.integer >= 2 )
 		Common::printf( "BOTTAKEOFF t %d bot %d veh %d at %.0f %.0f %.0f facing %.0f chose %.0f then %.0f run %.0f need %.0f longest %.0f score %.0f\n", theLevel.time_, c.ent->s.number,
-			c.client->vehicle_, origin[0], origin[1], origin[2], c.ps.vehicleAngles[YAW], c.bot.takeoff.yaw, c.bot.takeoff.departYaw, bestRun, groundRun, longest, best );
+			c.client->vehicle_, origin[0], origin[1], origin[2], c.ps.vehicleAngles[YAW], c.bot.takeoff.yaw, c.bot.takeoff.departYaw, best.run, roll.groundRun, longest, best.score );
 #endif
-	// with less than a comfortable length, taxi to a better place
-	if( bestRun < comfortable && findTaxiSpot( c, origin, comfortable ) )
-		return;
-	// someone is standing on the run: give them a moment to move before rolling
+	settleDeparture( c, origin, best, roll );
+}
+
+// what this aircraft needs from a runway: its ground run, its turn radius just after lift-off, and a comfortable
+// length, half as much again as the rough estimate since a runway end is unforgiving
+PlaneTasks::Roll PlaneTasks::rollFor( const Mind& c )
+{
+	constexpr float groundAcceleration = 85.0f;
+	const float stall = static_cast<float>( c.veh.stallspeed );
+	const float turnRate = std::max( 10.0f, c.veh.turnspeed[YAW] ) * std::numbers::pi_v<float> / 180.0f;
+	Roll roll;
+	roll.groundRun = stall * rotateSpeed * stall * rotateSpeed / (2.0f * groundAcceleration) * 1.15f;
+	roll.radius = stall * 1.15f / turnRate;
+	roll.comfortable = roll.groundRun * 1.5f + 150.0f;
+	return roll;
+}
+
+// One heading's worth: enough run, a clear roll, a climb out that fits, and more runway up to twice a comfortable
+// length. The credit does not stop at the bare need: then the first short heading tied with the long one, was
+// chosen, was found too short to be comfortable, and the aircraft taxied about looking for a better place
+PlaneTasks::Heading PlaneTasks::scoreHeading( const Mind& c, const Vec3& origin, float yaw, const Roll& roll )
+{
+	Heading h;
+	h.yaw = yaw;
+	h.run = BotWorld::runwayRun( origin, yaw, 4000 );
+	if( h.run < 150 )
+		return h;
+	Vec3 level = { 0, yaw, 0 }, dir;
+	AngleVectors( level, dir, nullptr, nullptr );
+	h.rollClear = rollIsClear( c, origin, dir, std::min( h.run, roll.groundRun + 100.0f ) );
+	Pose liftOff;
+	VectorMA( origin, std::min( h.run, roll.groundRun ), dir, liftOff.origin );
+	liftOff.origin[2] += 30;
+	liftOff.yaw = yaw;
+	liftOff.seconds = 3.0f;
+	const bool departClear = climbOutTurn( c, liftOff, roll.radius, h.departTurn );
+	h.score = (h.run >= roll.groundRun ? 5000.0f : 0.0f) + (h.rollClear ? 3000.0f : 0.0f) + (departClear ? 4000.0f - fabs( h.departTurn ) * 5.0f : 0.0f) +
+		std::min( h.run, roll.comfortable * 2.0f ) * 2.0f;
+	return h;
+}
+
+// nothing standing on the take-off roll
+bool PlaneTasks::rollIsClear( const Mind& c, const Vec3& origin, const Vec3& dir, float length )
+{
+	Vec3 start;
+	VectorCopy( origin, start );
+	start[2] += 14;
+	trace_t ground;
+	BotWorld::pathBlocked( start, dir, length, c.ent->s.number, ground, 30.0f );
+	return ground.startsolid || ground.fraction >= 1.0f;
+}
+
+// the gentlest turn after lift-off whose climb fits the terrain and leads somewhere
+bool PlaneTasks::climbOutTurn( const Mind& c, const Pose& liftOff, float radius, float& turn )
+{
+	constexpr float climbSlope = 0.14f, departure = 900.0f;
+	for( float option : { 0.0f, 30.0f, -30.0f, 60.0f, -60.0f, 90.0f, -90.0f } )
+	{
+		Pose end;
+		if( sweepFrom( c, liftOff, radius, option, climbSlope, departure, 60.0f, &end ) >= departure && wayOut( c, end, radius, departure ) )
+		{
+			turn = option;
+			return true;
+		}
+	}
+	return false;
+}
+
+// with less than a comfortable length, taxi to a better place; someone standing on the run: a moment to move
+// before rolling, a few times at most; otherwise the plan holds for half a minute
+void PlaneTasks::settleDeparture( Mind& c, const Vec3& origin, const Heading& best, const Roll& roll )
+{
 	constexpr int holdLimit = 8;
-	if( best > 0 && !bestClear && c.bot.takeoff.holds < holdLimit )
+	vec3_t from;
+	origin.copyTo( from );
+	if( best.run < roll.comfortable && findTaxiSpot( c, from, roll.comfortable ) )
+		return;
+	if( best.score > 0 && !best.rollClear && c.bot.takeoff.holds < holdLimit )
 	{
 		c.bot.takeoff.holds++;
 		c.bot.takeoff.holdTime = theLevel.time_ + 1000;
 		return;
 	}
-	if( best > 0 )
+	if( best.score > 0 )
 		c.bot.takeoff.planTime = theLevel.time_ + 30000;
 }
 

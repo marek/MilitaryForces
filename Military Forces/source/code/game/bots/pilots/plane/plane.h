@@ -146,6 +146,26 @@ struct PlaneTasks
 	// Chooses the take-off heading: enough runway to reach flying speed, nothing standing on it, and from the lift-off
 	// point a climb, straight or turning, that fits the terrain and leads somewhere.
 	static void planDeparture( Mind& c );
+	// what a take-off needs from a runway
+	struct Roll
+	{
+		float	groundRun = 0;
+		float	radius = 0;	// turn radius just after lift-off
+		float	comfortable = 0;	// a comfortable length of runway
+	};
+	// one heading looked at for the take-off
+	struct Heading
+	{
+		float	yaw = 0;
+		float	run = 0;
+		bool	rollClear = false;
+		float	departTurn = 0;
+		float	score = 0;
+	};
+	static Roll rollFor( const Mind& c );
+	static Heading scoreHeading( const Mind& c, const Vec3& origin, float yaw, const Roll& roll );
+	static bool rollIsClear( const Mind& c, const Vec3& origin, const Vec3& dir, float length );
+	static void settleDeparture( Mind& c, const Vec3& origin, const Heading& best, const Roll& roll );
 
 	// On the ground: wait when told to hold, plan a departure, taxi to a spot with enough runway if needed, then roll
 	// and lift off. Slow, it stops for anyone ahead and keeps off the path of an aircraft on its roll
@@ -226,6 +246,7 @@ struct PlaneTasks
 		float	yaw;
 		float	seconds;
 	};
+	static bool climbOutTurn( const Mind& c, const Pose& liftOff, float radius, float& turn );
 
 	// flies an arc of turnDegrees at the given radius and then straight on, returns the free distance up to horizon
 	static float sweepFrom( const Mind& c, const Pose& start, float radius, float turnDegrees, float slope, float horizon, float halfWidth, Pose* finish = nullptr );
