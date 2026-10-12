@@ -2157,6 +2157,35 @@ void CGame::drawTourneyScoreboard() {
 	CGame::drawOldTourneyScoreboard();
 }
 
+// the name of each team mate the radar shows, above its vehicle, in the smallest legible text; the radar key turns
+// them on and off with the radar, and cg_drawFriend (the "friendlabels" command) turns them off altogether
+static void CG_DrawFriendLabels()
+{
+	constexpr float labelScale = 0.15f;
+	constexpr vec4_t labelColour = { 0.45f, 0.65f, 1.0f, 1.0f };
+	if( !cg_drawFriend.integer )
+		return;
+	for( int i = 0; i < cg.numRadarFriends; i++ )
+	{
+		const int client = cg.radarFriends[i];
+		if( client < 0 || client >= MAX_CLIENTS || client == cg.snap->ps.clientNum )
+			continue;
+		const clientInfo_t& ci = cgs.clientinfo[client];
+		if( !ci.infoValid || ci.vehicle < 0 || ci.vehicle >= bg_numberOfVehicles )
+			continue;
+		vec3_t at;
+		VectorCopy( cg_entities[client].lerpOrigin, at );
+		at[2] += availableVehicles[ci.vehicle].maxs[2] + 10;
+		if( const auto screen = CGame::worldToScreenCoords( at, true ) )
+		{
+			char name[MAX_QPATH];
+			Q_strncpyz( name, ci.name, sizeof( name ) );
+			Q_CleanStr( name );
+			CGame::text_Paint( screen->x - CGame::text_Width( name, labelScale, 0 ) / 2, screen->y, labelScale, labelColour, name, 0, 0, ITEM_TEXTSTYLE_SHADOWED );
+		}
+	}
+}
+
 /*
 =================
 CGame::draw2D_MFQ3
@@ -2214,7 +2243,9 @@ void CGame::draw2D_MFQ3( ) {
 			 cg.snap->ps.stats[STAT_HEALTH] > 0 &&
 			 !(cg.snap->ps.pm_flags & PMF_VEHICLESELECT) )
 		{
+			cg.numRadarFriends = 0;
 			CGame::drawStatusBar_MFQ3_new();
+			CG_DrawFriendLabels();
 
 //			CG_DrawCrosshair();
 			CGame::drawCrosshairNames();

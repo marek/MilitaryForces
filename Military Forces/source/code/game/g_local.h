@@ -898,6 +898,7 @@ void ClientEndFrame( GameEntity *ent );
 // g_team.c
 //
 bool OnSameTeam( GameEntity *ent1, GameEntity *ent2 );
+bool OnSameSide( GameEntity *ent, GameEntity *other );
 void Team_CheckDroppedItem( GameEntity *dropped );
 bool CheckObeliskAttack( GameEntity *obelisk, GameEntity *attacker );
 

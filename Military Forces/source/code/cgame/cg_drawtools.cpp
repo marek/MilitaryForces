@@ -922,7 +922,7 @@ bool CGame::polyMeshGeneratedShadow( BasicDrawInfo_t *drawInfo, float *shadowPla
 	if( cg_shadowDebug.value )
 	{
 		// use a square outline texture (targetting reticle)
-		shaderHandle = cgs.media.HUDreticles[ HR_TARGET_FRIEND ];
+		shaderHandle = cgs.media.HUDreticles[ HR_TARGET_ENEMY ];
 	}
 	else
 	{
@@ -1125,8 +1125,6 @@ Adds a reticle, either as a 2D sprite or as pending HUD gfx
 
 #define _DRAW_AS_HUD
 
-#pragma message ("CG_AddReticleEntityToScene() FRIEND tracking/lock NOT implemented")
-
 void CGame::addReticleEntityToScene( refEntity_t * pReticle, ClientEntity * pTarget )
 {
 	float offsetx, offsety, scaling = 1.0f;
@@ -1306,8 +1304,6 @@ static void CG_Parse_Reticle_Target( reticle_t * pR )
 	{
 		// assume everthing else is a player for now
 		client = pR->pTarget->currentState.number;
-
-#pragma message( "CG_Parse_Reticle_Target() FRIEND label colouring NOT implemented" )
 
 		// create the text
 		pText = va( "^2%s ^3%s", cgs.clientinfo[ client ].name, 

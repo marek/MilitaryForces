@@ -39,6 +39,7 @@ ControlUtils::ControlUtils()
 	bindings_.emplace_back("contact_tower",	"Contact Tower",				ID_CONTACTTOWER,	K_BACKSPACE,	-1,			-1, -1 );
 	bindings_.emplace_back("radar",			"RADAR on/off",					ID_RADAR,			-1,				-1,			-1, -1, 'r' );
 	bindings_.emplace_back("extinfo",			"Ext.Info on/off",				ID_EXTINFO,			'-',			-1,			-1, -1 );
+	bindings_.emplace_back("friendlabels",	"Toggle friendly tracking",		ID_FRIENDLABELS,	-1,				-1,			-1, -1 );
 	// one key for both radar jobs: a tap steps the range, holding it switches the radar
 	bindings_.emplace_back("radarrange",		"RADAR range",					ID_RADARRANGE,		'r',			-1,			-1, -1 );
 	bindings_.emplace_back("mfd1_mode",		"Cycle MFD1 Mode",				ID_CYCLEMFD1,		-1,				-1,			-1, -1 );

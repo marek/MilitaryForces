@@ -181,6 +181,18 @@ bool OnSameTeam( GameEntity *ent1, GameEntity *ent2 )
 }
 
 
+// a team mate, or a placed vehicle or base site of the player's team (team games only)
+bool OnSameSide( GameEntity *ent, GameEntity *other )
+{
+	if( g_gametype.integer < GT_TEAM || !ent->client_ )
+		return false;
+	if( other->client_ )
+		return OnSameTeam( ent, other );
+	if( other->s.eType == ET_MISC_VEHICLE )
+		return other->s.generic1 == ent->client_->sess_.sessionTeam_;
+	return false;
+}
+
 static char ctfFlagStatusRemap[] = { '0', '1', '*', '*', '2' };
 static char oneFlagStatusRemap[] = { '0', '1', '2', '3', '4' };
 

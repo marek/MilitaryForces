@@ -128,7 +128,7 @@ void updateTargetTracking( GameEntity *ent )
 			for( int i = 1; i < theLevel.num_entities_; i++ )
 			{
 				GameEntity* other = theLevel.getEntity( i );
-				if( !other || other == ent || !other->inuse_ || other->health_ <= 0 )
+				if( !other || other == ent || !other->inuse_ || other->health_ <= 0 || OnSameSide( ent, other ) )
 					continue;
 				if( other->s.eType == ET_VEHICLE && other->client_ )
 				{
@@ -167,8 +167,10 @@ void updateTargetTracking( GameEntity *ent )
 		if( tr.entityNum == ENTITYNUM_NONE ) 
 			return;
 
-		// found something
+		// found something; a friend is never a radar target, so it never stands between the player and a lock
 		test = theLevel.getEntity(tr.entityNum);// &g_entities[tr.entityNum];
+		if( OnSameSide( ent, test ) )
+			return;
 		if( test->s.eType == ET_VEHICLE && test->client_ && 
 			(availableVehicles[test->client_->vehicle_].cat & targetcat) ) 
 		{
@@ -229,7 +231,7 @@ void updateTargetTracking( GameEntity *ent )
 			}
 			diff = ent->tracktarget_->r.currentOrigin - ent->r.currentOrigin;
 		}
-		if( !actualcat ) 
+		if( !actualcat || OnSameSide( ent, ent->tracktarget_ ) ) 
 		{
 			untrack(ent);
 			return;

@@ -245,15 +245,17 @@ void CGame::interpolatePlayerState( bool grabAngles ) {
 		}
 		out->velocity[i] = prev->ps.velocity[i] + 
 				f * (next->ps.velocity[i] - prev->ps.velocity[i] );
-		if( cg.snap->ps.pm_type == PM_VEHICLE ) {
-			out->vehicleAngles[i] = prev->ps.vehicleAngles[i] + f * (next->ps.vehicleAngles[i] - 
-							prev->ps.vehicleAngles[i]);
-			out->gunAngle = prev->ps.gunAngle + f * (next->ps.gunAngle - prev->ps.gunAngle);
-			out->turretAngle = prev->ps.turretAngle + f * (next->ps.turretAngle - prev->ps.turretAngle);
-#pragma message( "this is the problem: predict correctly here!" )
-		}
-
     }
+	// the body turns as one rotation, the short way through a loop or a roll; turret and gun each by its own angle
+	if( cg.snap->ps.pm_type == PM_VEHICLE ) {
+		quat_t from, to, between;
+		AnglesToQuat( prev->ps.vehicleAngles, from );
+		AnglesToQuat( next->ps.vehicleAngles, to );
+		QuatInterpolate( from, to, f, between );
+		QuatToAngles( between, out->vehicleAngles );
+		out->gunAngle = LerpAngle( prev->ps.gunAngle, next->ps.gunAngle, f );
+		out->turretAngle = LerpAngle( prev->ps.turretAngle, next->ps.turretAngle, f );
+	}
    
 	if( cg.snap->ps.pm_type == PM_VEHICLE ) {
 		VectorCopy( out->vehicleAngles, cg.predictedPlayerEntity.currentState.angles );

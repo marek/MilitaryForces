@@ -134,7 +134,7 @@ vmCvar_t	cg_advanced;
 vmCvar_t	cg_predictItems;
 vmCvar_t	cg_drawTeamOverlay;
 static vmCvar_t	cg_teamOverlayUserinfo;
-static vmCvar_t	cg_drawFriend;
+vmCvar_t	cg_drawFriend;
 vmCvar_t	cg_teamChatsOnly;
 vmCvar_t	cg_hudFiles;
 vmCvar_t 	cg_smoothClients;
@@ -842,14 +842,11 @@ void CGame::registerGraphics( ) {
 
 	static char		*mfq3_hudrets[HR_MAX] = {
 		"newhud/reticle/reticle1.tga",
-		"newhud/reticle/reticle2.tga",
 		"newhud/reticle/reticle3.tga",
-		"newhud/reticle/reticle4.tga",
 		"newhud/reticle/reticle5.tga",
 		"newhud/reticle/reticle6.tga",
 		"newhud/reticle/reticle7.tga",
 		"newhud/reticle/reticle8.tga",
-		"newhud/reticle/reticle9.tga",
 		"newhud/reticle/reticle10.tga"
 	};
 

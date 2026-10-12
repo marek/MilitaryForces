@@ -700,6 +700,9 @@ struct cg_t {
 	int				toggleViewTime;
 	ClientEntity		*radarEnts[MAX_RADAR_TARGETS];
 	unsigned int	radarTargets;
+	// team mates the radar showed this frame, for their name labels
+	int				radarFriends[MAX_RADAR_TARGETS];
+	int				numRadarFriends;
 	int				tracernum;
 	int				HUDColor;
 	int				HUDColorTime;
@@ -732,14 +735,11 @@ enum HUDColors_t {
 
 enum HUDReticles_t {
 	HR_GUIDED_WHITE,
-	HR_TRACKING_FRIEND,
 	HR_TRACKING_ENEMY,
-	HR_LOCKED_FRIEND,
 	HR_LOCKED_ENEMY,
 	HR_GUIDED,
 	HR_UNGUIDED_AND_GUN,
 	HR_BOMB,
-	HR_TARGET_FRIEND,
 	HR_TARGET_ENEMY,
 	HR_MAX
 };
@@ -1190,6 +1190,7 @@ extern	vmCvar_t		cg_crosshairX;
 extern	vmCvar_t		cg_crosshairY;
 extern	vmCvar_t		cg_crosshairSize;
 extern	vmCvar_t		cg_drawStatus;
+extern	vmCvar_t		cg_drawFriend;
 extern	vmCvar_t		cg_draw2D;
 extern	vmCvar_t		cg_debugEvents;
 extern	vmCvar_t		cg_errorDecay;
@@ -1775,6 +1776,7 @@ public:
 	static void camBomb_f();
 	static void camOld_f();
 	static void toggleInfo_f();
+	static void toggleFriendLabels_f();
 	static void toggleView_f();
 	static void adjustReset_f();
 	static void zoomIn_f();

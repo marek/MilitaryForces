@@ -327,6 +327,13 @@ void CGame::toggleInfo_f( ) {
 	cg.INFOTime = cg.time + 500;
 }
 
+// friendlabels: the name labels over team mates on the radar, on or off
+void CGame::toggleFriendLabels_f( ) {
+	const bool on = !cg_drawFriend.integer;
+	CvarSystem::set( "cg_drawFriend", on ? "1" : "0" );
+	CGame::printf( "Friendly tracking %s\n", on ? "on" : "off" );
+}
+
 /*
 ==================
 MFQ3 toggle view between external and cockpit view
@@ -755,6 +762,7 @@ static consoleCommand_t	commands[] = {
 	{ "tcmd", CG_TargetCommand_f },
 	{ "gps", CGame::toggleGps_f },
 	{ "extinfo", CGame::toggleInfo_f },
+	{ "friendlabels", CGame::toggleFriendLabels_f },
 	{ "toggleview", CGame::toggleView_f },
 	{ "+zoomin", CGame::zoomIn_f },
 	{ "-zoomin", CGame::adjustReset_f },

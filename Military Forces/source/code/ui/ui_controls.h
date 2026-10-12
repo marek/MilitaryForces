@@ -67,7 +67,8 @@ struct ControlUtils
 		ID_BOMBCAMERA		= 48,
 		ID_CYCLEMFD1		= 49,
 		ID_CYCLEMFD2		= 50,
-		ID_EJECT			= 51
+		ID_EJECT			= 51,
+		ID_FRIENDLABELS		= 52
 	};
 
 							ControlUtils();

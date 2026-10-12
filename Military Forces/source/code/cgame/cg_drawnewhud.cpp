@@ -478,6 +478,7 @@ void CGame::drawRadarSymbols_AIR_new( int vehicle, float range, int x, int y ) {
 
 	// walk through list of targets
 	for( i = 0; i < cg.radarTargets; i++ ) {
+		bool friendBlip = false;
 		// dont show self
 		if( cg.radarEnts[i] == &cg.predictedPlayerEntity ) 
 			continue;
@@ -547,12 +548,16 @@ void CGame::drawRadarSymbols_AIR_new( int vehicle, float range, int x, int y ) {
 			icon += 2;
 		else if( cgs.gametype >= GT_TEAM ) {
 			if( CGame::apparentTeam( cg.radarEnts[i]->currentState.clientNum, cgs.clientinfo[self->currentState.clientNum].team ) ==
-				cgs.clientinfo[self->currentState.clientNum].team ) 
+				cgs.clientinfo[self->currentState.clientNum].team ) {
 				icon++;
+				friendBlip = true;
+			}
 		}
 
 		// draw
 		CGame::drawPic( x + dir[0], y - dir[1], 8, 8, cgs.media.radarIcons[icon] );
+		if( friendBlip && cg.numRadarFriends < MAX_RADAR_TARGETS )
+			cg.radarFriends[cg.numRadarFriends++] = cg.radarEnts[i]->currentState.clientNum;
 		// check if we should draw any more targets
 		drawnTargets++;
 		if( drawnTargets >= cg_radarTargets.integer ) break;
@@ -600,6 +605,7 @@ void CGame::drawRadarSymbols_GROUND_new( int vehicle, float range, int x, int y 
 
 	// walk through list of targets
 	for( i = 0; i < cg.radarTargets; i++ ) {
+		bool friendBlip = false;
 		// dont show self
 		if( cg.radarEnts[i] == &cg.predictedPlayerEntity ) 
 			continue;
@@ -689,8 +695,10 @@ void CGame::drawRadarSymbols_GROUND_new( int vehicle, float range, int x, int y 
 			else if( cgs.gametype >= GT_TEAM ) 
 			{
 				if( CGame::apparentTeam( cg.radarEnts[i]->currentState.clientNum, cgs.clientinfo[self->currentState.clientNum].team ) ==
-					cgs.clientinfo[self->currentState.clientNum].team ) 
+					cgs.clientinfo[self->currentState.clientNum].team ) {
 					icon++;
+					friendBlip = true;
+				}
 			}
 		// buildings
 		} 
@@ -750,6 +758,8 @@ void CGame::drawRadarSymbols_GROUND_new( int vehicle, float range, int x, int y 
 
 		// draw
 		CGame::drawPic( x + dir[0], y - dir[1], 8, 8, cgs.media.radarIcons[icon] );
+		if( friendBlip && cg.numRadarFriends < MAX_RADAR_TARGETS )
+			cg.radarFriends[cg.numRadarFriends++] = cg.radarEnts[i]->currentState.clientNum;
 		// check if we should draw any more targets
 		drawnTargets++;
 		if( drawnTargets >= cg_radarTargets.integer ) 
