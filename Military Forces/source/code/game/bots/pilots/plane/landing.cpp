@@ -122,7 +122,51 @@ namespace
 	}
 }
 
-// choose the landing direction: the end with the flatter, clearer approach, or no landing here at all
+namespace
+{
+	// one end of the runway to land towards: the steepest slope the terrain forces on the approach, and how far out
+	// the path is clear
+	void surveyEnd( const BotWorld::Pad& pad, float dir, float& slope, float& clear )
+	{
+		constexpr float lookOut = 3500.0f;
+		Vec3 from, out;
+		trace_t tr;
+		slope = BotWorld::approachSlope( pad, dir );
+		VectorMA( pad.center, -dir * (pad.halfLength - BotWorld::thresholdInset( pad )), pad.axis, from );
+		from[2] = pad.z + 250;
+		VectorScale( pad.axis, -dir, out );
+		out[2] = slope;
+		VectorNormalize( out );
+		BotWorld::pathBlocked( from, out, lookOut, ENTITYNUM_NONE, tr );
+		clear = tr.fraction * lookOut;
+	}
+
+	// the lane with the longest clear run, a little or well to either side of the centre line
+	float bestLane( const BotWorld::Pad& pad, float landDir )
+	{
+		float bestLength = -1, offset = 45.0f;
+		for( float lane : { 45.0f, -45.0f, 120.0f, -120.0f } )
+		{
+			Vec3 from, along;
+			trace_t tr;
+			VectorScale( pad.axis, landDir, along );
+			VectorMA( pad.center, -(pad.halfLength - BotWorld::thresholdInset( pad )), along, from );
+			from[0] += -along[1] * lane;
+			from[1] += along[0] * lane;
+			from[2] = pad.z + 30;
+			BotWorld::pathBlocked( from, along, pad.halfLength * 2.0f - 300.0f, ENTITYNUM_NONE, tr );
+			if( tr.fraction > bestLength )
+			{
+				bestLength = tr.fraction;
+				offset = lane;
+			}
+		}
+		return offset;
+	}
+}
+
+// choose the landing direction: the end with the flatter, clearer approach, or no landing here at all. The nearer end
+// is kept unless the other is clearly better; the pad is given up when neither will do
 Status LandingSteps::survey( Bots::Mind& c )
 {
 	if( c.bot.rearm.pad < 0 )
@@ -131,32 +175,15 @@ Status LandingSteps::survey( Bots::Mind& c )
 	c.bot.rearm.phase = Survey;
 	c.bot.landing.start = theLevel.time_;
 	c.bot.landing.outbound = false;
-
 	Vec3 rel;
 	VectorSubtract( c.ent->r.currentOrigin, pad.center, rel );
 	const float along = rel[0] * pad.axis[0] + rel[1] * pad.axis[1];
 	c.bot.landing.dir = along > 0 ? -1.0f : 1.0f;
 	if( landed( c ) )
 		return Status::Success;
-
-	// for each end: the steepest slope the terrain forces on the approach, and how far out the path is clear
 	float slope[2], clear[2];
 	for( int k = 0; k < 2; k++ )
-	{
-		const float dir = k ? 1.0f : -1.0f;
-		Vec3 from, out;
-		trace_t tr;
-		slope[k] = BotWorld::approachSlope( pad, dir );
-		VectorMA( pad.center, -dir * (pad.halfLength - BotWorld::thresholdInset( pad )), pad.axis, from );
-		from[2] = pad.z + 250;
-		VectorScale( pad.axis, -dir, out );
-		out[2] = slope[k];
-		VectorNormalize( out );
-		BotWorld::pathBlocked( from, out, 3500, ENTITYNUM_NONE, tr );
-		clear[k] = tr.fraction * 3500.0f;
-	}
-
-	// keep the nearer end unless the other is clearly better; give the pad up when neither will do
+		surveyEnd( pad, k ? 1.0f : -1.0f, slope[k], clear[k] );
 	int chosen = c.bot.landing.dir > 0 ? 1 : 0;
 	if( slope[1 - chosen] < slope[chosen] * 0.7f || (clear[chosen] < 1500 && clear[1 - chosen] > clear[chosen]) )
 		chosen = 1 - chosen;
@@ -172,30 +199,11 @@ Status LandingSteps::survey( Bots::Mind& c )
 	c.bot.landing.dir = chosen ? 1.0f : -1.0f;
 	c.bot.landing.slope = slope[chosen];
 	c.bot.landing.run = std::max( 900.0f, clear[chosen] - 300.0f );
-
 	Vec3 over;
 	VectorCopy( pad.center, over );
 	over[2] = pad.z + 40;
 	c.bot.landing.ceiling = BotWorld::ceilingAbove( over, ENTITYNUM_NONE );
-
-	// land on the lane with the longest clear run, a little or well to either side of the centre line
-	float bestLength = -1;
-	for( float offset : { 45.0f, -45.0f, 120.0f, -120.0f } )
-	{
-		Vec3 from, lane;
-		trace_t tr;
-		VectorScale( pad.axis, c.bot.landing.dir, lane );
-		VectorMA( pad.center, -(pad.halfLength - BotWorld::thresholdInset( pad )), lane, from );
-		from[0] += -lane[1] * offset;
-		from[1] += lane[0] * offset;
-		from[2] = pad.z + 30;
-		BotWorld::pathBlocked( from, lane, pad.halfLength * 2.0f - 300.0f, ENTITYNUM_NONE, tr );
-		if( tr.fraction > bestLength )
-		{
-			bestLength = tr.fraction;
-			c.bot.landing.offset = offset;
-		}
-	}
+	c.bot.landing.offset = bestLane( pad, c.bot.landing.dir );
 	return Status::Success;
 }
 
@@ -262,6 +270,66 @@ Status LandingSteps::approach( Bots::Mind& c )
 	return Status::Running;
 }
 
+namespace
+{
+	// go around: still high past the threshold, far off to the side, or someone is on the runway. Still flying with
+	// too little strip left to stop on is a go-around too: better than rolling off the far end
+	bool mustGoAround( Bots::Mind& c, const Geometry& g, bool busy )
+	{
+		const float left = g.pad.halfLength - g.pos;
+		const bool around = left < rollOutRoom( c, c.speed ) || (g.before < -200 && g.above > 150) || fabs( g.side ) > 900 || (g.before > 300 && busy);
+#ifdef MF_BOT_DEBUG
+		if( around && g_botDebug.integer >= 2 )
+			Common::printf( "BOTGOAROUND t %d bot %d veh %d before %.0f above %.0f side %.0f half %.0f busy %d speed %.0f fuel %d\n", theLevel.time_, c.ent->s.number,
+				c.ent->client_->vehicle_, g.before, g.above, g.side, g.pad.halfLength, busy, c.speed, c.ps.stats[STAT_FUEL] );
+#endif
+		return around;
+	}
+
+	// One straight slope down to the touchdown point: the slope the survey found clears the ground before the runway,
+	// so the plane crosses the threshold already low and has the whole strip to stop on. Nose down by the slope itself,
+	// corrected by how far off it the plane is: correcting alone trails the slope by its own error. Over the runway it
+	// is flown down without a float, which uses the strip up, but nearly level at the end: a nose that reaches the
+	// ground before the wheels is a crash. Too low before the runway, or terrain ahead of the nose: pull up
+	void flyDownSlope( Bots::Mind& c, const Geometry& g, bool overRunway )
+	{
+		const float touch = fabs( c.veh.mins[2] ) + c.veh.gearheight;	// height of the origin when the wheels touch
+		const bool shortField = g.pad.halfLength < 500;
+		const float wantAbove = std::clamp( touch + std::max( 0.0f, g.before ) * c.bot.landing.slope, touch, 800.0f );
+		const float slopeAngle = g.before > 0 ? atan( c.bot.landing.slope ) * 180.0f / std::numbers::pi_v<float> : 0.0f;
+		c.view[PITCH] = std::clamp( slopeAngle + (g.above - wantAbove) / 6.0f, -10.0f, 16.0f );
+		if( overRunway )
+		{
+			c.view[PITCH] = g.above > touch + 8 ? std::clamp( (g.above - touch) / 4.0f, 3.0f, 10.0f ) : 3.0f;
+			return;
+		}
+		Vec3 nose;
+		trace_t tr;
+		AngleVectors( c.ps.vehicleAngles, nose, nullptr, nullptr );
+		const bool near = shortField || g.before < 500;
+		if( c.sense.height < (near ? 14.0f + touch : 60.0f) ||
+			(BotWorld::pathBlocked( c.ent->r.currentOrigin, nose, near ? 250.0f : 500.0f, c.ent->s.number, tr ) && tr.entityNum == ENTITYNUM_WORLD) )
+			c.view[PITCH] = -12.0f;
+	}
+
+	// slow in steps, to just above the stall by the threshold; the gear only comes down below the green-arc speed, asked
+	// for once and given time to travel
+	void slowForTouchdown( Bots::Mind& c, const Geometry& g, bool overRunway )
+	{
+		const bool shortField = g.pad.halfLength < 500;
+		const float wantSpeed = g.stall * (overRunway ? 1.15f : g.before > 1200 ? 1.7f : shortField ? 1.2f : g.before > 500 ? 1.45f : 1.25f);
+		c.cmd.forwardmove = c.speed < wantSpeed ? moveFull : -moveFull;
+		const bool wantBrake = c.speed > wantSpeed * 1.25f;
+		if( wantBrake != ((c.ps.ONOFF & OO_SPEEDBRAKE) != 0) )
+			c.cmd.buttons |= BUTTON_BRAKE;
+		if( !(c.ps.ONOFF & OO_GEAR) && c.speed < g.stall * SPEED_GREEN_ARC * 0.95f && theLevel.time_ > c.bot.landing.gearTime )
+		{
+			c.cmd.buttons |= BUTTON_GEAR;
+			c.bot.landing.gearTime = theLevel.time_ + 4000;
+		}
+	}
+}
+
 // down the slope to the touchdown point, slowing to just above the stall, gear down
 Status LandingSteps::final( Bots::Mind& c )
 {
@@ -269,71 +337,24 @@ Status LandingSteps::final( Bots::Mind& c )
 		return Status::Failure;
 	if( landed( c ) )
 		return Status::Success;
-
 	const Geometry g( BotWorld::pads_[c.bot.rearm.pad], c );
 	c.bot.rearm.phase = Final;
 	c.controls.claim();
-	// go around: still high past the threshold, far off to the side, or someone is on the runway
-	// still flying with too little strip left to stop on is a go-around too: better than rolling off the far end
-	const float left = g.pad.halfLength - g.pos;
-	if( left < rollOutRoom( c, c.speed ) || (g.before < -200 && g.above > 150) || fabs( g.side ) > 900 || (g.before > 300 && Bots::runwayBusy( c.bot.rearm.pad, c.ent )) )
+	if( mustGoAround( c, g, Bots::runwayBusy( c.bot.rearm.pad, c.ent ) ) )
 	{
-#ifdef MF_BOT_DEBUG
-		if( g_botDebug.integer >= 2 )
-			Common::printf( "BOTGOAROUND t %d bot %d veh %d before %.0f above %.0f side %.0f half %.0f busy %d speed %.0f fuel %d\n", theLevel.time_, c.ent->s.number,
-				c.ent->client_->vehicle_, g.before, g.above, g.side, g.pad.halfLength, Bots::runwayBusy( c.bot.rearm.pad, c.ent ), c.speed, c.ps.stats[STAT_FUEL] );
-#endif
 		c.controls.release();
 		return Status::Failure;
 	}
-
 	Vec3 target;
 	VectorMA( g.pad.center, g.pos + 900.0f, g.travel, target );
 	target[0] += -g.travel[1] * c.bot.landing.offset;
 	target[1] += g.travel[0] * c.bot.landing.offset;
 	c.headFor( target );
-
-	Vec3 under;
-	under = c.ent->r.currentOrigin;
+	Vec3 under = c.ent->r.currentOrigin;
 	under[2] = g.pad.z;
 	const bool overRunway = BotWorld::runwayAt( under );
-	// height of the origin when the wheels touch
-	const float touch = fabs( c.veh.mins[2] ) + c.veh.gearheight;
-	const bool shortField = g.pad.halfLength < 500;
-	// one straight slope down to the touchdown point: the slope the survey found clears the ground before the runway,
-	// so the plane crosses the threshold already low and has the whole strip to stop on
-	const float wantAbove = std::clamp( touch + std::max( 0.0f, g.before ) * c.bot.landing.slope, touch, 800.0f );
-	// nose down by the slope itself, corrected by how far off it the plane is: correcting alone trails the slope by its own error
-	const float slopeAngle = g.before > 0 ? atan( c.bot.landing.slope ) * 180.0f / std::numbers::pi_v<float> : 0.0f;
-	c.view[PITCH] = std::clamp( slopeAngle + (g.above - wantAbove) / 6.0f, -10.0f, 16.0f );
-	// over the runway: fly it down without a float, which uses the strip up, but nearly level at the end: a nose that
-	// reaches the ground before the wheels is a crash
-	if( overRunway )
-		c.view[PITCH] = g.above > touch + 8 ? std::clamp( (g.above - touch) / 4.0f, 3.0f, 10.0f ) : 3.0f;
-	else
-	{
-		Vec3 nose;
-		trace_t tr;
-		AngleVectors( c.ps.vehicleAngles, nose, nullptr, nullptr );
-		// too low before the runway, or terrain ahead of the nose: pull up
-		const bool near = shortField || g.before < 500;
-		if( c.sense.height < (near ? 14.0f + touch : 60.0f) ||
-			(BotWorld::pathBlocked( c.ent->r.currentOrigin, nose, near ? 250.0f : 500.0f, c.ent->s.number, tr ) && tr.entityNum == ENTITYNUM_WORLD) )
-			c.view[PITCH] = -12.0f;
-	}
-
-	// slow in steps, to just above the stall by the threshold
-	const float wantSpeed = g.stall * (overRunway ? 1.15f : g.before > 1200 ? 1.7f : shortField ? 1.2f : g.before > 500 ? 1.45f : 1.25f);
-	c.cmd.forwardmove = c.speed < wantSpeed ? moveFull : -moveFull;
-	const bool wantBrake = c.speed > wantSpeed * 1.25f;
-	if( wantBrake != ((c.ps.ONOFF & OO_SPEEDBRAKE) != 0) )
-		c.cmd.buttons |= BUTTON_BRAKE;
-	// the gear only comes down below the green-arc speed; ask once and wait for it to travel
-	if( !(c.ps.ONOFF & OO_GEAR) && c.speed < g.stall * SPEED_GREEN_ARC * 0.95f && theLevel.time_ > c.bot.landing.gearTime )
-	{
-		c.cmd.buttons |= BUTTON_GEAR;
-		c.bot.landing.gearTime = theLevel.time_ + 4000;
-	}
+	flyDownSlope( c, g, overRunway );
+	slowForTouchdown( c, g, overRunway );
 	return Status::Running;
 }
 
