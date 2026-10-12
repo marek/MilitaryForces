@@ -422,7 +422,7 @@ GameEntity* Bots::findStructure( GameEntity* ent, State& bot )
 	if( theLevel.time_ < bot.structureTime )
 	{
 		GameEntity* current = bot.structure >= 0 ? theLevel.getEntity( bot.structure ) : nullptr;
-		if( current && current->inuse_ && current->s.eType == ET_EXPLOSIVE && current->takedamage_ && current->health_ > 0 )
+		if( current && standing( current ) )
 			return current;
 		if( bot.structure < 0 )
 			return nullptr;
@@ -431,37 +431,16 @@ GameEntity* Bots::findStructure( GameEntity* ent, State& bot )
 	bot.structure = -1;
 	if( !BotWorld::padsBuilt_ )
 		BotWorld::buildPads();
-
 	const int team = ent->client_->sess_.sessionTeam_;
 	GameEntity* best = nullptr;
 	float bestScore = 0;
 	for( int i = MAX_CLIENTS + 1; i < theLevel.num_entities_; i++ )
 	{
 		GameEntity* other = theLevel.getEntity( i );
-		if( !other || !other->inuse_ || other->s.eType != ET_EXPLOSIVE || !other->takedamage_ || other->health_ <= 0 )
+		if( !other || !standing( other ) )
 			continue;
-		Vec3 centre;
-		for( int k = 0; k < 3; k++ )
-			centre[k] = (other->r.absmin[k] + other->r.absmax[k]) * 0.5f;
-		float score = Distance( ent->r.currentOrigin, centre );
-		if( g_gametype.integer >= GT_TEAM )
-		{
-			bool own = false, enemy = false;
-			for( const BotWorld::Pad& pad : BotWorld::pads_ )
-			{
-				if( pad.team == ClientBase::TEAM_FREE || Distance( pad.spot, centre ) > 2500 )
-					continue;
-				if( pad.team == team )
-					own = true;
-				else
-					enemy = true;
-			}
-			if( own && !enemy )
-				continue;
-			if( enemy )
-				score *= 0.4f;
-		}
-		if( !best || score < bestScore )
+		const float score = structureScore( ent, other, team );
+		if( score >= 0.0f && (!best || score < bestScore) )
 		{
 			best = other;
 			bestScore = score;
@@ -470,6 +449,34 @@ GameEntity* Bots::findStructure( GameEntity* ent, State& bot )
 	if( best )
 		bot.structure = best->s.number;
 	return best;
+}
+
+// a building that can still be destroyed
+bool Bots::standing( GameEntity* structure )
+{
+	return structure->inuse_ && structure->s.eType == ET_EXPLOSIVE && structure->takedamage_ && structure->health_ > 0;
+}
+
+// its distance, shortened near an enemy base; in a team game one only near the bot's own pads is no target (below 0)
+float Bots::structureScore( GameEntity* ent, GameEntity* structure, int team )
+{
+	constexpr float baseReach = 2500.0f, enemyBaseShare = 0.4f;
+	Vec3 centre;
+	for( int k = 0; k < 3; k++ )
+		centre[k] = (structure->r.absmin[k] + structure->r.absmax[k]) * 0.5f;
+	const float dist = Distance( ent->r.currentOrigin, centre );
+	if( g_gametype.integer < GT_TEAM )
+		return dist;
+	bool own = false, enemy = false;
+	for( const BotWorld::Pad& pad : BotWorld::pads_ )
+	{
+		if( pad.team == ClientBase::TEAM_FREE || Distance( pad.spot, centre ) > baseReach )
+			continue;
+		(pad.team == team ? own : enemy) = true;
+	}
+	if( own && !enemy )
+		return -1.0f;
+	return enemy ? dist * enemyBaseShare : dist;
 }
 
 void Bots::pickGoal( GameEntity* ent, State& bot, float radius )

@@ -311,6 +311,8 @@ private:
 	static int memoryTime( const State& bot );
 	static bool findHidePoint( GameEntity* ent, State& bot, GameEntity* threat, bool hullDown = false );
 	static GameEntity* findStructure( GameEntity* ent, State& bot );
+	static bool standing( GameEntity* structure );
+	static float structureScore( GameEntity* ent, GameEntity* structure, int team );
 	static void loadCharacters();
 	static bool replenished( GameEntity* ent );
 	static void finishRearm( GameEntity* ent, State& bot );
