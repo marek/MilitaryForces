@@ -1327,13 +1327,9 @@ public:
 	static void setMissionScriptOverviewDefaults( mission_overview_t* overview );
 	static int getIndexOfVehicle( int start, int gameset, int team, int cat, int cls, int vehicleType, int change_vehicle, bool allowNukes );
 	static int getIndexOfVehicleEx( int start, int gameset, int team, int cat, int cls, int vehicleType, int change_vehicle, bool allowNukes );
-	static int getIndexOfGI( int start, int gameset, int GIType, int mode);
-	static int getItemIndexFromHex(int hexValue);
-	static int getNumberOfItems(const char **itemlist);
 	static char * createModelPathname( int vehicle, char * pFormatString );
 	static char * createGIPathname( int vehicle, char * pFormatString );
 	static void limitFloat( float * value, float min, float max );
-	static void limitInt( int * value, int min, int max );
 	static int extractEnumFromId( int vehicle, unsigned int op );
 	static std::optional<md3Tag_t> findTag(const char* fileName, const char* tagname);
 	static bool distributeWeaponsOnPylons( int idx, completeLoadout_t* loadout );

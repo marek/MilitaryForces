@@ -187,74 +187,15 @@ int VehicleData::getIndexOfVehicle( int start,			// where to start in list
 
 /*
 =================
-VehicleData::getIndexOfGI
-=================
-*/
-int VehicleData::getIndexOfGI( int start, int gameset, int GIType, int mode)
-{
-    int				i;
-	int				gi_pt = -1;
-	bool		done = false;
-
-	if( gameset <= 0 ) gameset = MF_GAMESET_ANY;
-	if( start >= bg_numberOfGroundInstallations )
-		start = 0;
-	else if( start < 0 )
-		start = bg_numberOfGroundInstallations;
-
-	// scan loop
-    for( i = start+1; done != true; i++ )
-    {
-		if(i >= bg_numberOfGroundInstallations)
-			i = 0;					
-
-		if( i == start ) done = true;			//return start;	
-		if( !(availableGroundInstallations[i].gameset & gameset) ) continue;			// wrong set
-		
-		if(GIType != -1) {
-			if(mode == 1 && strcmp(availableGroundInstallations[i].tinyName, availableGroundInstallations[GIType].tinyName) == 0) {
-				//If its good mark known position just in case its the only good one
-				gi_pt = i;
-				continue;	// change vehicle
-			}else if(mode == 2 && strcmp(availableGroundInstallations[i].tinyName, availableGroundInstallations[GIType].tinyName) != 0) {
-				continue;						// make sure its the same
-			}
-		}
-		return i;
-    }
-
-    return gi_pt;
-}
-
-
-/*
-=================
 VehicleData::getNumberOfItems
 =================
 */
-
-// returns the number of items in a stringlist
-int VehicleData::getNumberOfItems(const char **itemlist)
-{
-	int i;
-	for( i = 0; itemlist[i] != nullptr; i++ );
-	return i;
-}
 
 /*
 =================
 VehicleData::getItemIndexFromHex
 =================
 */
-
-// takes an already properly right-shifted hex value (with only 1 bit set!)
-// and returns the item index for it
-int VehicleData::getItemIndexFromHex(int hexValue)
-{
-	int i;
-	for( i = -1; hexValue; i++ ) hexValue>>=1;
-	return i;
-}
 
 /*
 =================
@@ -322,14 +263,6 @@ VehicleData::limitFloat
 
 // generic float limiting
 void VehicleData::limitFloat( float * value, float min, float max )
-{
-	// min & max
-	if( *value < min ) *value = min;
-	if( *value > max ) *value = max;
-}
-
-// generic int limiting
-void VehicleData::limitInt( int * value, int min, int max )
 {
 	// min & max
 	if( *value < min ) *value = min;

@@ -267,7 +267,6 @@ public:
 	static void buildPads();
 	static bool flagPosition( int team, vec3_t out );
 	static void buildRoamPoints();
-	static bool steerAround( GameEntity* ent, float wantYaw, float travel, float& yaw );
 	static bool runwayAt( const vec3_t point, float* surface = nullptr );
 	static float runwayRun( const vec3_t origin, float yaw, float maxDist );
 	// the touchdown point sits this far inside the runway's end: close to it on a short strip, where every unit of roll counts

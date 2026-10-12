@@ -215,7 +215,6 @@ public:
 	void checkEvents();
 	void groundVehicleFlags();
 	void groundVehicle( clientInfo_t *ci );
-	void heloPilot( const refEntity_t *parent, qhandle_t parentModel, int idx );
 	void heloFlags();
 	void helo( clientInfo_t *ci );
 	void lQMFlags();

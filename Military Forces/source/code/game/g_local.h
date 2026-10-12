@@ -563,7 +563,6 @@ public:
 	static void setMovedir ( vec3_t angles, vec3_t movedir);
 	static GameEntity *tempEntity( vec3_t origin, int event );
 	static void sound( GameEntity *ent, int channel, int soundIndex );
-	static bool entitiesFree();
 	static void touchTriggers (GameEntity *ent);
 	static void addPredictableEvent( GameEntity *ent, int event, int eventParm );
 	static void addEvent( GameEntity *ent, int event, int eventParm, bool addToQueue );

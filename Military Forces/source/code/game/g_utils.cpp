@@ -447,26 +447,6 @@ float vectoyaw( const vec3_t vec )
 //	return e;
 //}
 
-/*
-=================
-Game::entitiesFree
-=================
-*/
-bool Game::entitiesFree() 
-{
-	if( theLevel.num_entities_ < ENTITYNUM_MAX_NORMAL )
-		return true;
-
-	for( int i = MAX_CLIENTS + 1; i < theLevel.num_entities_; i++ ) 
-	{
-		GameEntity* e = theLevel.getEntity(i);
-		if( !e || !e->inuse_ )
-			return true;
-	}
-	return false;
-}
-
-
 ///*
 //=================
 //G_FreeEntity

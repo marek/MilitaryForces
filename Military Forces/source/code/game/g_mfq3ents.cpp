@@ -8,11 +8,6 @@
 #include "g_level.h"
 #include "g_mfq3ents.h"
 
-void Think_ExplodeVehicle::execute()
-{
-	ExplodeVehicle(self_);
-}
-
 /*
 ===============================================================================
 

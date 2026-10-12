@@ -117,24 +117,6 @@ void BotWorld::buildRoamPoints()
 	}
 }
 
-// the heading nearest the wanted one with no world geometry in the way for that distance
-bool BotWorld::steerAround( GameEntity* ent, float wantYaw, float travel, float& yaw )
-{
-	constexpr std::array<float, 9> offsets = { 0.0f, 20.0f, -20.0f, 45.0f, -45.0f, 75.0f, -75.0f, 110.0f, -110.0f };
-	for( float offset : offsets )
-	{
-		Vec3 angles = { 0, wantYaw + offset, 0 }, dir;
-		AngleVectors( angles, dir, nullptr, nullptr );
-		trace_t tr;
-		if( !BotWorld::pathBlocked( ent->r.currentOrigin, dir, travel, ent->s.number, tr ) || tr.entityNum != ENTITYNUM_WORLD )
-		{
-			yaw = wantYaw + offset;
-			return true;
-		}
-	}
-	return false;
-}
-
 // is there runway under this point, and at what height?
 bool BotWorld::runwayAt( const vec3_t point, float* surface )
 {

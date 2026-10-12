@@ -47,38 +47,6 @@ void CGame::registerHelo( clientInfo_t *ci )
 }
 
 /*
-=============
-CG_PlanePilot
-=============
-*/
-void ClientEntity::heloPilot( const refEntity_t *parent, qhandle_t parentModel, int idx ) {
-/*
-	refEntity_t		pilot[MAX_PILOTS*3];	// three parts per pilot
-	unsigned int	i,j,k;
-	unsigned int	pilots = ((availableVehicles[idx].renderFlags & MFR_DUALPILOT) ? 2 : 1);
-	char			tag[12];
-
-	// pilot
-	for( i = 0; i < pilots; i++ ) {
-		for( j = 0; j < 3; j++ ) {
-			k = 3*i+j;
-			memset( &pilot[k], 0, sizeof( pilot[k] ) );
-			VectorCopy( parent->lightingOrigin, pilot[k].lightingOrigin );
-			pilot[k].shadowPlane = parent->shadowPlane;
-			pilot[k].renderfx = parent->renderfx;
-			if( j == 0 ) pilot[k].hModel = (cgs.gameset != MF_GAMESET_MODERN ? cgs.media.pilotWW2 : cgs.media.pilot);
-			else if( j == 1 ) pilot[k].hModel = (cgs.gameset != MF_GAMESET_MODERN ? cgs.media.pilotHeadWW2 : cgs.media.pilotHead);
-			else pilot[k].hModel = (cgs.gameset != MF_GAMESET_MODERN ? cgs.media.pilotSeatWW2 : cgs.media.pilotSeat);
-			AxisCopy( axisDefault, pilot[k].axis );
-			Com_sprintf( tag, 12, "tag_pilot%d", i+1 );
-			CGame::positionRotatedEntityOnTag( &pilot[k], parent, parentModel, tag);
-			refExport.AddRefEntityToScene( &pilot[k] );
-		}
-	}*/
-}
-
-
-/*
 ===============
 CG_PlaneFlags
 ===============

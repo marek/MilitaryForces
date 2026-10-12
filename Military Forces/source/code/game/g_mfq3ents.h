@@ -25,10 +25,5 @@ struct Touch_RadioTower : public GameEntity::EntityFunc_Touch
 	void	execute( GameEntity* other, trace_t *trace ) override;
 };
 
-struct Think_ExplodeVehicle : public GameEntity::EntityFunc_Think
-{
-	void	execute() override;
-};
-
 #endif // _G_MFQ3ENTS_H__
 
