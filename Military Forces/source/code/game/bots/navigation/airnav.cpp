@@ -1,6 +1,6 @@
-#include "../g_local.h"
-#include "../g_level.h"
-#include "bot_airnav.h"
+#include "../../g_local.h"
+#include "../../g_level.h"
+#include "airnav.h"
 #include <algorithm>
 #include <cmath>
 

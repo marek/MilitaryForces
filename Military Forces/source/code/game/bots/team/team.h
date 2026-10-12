@@ -1,7 +1,7 @@
 #ifndef __BOT_TEAM_H__
 #define __BOT_TEAM_H__
 
-#include "bot.h"
+#include "../bot.h"
 
 // What a team of bots decides together in a team game: what it fields, what it is doing, and what each bot is asked
 // to do about it. The plan belongs to the team, not to any bot, and is remade every few seconds and whenever a flag

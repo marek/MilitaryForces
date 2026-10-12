@@ -1,7 +1,7 @@
 #ifndef __BOT_AIRNAV_H__
 #define __BOT_AIRNAV_H__
 
-#include "../q_shared.h"
+#include "../../q_shared.h"
 #include <vector>
 
 // paths through the air in an octree of free space (see the .cpp)

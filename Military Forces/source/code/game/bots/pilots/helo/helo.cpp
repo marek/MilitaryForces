@@ -1,5 +1,5 @@
-#include "bot_mind.h"
-#include "bot_airnav.h"
+#include "../../core/mind.h"
+#include "../../navigation/airnav.h"
 
 using behavior::Status;
 

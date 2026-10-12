@@ -1,10 +1,10 @@
-#include "../g_local.h"
-#include "../g_level.h"
-#include "../g_team.h"
-#include "bot.h"
-#include "bot_local.h"
-#include "bot_team.h"
-#include "bot_groundnav.h"
+#include "../../g_local.h"
+#include "../../g_level.h"
+#include "../../g_team.h"
+#include "../bot.h"
+#include "../core/local.h"
+#include "team.h"
+#include "../navigation/groundnav.h"
 #include <algorithm>
 #include <array>
 #include <cmath>

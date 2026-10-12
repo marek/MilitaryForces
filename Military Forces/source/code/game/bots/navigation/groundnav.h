@@ -1,7 +1,7 @@
 #ifndef __BOT_GROUNDNAV_H__
 #define __BOT_GROUNDNAV_H__
 
-#include "../q_shared.h"
+#include "../../q_shared.h"
 #include <vector>
 
 // paths over land and over water on a grid of cells (see the .cpp)
