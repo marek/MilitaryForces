@@ -231,91 +231,130 @@ namespace
 		return home;
 	}
 
-	void makePlan( int team )
+	struct Planner
 	{
-		Plan& plan = plans[team];
-		plan.nextPlan = theLevel.time_ + planEvery;
-		const std::vector<Member> members = membersOf( team );
-		const Vec3 ownBase = bases[team], enemyBase = bases[other( team )];
-		const bool ctf = g_gametype.integer == GT_CTF;
-		const int level = BotTeam::level();
+		int							team;
+		Plan&						plan;
+		const std::vector<Member>	members;
+		const Vec3					ownBase, enemyBase;
+		const bool					ctf;
+		const int					level;
+		const Member*				lead = nullptr;	// the real player furthest forward
+		int							humansDefending = 0, humansAttacking = 0;
+		std::vector<const Member*>	free;	// bots not yet given a job
+		std::vector<const Member*>	attackers;
+		Vec3						front;
+		Vec3						attackPlace;
+		int							groundGo = 0, heloGo = 0, fighterGo = 0;
 
-		plan.have.fill( 0 );
-		for( const Member& m : members )
-			plan.have[static_cast<int>( m.kind )]++;
+		explicit Planner( int team ) : team( team ), plan( plans[team] ), members( membersOf( team ) ), ownBase( bases[team] ),
+			enemyBase( bases[other( team )] ), ctf( g_gametype.integer == GT_CTF ), level( BotTeam::level() ) {}
 
-		// what the real players are doing shapes the rest: where the one furthest forward is, the attack goes
-		const Member* lead = nullptr;
-		int humansDefending = 0, humansAttacking = 0;
-		for( const Member& m : members )
+		void run()
 		{
-			if( m.bot || m.kind == Kind::Other )
-				continue;
-			if( Distance( m.origin, ownBase ) < humanDefending )
-				humansDefending++;
-			else
-			{
-				humansAttacking++;
-				if( !lead || Distance( m.origin, enemyBase ) < Distance( lead->origin, enemyBase ) )
-					lead = &m;
-			}
+			plan.nextPlan = theLevel.time_ + planEvery;
+			plan.have.fill( 0 );
+			for( const Member& m : members )
+				plan.have[static_cast<int>( m.kind )]++;
+			readPlayers();
+			chooseEffort();
+			freeBots();
+			findCarriers();
+			escortOurCarrier();
+			huntTheirCarrier();
+			defendFlag();
+			pickAttackers();
+			push();
+			sendAttackers();
+			giveTheRest();
+			report();
 		}
 
-		// the effort: their flag; in a team deathmatch where the real players are fighting, else where their ground
-		// forces were last seen, else their base
-		plan.effort = enemyBase;
-		plan.hasEffort = true;
-		if( !ctf )
+		BotTeam::Assignment& give( const Member* m, Job job )
 		{
-			Vec3 sum( 0, 0, 0 );
-			int count = 0;
-			for( int i = 1; i <= theLevel.maxclients_ && i <= MAX_CLIENTS; i++ )
+			BotTeam::Assignment& a = assignments[m->num];
+			a.job = job;
+			return a;
+		}
+
+		void readPlayers()
+		{
+			// what the real players are doing shapes the rest: where the one furthest forward is, the attack goes
+			for( const Member& m : members )
 			{
-				GameEntity* enemy = theLevel.getEntity( i );
-				Vec3 at;
-				if( alive( enemy ) && enemy->client_->sess_.sessionTeam_ == other( team ) && !flies( BotTeam::kindOf( enemy->client_->vehicle_ ) ) && whereIs( plan, i, at ) )
+				if( m.bot || m.kind == Kind::Other )
+					continue;
+				if( Distance( m.origin, ownBase ) < humanDefending )
+					humansDefending++;
+				else
 				{
-					sum = sum + at;
-					count++;
+					humansAttacking++;
+					if( !lead || Distance( m.origin, enemyBase ) < Distance( lead->origin, enemyBase ) )
+						lead = &m;
 				}
 			}
-			if( lead )
-				plan.effort = towards( lead->origin, enemyBase, scoutAhead );
-			else if( count )
-				plan.effort = sum * (1.0f / count);
 		}
 
-		std::vector<const Member*> free;
-		for( const Member& m : members )
+		void chooseEffort()
 		{
-			if( m.bot )
+			// the effort: their flag; in a team deathmatch where the real players are fighting, else where their ground
+			// forces were last seen, else their base
+			plan.effort = enemyBase;
+			plan.hasEffort = true;
+			if( !ctf )
 			{
+				Vec3 sum( 0, 0, 0 );
+				int count = 0;
+				for( int i = 1; i <= theLevel.maxclients_ && i <= MAX_CLIENTS; i++ )
+				{
+					GameEntity* enemy = theLevel.getEntity( i );
+					Vec3 at;
+					if( alive( enemy ) && enemy->client_->sess_.sessionTeam_ == other( team ) && !flies( BotTeam::kindOf( enemy->client_->vehicle_ ) ) && whereIs( plan, i, at ) )
+					{
+						sum = sum + at;
+						count++;
+					}
+				}
+				if( lead )
+					plan.effort = towards( lead->origin, enemyBase, scoutAhead );
+				else if( count )
+					plan.effort = sum * (1.0f / count);
+			}
+		}
+
+		// every bot starts the plan free; its last job is kept to tell a change
+		void freeBots()
+		{
+			for( const Member& m : members )
+			{
+				if( !m.bot )
+					continue;
 				lastJobs[m.num] = assignments[m.num].job;
 				assignments[m.num] = BotTeam::Assignment{};
 				free.push_back( &m );
 			}
 		}
-		const auto give = [&]( const Member* m, Job job ) -> BotTeam::Assignment&
-		{
-			BotTeam::Assignment& a = assignments[m->num];
-			a.job = job;
-			return a;
-		};
 
-		// flags first: the carrier's escort, and the hunt for theirs
-		plan.ourCarrier = plan.theirCarrier = -1;
-		for( int i = 1; ctf && i <= theLevel.maxclients_ && i <= MAX_CLIENTS; i++ )
+		void findCarriers()
 		{
-			GameEntity* ent = theLevel.getEntity( i );
-			if( !alive( ent ) || !flagCarrier( ent ) )
-				continue;
-			if( ent->client_->sess_.sessionTeam_ == team )
-				plan.ourCarrier = i;
-			else
-				plan.theirCarrier = i;
+			// flags first: the carrier's escort, and the hunt for theirs
+			plan.ourCarrier = plan.theirCarrier = -1;
+			for( int i = 1; ctf && i <= theLevel.maxclients_ && i <= MAX_CLIENTS; i++ )
+			{
+				GameEntity* ent = theLevel.getEntity( i );
+				if( !alive( ent ) || !flagCarrier( ent ) )
+					continue;
+				if( ent->client_->sess_.sessionTeam_ == team )
+					plan.ourCarrier = i;
+				else
+					plan.theirCarrier = i;
+			}
 		}
-		if( plan.ourCarrier >= 0 )
+
+		void escortOurCarrier()
 		{
+			if( plan.ourCarrier < 0 )
+				return;
 			GameEntity* carrier = theLevel.getEntity( plan.ourCarrier );
 			const Vec3 at( carrier->r.currentOrigin );
 			if( Bots::isBot( plan.ourCarrier ) )
@@ -339,8 +378,11 @@ namespace
 				give( m, Job::Escort ).ward = plan.ourCarrier;
 			}
 		}
-		if( plan.theirCarrier >= 0 )
+
+		void huntTheirCarrier()
 		{
+			if( plan.theirCarrier < 0 )
+				return;
 			Vec3 at;
 			if( !whereIs( plan, plan.theirCarrier, at ) )
 				at = ownBase;
@@ -374,10 +416,11 @@ namespace
 			}
 		}
 
-		// who attacks and who stays: in capture the flag by share, shifted by the score and by what the real players took on
-		std::vector<const Member*> attackers;
-		if( ctf )
+		void defendFlag()
 		{
+			// who attacks and who stays: in capture the flag by share, shifted by the score and by what the real players took on
+			if( !ctf )
+				return;
 			int carriers = humansAttacking + humansDefending;
 			for( const Member* m : free )
 				if( carriesFlags( m->kind ) )
@@ -405,45 +448,40 @@ namespace
 				a.place = ownBase + Vec3( cos( angle ), sin( angle ), 0 ) * (defendRadius * 0.5f);
 			}
 		}
-		for( auto it = free.begin(); it != free.end(); )
+
+		void pickAttackers()
 		{
-			if( (*it)->kind == Kind::Tank || (*it)->kind == Kind::Boat || (*it)->kind == Kind::AttackHelo )
+			for( auto it = free.begin(); it != free.end(); )
 			{
-				attackers.push_back( *it );
-				it = free.erase( it );
+				if( (*it)->kind == Kind::Tank || (*it)->kind == Kind::Boat || (*it)->kind == Kind::AttackHelo )
+				{
+					attackers.push_back( *it );
+					it = free.erase( it );
+				}
+				else
+					++it;
 			}
-			else
-				++it;
+			if( lead )
+				attackers.push_back( lead );
+			front = middleOf( attackers, towards( ownBase, plan.effort, gatherShort ) );
+			if( lead )
+				attackers.pop_back();
 		}
-		if( lead )
-			attackers.push_back( lead );
-		const Vec3 front = middleOf( attackers, towards( ownBase, plan.effort, gatherShort ) );
-		if( lead )
-			attackers.pop_back();
 
 		// a push gathers short of the objective and goes together; a real player out in front is the gathering point
-		int groundGo = 0, heloGo = 0, fighterGo = 0;
-		Vec3 attackPlace = plan.effort;
-		if( level >= 2 && static_cast<int>( attackers.size() ) + (lead ? 1 : 0) >= pushFrom )
+		void push()
 		{
+			attackPlace = plan.effort;
+			if( level < 2 || static_cast<int>( attackers.size() ) + (lead ? 1 : 0) < pushFrom )
+			{
+				plan.pushing = false;
+				plan.gatherSince = 0;
+				return;
+			}
 			if( plan.pushing && theLevel.time_ > plan.pushSince + pushLasts )
 				plan.pushing = false;
 			if( !plan.pushing )
-			{
-				if( !plan.gatherSince )
-					plan.gatherSince = theLevel.time_;
-				plan.gather = lead ? lead->origin : towards( plan.effort, front, gatherShort );
-				int near = 0;
-				for( const Member* m : attackers )
-					if( Distance( m->origin, plan.gather ) < gathered )
-						near++;
-				if( near >= attackers.size() * enoughGathered || theLevel.time_ > plan.gatherSince + gatherPatience )
-				{
-					plan.pushing = true;
-					plan.pushSince = theLevel.time_;
-					plan.gatherSince = 0;
-				}
-			}
+				gather();
 			if( plan.pushing )
 			{
 				// fighters go at once, the ground after them, and the helicopters, which are faster, later still
@@ -457,85 +495,112 @@ namespace
 				groundGo = heloGo = fighterGo = theLevel.time_ + planEvery * 2;
 			}
 		}
-		else
+
+		// the attackers come together at the gathering point; the push goes when enough are there or waiting has gone on
+		void gather()
 		{
-			plan.pushing = false;
+			if( !plan.gatherSince )
+				plan.gatherSince = theLevel.time_;
+			plan.gather = lead ? lead->origin : towards( plan.effort, front, gatherShort );
+			int near = 0;
+			for( const Member* m : attackers )
+				if( Distance( m->origin, plan.gather ) < gathered )
+					near++;
+			if( near < attackers.size() * enoughGathered && theLevel.time_ <= plan.gatherSince + gatherPatience )
+				return;
+			plan.pushing = true;
+			plan.pushSince = theLevel.time_;
 			plan.gatherSince = 0;
 		}
-		for( const Member* m : attackers )
+
+		void sendAttackers()
 		{
-			BotTeam::Assignment& a = give( m, Job::Attack );
-			a.hasPlace = true;
-			// helicopters go ahead of the ground along its way and see what it is about to meet
-			a.place = m->kind == Kind::AttackHelo && !plan.pushing && level >= 2 ? towards( attackPlace, plan.effort, scoutAhead ) : attackPlace;
-			if( plan.pushing )
-				a.place = plan.effort;
-			a.goTime = m->kind == Kind::AttackHelo ? heloGo : groundGo;
+			for( const Member* m : attackers )
+			{
+				BotTeam::Assignment& a = give( m, Job::Attack );
+				a.hasPlace = true;
+				// helicopters go ahead of the ground along its way and see what it is about to meet
+				a.place = m->kind == Kind::AttackHelo && !plan.pushing && level >= 2 ? towards( attackPlace, plan.effort, scoutAhead ) : attackPlace;
+				if( plan.pushing )
+					a.place = plan.effort;
+				a.goTime = m->kind == Kind::AttackHelo ? heloGo : groundGo;
+			}
 		}
 
-		// the rest by kind
-		const Member* firstTank = nullptr;
-		for( const Member* m : attackers )
-			if( m->kind == Kind::Tank && (!firstTank || Distance( m->origin, front ) < Distance( firstTank->origin, front )) )
-				firstTank = m;
-		// an enemy air defence vehicle where the push is going is the bombers' first target
-		int enemyAirDefence = -1;
-		for( int i = 1; i <= theLevel.maxclients_ && i <= MAX_CLIENTS; i++ )
+		void giveTheRest()
 		{
-			GameEntity* enemy = theLevel.getEntity( i );
-			Vec3 at;
-			if( alive( enemy ) && enemy->client_->sess_.sessionTeam_ == other( team ) && BotTeam::kindOf( enemy->client_->vehicle_ ) == Kind::AirDefence && whereIs( plan, i, at ) &&
-				( enemyAirDefence < 0 || Distance( at, plan.effort ) < Distance( plans[team].seen[enemyAirDefence].position, plan.effort ) ) )
-				enemyAirDefence = i;
-		}
-		for( const Member* m : free )
-		{
-			switch( m->kind )
+			// the rest by kind
+			const Member* firstTank = nullptr;
+			for( const Member* m : attackers )
+				if( m->kind == Kind::Tank && (!firstTank || Distance( m->origin, front ) < Distance( firstTank->origin, front )) )
+					firstTank = m;
+			// an enemy air defence vehicle where the push is going is the bombers' first target
+			int enemyAirDefence = -1;
+			for( int i = 1; i <= theLevel.maxclients_ && i <= MAX_CLIENTS; i++ )
 			{
-			case Kind::AirDefence:
-				if( firstTank || lead )
-					give( m, Job::Escort ).ward = firstTank ? firstTank->num : lead->num;
-				else
+				GameEntity* enemy = theLevel.getEntity( i );
+				Vec3 at;
+				if( alive( enemy ) && enemy->client_->sess_.sessionTeam_ == other( team ) && BotTeam::kindOf( enemy->client_->vehicle_ ) == Kind::AirDefence && whereIs( plan, i, at ) &&
+					( enemyAirDefence < 0 || Distance( at, plan.effort ) < Distance( plans[team].seen[enemyAirDefence].position, plan.effort ) ) )
+					enemyAirDefence = i;
+			}
+			for( const Member* m : free )
+			{
+				switch( m->kind )
 				{
-					BotTeam::Assignment& a = give( m, Job::Defend );
+				case Kind::AirDefence:
+					if( firstTank || lead )
+						give( m, Job::Escort ).ward = firstTank ? firstTank->num : lead->num;
+					else
+					{
+						BotTeam::Assignment& a = give( m, Job::Defend );
+						a.hasPlace = true;
+						a.place = ownBase;
+					}
+					break;
+				case Kind::Fighter:
+				{
+					BotTeam::Assignment& a = give( m, Job::AirCover );
 					a.hasPlace = true;
-					a.place = ownBase;
+					a.place = plan.ourCarrier >= 0 ? Vec3( theLevel.getEntity( plan.ourCarrier )->r.currentOrigin ) : plan.pushing ? plan.effort : front;
+					a.goTime = fighterGo;
+					break;
 				}
-				break;
-			case Kind::Fighter:
-			{
-				BotTeam::Assignment& a = give( m, Job::AirCover );
-				a.hasPlace = true;
-				a.place = plan.ourCarrier >= 0 ? Vec3( theLevel.getEntity( plan.ourCarrier )->r.currentOrigin ) : plan.pushing ? plan.effort : front;
-				a.goTime = fighterGo;
-				break;
-			}
-			case Kind::Bomber:
-				give( m, Job::Attack ).target = enemyAirDefence;
-				break;
-			case Kind::Supply:
-			{
-				BotTeam::Assignment& a = give( m, Job::Supply );
-				a.hasPlace = true;
-				a.place = towards( front, ownBase, supplyBehind );
-				break;
-			}
-			default:
-				break;
+				case Kind::Bomber:
+					give( m, Job::Attack ).target = enemyAirDefence;
+					break;
+				case Kind::Supply:
+				{
+					BotTeam::Assignment& a = give( m, Job::Supply );
+					a.hasPlace = true;
+					a.place = towards( front, ownBase, supplyBehind );
+					break;
+				}
+				default:
+					break;
+				}
 			}
 		}
 
-#ifdef MF_BOT_DEBUG
-		if( g_botDebug.integer >= 2 )
+		void report()
 		{
-			Common::printf( "BOTTEAM t %d %s level %d effort %.0f %.0f pushing %d carrier ours %d theirs %d jobs", theLevel.time_, teamName( team ), level,
-				plan.effort[0], plan.effort[1], plan.pushing, plan.ourCarrier, plan.theirCarrier );
-			for( const Member& m : members )
-				if( m.bot )
-					Common::printf( " %d:%s:%s", m.num, kindName( static_cast<int>( m.kind ) ), jobName( assignments[m.num].job ) );
-			Common::printf( "\n" );
+	#ifdef MF_BOT_DEBUG
+			if( g_botDebug.integer >= 2 )
+			{
+				Common::printf( "BOTTEAM t %d %s level %d effort %.0f %.0f pushing %d carrier ours %d theirs %d jobs", theLevel.time_, teamName( team ), level,
+					plan.effort[0], plan.effort[1], plan.pushing, plan.ourCarrier, plan.theirCarrier );
+				for( const Member& m : members )
+					if( m.bot )
+						Common::printf( " %d:%s:%s", m.num, kindName( static_cast<int>( m.kind ) ), jobName( assignments[m.num].job ) );
+				Common::printf( "\n" );
+			}
+	#endif
 		}
-#endif
+	};
+
+	void makePlan( int team )
+	{
+		Planner( team ).run();
 	}
 
 	// between plans: wards move, so their escorts' places do; and those fighting one enemy together are given their sides
