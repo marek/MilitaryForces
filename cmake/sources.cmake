@@ -27,8 +27,8 @@ list(APPEND GAME_SOURCES
     bots/pilots/plane/patrol.cpp bots/pilots/plane/flight.cpp bots/pilots/plane/safety.cpp bots/pilots/plane/landing.cpp
     bots/pilots/helo/tree.cpp bots/pilots/helo/rearm.cpp bots/pilots/helo/transport.cpp bots/pilots/helo/combat.cpp
     bots/pilots/helo/stealth.cpp bots/pilots/helo/patrol.cpp bots/pilots/helo/flight.cpp
-    bots/pilots/surface/surface.cpp
-    bots/pilots/infantry/infantry.cpp)
+    bots/pilots/surface/tree.cpp bots/pilots/surface/cover.cpp bots/pilots/surface/combat.cpp bots/pilots/surface/support.cpp bots/pilots/surface/drive.cpp
+    bots/pilots/infantry/tree.cpp bots/pilots/infantry/boarding.cpp bots/pilots/infantry/walking.cpp bots/pilots/infantry/rider.cpp)
 list(TRANSFORM GAME_SOURCES PREPEND "${SOURCE_DIR}/game/")
 
 set(CGAME_SOURCES
