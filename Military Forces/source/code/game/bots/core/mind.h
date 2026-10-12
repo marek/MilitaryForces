@@ -101,27 +101,27 @@ struct Bots::Mind
 		const Vec3 here( ent->r.currentOrigin );
 		if( !steer.hasDest || steer.hold || (steer.dest - here).length() < (finish >= 0.0f ? finish : reach * 2.0f) )
 		{
-			bot.path.clear();
-			bot.following = false;
+			bot.path.points.clear();
+			bot.path.following = false;
 			return false;
 		}
-		if( theLevel.time_ >= bot.pathTime )
+		if( theLevel.time_ >= bot.path.searchTime )
 		{
-			GroundNav::findPath( here, steer.dest, water, bot.path );
-			bot.pathIndex = 0;
-			bot.pathTime = theLevel.time_ + 2000;
+			GroundNav::findPath( here, steer.dest, water, bot.path.points );
+			bot.path.index = 0;
+			bot.path.searchTime = theLevel.time_ + 2000;
 		}
-		while( bot.pathIndex + 1 < bot.path.size() )
+		while( bot.path.index + 1 < bot.path.points.size() )
 		{
-			const Vec3 leg = bot.path[bot.pathIndex] - here;
+			const Vec3 leg = bot.path.points[bot.path.index] - here;
 			if( leg.x() * leg.x() + leg.y() * leg.y() > reach * reach )
 				break;
-			bot.pathIndex++;
+			bot.path.index++;
 		}
-		bot.following = bot.pathIndex < bot.path.size();
-		if( !bot.following )
+		bot.path.following = bot.path.index < bot.path.points.size();
+		if( !bot.path.following )
 			return false;
-		const Vec3 leg = bot.path[bot.pathIndex] - here;
+		const Vec3 leg = bot.path.points[bot.path.index] - here;
 		VectorSet( steer.course, leg.x(), leg.y(), 0 );
 		return true;
 	}

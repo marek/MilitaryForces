@@ -284,5 +284,5 @@ void BotWeapons::bomb( GameEntity* ent, Bots::State& bot, const vec3_t target, u
 	}
 	// past the release point: fly on out before coming round again
 	if( dist < lead - 400 && theLevel.time_ > bot.bombTime + 500 )
-		bot.egressTime = theLevel.time_ + 8000;
+		bot.pursuit.egressTime = theLevel.time_ + 8000;
 }
