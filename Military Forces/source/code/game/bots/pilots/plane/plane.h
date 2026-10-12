@@ -237,6 +237,41 @@ struct PlaneTasks
 	// radius followed by a straight; if that does not fit, other manoeuvres are tried in order of preference.
 	static Status probeTerrain( Mind& c );
 
+	// one look ahead of the manoeuvre planner
+	struct Probe
+	{
+		float	yaw = 0;	// the heading now
+		float	margin = 0;	// half the corridor width
+		float	wantYaw = 0;
+		float	wantPitch = 0;
+		float	wantTurn = 0;
+		float	wantSlope = 0;
+		bool	slow = false;	// near the stall
+		float	horizon = 0;	// how far ahead to look
+		float	radius = 0;	// the turn radius now
+		float	brakedRadius = 0;	// and with the air brake out
+		bool	canBrake = false;
+	};
+	struct Candidate { float turn; float slope; float pitch; float penalty; };
+	struct Candidates
+	{
+		std::array<Candidate, 34> list;
+		size_t count = 0;
+	};
+	struct Choice
+	{
+		const Candidate*	chosen = nullptr;
+		float				free = 0;	// how far it flies clear
+		bool				braked = false;
+	};
+	static void lookAhead( Mind& c );
+	static bool confinedHere( const Mind& c );
+	static Probe probeFor( const Mind& c );
+	static void checkWantedLine( Mind& c, const Probe& probe );
+	static void listManoeuvres( const Mind& c, const Probe& probe, Candidates& out );
+	static Choice chooseManoeuvre( const Mind& c, const Probe& probe, const Candidates& candidates, float width );
+	static Choice flyCandidate( const Mind& c, const Probe& probe, const Candidate& candidate, float width );
+
 	// slow down, with the air brake if need be, where the plane has to turn tighter than its speed allows
 	static Status cornerSpeed( Mind& c );
 

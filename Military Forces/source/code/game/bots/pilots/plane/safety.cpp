@@ -199,140 +199,176 @@ bool PlaneTasks::wayOut( const Mind& c, const Pose& end, float brakedRadius, flo
 }
 
 // Plans the next second or two of flight. The heading the pilot wants is flown ahead as an arc at the aircraft's turn
-// radius followed by a straight; if that does not fit, other manoeuvres are tried in order of preference.
+// radius followed by a straight; if that does not fit, other manoeuvres are tried in order of preference. The
+// manoeuvre chosen is held for a moment.
 behavior::Status PlaneTasks::probeTerrain( Mind& c )
 {
-	State& bot = c.bot;
-	GameEntity* ent = c.ent;
-	const float yaw = c.ps.vehicleAngles[YAW];
 	// the first moments of a departure were planned on the ground; too low to manoeuvre yet
 	if( departing( c ) && c.sense.height < 60.0f )
 		return Status::Success;
-	if( theLevel.time_ >= bot.avoid.probeTime )
+	if( theLevel.time_ >= c.bot.avoid.probeTime )
+		lookAhead( c );
+	if( theLevel.time_ < c.bot.avoid.time )
 	{
-		// look more often when something is in the way
-		bot.avoid.probeTime = theLevel.time_ + (bot.avoid.confined || bot.avoid.probeBlocked ? 150 : 300);
-		Vec3 flat = { 0, yaw, 0 }, right, left;
-		trace_t tr;
-		AngleVectors( flat, nullptr, right, nullptr );
-		VectorNegate( right, left );
-		BotWorld::pathBlocked( ent->r.currentOrigin, left, 1200, ent->s.number, tr );
-		const float leftClear = tr.fraction * 1200.0f;
-		BotWorld::pathBlocked( ent->r.currentOrigin, right, 1200, ent->s.number, tr );
-		const float rightClear = tr.fraction * 1200.0f;
-		bot.avoid.confined = leftClear + rightClear < 1500 || c.room < 900;
-
-		// the corridor looked along is as wide as the aircraft's own box and a little more: a bomber does not fit
-		// where a fighter does
-		const float margin = std::max( 60.0f, std::max( c.veh.maxs[0], c.veh.maxs[1] ) * 0.5f + 35.0f );
-		const float wantYaw = c.view[YAW];
-		const float wantTurn = AngleSubtract( wantYaw, yaw );
-		// near the stall the nose can only come up a little, so plan the climb that can actually be flown
-		const bool slow = c.speed < c.veh.stallspeed * 1.7f;
-		const float flyablePitch = slow ? std::max( c.view[PITCH], -10.0f ) : c.view[PITCH];
-		const float wantSlope = std::clamp( -static_cast<float>( tan( flyablePitch * std::numbers::pi_v<float> / 180.0 ) ), -0.4f, 0.5f );
-		const float horizon = std::clamp( c.airspeed * 3.0f, 900.0f, 2500.0f );
-		const bool wasBlocked = bot.avoid.probeBlocked;
-		const float radius = c.turnRadius();
-		const float turnRate = std::max( 10.0f, c.veh.turnspeed[YAW] ) * std::numbers::pi_v<float> / 180.0f;
-		const float brakedRadius = (c.airspeed + std::min( c.airspeed, c.veh.stallspeed * 1.2f )) * 0.5f / turnRate;
-		const bool canBrake = brakedRadius < radius * 0.85f;
-
-		Pose wantEnd;
-		bot.avoid.probeWant = sweep( c, radius, wantTurn, wantSlope, horizon, margin, &wantEnd );
-		if( bot.avoid.probeWant >= horizon && !wayOut( c, wantEnd, brakedRadius, horizon ) )
-			bot.avoid.probeWant = horizon * 0.9f;
-		bot.avoid.probeBest = bot.avoid.probeWant;
-		// a jet spawns fast: slow down at once when there is no room
-		if( (bot.avoid.confined || bot.avoid.probeWant < horizon) && theLevel.time_ < bot.spawnTime + 4000 )
-			bot.avoid.brakeTime = theLevel.time_ + 600;
-		bot.avoid.probeBlocked = bot.avoid.probeWant < horizon;
-		if( wasBlocked && !bot.avoid.probeBlocked )
-			bot.avoid.time = 0;
-		if( bot.avoid.probeBlocked )
-		{
-			constexpr std::array<float, 11> turns = { 0.0f, 30.0f, -30.0f, 60.0f, -60.0f, 90.0f, -90.0f, 135.0f, -135.0f, 180.0f, -180.0f };
-			struct Climb { float slope; float pitch; };
-			const std::array<Climb, 3> climbs = { { { wantSlope, c.view[PITCH] }, { slow ? 0.17f : 0.35f, slow ? -10.0f : -19.0f }, { -0.25f, 14.0f } } };
-			const bool canDive = c.sense.height > c.minHeight + 300.0f;
-
-			// candidates in order of preference, so the search can stop at the first one that is clear
-			struct Candidate { float turn; float slope; float pitch; float penalty; };
-			std::array<Candidate, turns.size() * climbs.size() + 1> candidates;
-			size_t count = 0;
-			// the wanted heading itself comes first: it may still be the best of a bad set
-			candidates[count++] = { wantTurn, wantSlope, c.view[PITCH], -500.0f };
-			for( float turn : turns )
-			{
-				for( size_t k = 0; k < climbs.size(); k++ )
-				{
-					if( k == 2 && !canDive )
-						continue;
-					float penalty = fabs( AngleSubtract( yaw + turn, wantYaw ) ) * 2.0f + fabs( turn ) + (k ? 60.0f : 0.0f);
-					// keep right: when both sides are open, pass traffic on the right
-					if( turn > 0 )
-						penalty += 15.0f;
-					candidates[count++] = { turn, climbs[k].slope, climbs[k].pitch, penalty };
-				}
-			}
-			std::sort( candidates.begin(), candidates.begin() + count, []( const Candidate& a, const Candidate& b ) { return a.penalty < b.penalty; } );
-
-			// with clearance first; if nothing fits, the longest bare line
-			for( float width : { margin, 0.0f } )
-			{
-				float best = -99999.0f, bestFree = 0;
-				bool bestBraked = false;
-				const Candidate* chosen = nullptr;
-				for( size_t i = 0; i < count; i++ )
-				{
-					const Candidate& candidate = candidates[i];
-					Pose end;
-					float free = sweep( c, radius, candidate.turn, candidate.slope, horizon, width, &end );
-					bool braked = false;
-					// the same turn with the air brake out, at the radius the lower speed gives
-					if( free < horizon && fabs( candidate.turn ) > 10.0f && canBrake )
-					{
-						Pose slowEnd;
-						const float slowFree = sweep( c, brakedRadius, candidate.turn, candidate.slope, horizon, width, &slowEnd );
-						if( slowFree > free )
-						{
-							free = slowFree;
-							braked = true;
-							end = slowEnd;
-						}
-					}
-					// leads into a dead end: better than a wall, worse than any open path
-					if( free >= horizon && width > 0 && !wayOut( c, end, brakedRadius, horizon ) )
-						free = horizon * 0.9f;
-					const float score = (free < horizon ? free * 2.0f - horizon * 2.0f : horizon) - std::max( candidate.penalty, 0.0f ) - (braked ? 40.0f : 0.0f);
-					if( score > best )
-					{
-						best = score;
-						bestFree = free;
-						bestBraked = braked;
-						chosen = &candidate;
-					}
-					if( free >= horizon )
-						break;
-				}
-				if( chosen )
-				{
-					bot.avoid.yaw = yaw + std::clamp( chosen->turn, -100.0f, 100.0f );
-					bot.avoid.pitch = chosen->pitch;
-				}
-				bot.avoid.probeBest = bestFree;
-				if( bestBraked )
-					bot.avoid.brakeTime = theLevel.time_ + 600;
-				if( bestFree > radius * 1.2f )
-					break;
-			}
-			bot.avoid.time = theLevel.time_ + 400;
-		}
-	}
-	if( theLevel.time_ < bot.avoid.time )
-	{
-		c.view[YAW] = bot.avoid.yaw;
-		c.view[PITCH] = bot.avoid.pitch;
+		c.view[YAW] = c.bot.avoid.yaw;
+		c.view[PITCH] = c.bot.avoid.pitch;
 	}
 	return Status::Success;
+}
+
+// one look ahead: how tight the terrain is, whether the wanted line is open, and if not which manoeuvre is
+void PlaneTasks::lookAhead( Mind& c )
+{
+	State& bot = c.bot;
+	// look more often when something is in the way
+	bot.avoid.probeTime = theLevel.time_ + (bot.avoid.confined || bot.avoid.probeBlocked ? 150 : 300);
+	bot.avoid.confined = confinedHere( c );
+	const Probe probe = probeFor( c );
+	const bool wasBlocked = bot.avoid.probeBlocked;
+	checkWantedLine( c, probe );
+	if( wasBlocked && !bot.avoid.probeBlocked )
+		bot.avoid.time = 0;
+	if( !bot.avoid.probeBlocked )
+		return;
+	Candidates candidates;
+	listManoeuvres( c, probe, candidates );
+	// with clearance first; if nothing fits, the longest bare line
+	for( float width : { probe.margin, 0.0f } )
+	{
+		const Choice choice = chooseManoeuvre( c, probe, candidates, width );
+		if( choice.chosen )
+		{
+			bot.avoid.yaw = probe.yaw + std::clamp( choice.chosen->turn, -100.0f, 100.0f );
+			bot.avoid.pitch = choice.chosen->pitch;
+		}
+		bot.avoid.probeBest = choice.free;
+		if( choice.braked )
+			bot.avoid.brakeTime = theLevel.time_ + 600;
+		if( choice.free > probe.radius * 1.2f )
+			break;
+	}
+	bot.avoid.time = theLevel.time_ + 400;
+}
+
+// terrain tighter than the aircraft's turn: little room to either side, or little between floor and ceiling
+bool PlaneTasks::confinedHere( const Mind& c )
+{
+	constexpr float lookAside = 1200.0f;
+	Vec3 flat = { 0, c.ps.vehicleAngles[YAW], 0 }, right, left;
+	trace_t tr;
+	AngleVectors( flat, nullptr, right, nullptr );
+	VectorNegate( right, left );
+	BotWorld::pathBlocked( c.ent->r.currentOrigin, left, lookAside, c.ent->s.number, tr );
+	const float leftClear = tr.fraction * lookAside;
+	BotWorld::pathBlocked( c.ent->r.currentOrigin, right, lookAside, c.ent->s.number, tr );
+	const float rightClear = tr.fraction * lookAside;
+	return leftClear + rightClear < 1500 || c.room < 900;
+}
+
+// what this look ahead measures against: the corridor, the wanted line, how far ahead and the turns at hand
+PlaneTasks::Probe PlaneTasks::probeFor( const Mind& c )
+{
+	Probe probe;
+	probe.yaw = c.ps.vehicleAngles[YAW];
+	// the corridor looked along is as wide as the aircraft's own box and a little more: a bomber does not fit where
+	// a fighter does
+	probe.margin = std::max( 60.0f, std::max( c.veh.maxs[0], c.veh.maxs[1] ) * 0.5f + 35.0f );
+	probe.wantYaw = c.view[YAW];
+	probe.wantPitch = c.view[PITCH];
+	probe.wantTurn = AngleSubtract( probe.wantYaw, probe.yaw );
+	// near the stall the nose can only come up a little, so plan the climb that can actually be flown
+	probe.slow = c.speed < c.veh.stallspeed * 1.7f;
+	const float flyablePitch = probe.slow ? std::max( c.view[PITCH], -10.0f ) : c.view[PITCH];
+	probe.wantSlope = std::clamp( -static_cast<float>( tan( flyablePitch * std::numbers::pi_v<float> / 180.0 ) ), -0.4f, 0.5f );
+	probe.horizon = std::clamp( c.airspeed * 3.0f, 900.0f, 2500.0f );
+	probe.radius = c.turnRadius();
+	const float turnRate = std::max( 10.0f, c.veh.turnspeed[YAW] ) * std::numbers::pi_v<float> / 180.0f;
+	probe.brakedRadius = (c.airspeed + std::min( c.airspeed, c.veh.stallspeed * 1.2f )) * 0.5f / turnRate;
+	probe.canBrake = probe.brakedRadius < probe.radius * 0.85f;
+	return probe;
+}
+
+// the wanted line flown ahead; one that leads into a dead end counts as not quite open
+void PlaneTasks::checkWantedLine( Mind& c, const Probe& probe )
+{
+	State& bot = c.bot;
+	Pose wantEnd;
+	bot.avoid.probeWant = sweep( c, probe.radius, probe.wantTurn, probe.wantSlope, probe.horizon, probe.margin, &wantEnd );
+	if( bot.avoid.probeWant >= probe.horizon && !wayOut( c, wantEnd, probe.brakedRadius, probe.horizon ) )
+		bot.avoid.probeWant = probe.horizon * 0.9f;
+	bot.avoid.probeBest = bot.avoid.probeWant;
+	// a jet spawns fast: slow down at once when there is no room
+	if( (bot.avoid.confined || bot.avoid.probeWant < probe.horizon) && theLevel.time_ < bot.spawnTime + 4000 )
+		bot.avoid.brakeTime = theLevel.time_ + 600;
+	bot.avoid.probeBlocked = bot.avoid.probeWant < probe.horizon;
+}
+
+// every turn and climb or dive worth trying, best first, so the search can stop at the first one that is clear. The
+// wanted line itself leads: it may still be the best of a bad set. Both sides open, traffic is passed on the right
+void PlaneTasks::listManoeuvres( const Mind& c, const Probe& probe, Candidates& out )
+{
+	constexpr std::array<float, 11> turns = { 0.0f, 30.0f, -30.0f, 60.0f, -60.0f, 90.0f, -90.0f, 135.0f, -135.0f, 180.0f, -180.0f };
+	constexpr float leaveWanted = -500.0f, offLevel = 60.0f, keepRight = 15.0f;
+	struct Climb { float slope; float pitch; };
+	const std::array<Climb, 3> climbs = { { { probe.wantSlope, probe.wantPitch }, { probe.slow ? 0.17f : 0.35f, probe.slow ? -10.0f : -19.0f }, { -0.25f, 14.0f } } };
+	const bool canDive = c.sense.height > c.minHeight + 300.0f;
+	out.count = 0;
+	out.list[out.count++] = { probe.wantTurn, probe.wantSlope, probe.wantPitch, leaveWanted };
+	for( float turn : turns )
+	{
+		for( size_t k = 0; k < climbs.size(); k++ )
+		{
+			if( k == 2 && !canDive )
+				continue;
+			const float penalty = fabs( AngleSubtract( probe.yaw + turn, probe.wantYaw ) ) * 2.0f + fabs( turn ) + (k ? offLevel : 0.0f) + (turn > 0 ? keepRight : 0.0f);
+			out.list[out.count++] = { turn, climbs[k].slope, climbs[k].pitch, penalty };
+		}
+	}
+	std::sort( out.list.begin(), out.list.begin() + out.count, []( const Candidate& a, const Candidate& b ) { return a.penalty < b.penalty; } );
+}
+
+// the best of the candidates at this corridor width: open lines first, the least penalty among them, stopping at
+// the first that is fully open
+PlaneTasks::Choice PlaneTasks::chooseManoeuvre( const Mind& c, const Probe& probe, const Candidates& candidates, float width )
+{
+	Choice choice;
+	float best = -99999.0f;
+	for( size_t i = 0; i < candidates.count; i++ )
+	{
+		const Candidate& candidate = candidates.list[i];
+		const Choice tried = flyCandidate( c, probe, candidate, width );
+		const float score = (tried.free < probe.horizon ? tried.free * 2.0f - probe.horizon * 2.0f : probe.horizon) - std::max( candidate.penalty, 0.0f ) - (tried.braked ? 40.0f : 0.0f);
+		if( score > best )
+		{
+			best = score;
+			choice = tried;
+			choice.chosen = &candidate;
+		}
+		if( tried.free >= probe.horizon )
+			break;
+	}
+	return choice;
+}
+
+// how far one candidate flies clear: as it is, or the same turn with the air brake out at the radius the lower speed
+// gives. One that leads into a dead end is better than a wall and worse than any open path
+PlaneTasks::Choice PlaneTasks::flyCandidate( const Mind& c, const Probe& probe, const Candidate& candidate, float width )
+{
+	Choice tried;
+	Pose end;
+	tried.free = sweep( c, probe.radius, candidate.turn, candidate.slope, probe.horizon, width, &end );
+	if( tried.free < probe.horizon && fabs( candidate.turn ) > 10.0f && probe.canBrake )
+	{
+		Pose slowEnd;
+		const float slowFree = sweep( c, probe.brakedRadius, candidate.turn, candidate.slope, probe.horizon, width, &slowEnd );
+		if( slowFree > tried.free )
+		{
+			tried.free = slowFree;
+			tried.braked = true;
+			end = slowEnd;
+		}
+	}
+	if( tried.free >= probe.horizon && width > 0 && !wayOut( c, end, probe.brakedRadius, probe.horizon ) )
+		tried.free = probe.horizon * 0.9f;
+	return tried;
 }
