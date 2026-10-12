@@ -27,28 +27,6 @@ bool Bots::turnClear( GameEntity* ent, float radius, float degrees, float climb 
 	return true;
 }
 
-// where another aircraft will be: straight on, or round its turn when it is banked hard
-void PlaneTasks::predictAircraft( GameEntity* other, float seconds, vec3_t out )
-{
-	const playerState_t& ps = other->client_->ps_;
-	const float roll = ps.vehicleAngles[ROLL];
-	const float rate = std::max( 10.0f, availableVehicles[other->client_->vehicle_].turnspeed[YAW] ) * std::numbers::pi_v<float> / 180.0f;
-	const float speed = sqrtf( ps.velocity[0] * ps.velocity[0] + ps.velocity[1] * ps.velocity[1] );
-	if( !(availableVehicles[other->client_->vehicle_].cat & CAT_PLANE) || fabs( roll ) < 45.0f || speed < 1.0f )
-	{
-		VectorMA( other->r.currentOrigin, seconds, ps.velocity, out );
-		return;
-	}
-	const float radius = speed / rate;
-	const float angle = rate * seconds;
-	const float side = roll > 0 ? 1.0f : -1.0f;
-	const float forward[2] = { ps.velocity[0] / speed, ps.velocity[1] / speed };
-	const float right[2] = { forward[1], -forward[0] };
-	out[0] = other->r.currentOrigin[0] + radius * (sin( angle ) * forward[0] + side * (1.0f - cos( angle )) * right[0]);
-	out[1] = other->r.currentOrigin[1] + radius * (sin( angle ) * forward[1] + side * (1.0f - cos( angle )) * right[1]);
-	out[2] = other->r.currentOrigin[2] + ps.velocity[2] * seconds;
-}
-
 // true when another aircraft is predicted to be near this point at that time
 bool PlaneTasks::trafficAt( const Mind& c, const vec3_t point, float seconds )
 {
@@ -77,7 +55,7 @@ bool PlaneTasks::trafficAt( const Mind& c, const vec3_t point, float seconds )
 				continue;
 		}
 		Vec3 predicted;
-		predictAircraft( other, seconds, predicted );
+		Intercept::predict( other, seconds, predicted );
 		// flying alongside is fine: only a path that closes on the other aircraft is blocked
 		const float now = Distance( other->r.currentOrigin, c.ent->r.currentOrigin );
 		const float then = Distance( predicted, point );
