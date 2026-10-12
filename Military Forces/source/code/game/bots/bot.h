@@ -327,6 +327,20 @@ private:
 	static void goalAroundHome( GameEntity* ent, State& bot, float radius, unsigned int cat );
 	static int pickVehicle( int teamFlag, bool allowInfantry = true, const Character* who = nullptr, const State* memory = nullptr, int teamKind = -1 );
 	static float failureSensitivity( const Character& who );
+	// what a bot choosing a vehicle goes by
+	struct Choice
+	{
+		unsigned int		cats = 0;
+		int					teamFlag = 0;
+		bool				allowInfantry = true;
+		const Character*	who = nullptr;
+		const State*		memory = nullptr;
+		int					teamKind = -1;
+		bool				teamHasSupplier = true;
+	};
+	static unsigned int allowedCategories();
+	static int vehicleWeight( int vehicle, const Choice& choice );
+	static bool carriesNuke( int vehicle );
 	static float switchDesire( const State& bot, int kind );
 	static unsigned int spawnCategories();
 	static void fill();

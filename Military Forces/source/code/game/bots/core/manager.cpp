@@ -163,75 +163,21 @@ bool Bots::teamHasSupplier( int team, GameEntity* except )
 // (teamKind: only vehicles of the kind the team asked for, see BotTeam)
 int Bots::pickVehicle( int teamFlag, bool allowInfantry, const Character* who, const State* memory, int teamKind )
 {
-	unsigned int cats = spawnCategories();
-	if( g_botVehicles.string[0] )
-	{
-		unsigned int wanted = 0;
-		if( strstr( g_botVehicles.string, "plane" ) ) wanted |= CAT_PLANE;
-		if( strstr( g_botVehicles.string, "helo" ) ) wanted |= CAT_HELO;
-		if( strstr( g_botVehicles.string, "ground" ) ) wanted |= CAT_GROUND;
-		if( strstr( g_botVehicles.string, "boat" ) ) wanted |= CAT_BOAT;
-		if( strstr( g_botVehicles.string, "infantry" ) ) wanted |= CAT_LQM;
-		if( cats & wanted )
-			cats &= wanted;
-	}
-	const bool groundTargets = (cats & (CAT_GROUND|CAT_BOAT)) != 0;
-	const unsigned long gameset = Game::getGameset();
+	Choice choice;
+	choice.cats = allowedCategories();
+	choice.teamFlag = teamFlag;
+	choice.allowInfantry = allowInfantry;
+	choice.who = who;
+	choice.memory = memory;
+	choice.teamKind = teamKind;
 	// a team with nobody flying supplies: team-minded characters consider taking the supply helicopter
-	const bool teamHasSupplier = g_gametype.integer < GT_TEAM || Bots::teamHasSupplier( teamFlag == MF_TEAM_1 ? ClientBase::TEAM_RED : ClientBase::TEAM_BLUE );
+	choice.teamHasSupplier = g_gametype.integer < GT_TEAM || Bots::teamHasSupplier( teamFlag == MF_TEAM_1 ? ClientBase::TEAM_RED : ClientBase::TEAM_BLUE );
 	std::array<int, 256> candidates;
 	std::array<int, 256> weights;
 	int num = 0, total = 0;
-
 	for( int i = 0; i < bg_numberOfVehicles && num < 256; i++ )
 	{
-		const completeVehicleData_t& veh = availableVehicles[i];
-		if( !(veh.gameset & gameset) || !(veh.team & teamFlag) || !(veh.cat & cats) || !VehicleData::selectable( i ) )
-			continue;
-		if( teamKind >= 0 && static_cast<int>( BotTeam::kindOf( i ) ) != teamKind )
-			continue;
-		// bots do not take nuclear weapons
-		bool nuke = false;
-		for( unsigned int weapon : veh.weapons )
-		{
-			if( availableWeapons[weapon].type == WT_NUKEBOMB || availableWeapons[weapon].type == WT_NUKEMISSILE )
-				nuke = true;
-		}
-		if( nuke )
-			continue;
-		// base weight per kind evens out how many entries each kind has in the vehicle table
-		int weight = 0;
-		const int kind = kindOf( i );
-		if( veh.cat & CAT_PLANE ) weight = 4;
-		else if( veh.cat & CAT_HELO ) weight = 8;
-		else if( veh.cat & CAT_GROUND ) weight = 6;
-		else if( veh.cat & CAT_BOAT ) weight = 12;
-		else if( (veh.cat & CAT_LQM) && allowInfantry ) weight = 8;
-		// the character's own taste
-		if( who )
-			weight = static_cast<int>( weight * 10 * std::max( teamKind >= 0 ? 0.1f : 0.0f, who->prefer[kind] ) );
-		// supplies are for team mates: nobody flies the supply helicopter in a free-for-all
-		if( g_gametype.integer < GT_TEAM && BotWeapons::carriesSupplies( i ) )
-			continue;
-		if( who && !teamHasSupplier && BotWeapons::carriesSupplies( i ) )
-			weight = static_cast<int>( weight * (2.0f + 8.0f * who->teamwork) );
-		// bombers have little to do on a map with nothing on the ground to bomb
-		if( !groundTargets && (veh.cat & CAT_PLANE) && (veh.cls & CLASS_PLANE_BOMBER) )
-			weight = weight * 12 / 100;
-		// more than half of all bots' lives in this kind ended in an early crash here: the map does not suit it
-		if( kindLives_[kind] >= 12 && kindCrashes_[kind] * 10 > kindLives_[kind] * 5 )
-			weight = std::max( 1, weight / 3 );
-		// this very aircraft has flown into the map nearly every time it was tried: it does not fit here (a wide-turning
-		// bomber in a canyon), and nobody takes it again this map
-		if( unfitHere( i ) )
-			continue;
-		// and this bot's own record in it
-		if( memory && who && memory->ownLives[kind] > 0 )
-		{
-			const float failureRate = static_cast<float>( memory->ownFailures[kind] ) / memory->ownLives[kind];
-			weight = std::max( 1, static_cast<int>( weight / (1.0f + failureRate * memory->ownLives[kind] * failureSensitivity( *who )) ) );
-		}
-
+		const int weight = vehicleWeight( i, choice );
 		if( weight <= 0 )
 			continue;
 		candidates[num] = i;
@@ -241,7 +187,6 @@ int Bots::pickVehicle( int teamFlag, bool allowInfantry, const Character* who, c
 	}
 	if( !num )
 		return -1;
-
 	int pick = rand() % total;
 	for( int i = 0; i < num; i++ )
 	{
@@ -250,6 +195,73 @@ int Bots::pickVehicle( int teamFlag, bool allowInfantry, const Character* who, c
 			return candidates[i];
 	}
 	return candidates[0];
+}
+
+// the kinds of vehicle bots may spawn in here, narrowed by g_botVehicles when that leaves any
+unsigned int Bots::allowedCategories()
+{
+	unsigned int cats = spawnCategories();
+	if( !g_botVehicles.string[0] )
+		return cats;
+	unsigned int wanted = 0;
+	if( strstr( g_botVehicles.string, "plane" ) ) wanted |= CAT_PLANE;
+	if( strstr( g_botVehicles.string, "helo" ) ) wanted |= CAT_HELO;
+	if( strstr( g_botVehicles.string, "ground" ) ) wanted |= CAT_GROUND;
+	if( strstr( g_botVehicles.string, "boat" ) ) wanted |= CAT_BOAT;
+	if( strstr( g_botVehicles.string, "infantry" ) ) wanted |= CAT_LQM;
+	return (cats & wanted) ? cats & wanted : cats;
+}
+
+// how much a bot would like this vehicle, 0 when it is not to be taken at all
+int Bots::vehicleWeight( int i, const Choice& choice )
+{
+	const completeVehicleData_t& veh = availableVehicles[i];
+	if( !(veh.gameset & Game::getGameset()) || !(veh.team & choice.teamFlag) || !(veh.cat & choice.cats) || !VehicleData::selectable( i ) )
+		return 0;
+	if( choice.teamKind >= 0 && static_cast<int>( BotTeam::kindOf( i ) ) != choice.teamKind )
+		return 0;
+	// bots do not take nuclear weapons; supplies are for team mates, so nobody flies the supply helicopter in a
+	// free-for-all; an aircraft that has flown into the map nearly every time it was tried does not fit here (a
+	// wide-turning bomber in a canyon), and nobody takes it again this map
+	if( carriesNuke( i ) || (g_gametype.integer < GT_TEAM && BotWeapons::carriesSupplies( i )) || unfitHere( i ) )
+		return 0;
+	// base weight per kind evens out how many entries each kind has in the vehicle table
+	int weight = 0;
+	const int kind = kindOf( i );
+	if( veh.cat & CAT_PLANE ) weight = 4;
+	else if( veh.cat & CAT_HELO ) weight = 8;
+	else if( veh.cat & CAT_GROUND ) weight = 6;
+	else if( veh.cat & CAT_BOAT ) weight = 12;
+	else if( (veh.cat & CAT_LQM) && choice.allowInfantry ) weight = 8;
+	const Character* who = choice.who;
+	// the character's own taste
+	if( who )
+		weight = static_cast<int>( weight * 10 * std::max( choice.teamKind >= 0 ? 0.1f : 0.0f, who->prefer[kind] ) );
+	if( who && !choice.teamHasSupplier && BotWeapons::carriesSupplies( i ) )
+		weight = static_cast<int>( weight * (2.0f + 8.0f * who->teamwork) );
+	// bombers have little to do on a map with nothing on the ground to bomb
+	if( !(choice.cats & (CAT_GROUND|CAT_BOAT)) && (veh.cat & CAT_PLANE) && (veh.cls & CLASS_PLANE_BOMBER) )
+		weight = weight * 12 / 100;
+	// more than half of all bots' lives in this kind ended in an early crash here: the map does not suit it
+	if( kindLives_[kind] >= 12 && kindCrashes_[kind] * 10 > kindLives_[kind] * 5 )
+		weight = std::max( 1, weight / 3 );
+	// and this bot's own record in it
+	if( choice.memory && who && choice.memory->ownLives[kind] > 0 )
+	{
+		const float failureRate = static_cast<float>( choice.memory->ownFailures[kind] ) / choice.memory->ownLives[kind];
+		weight = std::max( 1, static_cast<int>( weight / (1.0f + failureRate * choice.memory->ownLives[kind] * failureSensitivity( *who )) ) );
+	}
+	return weight;
+}
+
+bool Bots::carriesNuke( int vehicle )
+{
+	for( unsigned int weapon : availableVehicles[vehicle].weapons )
+	{
+		if( availableWeapons[weapon].type == WT_NUKEBOMB || availableWeapons[weapon].type == WT_NUKEMISSILE )
+			return true;
+	}
+	return false;
 }
 
 int Bots::add( int vehicle, const char* team, const char* name )
