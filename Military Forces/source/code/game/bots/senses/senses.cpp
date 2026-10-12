@@ -5,6 +5,7 @@
 #include "../team/team.h"
 #include "../weapons/envelope.h"
 #include "../navigation/intercept.h"
+#include "../core/lod.h"
 #include <algorithm>
 #include <bit>
 #include <cmath>
@@ -463,7 +464,7 @@ void BotSenses::sense( GameEntity* ent, Bots::State& bot, Bots::Sense& out )
 		// with no enemy of its own it takes its leader's
 		if( !enemy && bot.leader >= 1 && Bots::isBot( bot.leader ) && Bots::states_[bot.leader].enemy >= 0 )
 			bot.enemy = Bots::states_[bot.leader].enemy;
-		bot.enemyTime = theLevel.time_ + 700 + (rand() % 300);
+		bot.enemyTime = theLevel.time_ + (700 + (rand() % 300)) * ThinkRate::slowdown( ent, bot );
 	}
 	if( bot.enemy >= 0 )
 	{
@@ -685,7 +686,7 @@ void BotSenses::sense( GameEntity* ent, Bots::State& bot, Bots::Sense& out )
 				theLevel.time_, ent->s.number, client->vehicle_, static_cast<int>( previous ), static_cast<int>( bot.desire ), out.health, bot.enemy,
 				out.enemyDist, out.enemyVisible, out.locked, out.launched, out.underFire, out.blindsided, out.airThreat ? out.airThreatDist : -1.0f );
 #endif
-		bot.goalEvalTime = theLevel.time_ + Bots::handicap( bot ).reconsiderEvery;
+		bot.goalEvalTime = theLevel.time_ + Bots::handicap( bot ).reconsiderEvery * ThinkRate::slowdown( ent, bot );
 		if( bot.desire != previous )
 			bot.commitTime = theLevel.time_ + 3000 + static_cast<int>( 3000 * Bots::character( bot ).patience );
 	}

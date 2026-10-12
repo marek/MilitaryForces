@@ -24,7 +24,7 @@ behavior::Status PlaneTasks::navigate( Mind& c )
 	{
 		AirNav::findPath( here, c.steer.dest, bot.path.points, Vec3( c.ps.velocity ).normalized(), radius );
 		bot.path.index = 0;
-		bot.path.searchTime = theLevel.time_ + 1500;
+		bot.path.searchTime = theLevel.time_ + 1500 + ThinkRate::stagger( c.ent->s.number, 300 );
 	}
 	while( bot.path.index + 1 < bot.path.points.size() &&
 		((bot.path.points[bot.path.index] - here).length() < radius * 1.3f || AirNav::clearLine( here, bot.path.points[bot.path.index + 1], 70.0f )) )
