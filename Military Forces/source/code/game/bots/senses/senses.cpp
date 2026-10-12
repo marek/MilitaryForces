@@ -456,7 +456,25 @@ float BotSenses::targetScore( GameEntity* ent, Bots::State& bot, const Capabilit
 void BotSenses::sense( GameEntity* ent, Bots::State& bot, Bots::Sense& out )
 {
 	const Capabilities can = Capabilities::of( ent->client_->vehicle_ );
-	const bool fighter = can.runway && !can.groundStrike;
+	trackEnemy( ent, bot, can, out );
+	if( out.enemy )
+		aimAt( ent, bot, can, out );
+	out.height = BotWorld::heightAboveGround( ent->r.currentOrigin, ent->s.number );
+	recordTrail( ent, bot );
+	ownState( ent, can, out );
+	noticeHits( ent, bot, out );
+	if( out.launched )
+		findMissile( ent, out );
+	findAirThreat( ent, out );
+	out.duel = out.enemy && out.enemyAir && foesNear( ent ) == 1 && ((out.can.runway && !out.can.groundStrike) || out.can.gunship);
+	out.outranged = outranged( ent, out );
+	reviewGoal( ent, bot, out );
+}
+
+// the enemy to fight, looked for now and then; with none of its own it takes its leader's. One out of sight is kept
+// while it is remembered
+void BotSenses::trackEnemy( GameEntity* ent, Bots::State& bot, const Capabilities& can, Bots::Sense& out )
+{
 	if( theLevel.time_ >= bot.enemyTime )
 	{
 		GameEntity* enemy = BotSenses::findEnemy( ent, bot, can );
@@ -490,102 +508,129 @@ void BotSenses::sense( GameEntity* ent, Bots::State& bot, Bots::Sense& out )
 			bot.enemyTime = 0;
 		}
 	}
-	if( out.enemy )
-	{
-		Vec3 target;
-		VectorCopy( out.enemyVisible ? out.enemy->r.currentOrigin : bot.seen[out.enemy->s.number].position, target );
-		const float dist = Distance( ent->r.currentOrigin, target );
-		// aim ahead of a moving enemy by the flight time of the gun's shot
-		const int weapon = availableVehicles[ent->client_->vehicle_].weapons[0];
-		const float shotSpeed = weapon && availableWeapons[weapon].muzzleVelocity > 0 ? static_cast<float>( availableWeapons[weapon].muzzleVelocity ) : 2500.0f;
-		if( out.enemyVisible )
-			target = Intercept::lead( ent->r.currentOrigin, target, out.enemy->client_->ps_.velocity, shotSpeed, 1.5f );
-		const unsigned int enemyCat = availableVehicles[out.enemy->client_->vehicle_].cat;
-		// An aircraft with gun turrets is approached from where the fewest of them can bear: each turret only covers
-		// its own field. That choice is made out of gun range, where it costs nothing: the fighter flies for a point
-		// at gun range on the thinnest side. Inside gun range it does what a person does, which is put the nose on
-		// the bomber and shoot; a fighter that goes on circling for a better side there is only a target.
-		// Pilots with little cunning do not think of the approach at all
-		bool flanking = false;
-		if( fighter && (availableVehicles[out.enemy->client_->vehicle_].flags & VF_GUNSTATIONS) &&
-			out.enemyVisible && dist > gunRange && Bots::character( bot ).cunning > 0.25f )
-		{
-			const int theirs = out.enemy->client_->vehicle_;
-			const float* hull = out.enemy->client_->ps_.vehicleAngles;
-			Vec3 toMe = Vec3( ent->r.currentOrigin ) - Vec3( out.enemy->r.currentOrigin ), myBearing;
-			vectoangles( toMe, myBearing );
-			const int onMe = std::popcount( VehicleData::gunStationsBearing( theirs, hull, myBearing ) );
-			int fewest = onMe;
-			float nearest = 0;
-			Vec3 side;
-			// (vectoangles pitch: positive is below the bomber). Level first: a turreted bomber's blind side is level
-			for( float pitch : { 0.0f, -20.0f, 20.0f, -50.0f, 50.0f } )
-			{
-				for( float yaw = 0.0f; yaw < 360.0f; yaw += 30.0f )
-				{
-					Vec3 angles = { pitch, hull[YAW] + yaw, 0 }, dir;
-					const int bearing = std::popcount( VehicleData::gunStationsBearing( theirs, hull, angles ) );
-					AngleVectors( angles, dir, nullptr, nullptr );
-					// of the sides equally thinly covered, the one nearest to where the fighter already is
-					const float along = DotProduct( dir, toMe );
-					if( bearing < fewest || (bearing == fewest && bearing < onMe && along > nearest) )
-					{
-						fewest = bearing;
-						nearest = along;
-						side = dir;
-					}
-				}
-			}
-			if( fewest < onMe )
-			{
-				target = Vec3( out.enemy->r.currentOrigin ) + side * gunRange;
-				flanking = true;
-			}
-		}
-		// Several of the team on one enemy: each comes in along its own bearing and height, and where they are to go
-		// in together it waits at its place until the others are at theirs
-		const BotTeam::Assignment& teamJob = BotTeam::of( ent->s.number );
-		if( !flanking && teamJob.flank && out.enemyVisible )
-		{
-			const bool flyer = (availableVehicles[ent->client_->vehicle_].cat & (CAT_PLANE|CAT_HELO)) != 0;
-			const float standOff = flyer ? gunRange : 900.0f;
-			if( dist > standOff * 1.4f || theLevel.time_ < teamJob.goTime )
-			{
-				Vec3 side;
-				const Vec3 bearing( 0, teamJob.bearing, 0 );
-				AngleVectors( bearing, side, nullptr, nullptr );
-				target = Vec3( out.enemy->r.currentOrigin ) + side * standOff;
-				if( flyer )
-					target[2] += teamJob.lift;
-				flanking = true;
-			}
-		}
-		// a cunning fighter goes for the place behind and below an aircraft that is not hunting it
-		if( !flanking && fighter && (enemyCat & (CAT_PLANE|CAT_HELO)) && dist > 1200 && dist < 6000 &&
-			Bots::character( bot ).cunning > 0.5f && out.enemy->tracktarget_ != ent )
-		{
-			Vec3 behind;
-			AngleVectors( out.enemy->client_->ps_.vehicleAngles, behind, nullptr, nullptr );
-			target = target + behind * ( -700.0f );
-			target[2] -= 250.0f * Bots::character( bot ).cunning;
-		}
-		VectorSubtract( target, ent->r.currentOrigin, out.enemyDir );
-		out.enemyDist = VectorNormalize( out.enemyDir );
-		vectoangles( out.enemyDir, out.enemyAngles );
-		out.enemyAngles[PITCH] = AngleSubtract( out.enemyAngles[PITCH], 0 );
-		out.enemyAir = (availableVehicles[out.enemy->client_->vehicle_].cat & (CAT_PLANE|CAT_HELO)) != 0 &&
-			!(out.enemy->client_->ps_.ONOFF & OO_LANDED);
-	}
-	out.height = BotWorld::heightAboveGround( ent->r.currentOrigin, ent->s.number );
-	// where it was over the last six seconds, for the crash record
-	if( theLevel.time_ >= bot.trailTime )
-	{
-		for( int i = 5; i > 0; i-- )
-			VectorCopy( bot.trail[i - 1], bot.trail[i] );
-		VectorCopy( ent->r.currentOrigin, bot.trail[0] );
-		bot.trailTime = theLevel.time_ + 1000;
-	}
+}
 
+// Where to aim and fly: ahead of a moving enemy by the flight time of the gun's shot, or to the side of a turreted
+// bomber where its guns bear least, or the bearing the team gave, or behind and below an aircraft that is not hunting it
+void BotSenses::aimAt( GameEntity* ent, Bots::State& bot, const Capabilities& can, Bots::Sense& out )
+{
+	const bool fighter = can.runway && !can.groundStrike;
+	Vec3 target;
+	VectorCopy( out.enemyVisible ? out.enemy->r.currentOrigin : bot.seen[out.enemy->s.number].position, target );
+	const float dist = Distance( ent->r.currentOrigin, target );
+	const int weapon = availableVehicles[ent->client_->vehicle_].weapons[0];
+	const float shotSpeed = weapon && availableWeapons[weapon].muzzleVelocity > 0 ? static_cast<float>( availableWeapons[weapon].muzzleVelocity ) : 2500.0f;
+	if( out.enemyVisible )
+		target = Intercept::lead( ent->r.currentOrigin, target, out.enemy->client_->ps_.velocity, shotSpeed, 1.5f );
+	if( !turretFlank( ent, bot, out, fighter, dist, target ) && !teamFlank( ent, out, dist, target ) )
+		cunningApproach( ent, bot, out, fighter, dist, target );
+	VectorSubtract( target, ent->r.currentOrigin, out.enemyDir );
+	out.enemyDist = VectorNormalize( out.enemyDir );
+	vectoangles( out.enemyDir, out.enemyAngles );
+	out.enemyAngles[PITCH] = AngleSubtract( out.enemyAngles[PITCH], 0 );
+	out.enemyAir = (availableVehicles[out.enemy->client_->vehicle_].cat & (CAT_PLANE|CAT_HELO)) != 0 &&
+		!(out.enemy->client_->ps_.ONOFF & OO_LANDED);
+}
+
+// An aircraft with gun turrets is approached from where the fewest of them can bear: each turret only covers
+// its own field. That choice is made out of gun range, where it costs nothing: the fighter flies for a point
+// at gun range on the thinnest side. Inside gun range it does what a person does, which is put the nose on
+// the bomber and shoot; a fighter that goes on circling for a better side there is only a target.
+// Pilots with little cunning do not think of the approach at all
+bool BotSenses::turretFlank( GameEntity* ent, const Bots::State& bot, const Bots::Sense& out, bool fighter, float dist, Vec3& target )
+{
+	if( !(fighter && (availableVehicles[out.enemy->client_->vehicle_].flags & VF_GUNSTATIONS) &&
+		out.enemyVisible && dist > gunRange && Bots::character( bot ).cunning > 0.25f) )
+		return false;
+	Vec3 side;
+	if( !thinnestSide( ent, out.enemy, side ) )
+		return false;
+	target = Vec3( out.enemy->r.currentOrigin ) + side * gunRange;
+	return true;
+}
+
+// the direction from a turreted aircraft on which fewer of its gun stations bear than on where this one is now; of
+// the sides equally thinly covered, the one nearest to where it already is. Level first: a turreted bomber's blind
+// side is level (vectoangles pitch: positive is below the bomber)
+bool BotSenses::thinnestSide( GameEntity* ent, GameEntity* bomber, Vec3& side )
+{
+	const int theirs = bomber->client_->vehicle_;
+	const float* hull = bomber->client_->ps_.vehicleAngles;
+	Vec3 toMe = Vec3( ent->r.currentOrigin ) - Vec3( bomber->r.currentOrigin ), myBearing;
+	vectoangles( toMe, myBearing );
+	const int onMe = std::popcount( VehicleData::gunStationsBearing( theirs, hull, myBearing ) );
+	int fewest = onMe;
+	float nearest = 0;
+	for( float pitch : { 0.0f, -20.0f, 20.0f, -50.0f, 50.0f } )
+	{
+		for( float yaw = 0.0f; yaw < 360.0f; yaw += 30.0f )
+		{
+			Vec3 angles = { pitch, hull[YAW] + yaw, 0 }, dir;
+			const int bearing = std::popcount( VehicleData::gunStationsBearing( theirs, hull, angles ) );
+			AngleVectors( angles, dir, nullptr, nullptr );
+			const float along = DotProduct( dir, toMe );
+			if( bearing > fewest || (bearing == fewest && (bearing >= onMe || along <= nearest)) )
+				continue;
+			fewest = bearing;
+			nearest = along;
+			side = dir;
+		}
+	}
+	return fewest < onMe;
+}
+
+// Several of the team on one enemy: each comes in along its own bearing and height, and where they are to go
+// in together it waits at its place until the others are at theirs
+bool BotSenses::teamFlank( GameEntity* ent, const Bots::Sense& out, float dist, Vec3& target )
+{
+	const BotTeam::Assignment& teamJob = BotTeam::of( ent->s.number );
+	if( !teamJob.flank || !out.enemyVisible )
+		return false;
+	{
+		const bool flyer = (availableVehicles[ent->client_->vehicle_].cat & (CAT_PLANE|CAT_HELO)) != 0;
+		const float standOff = flyer ? gunRange : 900.0f;
+		if( dist > standOff * 1.4f || theLevel.time_ < teamJob.goTime )
+		{
+			Vec3 side;
+			const Vec3 bearing( 0, teamJob.bearing, 0 );
+			AngleVectors( bearing, side, nullptr, nullptr );
+			target = Vec3( out.enemy->r.currentOrigin ) + side * standOff;
+			if( flyer )
+				target[2] += teamJob.lift;
+			return true;
+		}
+	}
+	return false;
+}
+
+// a cunning fighter goes for the place behind and below an aircraft that is not hunting it
+void BotSenses::cunningApproach( GameEntity* ent, const Bots::State& bot, const Bots::Sense& out, bool fighter, float dist, Vec3& target )
+{
+	const unsigned int enemyCat = availableVehicles[out.enemy->client_->vehicle_].cat;
+	if( fighter && (enemyCat & (CAT_PLANE|CAT_HELO)) && dist > 1200 && dist < 6000 &&
+		Bots::character( bot ).cunning > 0.5f && out.enemy->tracktarget_ != ent )
+	{
+		Vec3 behind;
+		AngleVectors( out.enemy->client_->ps_.vehicleAngles, behind, nullptr, nullptr );
+		target = target + behind * ( -700.0f );
+		target[2] -= 250.0f * Bots::character( bot ).cunning;
+	}
+}
+
+// where it was over the last six seconds, for the crash record
+void BotSenses::recordTrail( GameEntity* ent, Bots::State& bot )
+{
+	if( theLevel.time_ < bot.trailTime )
+		return;
+	for( int i = 5; i > 0; i-- )
+		VectorCopy( bot.trail[i - 1], bot.trail[i] );
+	VectorCopy( ent->r.currentOrigin, bot.trail[0] );
+	bot.trailTime = theLevel.time_ + 1000;
+}
+
+// its own vehicle: what it can do, how hurt, locked on or launched at, stealthy and whether showing
+void BotSenses::ownState( GameEntity* ent, const Capabilities& can, Bots::Sense& out )
+{
 	GameClient* client = ent->client_;
 	const playerState_t& ps = client->ps_;
 	out.role = BotSenses::roleOf( client->vehicle_ );
@@ -595,8 +640,12 @@ void BotSenses::sense( GameEntity* ent, Bots::State& bot, Bots::Sense& out )
 	out.launched = (ps.stats[STAT_LOCKINFO] & LI_BEING_LAUNCHED) != 0;
 	out.stealth = (availableVehicles[client->vehicle_].flags & VF_STEALTH) != 0;
 	out.revealed = ps.timers[TIMER_REVEAL] > theLevel.time_;
+}
 
-	// hit: remember when, and which way to break if this is the first hit in a while
+// hit: remember when, and which way to break if this is the first hit in a while
+void BotSenses::noticeHits( GameEntity* ent, Bots::State& bot, Bots::Sense& out )
+{
+	const playerState_t& ps = ent->client_->ps_;
 	if( ent->health_ < bot.lastHealth - 2 )
 	{
 		if( theLevel.time_ > bot.hitTime + 4000 )
@@ -617,32 +666,36 @@ void BotSenses::sense( GameEntity* ent, Bots::State& bot, Bots::Sense& out )
 		}
 		out.blindsided = !seen;
 	}
+}
 
-	// the missile that will arrive first
-	if( out.launched )
+// the missile that will arrive first
+void BotSenses::findMissile( GameEntity* ent, Bots::Sense& out )
+{
+	const playerState_t& ps = ent->client_->ps_;
+	for( int i = MAX_CLIENTS + 1; i < theLevel.num_entities_; i++ )
 	{
-		for( int i = MAX_CLIENTS + 1; i < theLevel.num_entities_; i++ )
-		{
-			GameEntity* other = theLevel.getEntity( i );
-			if( !other || !other->inuse_ || other->s.eType != ET_MISSILE || other->tracktarget_ != ent )
-				continue;
-			Vec3 rel;
-			rel = other->r.currentOrigin - ent->r.currentOrigin;
-			const float dist = VectorLength( rel );
-			if( out.missile && dist > out.missileDist )
-				continue;
-			Vec3 relVel, angles;
-			VectorSubtract( other->s.pos.trDelta, ps.velocity, relVel );
-			const float closing = -DotProduct( rel, relVel ) / std::max( dist, 1.0f );
-			vectoangles( rel, angles );
-			out.missile = other;
-			out.missileDist = dist;
-			out.missileTime = closing > 1 ? dist / closing : 99.0f;
-			out.missileYaw = angles[YAW];
-		}
+		GameEntity* other = theLevel.getEntity( i );
+		if( !other || !other->inuse_ || other->s.eType != ET_MISSILE || other->tracktarget_ != ent )
+			continue;
+		Vec3 rel;
+		rel = other->r.currentOrigin - ent->r.currentOrigin;
+		const float dist = VectorLength( rel );
+		if( out.missile && dist > out.missileDist )
+			continue;
+		Vec3 relVel, angles;
+		VectorSubtract( other->s.pos.trDelta, ps.velocity, relVel );
+		const float closing = -DotProduct( rel, relVel ) / std::max( dist, 1.0f );
+		vectoangles( rel, angles );
+		out.missile = other;
+		out.missileDist = dist;
+		out.missileTime = closing > 1 ? dist / closing : 99.0f;
+		out.missileYaw = angles[YAW];
 	}
+}
 
-	// the nearest enemy aircraft in the air: what surface vehicles hide from
+// the nearest enemy aircraft in the air: what surface vehicles hide from
+void BotSenses::findAirThreat( GameEntity* ent, Bots::Sense& out )
+{
 	for( int i = 1; i <= theLevel.maxclients_; i++ )
 	{
 		GameEntity* other = theLevel.getEntity( i );
@@ -659,8 +712,11 @@ void BotSenses::sense( GameEntity* ent, Bots::State& bot, Bots::Sense& out )
 			out.airThreatDist = dist;
 		}
 	}
+}
 
-	// one enemy aircraft and nobody else near is a duel
+// enemies within five thousand units: one alone in the air is a duel
+int BotSenses::foesNear( GameEntity* ent )
+{
 	int foes = 0;
 	for( int i = 1; i <= theLevel.maxclients_; i++ )
 	{
@@ -672,10 +728,13 @@ void BotSenses::sense( GameEntity* ent, Bots::State& bot, Bots::Sense& out )
 		if( Distance( ent->r.currentOrigin, other->r.currentOrigin ) < 5000 )
 			foes++;
 	}
-	out.duel = out.enemy && out.enemyAir && foes == 1 && ((out.can.runway && !out.can.groundStrike) || out.can.gunship);
-	out.outranged = outranged( ent, out );
+	return foes;
+}
 
-	// the goal is reviewed once a second, but a goal just taken is kept for a few seconds unless something forces the matter
+// the goal is reviewed once a second, but a goal just taken is kept for a few seconds unless something forces the matter
+void BotSenses::reviewGoal( GameEntity* ent, Bots::State& bot, const Bots::Sense& out )
+{
+	GameClient* client = ent->client_;
 	if( theLevel.time_ >= bot.goalEvalTime && (theLevel.time_ >= bot.commitTime || out.launched || out.underFire || bot.desire == Bots::Goal::Roam) )
 	{
 		const Bots::Goal previous = bot.desire;
