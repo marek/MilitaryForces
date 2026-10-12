@@ -114,6 +114,31 @@ The game data is a separate repository. Packaging takes the built paks from `../
 `builds/<preset>/MilitaryForces +set fs_basepath <folder holding mfdata>` (or `MilitaryForcesDed` for the dedicated
 server). On Windows that is `builds/windows/MilitaryForces.exe`.
 
+### Video mode and fullscreen
+
+`r_mode` is a numeric index into the list below (not a resolution string). `r_fullscreen` is `0` for a window and `1`
+for fullscreen. A clean install is windowed at the **desktop's native resolution** (not a fixed mode number); archived
+settings live in the per-user `mfconfig.cfg` (on Windows: `Documents\My Games\Military Forces\mfdata\mfconfig.cfg`).
+Example: `+set r_mode 15 +set r_fullscreen 0` for a 1920×1080 window. A custom size uses `r_customwidth` /
+`r_customheight` instead of a listed mode.
+
+| `r_mode` | Resolution | `r_mode` | Resolution |
+|---:|---|---:|---|
+| 0 | 320×240 | 14 | 1600×900 |
+| 1 | 400×300 | 15 | 1920×1080 |
+| 2 | 512×384 | 16 | 2560×1440 |
+| 3 | 640×480 | 17 | 3840×2160 |
+| 4 | 800×600 | 18 | 1280×800 |
+| 5 | 960×720 | 19 | 1440×900 |
+| 6 | 1024×768 | 20 | 1680×1050 |
+| 7 | 1152×864 | 21 | 1920×1200 |
+| 8 | 1280×1024 | 22 | 2560×1600 |
+| 9 | 1600×1200 | 23 | 1512×982 |
+| 10 | 2048×1536 | 24 | 1728×1117 |
+| 11 | 856×480 | 25 | 3024×1964 |
+| 12 | 1280×720 | 26 | 3456×2234 |
+| 13 | 1366×768 | 27 | 5120×2880 |
+
 ## Credits
 
 Military Forces is built on the Quake III Arena source code released by id Software under the GPL, and on [ioquake3](https://ioquake3.org).
