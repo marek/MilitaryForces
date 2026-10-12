@@ -60,6 +60,124 @@ public:
 	struct Mind;
 
 	// everything one bot remembers from frame to frame. Times are level times in milliseconds
+	// going back to a pad for fuel and arms
+	struct Rearm
+	{
+		int		pad = -1;	// the pad it is going to for fuel and arms
+		int		phase = 0;	// survey, approach, final, on the ground
+		int		badPad = -1;	// a pad given up on
+		int		badPadTime = 0;	// and until when it is avoided
+
+		void reset() { *this = {}; }
+		// done with the pad it was going to, keeping in mind the one given up on
+		void letGo()
+		{
+			pad = -1;
+			phase = 0;
+		}
+	};
+
+	// a plane's landing: the runway, the way down, and whether this map has anywhere to land
+	struct Landing
+	{
+		float	dir = 1;	// which way along the runway it lands
+		float	run = 3500;	// how long a run-in the terrain allows
+		float	slope = 0.15f;	// the slope of the way down the terrain allows
+		bool	outbound = false;	// flying away from the runway to turn round
+		float	ceiling = 800;	// room above the runway
+		float	offset = 45;	// the lane beside the centre line it lands on
+		float	approachHeight = 0;	// the height to fly on the approach
+		int		gearTime = 0;	// no further gear command before then
+		int		padCheckTime = 0;	// when to look again for a pad this plane can land on
+		bool	canLand = true;	// this map has a pad it can land on
+		int		start = 0;	// when this landing was begun
+		int		giveUp = 0;	// no landing attempt before then
+
+		void reset() { *this = {}; }
+	};
+
+	// a plane's take-off: the plan, taxiing to a spot, holding short, giving way
+	struct Takeoff
+	{
+		int		groundTime = 0;	// when it was last on the ground
+		float	yaw = 0;	// the heading planned for the take-off roll
+		float	departYaw = 0;	// and for the climb out
+		int		planTime = 0;	// the take-off plan holds until then
+		int		taxiTime = 0;	// taxiing to a better spot until then
+		int		holdTime = 0;	// holding short until then
+		int		heldSince = 0;	// waiting on the ground for an aircraft standing ahead since then, 0 when not
+		int		sidestepTime = 0;	// taxiing round one that would not move, until then
+		int		holds = 0;	// holds in a row, so it does not wait for ever
+		vec3_t	taxiSpot = { 0, 0, 0 };	// where it taxis to before rolling
+
+		void reset() { *this = {}; }
+	};
+
+	// hiding: where, until when, and a helicopter coming up out of it to fire
+	struct Cover
+	{
+		vec3_t	point = { 0, 0, 0 };	// where it hides
+		int		time = 0;	// stays in cover, or keeps its hiding place, until then
+		bool	has = false;	// it has a hiding place
+		int		popTime = 0;	// a helicopter up out of cover goes back down then
+		vec3_t	lastPop = { 0, 0, 0 };	// where a stealth helicopter last came up to fire: not there again
+		int		strikeAmmo = 0;	// what it carried when it came up, to tell when a missile has gone
+		bool	breakingOff = false;	// getting out of a fight at close quarters
+		bool	exposed = false;	// up out of cover and shooting
+
+		void reset() { *this = {}; }
+	};
+
+	// chasing an enemy: the turn chosen towards it, and flying on out after a pass
+	struct Pursuit
+	{
+		int		egressTime = 0;	// flying on out after a pass until then
+		int		chaseTime = 0;	// a chosen turn is flown out until then
+		float	turn = 0;	// the turn chosen towards the enemy
+		float	pitch = 0;	// and its climb or dive
+
+		void reset() { *this = {}; }
+	};
+
+	// the manoeuvre planner: the heading it holds, and what it found looking ahead
+	struct Avoidance
+	{
+		int		time = 0;	// the manoeuvre planner's heading holds until then
+		float	yaw = 0;
+		float	pitch = 0;
+		int		probeTime = 0;	// when the manoeuvre planner next looks ahead
+		bool	probeBlocked = false;
+		int		brakeTime = 0;	// slowing for a tight turn until then
+		float	probeWant = 0;	// free distance on the wanted line, at the last look ahead
+		float	probeBest = 0;	// and on the line chosen
+		bool	confined = false;	// in terrain tighter than its turn
+
+		void reset() { *this = {}; }
+	};
+
+	// a path round an obstacle, from the path finder
+	struct Path
+	{
+		std::vector<Vec3>	points;
+		size_t	index = 0;
+		int		searchTime = 0;	// when to search for a path again
+		bool	following = false;	// flying or driving that path now
+		bool	cornerAhead = false;	// the path turns sharply soon
+
+		void reset() { *this = {}; }
+	};
+
+	// noticing it has not moved, and backing out
+	struct Stuck
+	{
+		vec3_t	lastOrigin = { 0, 0, 0 };	// where it was at the last stuck check
+		int		checkTime = 0;
+		int		reverseTime = 0;	// backing out of a blocked spot until then
+		int		turn = 0;	// and steering this way meanwhile
+
+		void reset() { *this = {}; }
+	};
+
 	struct State
 	{
 		bool	active = false;	// this client is a bot
@@ -70,16 +188,8 @@ public:
 		bool	hasHome = false;
 		vec3_t	goal = { 0, 0, 0 };	// where it is roaming to
 		int		goalTime = 0;	// when that goal goes stale
-		vec3_t	lastOrigin = { 0, 0, 0 };	// where it was at the last stuck check
-		int		stuckCheckTime = 0;
-		int		reverseTime = 0;	// backing out of a blocked spot until then
-		int		reverseTurn = 0;	// and steering this way meanwhile
-		int		egressTime = 0;	// flying on out after a pass until then
 		int		spawnTime = 0;	// when this life began
 		int		commandTime = 0;	// no further client command (enter, radar, respawn) before then
-		int		avoidTime = 0;	// the manoeuvre planner's heading holds until then
-		float	avoidYaw = 0;
-		float	avoidPitch = 0;
 		float	aimPhase = 0;	// where the aim wander is in its swing
 		bool	wasAlive = false;	// alive in the last frame: a change marks a life's start or end
 		int		character = 0;	// index of its character
@@ -106,62 +216,23 @@ public:
 		int		trailTime = 0;
 		int		logTime = 0;
 		std::array<Seen, MAX_CLIENTS + 1> seen;	// where each other player was last seen
-		vec3_t	hidePoint = { 0, 0, 0 };
-		int		hideTime = 0;	// stays in cover, or keeps its hiding place, until then
-		bool	hasHide = false;
-		int		popTime = 0;	// a helicopter up out of cover goes back down then
-		vec3_t	lastPop = { 0, 0, 0 };	// where a stealth helicopter last came up to fire: not there again
-		int		strikeAmmo = 0;	// what it carried when it came up, to tell when a missile has gone
-		bool	breakingOff = false;	// getting out of a fight at close quarters
-		bool	exposed = false;	// up out of cover and shooting
 		int		flareTime = 0;
 		int		bombTime = 0;	// when a bomb or a crate was last released
-		int		pad = -1;	// the pad it is going to for fuel and arms
-		int		landPhase = 0;	// survey, approach, final, on the ground
-		float	landDir = 1;	// which way along the runway it lands
-		float	landRun = 3500;	// how long a run-in the terrain allows
-		float	landSlope = 0.15f;	// the slope of the way down the terrain allows
-		bool	landOutbound = false;	// flying away from the runway to turn round
-		float	landCeiling = 800;	// room above the runway
-		int		badPad = -1;	// a pad given up on
 		int		reactTime = 0;	// it may shoot at a new enemy from then
 		int		reactEnemy = -1;
 		float	breakSide = 1;	// the side to break to from a missile
-		int		chaseTime = 0;	// a chosen turn is flown out until then
-		std::vector<Vec3> path;	// the path round an obstacle, from the path finder
-		size_t	pathIndex = 0;
-		int		pathTime = 0;	// when to search for a path again
-		bool	following = false;	// flying or driving that path now
-		bool	cornerAhead = false;	// the path turns sharply soon
+		// the parts each behaviour owns
+		Rearm	rearm;
+		Landing	landing;
+		Takeoff	takeoff;
+		Cover	cover;
+		Pursuit	pursuit;
+		Avoidance	avoid;
+		Path	path;
+		Stuck	stuck;
 		behavior::Memory tree;	// what the behaviour tree remembers between frames
 		const behavior::Tree<Mind>* treeUsed = nullptr;	// the tree that memory belongs to
-		float	chaseTurn = 0;	// the turn chosen towards the enemy
-		float	chasePitch = 0;	// and its climb or dive
-		int		badPadTime = 0;	// and until when it is avoided
-		float	landOffset = 45;	// the lane beside the centre line it lands on
-		float	approachHeight = 0;	// the height to fly on the approach
-		int		gearTime = 0;	// no further gear command before then
 		int		turretTime = 0;		// start of the current turret burst, or of the pause after it
-		int		padCheckTime = 0;	// when to look again for a pad this plane can land on
-		bool	canLand = true;	// a plane: this map has a pad it can land on
-		int		landStart = 0;	// when this landing was begun
-		int		landGiveUp = 0;	// no landing attempt before then
-		int		probeTime = 0;	// when the manoeuvre planner next looks ahead
-		bool	probeBlocked = false;
-		int		brakeTime = 0;	// slowing for a tight turn until then
-		int		groundTime = 0;	// when it was last on the ground
-		float	probeWant = 0;	// free distance on the wanted line, at the last look ahead
-		float	probeBest = 0;	// and on the line chosen
-		bool	confined = false;	// in terrain tighter than its turn
-		float	takeoffYaw = 0;	// the heading planned for the take-off roll
-		float	departYaw = 0;	// and for the climb out
-		int		takeoffTime = 0;	// the take-off plan holds until then
-		int		taxiTime = 0;	// taxiing to a better spot until then
-		int		holdTime = 0;	// holding short until then
-		int		heldSince = 0;	// waiting on the ground for an aircraft standing ahead since then, 0 when not
-		int		sidestepTime = 0;	// taxiing round one that would not move, until then
-		int		takeoffHolds = 0;	// holds in a row, so it does not wait for ever
-		vec3_t	taxiSpot = { 0, 0, 0 };	// where it taxis to before rolling
 	};
 
 
@@ -172,24 +243,24 @@ public:
 		float		enemyDist = 0;	// to the point to aim at, which leads a moving enemy
 		vec3_t		enemyDir = { 0, 0, 0 };
 		vec3_t		enemyAngles = { 0, 0, 0 };
-		bool		enemyAir = false;	// the enemy is an aircraft in the air
+		bool	enemyAir = false;	// the enemy is an aircraft in the air
 		float		height = 0;	// above the ground or water
-		bool		enemyVisible = false;
-		bool		locked = false;	// someone has a lock on it, or a missile is on its way
-		bool		launched = false;	// a missile is on its way
+		bool	enemyVisible = false;
+		bool	locked = false;	// someone has a lock on it, or a missile is on its way
+		bool	launched = false;	// a missile is on its way
 		float		health = 1;	// as a share of full health
 		GameEntity*	airThreat = nullptr;	// the nearest enemy aircraft in the air
 		float		airThreatDist = 0;
 		Role		role = Role::Fighter;
-		bool		stealth = false;	// flying a stealth aircraft
-		bool		revealed = false;	// and it is showing on radar at the moment
-		bool		underFire = false;	// hit within the last seconds
-		bool		blindsided = false;	// and by someone it is not looking at
+		bool	stealth = false;	// flying a stealth aircraft
+		bool	revealed = false;	// and it is showing on radar at the moment
+		bool	underFire = false;	// hit within the last seconds
+		bool	blindsided = false;	// and by someone it is not looking at
 		GameEntity*	missile = nullptr;	// the missile that will arrive first
 		float		missileDist = 0;
 		float		missileTime = 0;	// seconds until it does
 		float		missileYaw = 0;	// the direction it comes from
-		bool		duel = false;	// one enemy aircraft and nobody else near
+		bool	duel = false;	// one enemy aircraft and nobody else near
 	};
 
 	friend struct LandingSteps;
@@ -261,7 +332,7 @@ public:
 		Vec3			axis;	// direction of the runway
 		float			halfLength;	// half the runway's length, 0 without one
 		float			z;	// height of the surface
-		bool			runway;	// long enough for a plane to land on
+		bool		runway;	// long enough for a plane to land on
 		unsigned int	category;	// the kinds of vehicle it serves
 		int				team;	// whose it is in a team game
 	};

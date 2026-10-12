@@ -158,7 +158,7 @@ struct GoalScoring
 	{
 		if( s.sense.role == Role::Infantry )
 			return 0.0f;
-		if( plane( s ) && (!g_botLanding.integer || theLevel.time_ < s.bot.landGiveUp) )
+		if( plane( s ) && (!g_botLanding.integer || theLevel.time_ < s.bot.landing.giveUp) )
 			return 0.0f;
 		// fuel is the need that cannot wait: it grows as the tank empties, and below a quarter not even a duel outweighs it
 		constexpr float fuelWanted = 0.45f, fuelUrgent = 0.25f, fuelPull = 8.0f;
@@ -175,10 +175,10 @@ struct GoalScoring
 		if( fuel >= fuelUrgent )
 			need *= duelResolve( s, 1.0f );
 		// once on the way to a pad, see it through
-		if( s.bot.pad >= 0 )
+		if( s.bot.rearm.pad >= 0 )
 			need = std::max( need, 0.9f );
 		// no pad this vehicle can use: nothing to go back to
-		if( need > 0 && BotWorld::findPad( s.ent, theLevel.time_ < s.bot.badPadTime ? s.bot.badPad : -1 ) < 0 )
+		if( need > 0 && BotWorld::findPad( s.ent, theLevel.time_ < s.bot.rearm.badPadTime ? s.bot.rearm.badPad : -1 ) < 0 )
 			return 0.0f;
 		return need;
 	}
@@ -264,17 +264,14 @@ Bots::Goal Bots::chooseGoal( GameEntity* ent, State& bot, const Sense& sense )
 	// rearming needs a pad chosen; any other goal lets it go
 	if( goal == Goal::Rearm )
 	{
-		if( bot.pad < 0 )
+		if( bot.rearm.pad < 0 )
 		{
-			bot.pad = BotWorld::findPad( ent, theLevel.time_ < bot.badPadTime ? bot.badPad : -1 );
-			bot.landPhase = 0;
+			bot.rearm.pad = BotWorld::findPad( ent, theLevel.time_ < bot.rearm.badPadTime ? bot.rearm.badPad : -1 );
+			bot.rearm.phase = 0;
 		}
 	}
 	else
-	{
-		bot.pad = -1;
-		bot.landPhase = 0;
-	}
+		bot.rearm.letGo();
 	return goal;
 }
 
@@ -295,12 +292,8 @@ bool Bots::replenished( GameEntity* ent )
 // done at the pad: clear the landing and take-off state and look for something to do
 void Bots::finishRearm( GameEntity* ent, State& bot )
 {
-	bot.takeoffTime = 0;
-	bot.taxiTime = 0;
-	bot.holdTime = 0;
-	bot.takeoffHolds = 0;
-	bot.pad = -1;
-	bot.landPhase = 0;
+	bot.takeoff.reset();
+	bot.rearm.letGo();
 	bot.goalEvalTime = 0;
 	bot.commitTime = 0;
 	bot.desire = Goal::Roam;

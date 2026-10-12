@@ -45,7 +45,7 @@ bool Bots::runwayBusy( int padIndex, GameEntity* self )
 		const float side = rel[1] * pad.axis[0] - rel[0] * pad.axis[1];
 		if( fabs( along ) < pad.halfLength + 150 && fabs( side ) < 220 && fabs( rel[2] ) < 160 )
 			return true;
-		if( isBot( i ) && i < self->s.number && states_[i].landPhase == 2 && states_[i].pad >= 0 && Distance( BotWorld::pads_[states_[i].pad].center, pad.center ) < 400 )
+		if( isBot( i ) && i < self->s.number && states_[i].rearm.phase == 2 && states_[i].rearm.pad >= 0 && Distance( BotWorld::pads_[states_[i].rearm.pad].center, pad.center ) < 400 )
 			return true;
 	}
 	return false;
@@ -71,13 +71,13 @@ struct PlaneTasks
 
 	// free flight: not in a step that works the controls itself (take-off, final, roll-out)
 	static bool flying( Mind& c ) { return !c.controls.claimed(); }
-	static bool landing( Mind& c ) { return c.bot.desire == Goal::Rearm && c.bot.pad >= 0; }
+	static bool landing( Mind& c ) { return c.bot.desire == Goal::Rearm && c.bot.rearm.pad >= 0; }
 	static bool onGround( Mind& c ) { return c.landed(); }
-	static bool onApproach( Mind& c ) { return c.bot.desire == Goal::Rearm && c.bot.landPhase == 1; }
+	static bool onApproach( Mind& c ) { return c.bot.desire == Goal::Rearm && c.bot.rearm.phase == 1; }
 	// a missile within six seconds; not acted on once committed to a final approach
 	static bool missileInbound( Mind& c )
 	{
-		return c.sense.missile && c.sense.missileTime <= 6.0f && !c.landed() && !(c.bot.desire == Goal::Rearm && c.bot.landPhase >= 2);
+		return c.sense.missile && c.sense.missileTime <= 6.0f && !c.landed() && !(c.bot.desire == Goal::Rearm && c.bot.rearm.phase >= 2);
 	}
 	static bool evading( Mind& c ) { return c.bot.desire == Goal::Evade && (c.sense.blindsided || c.sense.enemy); }
 	static bool blindsided( Mind& c ) { return c.sense.blindsided; }
@@ -86,14 +86,14 @@ struct PlaneTasks
 	// just through a firing pass on an aircraft: on out before coming round. From one with turrets, until clear of them
 	static bool extending( Mind& c )
 	{
-		if( !c.sense.enemy || !c.sense.enemyAir || c.bot.desire != Goal::Attack || theLevel.time_ > c.bot.egressTime )
+		if( !c.sense.enemy || !c.sense.enemyAir || c.bot.desire != Goal::Attack || theLevel.time_ > c.bot.pursuit.egressTime )
 			return false;
 		return !enemyHasTurrets( c ) || Distance( c.sense.enemy->r.currentOrigin, c.ent->r.currentOrigin ) < turretClear;
 	}
 	// an air enemy is turned back on as soon as the fighter is clear, whatever is left of the time allowed for it
 	static bool engaging( Mind& c )
 	{
-		return c.sense.enemy && c.bot.desire == Goal::Attack && (theLevel.time_ > c.bot.egressTime || (c.sense.enemyAir && !extending( c )));
+		return c.sense.enemy && c.bot.desire == Goal::Attack && (theLevel.time_ > c.bot.pursuit.egressTime || (c.sense.enemyAir && !extending( c )));
 	}
 	static bool canLevelBomb( Mind& c ) { return bomber( c ) && !c.sense.enemyAir && hasBombs( c ); }
 	// bold or cunning bomber pilots dive on a ground target when high and close enough
@@ -108,7 +108,7 @@ struct PlaneTasks
 	// in tight terrain, nothing of the world between the nose and the enemy
 	static bool fireLineClear( Mind& c )
 	{
-		if( !c.bot.confined || theLevel.time_ < c.bot.chaseTime )
+		if( !c.bot.avoid.confined || theLevel.time_ < c.bot.pursuit.chaseTime )
 			return true;
 		trace_t line;
 		Vec3 toEnemy;
@@ -117,12 +117,12 @@ struct PlaneTasks
 			line.entityNum == ENTITYNUM_WORLD && !line.startsolid);
 	}
 	// a turn chosen a moment ago is flown out before another is chosen
-	static bool arcCommitted( Mind& c ) { return theLevel.time_ < c.bot.chaseTime; }
+	static bool arcCommitted( Mind& c ) { return theLevel.time_ < c.bot.pursuit.chaseTime; }
 	static bool climbing( Mind& c ) { return c.bot.desire == Goal::Climb; }
 	// a bomber with nothing to fight, bombs left and height in hand
 	static bool canBombStructure( Mind& c )
 	{
-		return bomber( c ) && c.bot.desire == Goal::Roam && theLevel.time_ > c.bot.egressTime && c.sense.height > 700.0f && hasBombs( c );
+		return bomber( c ) && c.bot.desire == Goal::Roam && theLevel.time_ > c.bot.pursuit.egressTime && c.sense.height > 700.0f && hasBombs( c );
 	}
 	static bool wantsWingman( Mind& c )
 	{
@@ -135,7 +135,7 @@ struct PlaneTasks
 	static bool departing( Mind& c )
 	{
 		constexpr int departTime = 4000;
-		return !c.landed() && theLevel.time_ < c.bot.groundTime + departTime;
+		return !c.landed() && theLevel.time_ < c.bot.takeoff.groundTime + departTime;
 	}
 
 	// towards the roaming goal at the present height, a new goal when near it or when it is stale
@@ -156,7 +156,7 @@ struct PlaneTasks
 			c.view[PITCH] = std::clamp( c.sense.enemyAngles[PITCH], -50.0f, 35.0f );
 		else
 			c.holdAltitude();
-		if( c.bot.confined )
+		if( c.bot.avoid.confined )
 			c.view[PITCH] = std::clamp( c.view[PITCH], -14.0f, 14.0f );
 	}
 
@@ -167,19 +167,19 @@ struct PlaneTasks
 		c.weapons.free = true;
 		c.travelTo( c.enemyPosition() );
 		if( !c.sense.enemyAir && c.sense.enemyDist < 900 )
-			c.bot.egressTime = theLevel.time_ + 5000;
+			c.bot.pursuit.egressTime = theLevel.time_ + 5000;
 		if( c.sense.enemyAir && c.sense.enemyDist < passEnds )
-			c.bot.egressTime = theLevel.time_ + (enemyHasTurrets( c ) ? 6000 : 2500);
+			c.bot.pursuit.egressTime = theLevel.time_ + (enemyHasTurrets( c ) ? 6000 : 2500);
 	}
 
 	// keep flying the turn and the climb or dive that the arc choice settled on
 	static void flyChosenArc( Mind& c )
 	{
 		aimAtEnemy( c );
-		c.view[YAW] = c.ps.vehicleAngles[YAW] + c.bot.chaseTurn;
-		if( c.bot.chasePitch != 0.0f )
-			c.view[PITCH] = c.bot.chasePitch;
-		if( c.bot.confined )
+		c.view[YAW] = c.ps.vehicleAngles[YAW] + c.bot.pursuit.turn;
+		if( c.bot.pursuit.pitch != 0.0f )
+			c.view[PITCH] = c.bot.pursuit.pitch;
+		if( c.bot.avoid.confined )
 			c.view[PITCH] = std::clamp( c.view[PITCH], -14.0f, 14.0f );
 	}
 
@@ -210,17 +210,17 @@ struct PlaneTasks
 					if( run >= wanted && run > best )
 					{
 						best = run;
-						VectorCopy( spot, c.bot.taxiSpot );
+						VectorCopy( spot, c.bot.takeoff.taxiSpot );
 					}
 				}
 			}
 			if( best > 0 )
 			{
-				c.bot.taxiTime = theLevel.time_ + 20000;
-				c.bot.takeoffTime = 0;
+				c.bot.takeoff.taxiTime = theLevel.time_ + 20000;
+				c.bot.takeoff.planTime = 0;
 #ifdef MF_BOT_DEBUG
 				if( g_botDebug.integer >= 2 )
-					Common::printf( "BOTTAKEOFF t %d bot %d taxi %.0f to %.0f %.0f run %.0f\n", theLevel.time_, c.ent->s.number, dist, c.bot.taxiSpot[0], c.bot.taxiSpot[1], best );
+					Common::printf( "BOTTAKEOFF t %d bot %d taxi %.0f to %.0f %.0f run %.0f\n", theLevel.time_, c.ent->s.number, dist, c.bot.takeoff.taxiSpot[0], c.bot.takeoff.taxiSpot[1], best );
 #endif
 				return true;
 			}
@@ -297,28 +297,28 @@ struct PlaneTasks
 				best = score;
 				bestRun = run;
 				bestClear = rollClear;
-				c.bot.takeoffYaw = yaw;
-				c.bot.departYaw = yaw + departTurn;
+				c.bot.takeoff.yaw = yaw;
+				c.bot.takeoff.departYaw = yaw + departTurn;
 			}
 		}
 #ifdef MF_BOT_DEBUG
 		if( g_botDebug.integer >= 2 )
 			Common::printf( "BOTTAKEOFF t %d bot %d veh %d at %.0f %.0f %.0f facing %.0f chose %.0f then %.0f run %.0f need %.0f longest %.0f score %.0f\n", theLevel.time_, c.ent->s.number,
-				c.client->vehicle_, origin[0], origin[1], origin[2], c.ps.vehicleAngles[YAW], c.bot.takeoffYaw, c.bot.departYaw, bestRun, groundRun, longest, best );
+				c.client->vehicle_, origin[0], origin[1], origin[2], c.ps.vehicleAngles[YAW], c.bot.takeoff.yaw, c.bot.takeoff.departYaw, bestRun, groundRun, longest, best );
 #endif
 		// with less than a comfortable length, taxi to a better place
 		if( bestRun < comfortable && findTaxiSpot( c, origin, comfortable ) )
 			return;
 		// someone is standing on the run: give them a moment to move before rolling
 		constexpr int holdLimit = 8;
-		if( best > 0 && !bestClear && c.bot.takeoffHolds < holdLimit )
+		if( best > 0 && !bestClear && c.bot.takeoff.holds < holdLimit )
 		{
-			c.bot.takeoffHolds++;
-			c.bot.holdTime = theLevel.time_ + 1000;
+			c.bot.takeoff.holds++;
+			c.bot.takeoff.holdTime = theLevel.time_ + 1000;
 			return;
 		}
 		if( best > 0 )
-			c.bot.takeoffTime = theLevel.time_ + 30000;
+			c.bot.takeoff.planTime = theLevel.time_ + 30000;
 	}
 
 	// On the ground: wait when told to hold, plan a departure, taxi to a spot with enough runway if needed, then roll
@@ -326,38 +326,38 @@ struct PlaneTasks
 	static Status takeOff( Mind& c )
 	{
 		c.controls.claim();
-		c.bot.groundTime = theLevel.time_;
-		if( theLevel.time_ < c.bot.holdTime )
+		c.bot.takeoff.groundTime = theLevel.time_;
+		if( theLevel.time_ < c.bot.takeoff.holdTime )
 		{
 			c.view[YAW] = c.ps.vehicleAngles[YAW];
 			c.cmd.forwardmove = c.speed > 1 ? -moveFull : moveNone;
 			return Status::Running;
 		}
-		if( theLevel.time_ >= c.bot.taxiTime && theLevel.time_ >= c.bot.takeoffTime && c.speed < 20 )
+		if( theLevel.time_ >= c.bot.takeoff.taxiTime && theLevel.time_ >= c.bot.takeoff.planTime && c.speed < 20 )
 			planDeparture( c );
-		if( theLevel.time_ < c.bot.holdTime )
+		if( theLevel.time_ < c.bot.takeoff.holdTime )
 			return Status::Running;
-		if( theLevel.time_ < c.bot.taxiTime )
+		if( theLevel.time_ < c.bot.takeoff.taxiTime )
 		{
 			constexpr float taxiSpeed = 35.0f;
 			Vec3 toSpot;
-			VectorSubtract( c.bot.taxiSpot, c.ent->r.currentOrigin, toSpot );
+			VectorSubtract( c.bot.takeoff.taxiSpot, c.ent->r.currentOrigin, toSpot );
 			toSpot[2] = 0;
-			c.headFor( c.bot.taxiSpot );
+			c.headFor( c.bot.takeoff.taxiSpot );
 			c.view[PITCH] = 0.0f;
 			if( VectorLength( toSpot ) < 40 )
 			{
 				c.cmd.forwardmove = -moveFull;
 				// stopped on the spot: the next plan starts from here
 				if( c.speed <= 1 )
-					c.bot.taxiTime = 0;
+					c.bot.takeoff.taxiTime = 0;
 			}
 			else
 				c.cmd.forwardmove = c.speed < taxiSpeed ? moveFull : c.speed > taxiSpeed * 1.5f ? -moveFull : moveNone;
 		}
 		else
 		{
-			c.view[YAW] = theLevel.time_ < c.bot.takeoffTime ? c.bot.takeoffYaw : c.ps.vehicleAngles[YAW];
+			c.view[YAW] = theLevel.time_ < c.bot.takeoff.planTime ? c.bot.takeoff.yaw : c.ps.vehicleAngles[YAW];
 			// leave the ground with speed in hand: lifting off right at the stall drops the aircraft back
 			c.view[PITCH] = c.speed > c.veh.stallspeed * rotateSpeed ? -8.0f : 0.0f;
 			if( fabs( AngleSubtract( c.view[YAW], c.ps.vehicleAngles[YAW] ) ) > 6 )
@@ -380,7 +380,7 @@ struct PlaneTasks
 				{
 					// taxiing round one that will not move: only what is right under the nose stops it
 					constexpr float underNose = 110.0f;
-					if( theLevel.time_ < c.bot.sidestepTime && dist > underNose )
+					if( theLevel.time_ < c.bot.takeoff.sidestepTime && dist > underNose )
 						continue;
 					c.cmd.forwardmove = c.speed > 1 ? -moveFull : moveNone;
 					waiting = true;
@@ -390,7 +390,7 @@ struct PlaneTasks
 					constexpr int patience = 5000, sidestepFor = 9000;
 					constexpr float sidestep = 220.0f, aheadOfIt = 120.0f;
 					const bool standing = VectorLength( other->client_->ps_.velocity ) < 5.0f;
-					if( standing && c.bot.heldSince && theLevel.time_ - c.bot.heldSince > patience )
+					if( standing && c.bot.takeoff.heldSince && theLevel.time_ - c.bot.takeoff.heldSince > patience )
 					{
 						vec3_t right;
 						AngleVectors( flat, nullptr, right, nullptr );
@@ -403,9 +403,9 @@ struct PlaneTasks
 							GameHost::trace( &way, c.ent->r.currentOrigin, nullptr, nullptr, spot, c.ent->s.number, MASK_PLAYERSOLID, false );
 							if( way.fraction < 1.0f )
 								continue;
-							VectorCopy( spot, c.bot.taxiSpot );
-							c.bot.taxiTime = c.bot.sidestepTime = theLevel.time_ + sidestepFor;
-							c.bot.heldSince = 0;
+							VectorCopy( spot, c.bot.takeoff.taxiSpot );
+							c.bot.takeoff.taxiTime = c.bot.takeoff.sidestepTime = theLevel.time_ + sidestepFor;
+							c.bot.takeoff.heldSince = 0;
 							break;
 						}
 					}
@@ -428,16 +428,16 @@ struct PlaneTasks
 			}
 		}
 		if( !waiting )
-			c.bot.heldSince = 0;
-		else if( !c.bot.heldSince )
-			c.bot.heldSince = theLevel.time_;
+			c.bot.takeoff.heldSince = 0;
+		else if( !c.bot.takeoff.heldSince )
+			c.bot.takeoff.heldSince = theLevel.time_;
 		return Status::Running;
 	}
 
 	// follow the departure that was planned on the ground; the manoeuvre check still vets it
 	static Status depart( Mind& c )
 	{
-		c.view[YAW] = c.bot.departYaw;
+		c.view[YAW] = c.bot.takeoff.departYaw;
 		c.view[PITCH] = -8.0f;
 		return Status::Running;
 	}
@@ -503,7 +503,7 @@ struct PlaneTasks
 			}
 		}
 		if( c.sense.enemyDist < 1000 || c.sense.height < 700 )
-			c.bot.egressTime = theLevel.time_ + 6000;
+			c.bot.pursuit.egressTime = theLevel.time_ + 6000;
 		return Status::Running;
 	}
 
@@ -561,16 +561,16 @@ struct PlaneTasks
 			if( !Bots::turnClear( c.ent, radius, option.degrees, option.climb ) )
 				continue;
 			engage( c );
-			c.bot.chaseTurn = option.degrees > 0 ? 80.0f : -80.0f;
-			c.bot.chasePitch = option.climb > 0 ? -14.0f : option.climb < 0 ? 14.0f : 0.0f;
+			c.bot.pursuit.turn = option.degrees > 0 ? 80.0f : -80.0f;
+			c.bot.pursuit.pitch = option.climb > 0 ? -14.0f : option.climb < 0 ? 14.0f : 0.0f;
 			if( option.degrees != turn || option.climb != 0.0f )
 			{
-				c.bot.chaseTime = theLevel.time_ + 900;
+				c.bot.pursuit.chaseTime = theLevel.time_ + 900;
 				flyChosenArc( c );
 			}
 			else
 			{
-				c.bot.chaseTime = 0;
+				c.bot.pursuit.chaseTime = 0;
 				aimAtEnemy( c );
 			}
 			return Status::Running;
@@ -656,37 +656,37 @@ struct PlaneTasks
 		State& bot = c.bot;
 		if( c.steer.headingFixed || c.steer.evading )
 			return Status::Success;
-		if( bot.desire == Goal::Rearm && bot.landPhase == 1 )
-			c.travelTo( Vec3( bot.goal[0], bot.goal[1], bot.approachHeight ) );
+		if( bot.desire == Goal::Rearm && bot.rearm.phase == 1 )
+			c.travelTo( Vec3( bot.goal[0], bot.goal[1], bot.landing.approachHeight ) );
 		const Vec3 here( c.ent->r.currentOrigin );
 		const Vec3 toDest = c.steer.dest - here;
 		const float range = toDest.length();
 		const Vec3 probeEnd = range > 2500.0f ? here + toDest * (2500.0f / range) : c.steer.dest;
-		if( !c.steer.hasDest || range <= 300.0f || (!bot.confined && AirNav::clearLine( here, probeEnd, 70.0f )) )
+		if( !c.steer.hasDest || range <= 300.0f || (!bot.avoid.confined && AirNav::clearLine( here, probeEnd, 70.0f )) )
 		{
-			bot.path.clear();
-			bot.following = false;
-			bot.cornerAhead = false;
+			bot.path.points.clear();
+			bot.path.following = false;
+			bot.path.cornerAhead = false;
 			return Status::Success;
 		}
 		const float radius = c.turnRadius();
-		if( theLevel.time_ >= bot.pathTime )
+		if( theLevel.time_ >= bot.path.searchTime )
 		{
-			AirNav::findPath( here, c.steer.dest, bot.path, Vec3( c.ps.velocity ).normalized(), radius );
-			bot.pathIndex = 0;
-			bot.pathTime = theLevel.time_ + 1500;
+			AirNav::findPath( here, c.steer.dest, bot.path.points, Vec3( c.ps.velocity ).normalized(), radius );
+			bot.path.index = 0;
+			bot.path.searchTime = theLevel.time_ + 1500;
 		}
-		while( bot.pathIndex + 1 < bot.path.size() &&
-			((bot.path[bot.pathIndex] - here).length() < radius * 1.3f || AirNav::clearLine( here, bot.path[bot.pathIndex + 1], 70.0f )) )
-			bot.pathIndex++;
-		if( bot.pathIndex >= bot.path.size() )
+		while( bot.path.index + 1 < bot.path.points.size() &&
+			((bot.path.points[bot.path.index] - here).length() < radius * 1.3f || AirNav::clearLine( here, bot.path.points[bot.path.index + 1], 70.0f )) )
+			bot.path.index++;
+		if( bot.path.index >= bot.path.points.size() )
 		{
-			bot.following = false;
-			bot.cornerAhead = false;
+			bot.path.following = false;
+			bot.path.cornerAhead = false;
 			return Status::Success;
 		}
 
-		const Vec3 leg = bot.path[bot.pathIndex] - here;
+		const Vec3 leg = bot.path.points[bot.path.index] - here;
 		Vec3 legDir, legAngles;
 		leg.copyTo( legDir );
 		vectoangles( legDir, legAngles );
@@ -695,15 +695,15 @@ struct PlaneTasks
 		c.weapons.attacking = false;
 		c.view[YAW] = legAngles[YAW];
 		c.view[PITCH] = std::clamp( AngleSubtract( legAngles[PITCH], 0 ), -20.0f, 20.0f );
-		bot.following = true;
-		bot.cornerAhead = false;
-		if( bot.pathIndex + 1 < bot.path.size() )
+		bot.path.following = true;
+		bot.path.cornerAhead = false;
+		if( bot.path.index + 1 < bot.path.points.size() )
 		{
-			const Vec3 next = bot.path[bot.pathIndex + 1] - bot.path[bot.pathIndex];
+			const Vec3 next = bot.path.points[bot.path.index + 1] - bot.path.points[bot.path.index];
 			Vec3 nextDir, nextAngles;
 			next.copyTo( nextDir );
 			vectoangles( nextDir, nextAngles );
-			bot.cornerAhead = fabs( AngleSubtract( nextAngles[YAW], legAngles[YAW] ) ) > 35.0f && leg.length() < radius * 3.5f;
+			bot.path.cornerAhead = fabs( AngleSubtract( nextAngles[YAW], legAngles[YAW] ) ) > 35.0f && leg.length() < radius * 3.5f;
 		}
 		return Status::Success;
 	}
@@ -712,12 +712,12 @@ struct PlaneTasks
 	static Status approachProfile( Mind& c )
 	{
 		// firm enough to follow the approach height as it comes down towards the runway
-		c.view[PITCH] = std::clamp( (c.ent->r.currentOrigin[2] - c.bot.approachHeight) / 12.0f, -25.0f, 16.0f );
+		c.view[PITCH] = std::clamp( (c.ent->r.currentOrigin[2] - c.bot.landing.approachHeight) / 12.0f, -25.0f, 16.0f );
 		// inbound the plane is already slowing for the final: fast, it can neither come down nor turn onto the centre line
-		const float limit = c.veh.stallspeed * (c.bot.landOutbound ? 2.2f : 1.7f);
+		const float limit = c.veh.stallspeed * (c.bot.landing.outbound ? 2.2f : 1.7f);
 		if( c.speed > limit )
 			c.cmd.forwardmove = -moveFull;
-		const bool wantBrake = !c.bot.landOutbound && c.speed > limit * 1.15f;
+		const bool wantBrake = !c.bot.landing.outbound && c.speed > limit * 1.15f;
 		if( (c.veh.caps & HC_SPEEDBRAKE) && wantBrake != ((c.ps.ONOFF & OO_SPEEDBRAKE) != 0) )
 			c.cmd.buttons |= BUTTON_BRAKE;
 		return Status::Success;
@@ -922,10 +922,10 @@ struct PlaneTasks
 		// the first moments of a departure were planned on the ground; too low to manoeuvre yet
 		if( departing( c ) && c.sense.height < 60.0f )
 			return Status::Success;
-		if( theLevel.time_ >= bot.probeTime )
+		if( theLevel.time_ >= bot.avoid.probeTime )
 		{
 			// look more often when something is in the way
-			bot.probeTime = theLevel.time_ + (bot.confined || bot.probeBlocked ? 150 : 300);
+			bot.avoid.probeTime = theLevel.time_ + (bot.avoid.confined || bot.avoid.probeBlocked ? 150 : 300);
 			Vec3 flat = { 0, yaw, 0 }, right, left;
 			trace_t tr;
 			AngleVectors( flat, nullptr, right, nullptr );
@@ -934,7 +934,7 @@ struct PlaneTasks
 			const float leftClear = tr.fraction * 1200.0f;
 			BotWorld::pathBlocked( ent->r.currentOrigin, right, 1200, ent->s.number, tr );
 			const float rightClear = tr.fraction * 1200.0f;
-			bot.confined = leftClear + rightClear < 1500 || c.room < 900;
+			bot.avoid.confined = leftClear + rightClear < 1500 || c.room < 900;
 
 			// the corridor looked along is as wide as the aircraft's own box and a little more: a bomber does not fit
 			// where a fighter does
@@ -946,24 +946,24 @@ struct PlaneTasks
 			const float flyablePitch = slow ? std::max( c.view[PITCH], -10.0f ) : c.view[PITCH];
 			const float wantSlope = std::clamp( -static_cast<float>( tan( flyablePitch * std::numbers::pi_v<float> / 180.0 ) ), -0.4f, 0.5f );
 			const float horizon = std::clamp( c.airspeed * 3.0f, 900.0f, 2500.0f );
-			const bool wasBlocked = bot.probeBlocked;
+			const bool wasBlocked = bot.avoid.probeBlocked;
 			const float radius = c.turnRadius();
 			const float turnRate = std::max( 10.0f, c.veh.turnspeed[YAW] ) * std::numbers::pi_v<float> / 180.0f;
 			const float brakedRadius = (c.airspeed + std::min( c.airspeed, c.veh.stallspeed * 1.2f )) * 0.5f / turnRate;
 			const bool canBrake = brakedRadius < radius * 0.85f;
 
 			Pose wantEnd;
-			bot.probeWant = sweep( c, radius, wantTurn, wantSlope, horizon, margin, &wantEnd );
-			if( bot.probeWant >= horizon && !wayOut( c, wantEnd, brakedRadius, horizon ) )
-				bot.probeWant = horizon * 0.9f;
-			bot.probeBest = bot.probeWant;
+			bot.avoid.probeWant = sweep( c, radius, wantTurn, wantSlope, horizon, margin, &wantEnd );
+			if( bot.avoid.probeWant >= horizon && !wayOut( c, wantEnd, brakedRadius, horizon ) )
+				bot.avoid.probeWant = horizon * 0.9f;
+			bot.avoid.probeBest = bot.avoid.probeWant;
 			// a jet spawns fast: slow down at once when there is no room
-			if( (bot.confined || bot.probeWant < horizon) && theLevel.time_ < bot.spawnTime + 4000 )
-				bot.brakeTime = theLevel.time_ + 600;
-			bot.probeBlocked = bot.probeWant < horizon;
-			if( wasBlocked && !bot.probeBlocked )
-				bot.avoidTime = 0;
-			if( bot.probeBlocked )
+			if( (bot.avoid.confined || bot.avoid.probeWant < horizon) && theLevel.time_ < bot.spawnTime + 4000 )
+				bot.avoid.brakeTime = theLevel.time_ + 600;
+			bot.avoid.probeBlocked = bot.avoid.probeWant < horizon;
+			if( wasBlocked && !bot.avoid.probeBlocked )
+				bot.avoid.time = 0;
+			if( bot.avoid.probeBlocked )
 			{
 				constexpr std::array<float, 11> turns = { 0.0f, 30.0f, -30.0f, 60.0f, -60.0f, 90.0f, -90.0f, 135.0f, -135.0f, 180.0f, -180.0f };
 				struct Climb { float slope; float pitch; };
@@ -1031,22 +1031,22 @@ struct PlaneTasks
 					}
 					if( chosen )
 					{
-						bot.avoidYaw = yaw + std::clamp( chosen->turn, -100.0f, 100.0f );
-						bot.avoidPitch = chosen->pitch;
+						bot.avoid.yaw = yaw + std::clamp( chosen->turn, -100.0f, 100.0f );
+						bot.avoid.pitch = chosen->pitch;
 					}
-					bot.probeBest = bestFree;
+					bot.avoid.probeBest = bestFree;
 					if( bestBraked )
-						bot.brakeTime = theLevel.time_ + 600;
+						bot.avoid.brakeTime = theLevel.time_ + 600;
 					if( bestFree > radius * 1.2f )
 						break;
 				}
-				bot.avoidTime = theLevel.time_ + 400;
+				bot.avoid.time = theLevel.time_ + 400;
 			}
 		}
-		if( theLevel.time_ < bot.avoidTime )
+		if( theLevel.time_ < bot.avoid.time )
 		{
-			c.view[YAW] = bot.avoidYaw;
-			c.view[PITCH] = bot.avoidPitch;
+			c.view[YAW] = bot.avoid.yaw;
+			c.view[PITCH] = bot.avoid.pitch;
 		}
 		return Status::Success;
 	}
@@ -1056,9 +1056,9 @@ struct PlaneTasks
 	{
 		const bool canBrake = (c.veh.caps & HC_SPEEDBRAKE) != 0;
 		const bool braking = (c.ps.ONOFF & OO_SPEEDBRAKE) != 0;
-		if( c.bot.confined || c.bot.cornerAhead || theLevel.time_ < c.bot.brakeTime )
+		if( c.bot.avoid.confined || c.bot.path.cornerAhead || theLevel.time_ < c.bot.avoid.brakeTime )
 		{
-			const float slow = c.veh.stallspeed * (theLevel.time_ < c.bot.brakeTime ? 1.15f : 1.25f);
+			const float slow = c.veh.stallspeed * (theLevel.time_ < c.bot.avoid.brakeTime ? 1.15f : 1.25f);
 			if( c.speed > slow )
 				c.cmd.forwardmove = -moveFull;
 			if( (c.speed > slow * 1.3f) != braking && canBrake )
@@ -1084,7 +1084,7 @@ struct PlaneTasks
 	// too slow: nose down for speed where there is height to spend, no steep climbs, and out of a stall before anything else
 	static Status keepEnergy( Mind& c )
 	{
-		if( c.speed < c.veh.stallspeed * (c.bot.confined ? 1.08f : 1.3f) && c.sense.height > c.minHeight * 2 )
+		if( c.speed < c.veh.stallspeed * (c.bot.avoid.confined ? 1.08f : 1.3f) && c.sense.height > c.minHeight * 2 )
 			c.view[PITCH] = std::max( c.view[PITCH], 5.0f );
 		else if( c.speed < c.veh.stallspeed * 1.7f )
 			c.view[PITCH] = std::max( c.view[PITCH], -10.0f );
@@ -1122,7 +1122,7 @@ struct PlaneTasks
 		// The trip to the strip while that is still far off may be hurried like any other, further down
 		constexpr float stripFar = 6000.0f;
 		const bool rearming = c.bot.desire == Goal::Rearm;
-		const bool tripToStrip = rearming && c.bot.pad >= 0 && c.bot.landPhase <= 1 && Distance( BotWorld::pads_[c.bot.pad].center, c.ent->r.currentOrigin ) > stripFar;
+		const bool tripToStrip = rearming && c.bot.rearm.pad >= 0 && c.bot.rearm.phase <= 1 && Distance( BotWorld::pads_[c.bot.rearm.pad].center, c.ent->r.currentOrigin ) > stripFar;
 		if( rearming && !tripToStrip )
 			return false;
 		// the take-off roll and the first seconds of the climb out
@@ -1135,7 +1135,7 @@ struct PlaneTasks
 		if( c.bot.desire == Goal::Climb && c.sense.enemy )
 			return true;
 		// nothing more in a canyon or a corridor, or with a corner or an obstacle to fly round: speed there is a crash
-		const bool tight = c.bot.confined || c.bot.cornerAhead || theLevel.time_ < c.bot.avoidTime || theLevel.time_ < c.bot.brakeTime;
+		const bool tight = c.bot.avoid.confined || c.bot.path.cornerAhead || theLevel.time_ < c.bot.avoid.time || theLevel.time_ < c.bot.avoid.brakeTime;
 		if( tight )
 			return false;
 		// shot at, or locked: some pilots light it and some do not, the cautious more often. With ground near enough
@@ -1293,7 +1293,7 @@ void Bots::thinkPlane( GameEntity* ent, State& bot, const Sense& sense, usercmd_
 	{
 		if( theLevel.time_ > bot.turretTime + turretBurst + turretPause )
 			bot.turretTime = theLevel.time_;
-		if( theLevel.time_ < bot.turretTime + turretBurst && theLevel.time_ >= bot.avoidTime )
+		if( theLevel.time_ < bot.turretTime + turretBurst && theLevel.time_ >= bot.avoid.time )
 		{
 			// lead the target by the bullets' flight time
 			const float flight = sense.airThreatDist / std::max( 1.0f, static_cast<float>( availableWeapons[mind.veh.weapons[WP_MACHINEGUN]].muzzleVelocity ) );

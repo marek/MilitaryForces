@@ -19,12 +19,12 @@ struct HeloTasks
 	static bool overPad( const Mind& c )
 	{
 		Vec3 dir;
-		VectorSubtract( BotWorld::pads_[c.bot.pad].center, c.ent->r.currentOrigin, dir );
+		VectorSubtract( BotWorld::pads_[c.bot.rearm.pad].center, c.ent->r.currentOrigin, dir );
 		dir[2] = 0;
 		return VectorLength( dir ) < 120;
 	}
 
-	static bool rearming( Mind& c ) { return c.bot.desire == Goal::Rearm && c.bot.pad >= 0; }
+	static bool rearming( Mind& c ) { return c.bot.desire == Goal::Rearm && c.bot.rearm.pad >= 0; }
 	static bool parked( Mind& c ) { return c.landed() && overPad( c ); }
 	static bool abovePad( Mind& c ) { return overPad( c ); }
 	static bool missileInbound( Mind& c ) { return c.sense.missile && c.sense.missileTime < 6.0f && !c.landed(); }
@@ -81,9 +81,9 @@ struct HeloTasks
 	static bool capturing( Mind& c ) { return c.bot.desire == Goal::Capture; }
 	// near enough to fight from cover
 	static bool fighting( Mind& c ) { return c.sense.enemy && c.bot.desire == Goal::Attack && c.sense.enemyDist < 3000; }
-	static bool inCover( Mind& c ) { return theLevel.time_ < c.bot.hideTime; }
-	static bool hasCover( Mind& c ) { return c.bot.hasHide; }
-	static bool exposed( Mind& c ) { return c.bot.exposed; }
+	static bool inCover( Mind& c ) { return theLevel.time_ < c.bot.cover.time; }
+	static bool hasCover( Mind& c ) { return c.bot.cover.has; }
+	static bool exposed( Mind& c ) { return c.bot.cover.exposed; }
 	static bool seesEnemy( Mind& c ) { return c.sense.enemyVisible; }
 	static bool hasEnemy( Mind& c ) { return c.sense.enemy != nullptr; }
 	static bool airborne( Mind& c ) { return !c.landed(); }
@@ -132,7 +132,7 @@ struct HeloTasks
 	// over the pad: gear down and straight down
 	static Status descendToPad( Mind& c )
 	{
-		flyTo( c, BotWorld::pads_[c.bot.pad].center );
+		flyTo( c, BotWorld::pads_[c.bot.rearm.pad].center );
 		c.steer.hasDest = false;
 		c.weapons.cover = true;
 		c.steer.hold = true;
@@ -146,7 +146,7 @@ struct HeloTasks
 	// to the pad at a moderate height, slowing as it nears
 	static Status flyToPad( Mind& c )
 	{
-		flyTo( c, BotWorld::pads_[c.bot.pad].center );
+		flyTo( c, BotWorld::pads_[c.bot.rearm.pad].center );
 		c.weapons.cover = true;
 		c.steer.mode = ToPad;
 		c.steer.wantHeight = heloCruiseHeight * 0.6f;
@@ -193,10 +193,10 @@ struct HeloTasks
 	{
 		faceEnemy( c );
 		Vec3 toCover;
-		VectorSubtract( c.bot.hidePoint, c.ent->r.currentOrigin, toCover );
+		VectorSubtract( c.bot.cover.point, c.ent->r.currentOrigin, toCover );
 		toCover[2] = 0;
 		c.steer.dist = VectorLength( toCover );
-		c.headFor( c.bot.hidePoint );
+		c.headFor( c.bot.cover.point );
 		c.weapons.cover = true;
 		c.steer.wantHeight = 110.0f;
 		c.steer.mode = MoveToCover;
@@ -218,11 +218,11 @@ struct HeloTasks
 	{
 		faceEnemy( c );
 		c.steer.wantHeight = std::max( c.sense.height, heloLowHeight );
-		if( theLevel.time_ > c.bot.popTime )
+		if( theLevel.time_ > c.bot.cover.popTime )
 		{
-			c.bot.exposed = false;
-			c.bot.hideTime = theLevel.time_ + 2000 + static_cast<int>( 3000 * c.who().caution );
-			c.bot.hasHide = Bots::findHidePoint( c.ent, c.bot, c.sense.enemy );
+			c.bot.cover.exposed = false;
+			c.bot.cover.time = theLevel.time_ + 2000 + static_cast<int>( 3000 * c.who().caution );
+			c.bot.cover.has = Bots::findHidePoint( c.ent, c.bot, c.sense.enemy );
 		}
 		return Status::Running;
 	}
@@ -230,8 +230,8 @@ struct HeloTasks
 	// the enemy is in sight: start the time in the open, longer for the patient
 	static Status expose( Mind& c )
 	{
-		c.bot.exposed = true;
-		c.bot.popTime = theLevel.time_ + 3000 + static_cast<int>( 4000 * c.who().patience );
+		c.bot.cover.exposed = true;
+		c.bot.cover.popTime = theLevel.time_ + 3000 + static_cast<int>( 4000 * c.who().patience );
 		return fireExposed( c );
 	}
 
@@ -286,15 +286,15 @@ struct HeloTasks
 	static bool tooClose( Mind& c )
 	{
 		const float dist = Distance( c.sense.enemy->r.currentOrigin, c.ent->r.currentOrigin );
-		c.bot.breakingOff = dist < (c.bot.breakingOff ? clearOfThem : closeQuarters);
-		return c.bot.breakingOff;
+		c.bot.cover.breakingOff = dist < (c.bot.cover.breakingOff ? clearOfThem : closeQuarters);
+		return c.bot.cover.breakingOff;
 	}
 	static bool outOfStrikeRange( Mind& c ) { return Distance( c.sense.enemy->r.currentOrigin, c.ent->r.currentOrigin ) > strikeRange( c ); }
 
 	static Status breakOff( Mind& c )
 	{
 		c.view[YAW] = c.sense.enemyAngles[YAW] + 180.0f;
-		c.bot.exposed = false;
+		c.bot.cover.exposed = false;
 		c.weapons.cover = true;
 		c.steer.evading = true;
 		c.steer.wantHeight = 90.0f;
@@ -317,21 +317,21 @@ struct HeloTasks
 		faceEnemy( c );
 		c.steer.standoff = c.sense.enemyDist;
 		c.steer.wantHeight = std::max( c.sense.height, heloLowHeight );
-		if( guidedAmmo( c ) < c.bot.strikeAmmo || theLevel.time_ > c.bot.popTime )
+		if( guidedAmmo( c ) < c.bot.cover.strikeAmmo || theLevel.time_ > c.bot.cover.popTime )
 		{
-			c.bot.exposed = false;
-			c.bot.hideTime = theLevel.time_ + 4000 + static_cast<int>( 3000 * c.who().caution );
-			VectorCopy( c.ent->r.currentOrigin, c.bot.lastPop );
-			c.bot.hasHide = Bots::findHidePoint( c.ent, c.bot, c.sense.enemy );
+			c.bot.cover.exposed = false;
+			c.bot.cover.time = theLevel.time_ + 4000 + static_cast<int>( 3000 * c.who().caution );
+			VectorCopy( c.ent->r.currentOrigin, c.bot.cover.lastPop );
+			c.bot.cover.has = Bots::findHidePoint( c.ent, c.bot, c.sense.enemy );
 			// cover right where it has just been seen is no cover: go along the line across the enemy's view instead
-			if( !c.bot.hasHide || Distance( c.bot.hidePoint, c.bot.lastPop ) < sameSpot )
+			if( !c.bot.cover.has || Distance( c.bot.cover.point, c.bot.cover.lastPop ) < sameSpot )
 			{
 				Vec3 right;
 				const Vec3 facing( 0, c.sense.enemyAngles[YAW], 0 );
 				AngleVectors( facing, nullptr, right, nullptr );
 				const Vec3 aside = Vec3( c.ent->r.currentOrigin ) + right * (c.bot.breakSide * sidestep);
-				VectorCopy( aside, c.bot.hidePoint );
-				c.bot.hasHide = true;
+				VectorCopy( aside, c.bot.cover.point );
+				c.bot.cover.has = true;
 				c.bot.breakSide = -c.bot.breakSide;
 			}
 		}
@@ -343,9 +343,9 @@ struct HeloTasks
 		bool guided = false;
 		const int slot = BotWeapons::findWeaponSlot( c.client->vehicle_, c.ps, c.sense.enemyAir, c.sense.enemyDist, guided );
 		const int lockDelay = slot >= 0 ? availableWeapons[c.veh.weapons[slot]].lockdelay : 0;
-		c.bot.exposed = true;
-		c.bot.strikeAmmo = guidedAmmo( c );
-		c.bot.popTime = theLevel.time_ + lockDelay + 2500 + static_cast<int>( 2000 * c.who().patience );
+		c.bot.cover.exposed = true;
+		c.bot.cover.strikeAmmo = guidedAmmo( c );
+		c.bot.cover.popTime = theLevel.time_ + lockDelay + 2500 + static_cast<int>( 2000 * c.who().patience );
 		return strikeExposed( c );
 	}
 
@@ -467,24 +467,24 @@ struct HeloTasks
 		const Vec3 probeEnd = range > 1500.0f ? here + toDest * (1500.0f / range) : c.steer.dest;
 		if( !c.steer.hasDest || c.landed() || range <= 600.0f || AirNav::clearLine( here, probeEnd, 60.0f ) )
 		{
-			bot.path.clear();
-			bot.following = false;
+			bot.path.points.clear();
+			bot.path.following = false;
 			return Status::Success;
 		}
-		if( theLevel.time_ >= bot.pathTime )
+		if( theLevel.time_ >= bot.path.searchTime )
 		{
-			AirNav::findPath( here, c.steer.dest, bot.path );
-			bot.pathIndex = 0;
-			bot.pathTime = theLevel.time_ + 2000;
+			AirNav::findPath( here, c.steer.dest, bot.path.points );
+			bot.path.index = 0;
+			bot.path.searchTime = theLevel.time_ + 2000;
 		}
 		// on to the next waypoint once this one is reached or the one after can be flown to directly
-		while( bot.pathIndex + 1 < bot.path.size() &&
-			((bot.path[bot.pathIndex] - here).length() < 250.0f || AirNav::clearLine( here, bot.path[bot.pathIndex + 1], 60.0f )) )
-			bot.pathIndex++;
-		bot.following = bot.pathIndex < bot.path.size();
-		if( !bot.following )
+		while( bot.path.index + 1 < bot.path.points.size() &&
+			((bot.path.points[bot.path.index] - here).length() < 250.0f || AirNav::clearLine( here, bot.path.points[bot.path.index + 1], 60.0f )) )
+			bot.path.index++;
+		bot.path.following = bot.path.index < bot.path.points.size();
+		if( !bot.path.following )
 			return Status::Success;
-		const Vec3 waypoint = bot.path[bot.pathIndex];
+		const Vec3 waypoint = bot.path.points[bot.path.index];
 		Vec3 point;
 		waypoint.copyTo( point );
 		c.headFor( point );
@@ -683,7 +683,7 @@ struct HeloTasks
 	// shoot unless hiding, dodging or flying a path round something
 	static Status fire( Mind& c )
 	{
-		if( c.sense.enemy && !c.weapons.cover && !c.steer.evading && !c.bot.following )
+		if( c.sense.enemy && !c.weapons.cover && !c.steer.evading && !c.bot.path.following )
 			BotWeapons::fireWeapons( c.ent, c.bot, c.sense, c.cmd, c.steer.yawError );
 		return Status::Success;
 	}
@@ -749,7 +749,7 @@ void Bots::thinkHelo( GameEntity* ent, State& bot, const Sense& sense, usercmd_t
 	// attack helicopters fly low by default, transports higher; the steps change it as they need
 	mind.steer.wantHeight = sense.role == Role::AttackHelo ? heloLowHeight : heloCruiseHeight * 0.6f;
 	if( !HeloTasks::fighting( mind ) && !HeloTasks::stealthStriking( mind ) )
-		bot.exposed = false;
+		bot.cover.exposed = false;
 	view[YAW] = ps.vehicleAngles[YAW];
 	view[PITCH] = sense.enemy ? std::clamp( AngleSubtract( sense.enemyAngles[PITCH], 0 ), -30.0f, 45.0f ) : 0.0f;
 
@@ -757,6 +757,6 @@ void Bots::thinkHelo( GameEntity* ent, State& bot, const Sense& sense, usercmd_t
 
 	// an open bay shows a stealth helicopter to everyone: it is shut again as soon as nothing is about to leave it
 	constexpr int bayTap = 400;
-	if( sense.stealth && (ps.ONOFF & OO_WEAPONBAY) && !bot.exposed && (theLevel.time_ / bayTap) % 2 )
+	if( sense.stealth && (ps.ONOFF & OO_WEAPONBAY) && !bot.cover.exposed && (theLevel.time_ / bayTap) % 2 )
 		cmd.buttons |= BUTTON_WEAPONBAY;
 }

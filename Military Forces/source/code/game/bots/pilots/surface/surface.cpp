@@ -16,10 +16,10 @@ struct SurfaceTasks
 	{
 		return c.bot.desire == Goal::Attack && groundEnemy( c ) && !c.boat && c.sense.enemyDist > 900 && c.sense.enemyDist < 4500 && c.who().caution > 0.5f;
 	}
-	static bool rearming( Mind& c ) { return c.bot.desire == Goal::Rearm && c.bot.pad >= 0; }
+	static bool rearming( Mind& c ) { return c.bot.desire == Goal::Rearm && c.bot.rearm.pad >= 0; }
 	static bool evading( Mind& c ) { return c.bot.desire == Goal::Evade && c.sense.enemy; }
 	static bool engaging( Mind& c ) { return groundEnemy( c ) && c.bot.desire != Goal::Capture; }
-	static bool reversing( Mind& c ) { return theLevel.time_ < c.bot.reverseTime; }
+	static bool reversing( Mind& c ) { return theLevel.time_ < c.bot.stuck.reverseTime; }
 	static bool hasEnemy( Mind& c ) { return c.sense.enemy != nullptr; }
 	static bool hasLeader( Mind& c ) { return c.bot.leader >= 0 && c.bot.desire != Goal::Capture; }
 
@@ -58,14 +58,14 @@ struct SurfaceTasks
 	// a spot out of the aircraft's sight, looked for again every few seconds
 	static Status driveToCover( Mind& c )
 	{
-		if( !c.bot.hasHide || theLevel.time_ > c.bot.hideTime )
+		if( !c.bot.cover.has || theLevel.time_ > c.bot.cover.time )
 		{
-			c.bot.hasHide = Bots::findHidePoint( c.ent, c.bot, c.sense.airThreat );
-			c.bot.hideTime = theLevel.time_ + 4000;
+			c.bot.cover.has = Bots::findHidePoint( c.ent, c.bot, c.sense.airThreat );
+			c.bot.cover.time = theLevel.time_ + 4000;
 		}
-		if( !c.bot.hasHide )
+		if( !c.bot.cover.has )
 			return Status::Failure;
-		c.courseTo( c.bot.hidePoint );
+		c.courseTo( c.bot.cover.point );
 		holdNear( c, 90 );
 		return Status::Running;
 	}
@@ -80,14 +80,14 @@ struct SurfaceTasks
 	// a spot from which only the turret shows to the enemy
 	static Status hullDown( Mind& c )
 	{
-		if( theLevel.time_ > c.bot.hideTime )
+		if( theLevel.time_ > c.bot.cover.time )
 		{
-			c.bot.hasHide = Bots::findHidePoint( c.ent, c.bot, c.sense.enemy, true );
-			c.bot.hideTime = theLevel.time_ + 5000;
+			c.bot.cover.has = Bots::findHidePoint( c.ent, c.bot, c.sense.enemy, true );
+			c.bot.cover.time = theLevel.time_ + 5000;
 		}
-		if( !c.bot.hasHide )
+		if( !c.bot.cover.has )
 			return Status::Failure;
-		c.courseTo( c.bot.hidePoint );
+		c.courseTo( c.bot.cover.point );
 		holdNear( c, 90 );
 		return Status::Running;
 	}
@@ -95,7 +95,7 @@ struct SurfaceTasks
 	// onto the pad and wait there until full
 	static Status driveToPad( Mind& c )
 	{
-		c.courseTo( BotWorld::pads_[c.bot.pad].spot );
+		c.courseTo( BotWorld::pads_[c.bot.rearm.pad].spot );
 		holdNear( c, 80 );
 		if( c.steer.hold && Bots::replenished( c.ent ) )
 		{
@@ -120,7 +120,7 @@ struct SurfaceTasks
 	// stop and lob shells at it from where we are, at the place it was last seen if it is out of sight
 	static Status shellAirfield( Mind& c )
 	{
-		c.bot.hasHide = false;
+		c.bot.cover.has = false;
 		VectorCopy( c.sense.enemyDir, c.steer.course );
 		c.steer.hold = true;
 		return Status::Running;
@@ -129,7 +129,7 @@ struct SurfaceTasks
 	// straight away from the enemy
 	static Status withdraw( Mind& c )
 	{
-		c.bot.hasHide = false;
+		c.bot.cover.has = false;
 		VectorNegate( c.sense.enemyDir, c.steer.course );
 		return Status::Running;
 	}
@@ -137,7 +137,7 @@ struct SurfaceTasks
 	// close to gun range and stop there to shoot
 	static Status engage( Mind& c )
 	{
-		c.bot.hasHide = false;
+		c.bot.cover.has = false;
 		VectorCopy( c.sense.enemyDir, c.steer.course );
 		c.travelTo( c.enemyPosition() );
 		c.steer.hold = c.sense.enemyDist < 1500;
@@ -156,7 +156,7 @@ struct SurfaceTasks
 	// pull up beside a team mate on foot and wait so they can climb aboard
 	static Status pickUpWalker( Mind& c )
 	{
-		c.bot.hasHide = false;
+		c.bot.cover.has = false;
 		c.courseTo( c.target->r.currentOrigin );
 		holdNear( c, 60.0f + c.veh.maxs[1] );
 		return Status::Running;
@@ -188,7 +188,7 @@ struct SurfaceTasks
 		}
 		if( !destination )
 			return Status::Failure;
-		c.bot.hasHide = false;
+		c.bot.cover.has = false;
 		c.courseTo( destination );
 		holdNear( c, 150 );
 		return Status::Running;
@@ -230,7 +230,7 @@ struct SurfaceTasks
 		GameEntity* leader = BotSenses::leaderOf( c.bot );
 		if( !leader )
 			return Status::Failure;
-		c.bot.hasHide = false;
+		c.bot.cover.has = false;
 		c.courseTo( leader->r.currentOrigin );
 		holdNear( c, 350 );
 		return Status::Running;
@@ -239,7 +239,7 @@ struct SurfaceTasks
 	// nothing else to do: on to the roaming or capture goal
 	static Status driveToGoal( Mind& c )
 	{
-		c.bot.hasHide = false;
+		c.bot.cover.has = false;
 		c.courseTo( c.bot.goal );
 		return Status::Running;
 	}
@@ -289,24 +289,24 @@ struct SurfaceTasks
 				c.steer.blocked = true;
 		}
 		// stuck: meant to be moving and has not covered 40 units since the last check
-		if( theLevel.time_ > bot.stuckCheckTime )
+		if( theLevel.time_ > bot.stuck.checkTime )
 		{
-			if( !c.steer.hold && theLevel.time_ > bot.spawnTime + 4000 && theLevel.time_ > bot.reverseTime + 2000 &&
-				Distance( c.ent->r.currentOrigin, bot.lastOrigin ) < 40 )
+			if( !c.steer.hold && theLevel.time_ > bot.spawnTime + 4000 && theLevel.time_ > bot.stuck.reverseTime + 2000 &&
+				Distance( c.ent->r.currentOrigin, bot.stuck.lastOrigin ) < 40 )
 				c.steer.blocked = true;
-			VectorCopy( c.ent->r.currentOrigin, bot.lastOrigin );
-			bot.stuckCheckTime = theLevel.time_ + 2500;
+			VectorCopy( c.ent->r.currentOrigin, bot.stuck.lastOrigin );
+			bot.stuck.checkTime = theLevel.time_ + 2500;
 		}
-		if( c.steer.blocked && theLevel.time_ > bot.reverseTime )
+		if( c.steer.blocked && theLevel.time_ > bot.stuck.reverseTime )
 		{
 			// the path led into something the path finder did not see: it learns that this way is shut
-			if( bot.following && bot.pathIndex < bot.path.size() )
-				GroundNav::blockAhead( Vec3( c.ent->r.currentOrigin ), bot.path[bot.pathIndex] );
-			bot.reverseTime = theLevel.time_ + 1800;
-			bot.reverseTurn = (rand() & 1) ? moveFull : -moveFull;
-			bot.pathTime = 0;
+			if( bot.path.following && bot.path.index < bot.path.points.size() )
+				GroundNav::blockAhead( Vec3( c.ent->r.currentOrigin ), bot.path.points[bot.path.index] );
+			bot.stuck.reverseTime = theLevel.time_ + 1800;
+			bot.stuck.turn = (rand() & 1) ? moveFull : -moveFull;
+			bot.path.searchTime = 0;
 			// somewhere else to go, unless it is after a flag: that goal is not given up for an obstacle
-			if( !bot.following && bot.desire != Goal::Capture )
+			if( !bot.path.following && bot.desire != Goal::Capture )
 				Bots::pickGoal( c.ent, bot, c.boat ? 6000 : 4000 );
 		}
 		return Status::Success;
@@ -316,14 +316,14 @@ struct SurfaceTasks
 	static Status creepForward( Mind& c )
 	{
 		c.cmd.forwardmove = c.steer.blocked ? moveNone : moveFull;
-		c.cmd.rightmove = static_cast<signed char>( c.bot.reverseTurn );
+		c.cmd.rightmove = static_cast<signed char>( c.bot.stuck.turn );
 		return Status::Running;
 	}
 
 	static Status reverse( Mind& c )
 	{
 		c.cmd.forwardmove = -moveFull;
-		c.cmd.rightmove = static_cast<signed char>( c.bot.reverseTurn );
+		c.cmd.rightmove = static_cast<signed char>( c.bot.stuck.turn );
 		return Status::Running;
 	}
 

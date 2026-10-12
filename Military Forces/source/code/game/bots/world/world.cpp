@@ -434,7 +434,7 @@ bool Bots::findHidePoint( GameEntity* ent, State& bot, GameEntity* threat, bool 
 			const float dist = Distance( ent->r.currentOrigin, point );
 			if( !found || dist < bestDist )
 			{
-				VectorCopy( point, bot.hidePoint );
+				VectorCopy( point, bot.cover.point );
 				bestDist = dist;
 				found = true;
 			}

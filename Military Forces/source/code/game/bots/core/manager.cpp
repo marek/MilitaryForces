@@ -444,12 +444,15 @@ void Bots::think( GameEntity* ent, State& bot, usercmd_t& cmd )
 		bot.goalTime = 0;
 		bot.enemy = -1;
 		bot.enemyTime = 0;
-		bot.egressTime = 0;
-		bot.avoidTime = 0;
-		bot.reverseTime = 0;
-		bot.stuckCheckTime = theLevel.time_ + 3000;
-		bot.pad = -1;
-		bot.landPhase = 0;
+		// what each behaviour kept belongs to the last life and its vehicle
+		bot.pursuit.reset();
+		bot.avoid.reset();
+		bot.stuck.reset();
+		bot.stuck.checkTime = theLevel.time_ + 3000;
+		bot.path.reset();
+		bot.cover.reset();
+		bot.takeoff.reset();
+		bot.rearm.letGo();
 		bot.desire = Goal::Roam;
 		bot.commitTime = 0;
 		bot.tree = behavior::Memory{};
@@ -469,22 +472,22 @@ void Bots::think( GameEntity* ent, State& bot, usercmd_t& cmd )
 		bot.teamPlayer = random() < keenness * character( bot ).teamwork;
 		bot.leader = -1;
 		bot.leaderTime = 0;
-		bot.groundTime = 0;
-		bot.probeBlocked = false;
-		bot.brakeTime = 0;
-		bot.path.clear();
-		bot.pathTime = 0;
-		bot.following = false;
-		bot.cornerAhead = false;
-		bot.takeoffTime = 0;
-		bot.taxiTime = 0;
-		bot.holdTime = 0;
-		bot.takeoffHolds = 0;
+		bot.takeoff.groundTime = 0;
+		bot.avoid.probeBlocked = false;
+		bot.avoid.brakeTime = 0;
+		bot.path.points.clear();
+		bot.path.searchTime = 0;
+		bot.path.following = false;
+		bot.path.cornerAhead = false;
+		bot.takeoff.planTime = 0;
+		bot.takeoff.taxiTime = 0;
+		bot.takeoff.holdTime = 0;
+		bot.takeoff.holds = 0;
 		bot.hitTime = 0;
 		bot.lastHealth = ent->health_;
-		bot.exposed = false;
-		bot.hasHide = false;
-		VectorCopy( ent->r.currentOrigin, bot.lastOrigin );
+		bot.cover.exposed = false;
+		bot.cover.has = false;
+		VectorCopy( ent->r.currentOrigin, bot.stuck.lastOrigin );
 		if( !bot.hasHome )
 		{
 			VectorCopy( ent->r.currentOrigin, bot.home );
@@ -547,13 +550,13 @@ void Bots::think( GameEntity* ent, State& bot, usercmd_t& cmd )
 	constexpr int padCheckInterval = 2000;
 	if( availableVehicles[client->vehicle_].cat & CAT_PLANE )
 	{
-		if( theLevel.time_ >= bot.padCheckTime )
+		if( theLevel.time_ >= bot.landing.padCheckTime )
 		{
-			bot.padCheckTime = theLevel.time_ + padCheckInterval;
-			bot.canLand = g_botLanding.integer && theLevel.time_ >= bot.landGiveUp &&
-				BotWorld::findPad( ent, theLevel.time_ < bot.badPadTime ? bot.badPad : -1 ) >= 0;
+			bot.landing.padCheckTime = theLevel.time_ + padCheckInterval;
+			bot.landing.canLand = g_botLanding.integer && theLevel.time_ >= bot.landing.giveUp &&
+				BotWorld::findPad( ent, theLevel.time_ < bot.rearm.badPadTime ? bot.rearm.badPad : -1 ) >= 0;
 		}
-		if( !bot.canLand && bot.pad < 0 && ps.stats[STAT_FUEL] < ps.stats[STAT_MAX_FUEL] / 4 )
+		if( !bot.landing.canLand && bot.rearm.pad < 0 && ps.stats[STAT_FUEL] < ps.stats[STAT_MAX_FUEL] / 4 )
 			ps.stats[STAT_FUEL] = ps.stats[STAT_MAX_FUEL] / 4;
 	}
 

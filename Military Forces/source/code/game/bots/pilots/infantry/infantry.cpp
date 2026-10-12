@@ -149,19 +149,19 @@ struct InfantryTasks
 		c.view[YAW] = angles[YAW];
 		c.view[PITCH] = 0;
 		c.cmd.forwardmove = moveFull;
-		if( theLevel.time_ > bot.stuckCheckTime )
+		if( theLevel.time_ > bot.stuck.checkTime )
 		{
-			if( Distance( c.ent->r.currentOrigin, bot.lastOrigin ) < 8 && theLevel.time_ > bot.spawnTime + 3000 )
+			if( Distance( c.ent->r.currentOrigin, bot.stuck.lastOrigin ) < 8 && theLevel.time_ > bot.spawnTime + 3000 )
 			{
-				bot.reverseTime = theLevel.time_ + 1200;
-				bot.reverseTurn = (rand() & 1) ? moveFull : -moveFull;
-				bot.pathTime = 0;
+				bot.stuck.reverseTime = theLevel.time_ + 1200;
+				bot.stuck.turn = (rand() & 1) ? moveFull : -moveFull;
+				bot.path.searchTime = 0;
 			}
-			VectorCopy( c.ent->r.currentOrigin, bot.lastOrigin );
-			bot.stuckCheckTime = theLevel.time_ + 2000;
+			VectorCopy( c.ent->r.currentOrigin, bot.stuck.lastOrigin );
+			bot.stuck.checkTime = theLevel.time_ + 2000;
 		}
-		if( theLevel.time_ < bot.reverseTime )
-			c.cmd.rightmove = static_cast<signed char>( bot.reverseTurn );
+		if( theLevel.time_ < bot.stuck.reverseTime )
+			c.cmd.rightmove = static_cast<signed char>( bot.stuck.turn );
 		return Status::Success;
 	}
 

@@ -45,8 +45,8 @@ void Bots::logDeath( GameEntity* self, GameEntity* attacker, int meansOfDeath )
 		ps.velocity[0], ps.velocity[1], ps.velocity[2], ps.speed, ps.vehicleAngles[PITCH], ps.vehicleAngles[ROLL], ps.vehicleAngles[YAW],
 		BotWorld::heightAboveGround( self->r.currentOrigin, self->s.number ), BotWorld::ceilingAbove( self->r.currentOrigin, self->s.number ),
 		(GameHost::pointContents( below, self->s.number ) & MASK_WATER) != 0, ps.ONOFF, ps.fixed_throttle, ps.stats[STAT_FUEL],
-		bot.enemy, enemy ? Distance( enemy->r.currentOrigin, self->r.currentOrigin ) : -1.0f, theLevel.time_ < bot.avoidTime, theLevel.time_ < bot.egressTime,
-		bot.landPhase, bot.pad, ahead.fraction * 600.0f - 100.0f, ahead.fraction < 1.0f ? ahead.entityNum : -1, hit && hit->classname_ ? hit->classname_ : "-",
+		bot.enemy, enemy ? Distance( enemy->r.currentOrigin, self->r.currentOrigin ) : -1.0f, theLevel.time_ < bot.avoid.time, theLevel.time_ < bot.pursuit.egressTime,
+		bot.rearm.phase, bot.rearm.pad, ahead.fraction * 600.0f - 100.0f, ahead.fraction < 1.0f ? ahead.entityNum : -1, hit && hit->classname_ ? hit->classname_ : "-",
 		ahead.plane.normal[2], nearestNum, nearest );
 	for( int i = 0; i < 6; i++ )
 		Common::printf( " %.0f,%.0f,%.0f", bot.trail[i][0], bot.trail[i][1], bot.trail[i][2] );
@@ -76,9 +76,9 @@ void Bots::logState( GameEntity* ent, State& bot, const usercmd_t& cmd, const ve
 		theLevel.time_, ent->s.number, client->vehicle_, static_cast<int>( bot.desire ), ent->r.currentOrigin[0], ent->r.currentOrigin[1], ent->r.currentOrigin[2],
 		ps.velocity[0], ps.velocity[1], ps.velocity[2], ps.speed, ps.vehicleAngles[PITCH], ps.vehicleAngles[YAW], ps.vehicleAngles[ROLL], view[PITCH], view[YAW],
 		cmd.forwardmove, cmd.rightmove, cmd.buttons, ps.ONOFF, ps.fixed_throttle, ent->health_, bot.enemy,
-		reach[0], reach[1], reach[2], reach[3], reach[4], reach[5], reach[6], theLevel.time_ < bot.avoidTime, theLevel.time_ < bot.egressTime, bot.landPhase,
-		bot.following, bot.confined, theLevel.time_ < bot.brakeTime, bot.probeWant, bot.probeBest, bot.pathIndex < bot.path.size() ? bot.path[bot.pathIndex].x() : 0.0f, bot.pathIndex < bot.path.size() ? bot.path[bot.pathIndex].y() : 0.0f,
-		bot.pathIndex < bot.path.size() ? bot.path[bot.pathIndex].z() : 0.0f, static_cast<int>( bot.path.size() ) );
+		reach[0], reach[1], reach[2], reach[3], reach[4], reach[5], reach[6], theLevel.time_ < bot.avoid.time, theLevel.time_ < bot.pursuit.egressTime, bot.rearm.phase,
+		bot.path.following, bot.avoid.confined, theLevel.time_ < bot.avoid.brakeTime, bot.avoid.probeWant, bot.avoid.probeBest, bot.path.index < bot.path.points.size() ? bot.path.points[bot.path.index].x() : 0.0f, bot.path.index < bot.path.points.size() ? bot.path.points[bot.path.index].y() : 0.0f,
+		bot.path.index < bot.path.points.size() ? bot.path.points[bot.path.index].z() : 0.0f, static_cast<int>( bot.path.points.size() ) );
 }
 
 void Bots::listCommand()
