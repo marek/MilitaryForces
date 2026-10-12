@@ -73,6 +73,26 @@ float Bots::skill( const State& bot )
 	return std::clamp( g_botSkill.value, 1.0f, 5.0f ) / 5.0f * (0.5f + 0.5f * character( bot ).aim);
 }
 
+// skill as handicaps: the less skilled react later, aim less steadily, look round less often, see less far, release
+// bombs less exactly and reconsider less often
+Handicap Bots::handicap( const State& bot )
+{
+	constexpr float poorGunner = 4.0f, bestGunner = 0.6f;
+	constexpr int slowestScan = 3000, fastestGain = 1500;
+	const float s = std::clamp( skill( bot ), 0.0f, 1.0f );
+	Handicap h;
+	h.reactionScale = 1.6f - s;
+	h.aimWobble = (1.0f - s) * 3.0f;
+	h.flareChance = s;
+	h.breakLeadTime = 1.2f * (0.5f + s);
+	h.gunnerSpread = bestGunner + (poorGunner - bestGunner) * (1.0f - s);
+	h.scanPeriod = slowestScan - static_cast<int>( fastestGain * s );
+	h.bombError = 250.0f + 400.0f * (1.0f - s);
+	h.sightShare = 0.8f + 0.2f * s;
+	h.reconsiderEvery = 1500 - static_cast<int>( 500 * s );
+	return h;
+}
+
 int Bots::memoryTime( const State& bot )
 {
 	return 12000 + static_cast<int>( 30000 * character( bot ).patience );

@@ -6,6 +6,7 @@
 #include <vector>
 #include "behavior/behavior.h"
 #include "goals/capabilities.h"
+#include "core/skill.h"
 
 struct GameEntity;
 struct GameClient;
@@ -295,6 +296,7 @@ private:
 	static Goal chooseGoal( GameEntity* ent, State& bot, const Sense& sense );
 	static const Character& character( const State& bot );
 	static float skill( const State& bot );
+	static Handicap handicap( const State& bot );
 	static int memoryTime( const State& bot );
 	static bool findHidePoint( GameEntity* ent, State& bot, GameEntity* threat, bool hullDown = false );
 	static GameEntity* findStructure( GameEntity* ent, State& bot );
@@ -422,7 +424,7 @@ private:
 	static bool isOpponent( GameEntity* ent, GameEntity* other );
 	static Attention attentionOf( GameEntity* ent, const Bots::State& bot );
 	static bool locate( GameEntity* ent, Bots::State& bot, GameEntity* other, const Attention& attention, Contact& contact );
-	static bool inSight( GameEntity* ent, GameEntity* other, float dist );
+	static bool inSight( GameEntity* ent, GameEntity* other, float dist, float sightShare );
 	static bool noticed( GameEntity* ent, const Bots::State& bot, const Bots::Seen& seen, const vec3_t where, float dist, const Attention& attention );
 	static bool ahead( GameEntity* ent, const vec3_t point );
 	static bool lookingRound( GameEntity* ent, const Bots::State& bot );

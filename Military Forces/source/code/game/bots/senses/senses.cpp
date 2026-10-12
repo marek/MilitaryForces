@@ -320,7 +320,7 @@ bool BotSenses::locate( GameEntity* ent, Bots::State& bot, GameEntity* other, co
 		seen.time = theLevel.time_;
 		seen.level = std::max( seen.level, Bots::Awareness::Suspicious );
 	}
-	if( inSight( ent, other, contact.dist ) && noticed( ent, bot, seen, other->r.currentOrigin, contact.dist, attention ) )
+	if( inSight( ent, other, contact.dist, Bots::handicap( bot ).sightShare ) && noticed( ent, bot, seen, other->r.currentOrigin, contact.dist, attention ) )
 	{
 		VectorCopy( other->r.currentOrigin, seen.position );
 		seen.time = seen.awareTime = theLevel.time_;
@@ -356,11 +356,11 @@ bool BotSenses::locate( GameEntity* ent, Bots::State& bot, GameEntity* other, co
 }
 
 // within range, not hidden by stealth, and nothing in the way
-bool BotSenses::inSight( GameEntity* ent, GameEntity* other, float dist )
+bool BotSenses::inSight( GameEntity* ent, GameEntity* other, float dist, float sightShare )
 {
 	const completeVehicleData_t& veh = availableVehicles[ent->client_->vehicle_];
 	const bool flyer = (veh.cat & (CAT_PLANE|CAT_HELO)) != 0;
-	const float maxRange = flyer ? planeEnemyRange : surfaceEnemyRange;
+	const float maxRange = (flyer ? planeEnemyRange : surfaceEnemyRange) * sightShare;
 	const float radarRange = veh.radarRange > 0 ? static_cast<float>( veh.radarRange ) : 8000.0f;
 	GameClient* oc = other->client_;
 	return dist <= maxRange && !VehicleData::stealthHidden( oc->vehicle_, oc->ps_.timers[TIMER_REVEAL], theLevel.time_, dist, radarRange ) &&
@@ -393,8 +393,8 @@ bool BotSenses::ahead( GameEntity* ent, const vec3_t point )
 // a look round behind: part of every few seconds, more often for the more skilled
 bool BotSenses::lookingRound( GameEntity* ent, const Bots::State& bot )
 {
-	constexpr int slowestScan = 3000, fastestGain = 1500, lookFor = 700;
-	const int period = slowestScan - static_cast<int>( fastestGain * Bots::skill( bot ) );
+	constexpr int lookFor = 700;
+	const int period = Bots::handicap( bot ).scanPeriod;
 	return (theLevel.time_ + ent->s.number * 397) % period < lookFor;
 }
 
@@ -685,7 +685,7 @@ void BotSenses::sense( GameEntity* ent, Bots::State& bot, Bots::Sense& out )
 				theLevel.time_, ent->s.number, client->vehicle_, static_cast<int>( previous ), static_cast<int>( bot.desire ), out.health, bot.enemy,
 				out.enemyDist, out.enemyVisible, out.locked, out.launched, out.underFire, out.blindsided, out.airThreat ? out.airThreatDist : -1.0f );
 #endif
-		bot.goalEvalTime = theLevel.time_ + 1000;
+		bot.goalEvalTime = theLevel.time_ + Bots::handicap( bot ).reconsiderEvery;
 		if( bot.desire != previous )
 			bot.commitTime = theLevel.time_ + 3000 + static_cast<int>( 3000 * Bots::character( bot ).patience );
 	}
