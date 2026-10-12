@@ -8,6 +8,7 @@
 #include "g_level.h"
 #include "g_mfq3ents.h"
 #include "g_miscvehicle.h"
+#include "bots/team/orders.h"
 
 /*
 ==================
@@ -956,6 +957,14 @@ void Game::sayTo( GameEntity *ent, GameEntity *other, int mode, int color, const
 }
 
 #define EC		"\x19"
+
+static void G_Say( GameEntity *ent, GameEntity *target, int mode, const char *chatText );
+
+// a message to the team, as a player's say_team: used by bots answering orders and reporting
+void SayTeam( GameEntity* ent, const char* text )
+{
+	G_Say( ent, nullptr, SAY_TEAM, text );
+}
 
 static void G_Say( GameEntity *ent, GameEntity *target, int mode, const char *chatText ) 
 {
@@ -1993,6 +2002,8 @@ void ClientCommand( int clientNum )
 		Cmd_Radar_f (ent);
 	else if( Q_stricmp (cmd, "unlock") == 0 )
 		Cmd_Unlock_f (ent);
+	else if( Q_stricmp (cmd, "order") == 0 )
+		BotOrders::command( ent );
 	else if( Q_stricmp (cmd, "teamtask") == 0 )
 		Cmd_TeamTask_f (ent);
 	else if( Q_stricmp (cmd, "levelshot") == 0 )
