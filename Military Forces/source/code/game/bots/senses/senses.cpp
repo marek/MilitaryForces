@@ -160,9 +160,68 @@ float BotSenses::turnOnAttacker( GameEntity* ent, const Bots::State& bot, int at
 	return eager + (1.0f - eager) * std::clamp( invested - danger, 0.0f, 1.0f );
 }
 
+namespace
+{
+	// what a vehicle is good against, as weights on the distance to a target (below one: preferred); a kind it
+	// cannot fight at all is no target
+	struct TargetPreference
+	{
+		float	air = 1.0f;	// an aircraft in the air
+		float	airHelo = -1.0f;	// a helicopter in the air, when it differs from any aircraft
+		float	airBomber = -1.0f;	// a bomber in the air, likewise
+		float	ground = 1.0f;	// anything on the ground or water
+		float	parked = -1.0f;	// an aircraft on the ground, when it differs from the rest of the ground
+		bool	noAir = false;	// does not fight aircraft in the air
+		bool	airNeedsMissiles = false;	// fights them only with anti-aircraft missiles aboard
+		bool	noSoldiers = false;	// does not go after people on foot
+		float	reach = 0.0f;	// fights nothing further than this, when set
+	};
+
+	constexpr TargetPreference fighterTargets = { .air = 1.0f, .airHelo = 0.6f, .airBomber = 0.6f, .ground = 1.6f };
+	constexpr TargetPreference bomberTargets = { .noAir = true, .noSoldiers = true };
+	constexpr TargetPreference heloTargets = { .air = 3.0f, .airHelo = 1.2f };
+	constexpr TargetPreference tankTargets = { .air = 1.5f, .parked = 0.5f, .airNeedsMissiles = true };
+	constexpr TargetPreference airDefenceTargets = { .ground = 2.0f };
+	constexpr TargetPreference boatTargets = {};
+	constexpr TargetPreference soldierTargets = { .noAir = true, .reach = 1500.0f };
+
+	const TargetPreference& preferenceOf( const Capabilities& can )
+	{
+		if( can.runway )
+			return can.groundStrike ? bomberTargets : fighterTargets;
+		if( can.hovers )
+			return heloTargets;
+		if( can.armoured )
+			return can.antiAirVehicle ? airDefenceTargets : tankTargets;
+		if( can.onWater )
+			return boatTargets;
+		return soldierTargets;
+	}
+
+	// the weight on the distance to this target, or below zero when it is no target for this vehicle
+	float targetWeight( const TargetPreference& p, const completeVehicleData_t& target, bool air, bool antiAir, float dist )
+	{
+		if( p.reach > 0.0f && dist > p.reach )
+			return -1.0f;
+		if( !air )
+		{
+			if( p.noSoldiers && (target.cat & CAT_LQM) )
+				return -1.0f;
+			return p.parked >= 0.0f && (target.cat & (CAT_PLANE|CAT_HELO)) ? p.parked : p.ground;
+		}
+		if( p.noAir || (p.airNeedsMissiles && !antiAir) )
+			return -1.0f;
+		if( p.airHelo >= 0.0f && (target.cat & CAT_HELO) )
+			return p.airHelo;
+		if( p.airBomber >= 0.0f && (target.cls & CLASS_PLANE_BOMBER) )
+			return p.airBomber;
+		return p.air;
+	}
+}
+
 // The enemy most worth fighting: the nearest, weighted by what this vehicle is good against, by who is shooting at
 // it, by the leader's target and by the flag. An enemy out of sight is fought from memory for a while.
-GameEntity* BotSenses::findEnemy( GameEntity* ent, Bots::State& bot, Bots::Role role )
+GameEntity* BotSenses::findEnemy( GameEntity* ent, Bots::State& bot, const Capabilities& can )
 {
 	GameClient* client = ent->client_;
 	const completeVehicleData_t& veh = availableVehicles[client->vehicle_];
@@ -179,7 +238,7 @@ GameEntity* BotSenses::findEnemy( GameEntity* ent, Bots::State& bot, Bots::Role 
 	constexpr int underFireTime = 6000;
 	constexpr float planeHelpReach = 7000.0f, heloHelpReach = 4500.0f;
 	bool harassing[MAX_CLIENTS + 1] = {};
-	if( flyer && g_gametype.integer >= GT_TEAM && ( role == Bots::Role::Fighter || role == Bots::Role::AttackHelo ) )
+	if( flyer && g_gametype.integer >= GT_TEAM && ( (can.runway && !can.groundStrike) || can.gunship ) )
 	{
 		const float reach = (veh.cat & CAT_PLANE) ? planeHelpReach : heloHelpReach;
 		for( int i = 1; i <= theLevel.maxclients_; i++ )
@@ -257,43 +316,10 @@ GameEntity* BotSenses::findEnemy( GameEntity* ent, Bots::State& bot, Bots::Role 
 		const completeVehicleData_t& ov = availableVehicles[oc->vehicle_];
 		const bool air = (ov.cat & (CAT_PLANE|CAT_HELO)) != 0 && !(oc->ps_.ONOFF & OO_LANDED);
 		float score = dist;
-		switch( role )
-		{
-		case Bots::Role::Fighter:
-			if( !air )
-				score *= 1.6f;
-			else if( (ov.cat & CAT_HELO) || (ov.cls & CLASS_PLANE_BOMBER) )
-				score *= 0.6f;
-			break;
-		case Bots::Role::Bomber:
-			if( air || (ov.cat & CAT_LQM) )
-				continue;
-			break;
-		case Bots::Role::AttackHelo:
-		case Bots::Role::TransportHelo:
-			if( air )
-				score *= (ov.cat & CAT_HELO) ? 1.2f : 3.0f;
-			break;
-		case Bots::Role::Tank:
-			if( air && !antiAir )
-				continue;
-			if( air )
-				score *= 1.5f;
-			// an aircraft sitting on a runway is the best target a tank gun can have
-			else if( ov.cat & (CAT_PLANE|CAT_HELO) )
-				score *= 0.5f;
-			break;
-		case Bots::Role::AirDefence:
-			if( !air )
-				score *= 2.0f;
-			break;
-		case Bots::Role::Boat:
-			break;
-		case Bots::Role::Infantry:
-			if( dist > 1500 || air )
-				continue;
-			break;
-		}
+		const float preference = targetWeight( preferenceOf( can ), ov, air, antiAir, dist );
+		if( preference < 0.0f )
+			continue;
+		score *= preference;
 		// stay with the current target unless another is clearly better
 		if( i == bot.enemy )
 			score *= 0.7f;
@@ -338,9 +364,11 @@ GameEntity* BotSenses::findEnemy( GameEntity* ent, Bots::State& bot, Bots::Role 
 // everything a bot knows this frame: its enemy and where to aim, its own state, missiles, aircraft about, and its goal
 void BotSenses::sense( GameEntity* ent, Bots::State& bot, Bots::Sense& out )
 {
+	const Capabilities can = Capabilities::of( ent->client_->vehicle_ );
+	const bool fighter = can.runway && !can.groundStrike;
 	if( theLevel.time_ >= bot.enemyTime )
 	{
-		GameEntity* enemy = BotSenses::findEnemy( ent, bot, BotSenses::roleOf( ent->client_->vehicle_ ) );
+		GameEntity* enemy = BotSenses::findEnemy( ent, bot, can );
 		bot.enemy = enemy ? enemy->s.number : -1;
 		// with no enemy of its own it takes its leader's
 		if( !enemy && bot.leader >= 1 && Bots::isBot( bot.leader ) && Bots::states_[bot.leader].enemy >= 0 )
@@ -388,7 +416,7 @@ void BotSenses::sense( GameEntity* ent, Bots::State& bot, Bots::Sense& out )
 		// the bomber and shoot; a fighter that goes on circling for a better side there is only a target.
 		// Pilots with little cunning do not think of the approach at all
 		bool flanking = false;
-		if( BotSenses::roleOf( ent->client_->vehicle_ ) == Bots::Role::Fighter && (availableVehicles[out.enemy->client_->vehicle_].flags & VF_GUNSTATIONS) &&
+		if( fighter && (availableVehicles[out.enemy->client_->vehicle_].flags & VF_GUNSTATIONS) &&
 			out.enemyVisible && dist > gunRange && Bots::character( bot ).cunning > 0.25f )
 		{
 			const int theirs = out.enemy->client_->vehicle_;
@@ -442,7 +470,7 @@ void BotSenses::sense( GameEntity* ent, Bots::State& bot, Bots::Sense& out )
 			}
 		}
 		// a cunning fighter goes for the place behind and below an aircraft that is not hunting it
-		if( !flanking && BotSenses::roleOf( ent->client_->vehicle_ ) == Bots::Role::Fighter && (enemyCat & (CAT_PLANE|CAT_HELO)) && dist > 1200 && dist < 6000 &&
+		if( !flanking && fighter && (enemyCat & (CAT_PLANE|CAT_HELO)) && dist > 1200 && dist < 6000 &&
 			Bots::character( bot ).cunning > 0.5f && out.enemy->tracktarget_ != ent )
 		{
 			Vec3 behind;
@@ -470,6 +498,7 @@ void BotSenses::sense( GameEntity* ent, Bots::State& bot, Bots::Sense& out )
 	GameClient* client = ent->client_;
 	const playerState_t& ps = client->ps_;
 	out.role = BotSenses::roleOf( client->vehicle_ );
+	out.can = can;
 	out.health = std::clamp( static_cast<float>( ent->health_ ) / std::max( 1, client->pers_.maxHealth_ ), 0.0f, 1.0f );
 	out.locked = (ps.stats[STAT_LOCKINFO] & (LI_BEING_LOCKED|LI_BEING_LAUNCHED)) != 0;
 	out.launched = (ps.stats[STAT_LOCKINFO] & LI_BEING_LAUNCHED) != 0;
@@ -552,7 +581,7 @@ void BotSenses::sense( GameEntity* ent, Bots::State& bot, Bots::Sense& out )
 		if( Distance( ent->r.currentOrigin, other->r.currentOrigin ) < 5000 )
 			foes++;
 	}
-	out.duel = out.enemy && out.enemyAir && foes == 1 && (out.role == Bots::Role::Fighter || out.role == Bots::Role::AttackHelo);
+	out.duel = out.enemy && out.enemyAir && foes == 1 && ((out.can.runway && !out.can.groundStrike) || out.can.gunship);
 
 	// the goal is reviewed once a second, but a goal just taken is kept for a few seconds unless something forces the matter
 	if( theLevel.time_ >= bot.goalEvalTime && (theLevel.time_ >= bot.commitTime || out.launched || out.underFire || bot.desire == Bots::Goal::Roam) )

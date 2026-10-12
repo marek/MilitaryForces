@@ -60,7 +60,7 @@ void Bots::thinkHelo( GameEntity* ent, State& bot, const Sense& sense, usercmd_t
 	Mind mind{ ent, client, bot, sense, cmd, view, ps, availableVehicles[client->vehicle_], static_cast<float>( ps.speed ) / 10.0f };
 
 	// attack helicopters fly low by default, transports higher; the steps change it as they need
-	mind.steer.wantHeight = sense.role == Role::AttackHelo ? heloLowHeight : heloCruiseHeight * 0.6f;
+	mind.steer.wantHeight = sense.can.gunship ? heloLowHeight : heloCruiseHeight * 0.6f;
 	if( !HeloTasks::fighting( mind ) && !HeloTasks::stealthStriking( mind ) )
 		bot.cover.exposed = false;
 	view[YAW] = ps.vehicleAngles[YAW];

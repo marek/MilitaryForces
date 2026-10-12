@@ -15,7 +15,7 @@ set(GAME_SOURCES
     g_waypoint.cpp g_weapon.cpp g_world.cpp game.cpp mf_client.cpp mf_vehiclespawn.cpp)
 list(APPEND GAME_SOURCES
     bots/core/manager.cpp bots/core/characters.cpp bots/core/debug.cpp
-    bots/goals/goals.cpp
+    bots/goals/goals.cpp bots/goals/capabilities.cpp
     bots/senses/senses.cpp
     bots/world/world.cpp
     bots/navigation/airnav.cpp bots/navigation/groundnav.cpp

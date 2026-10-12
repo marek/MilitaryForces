@@ -20,7 +20,7 @@ struct PlaneTasks
 
 	using Role = Bots::Role;
 
-	static bool bomber( const Mind& c ) { return c.sense.role == Role::Bomber; }
+	static bool bomber( const Mind& c ) { return c.sense.can.groundStrike; }
 
 	static bool hasBombs( const Mind& c )
 	{

@@ -5,6 +5,7 @@
 #include <array>
 #include <vector>
 #include "behavior/behavior.h"
+#include "goals/capabilities.h"
 
 struct GameEntity;
 struct GameClient;
@@ -252,6 +253,7 @@ public:
 		GameEntity*	airThreat = nullptr;	// the nearest enemy aircraft in the air
 		float		airThreatDist = 0;
 		Role		role = Role::Fighter;
+		Capabilities	can;	// what its vehicle can do
 		bool	stealth = false;	// flying a stealth aircraft
 		bool	revealed = false;	// and it is showing on radar at the moment
 		bool	underFire = false;	// hit within the last seconds
@@ -378,7 +380,7 @@ public:
 class BotSenses
 {
 public:
-	static GameEntity* findEnemy( GameEntity* ent, Bots::State& bot, Bots::Role role );
+	static GameEntity* findEnemy( GameEntity* ent, Bots::State& bot, const Capabilities& can );
 	static void chooseLeader( GameEntity* ent, Bots::State& bot );
 	static GameEntity* leaderOf( const Bots::State& bot );
 	static int targetOf( GameEntity* leader );
