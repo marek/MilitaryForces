@@ -4,6 +4,7 @@
 #include "../../core/mind.h"
 #include "../../navigation/airnav.h"
 #include "../../crew/crew.h"
+#include "../../world/query.h"
 #include <algorithm>
 #include <cmath>
 
@@ -136,6 +137,8 @@ struct PlaneTasks
 
 	// parked where no heading has enough runway: find the nearest spot along the taxiway that has
 	static bool findTaxiSpot( Mind& c, const vec3_t origin, float wanted );
+	static float longestRun( const Vec3& spot, float wanted );
+	static float yawOf( const Vec3& dir );
 
 	// Chooses the take-off heading: enough runway to reach flying speed, nothing standing on it, and from the lift-off
 	// point a climb, straight or turning, that fits the terrain and leads somewhere.
