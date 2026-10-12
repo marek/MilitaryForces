@@ -3,6 +3,7 @@
 #include "../bot.h"
 #include "../core/local.h"
 #include "../team/team.h"
+#include "../weapons/envelope.h"
 #include <algorithm>
 #include <bit>
 #include <cmath>
@@ -582,6 +583,7 @@ void BotSenses::sense( GameEntity* ent, Bots::State& bot, Bots::Sense& out )
 			foes++;
 	}
 	out.duel = out.enemy && out.enemyAir && foes == 1 && ((out.can.runway && !out.can.groundStrike) || out.can.gunship);
+	out.outranged = outranged( ent, out );
 
 	// the goal is reviewed once a second, but a goal just taken is kept for a few seconds unless something forces the matter
 	if( theLevel.time_ >= bot.goalEvalTime && (theLevel.time_ >= bot.commitTime || out.launched || out.underFire || bot.desire == Bots::Goal::Roam) )
@@ -598,4 +600,15 @@ void BotSenses::sense( GameEntity* ent, Bots::State& bot, Bots::Sense& out )
 		if( bot.desire != previous )
 			bot.commitTime = theLevel.time_ + 3000 + static_cast<int>( 3000 * Bots::character( bot ).patience );
 	}
+}
+
+// the enemy's weapons reach this vehicle where its own do not reach back: a fight to get out of, or to close
+bool BotSenses::outranged( GameEntity* ent, const Bots::Sense& out )
+{
+	if( !out.enemy || !out.enemy->client_ || out.enemy->client_->vehicle_ < 0 )
+		return false;
+	const bool selfAir = (out.can.runway || out.can.hovers) && !(ent->client_->ps_.ONOFF & OO_LANDED);
+	const float theirs = Envelope::reachOf( out.enemy->client_->vehicle_, out.enemy->client_->ps_.ammo, selfAir );
+	const float ours = Envelope::reachOf( ent->client_->vehicle_, ent->client_->ps_.ammo, out.enemyAir );
+	return out.enemyDist <= theirs && out.enemyDist > ours;
 }

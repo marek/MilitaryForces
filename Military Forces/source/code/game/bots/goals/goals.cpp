@@ -111,6 +111,8 @@ struct GoalScoring
 	}
 	static float stealthRevealed( const Situation& s ) { return s.sense.stealth && s.sense.revealed && plane( s ) ? s.who.caution * 0.6f : 0.0f; }
 	static float duelResolveEvade( const Situation& s ) { return duelResolve( s, 0.7f ); }
+	// inside the enemy's reach with nothing that reaches back: get out of it, the cautious sooner
+	static float outranged( const Situation& s ) { return s.sense.outranged ? s.who.caution * 0.5f : 0.0f; }
 
 	// gain height: a bomber with a load for its run, a fighter to come down on a distant enemy, a stealth aircraft while unseen
 	static float bombRunHeight( const Situation& s )
@@ -231,7 +233,7 @@ namespace
 		{ "strike spent", Combine::Scale, G::spentStrike }, { "self defence", Combine::Add, G::bomberSelfDefence } };
 	constexpr Term evadeTerms[] = { { "hurt while pressed", Combine::Add, G::hurtWhilePressed }, { "missile", Combine::Add, G::missile },
 		{ "incoming", Combine::Add, G::incoming }, { "armour", Combine::Scale, G::armourShrugs }, { "bomber under air threat", Combine::Add, G::bomberUnderAirThreat },
-		{ "stealth revealed", Combine::Add, G::stealthRevealed }, { "duel", Combine::Scale, G::duelResolveEvade } };
+		{ "stealth revealed", Combine::Add, G::stealthRevealed }, { "outranged", Combine::Add, G::outranged }, { "duel", Combine::Scale, G::duelResolveEvade } };
 	constexpr Term climbTerms[] = { { "bomb run height", Combine::Add, G::bombRunHeight }, { "height over enemy", Combine::Add, G::heightOverEnemy },
 		{ "stealth approach", Combine::Add, G::stealthApproach } };
 	constexpr Term hideTerms[] = { { "unseen fire", Combine::Add, G::unseenFire }, { "aircraft overhead", Combine::Add, G::aircraftOverhead } };
