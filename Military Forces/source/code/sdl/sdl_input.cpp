@@ -1040,6 +1040,7 @@ static void IN_QueueMenuPosition( int windowX, int windowY )
 	if( windowW <= 0 || windowH <= 0 )
 		return;
 
+	// Mouse events are in GetWindowSize space; the GL drawable may differ under DPI scaling
 	px = windowX * static_cast<float>(cls.glconfig.vidWidth) / windowW;
 	py = windowY * static_cast<float>(cls.glconfig.vidHeight) / windowH;
 
@@ -1049,6 +1050,7 @@ static void IN_QueueMenuPosition( int windowX, int windowY )
 	if( scale <= 0.0f )
 		return;
 
+	// Match UI_Utils::adjustFrom640: centre the 640x480 block (edge-pinned items are decoration)
 	vx = ( px - 0.5f * ( cls.glconfig.vidWidth - 640.0f * scale ) ) / scale;
 	vy = ( py - 0.5f * ( cls.glconfig.vidHeight - 480.0f * scale ) ) / scale;
 	Common::queueEvent( in_eventTime, SE_MOUSE_ABS, static_cast<int>(vx), static_cast<int>(vy), 0, nullptr );

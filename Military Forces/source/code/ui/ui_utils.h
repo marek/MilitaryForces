@@ -50,6 +50,8 @@ struct UI_Utils
 
 	void						gradientBar_Paint( rectDef_t *rect, vec4_t color );
 
+	void						bindStatics();
+
 	void						item_TextColor( itemDef_t *item, vec4_t *newColor );
 	bool						item_EnableShowViaCvar( itemDef_t *item, int flag );
 	bool						item_SetFocus( itemDef_t *item, float x, float y );
