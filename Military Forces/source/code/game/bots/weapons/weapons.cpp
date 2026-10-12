@@ -116,7 +116,7 @@ void BotWeapons::fireWeapons( GameEntity* ent, Bots::State& bot, const Bots::Sen
 	if( bot.reactEnemy != sense.enemy->s.number )
 	{
 		bot.reactEnemy = sense.enemy->s.number;
-		bot.reactTime = theLevel.time_ + static_cast<int>( Bots::character( bot ).reaction * 1000.0f * (1.6f - Bots::skill( bot )) );
+		bot.reactTime = theLevel.time_ + static_cast<int>( Bots::character( bot ).reaction * 1000.0f * Bots::handicap( bot ).reactionScale );
 	}
 	if( theLevel.time_ < bot.reactTime )
 		return;
@@ -167,7 +167,7 @@ void BotWeapons::flares( GameEntity* ent, Bots::State& bot, const Bots::Sense& s
 		return;
 	if( sense.missile && sense.missileDist > 1800 && sense.missileTime > 2.0f )
 		return;
-	if( random() > Bots::skill( bot ) )
+	if( random() > Bots::handicap( bot ).flareChance )
 	{
 		bot.flareTime = theLevel.time_ + 400;
 		return;
@@ -262,7 +262,7 @@ void BotWeapons::bomb( GameEntity* ent, Bots::State& bot, const vec3_t target, u
 	// no release with team mates inside the blast; careless characters allow themselves less margin
 	const float blast = static_cast<float>( availableWeapons[veh.weapons[slot]].damageRadius );
 	const float safety = blast * (1.0f + 0.6f * Bots::character( bot ).caution) + 150.0f;
-	if( yawError < 8 && fabs( dist - lead ) < 250.0f + 400.0f * (1.0f - Bots::skill( bot )) && !BotWeapons::friendlyNear( ent, target, safety ) )
+	if( yawError < 8 && fabs( dist - lead ) < Bots::handicap( bot ).bombError && !BotWeapons::friendlyNear( ent, target, safety ) )
 	{
 		cmd.buttons |= BUTTON_ATTACK_MAIN;
 		bot.bombTime = theLevel.time_;

@@ -586,7 +586,7 @@ void Bots::think( GameEntity* ent, State& bot, usercmd_t& cmd )
 	}
 
 	// less skilled characters hold the aim less steadily; not while landing
-	const float wobble = bot.desire == Goal::Rearm ? 0.0f : (1.0f - skill( bot )) * 3.0f;
+	const float wobble = bot.desire == Goal::Rearm ? 0.0f : handicap( bot ).aimWobble;
 	bot.aimPhase += 0.11f;
 	view[YAW] += sin( bot.aimPhase ) * wobble;
 	view[PITCH] += cos( bot.aimPhase * 0.7f ) * wobble * 0.6f;

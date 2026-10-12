@@ -27,9 +27,8 @@ behavior::Status Crew::gunner( Bots::Mind& c )
 			// a gunner in a bucking bomber is no marksman: his aim wanders about the target, a few degrees for a
 			// poor gunner and under one for the best, so that the fire walks across the target and off it again
 			// rather than a whole burst going wide
-			constexpr float poorGunner = 4.0f, bestGunner = 0.6f;
 			constexpr float wanderYawMsec = 230.0f, wanderPitchMsec = 310.0f;
-			const float spread = bestGunner + (poorGunner - bestGunner) * (1.0f - std::clamp( Bots::skill( c.bot ), 0.0f, 1.0f ));
+			const float spread = Bots::handicap( c.bot ).gunnerSpread;
 			const float phase = static_cast<float>( c.ent->s.number ) * 1.7f;
 			aim[YAW] += spread * sin( theLevel.time_ / wanderYawMsec + phase );
 			aim[PITCH] += spread * sin( theLevel.time_ / wanderPitchMsec + phase * 2.0f );

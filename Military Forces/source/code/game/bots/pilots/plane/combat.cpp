@@ -49,7 +49,7 @@ behavior::Status PlaneTasks::defendMissile( Mind& c )
 	const float toRight = fabs( AngleSubtract( c.sense.missileYaw - 90.0f, c.ps.vehicleAngles[YAW] ) );
 	if( c.sense.missileTime > 1.5f )
 		c.bot.breakSide = toLeft < toRight ? 1.0f : -1.0f;
-	if( c.sense.missileTime > 1.2f * (0.5f + Bots::skill( c.bot )) )
+	if( c.sense.missileTime > Bots::handicap( c.bot ).breakLeadTime )
 	{
 		c.view[YAW] = c.sense.missileYaw + 90.0f * c.bot.breakSide;
 		c.view[PITCH] = c.sense.height > planeMinHeight * 2.0f ? 8.0f : -5.0f;
