@@ -770,6 +770,7 @@ void trigger_teleporter_touch (GameEntity *self, GameEntity *other, trace_t *tra
 // g_mfq3util.c
 //
 int canLandOnIt( GameEntity *ent );
+Vec3 lockPoint( const GameEntity* target );
 void untrack( GameEntity *ent );
 void track( GameEntity* ent, GameEntity* target );
 void unlock( GameEntity *ent );

@@ -31,6 +31,28 @@ void unlock( GameEntity* ent )
 	ent->client_->ps_.stats[STAT_LOCKINFO] &= ~LI_LOCKING;
 }
 
+Vec3 lockPoint( const GameEntity* target )
+{
+	// the middle of the target, not its origin: a vehicle's origin is at its underside, so a line drawn to it from above
+	// meets the ground the vehicle stands on
+	return ( Vec3( target->r.absmin ) + Vec3( target->r.absmax ) ) * 0.5f;
+}
+
+// Whether the line from the seeker to the target's middle is clear. The line counts as clear once it is inside the
+// target's own box: the ground it stands on reaches up into that box, and on a slope or a bump it meets the line there
+static bool seesTarget( const GameEntity* ent, const GameEntity* target, int mask )
+{
+	constexpr float margin = 1.0f;
+	trace_t tr;
+	GameHost::trace( &tr, ent->r.currentOrigin, nullptr, nullptr, lockPoint( target ), ent->s.number, mask, false );
+	if( tr.fraction >= 1.0f || tr.entityNum == target->s.number )
+		return true;
+	for( int i = 0; i < 3; i++ )
+		if( tr.endpos[i] < target->r.absmin[i] - margin || tr.endpos[i] > target->r.absmax[i] + margin )
+			return false;
+	return true;
+}
+
 void untrack( GameEntity* ent )
 {
 	// update target
@@ -114,17 +136,24 @@ void updateTargetTracking( GameEntity *ent )
 		VectorCopy( ent->s.angles, dir );
 		AngleVectors( dir, forward, nullptr, nullptr );
 	}
+	// An aircraft's pilot looks along that line from the camera, which sits above the aircraft, not from its middle.
+	// Close to a target the gap between the two lines is several degrees, enough to miss a tank the pilot has in the
+	// middle of the screen
+	Vec3 eye = ent->r.currentOrigin;
+	if( availableVehicles[ent->client_->vehicle_].cat & (CAT_HELO|CAT_PLANE) )
+		eye[2] += availableVehicles[ent->client_->vehicle_].cam_height[CAMERA_V_DEFAULT];
 
 	// no target yet
 	if( !ent->tracktarget_ ) 
 	{
-		// Ground targets first by a narrow cone about the aim: a sweep of the whole hull along that line, which is
-		// what follows, strikes the ground beside a target on it long before it reaches the target
+		// Ground targets first, by the line of sight: the target it passes through, or the one nearest it within three
+		// degrees. A sweep of the whole hull along that line, which is what follows, strikes the ground beside a target
+		// on it long before it reaches the target, and close in a target is wider than any narrow cone about its middle
 		if( groundinstallations )
 		{
-			constexpr float acquireCone = 0.9986f;	// three degrees
+			const float acquireTan = tanf( DEG2RAD( 3.0f ) );
 			GameEntity* found = nullptr;
-			float best = acquireCone;
+			float best = 0;
 			for( int i = 1; i < theLevel.num_entities_; i++ )
 			{
 				GameEntity* other = theLevel.getEntity( i );
@@ -142,18 +171,22 @@ void updateTargetTracking( GameEntity *ent )
 				}
 				else
 					continue;
-				Vec3 to = Vec3( other->r.currentOrigin ) - Vec3( ent->r.currentOrigin );
-				const float dist = VectorNormalize( to );
-				const float dot = DotProduct( forward, to );
-				if( dist > radarrange || dot < best )
+				const Vec3 aim = lockPoint( other );
+				const float dist = Distance( ent->r.currentOrigin, aim );
+				const Vec3 to = aim - eye;
+				const float along = DotProduct( forward, to );
+				if( dist > radarrange || along <= 0 )
+					continue;
+				const float miss = VectorLength( to - forward * along );
+				const float size = 0.5f * Distance( other->r.absmin, other->r.absmax );
+				if( miss > std::max( along * acquireTan, size ) || ( found && miss / along >= best ) )
 					continue;
 				if( other->client_ && VehicleData::stealthHidden( other->client_->vehicle_, other->client_->ps_.timers[TIMER_REVEAL], theLevel.time_, dist, radarrange ) )
 					continue;
-				GameHost::trace( &tr, ent->r.currentOrigin, nullptr, nullptr, other->r.currentOrigin, ent->s.number, MASK_SOLID, false );
-				if( tr.fraction < 1.0f && tr.entityNum != other->s.number )
+				if( !seesTarget( ent, other, MASK_SOLID ) )
 					continue;
 				found = other;
-				best = dot;
+				best = miss / along;
 			}
 			if( found )
 			{
@@ -207,11 +240,7 @@ void updateTargetTracking( GameEntity *ent )
 
 		if( ent->tracktarget_->s.eType == ET_EXPLOSIVE ) 
 		{
-			Vec3	mid;
 			actualcat = CAT_GROUND;
-			mid = ent->tracktarget_->r.absmax + ent->tracktarget_->r.absmin;
-			mid = mid * ( 0.5f );
-			diff = mid - ent->r.currentOrigin;
 		} 
 		else 
 		{
@@ -229,8 +258,8 @@ void updateTargetTracking( GameEntity *ent )
 			{
 				actualcat =	availableVehicles[ent->tracktarget_->client_->vehicle_].cat;
 			}
-			diff = ent->tracktarget_->r.currentOrigin - ent->r.currentOrigin;
 		}
+		diff = lockPoint( ent->tracktarget_ ) - Vec3( ent->r.currentOrigin );
 		if( !actualcat || OnSameSide( ent, ent->tracktarget_ ) ) 
 		{
 			untrack(ent);
@@ -254,8 +283,10 @@ void updateTargetTracking( GameEntity *ent )
 			untrack(ent);
 			return;
 		}
-		// check within cone
-		dot = DotProduct( forward, diff );
+		// check within cone, seen from where the pilot looks
+		Vec3 look = lockPoint( ent->tracktarget_ ) - eye;
+		VectorNormalize( look );
+		dot = DotProduct( forward, look );
 		if( dot < cone ) 
 		{
 			untrack(ent);
@@ -270,9 +301,7 @@ void updateTargetTracking( GameEntity *ent )
 		}
 			
 		// check LOS
-		endpos = ent->r.currentOrigin + diff * ( dist );
-		GameHost::trace( &tr, ent->r.currentOrigin, nullptr, nullptr, endpos, ent->s.number, MASK_PLAYERSOLID, false );
-		if( tr.fraction < 1 && tr.entityNum != ent->s.tracktarget ) 
+		if( !seesTarget( ent, ent->tracktarget_, MASK_PLAYERSOLID ) )
 		{
 			untrack(ent);
 			return;

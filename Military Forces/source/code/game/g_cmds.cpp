@@ -323,7 +323,14 @@ static void Cmd_DevPlace_f( GameEntity *ent )
 	ent->client_->devHold_ = true;
 	VectorCopy( ent->client_->devHoldOrigin_, ent->client_->ps_.origin );
 	VectorClear( ent->client_->ps_.velocity );
-	SetClientViewAngle( ent, ent->client_->devHoldAngles_ );
+	// an optional fifth argument pitches the look, not the vehicle: down is positive
+	Vec3 look = ent->client_->devHoldAngles_;
+	if( CommandSystem::argc() > 5 )
+	{
+		CommandSystem::argvBuffer( 5, arg, sizeof( arg ) );
+		look[PITCH] = atof( arg );
+	}
+	SetClientViewAngle( ent, look );
 }
 
 /*

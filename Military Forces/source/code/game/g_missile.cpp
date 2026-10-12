@@ -884,13 +884,7 @@ struct Think_FollowTarget : public GameEntity::EntityFunc_Think
 		}
 
 		// direction vector and range
-		if( self->tracktarget_->s.eType == ET_EXPLOSIVE ) 
-		{
-			mid = self->tracktarget_->r.absmin + self->tracktarget_->r.absmax;
-			mid = mid * ( 0.5f );
-		} 
-		else 
-			mid = self->tracktarget_->r.currentOrigin;
+		mid = lockPoint( self->tracktarget_ );
 
 		targdir = mid - self->r.currentOrigin;
 		dist = VectorNormalize(targdir);
