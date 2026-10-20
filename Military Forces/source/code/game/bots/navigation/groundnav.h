@@ -3,6 +3,7 @@
 
 #include "../../q_shared.h"
 #include <vector>
+#include "danger.h"
 
 // paths over land and over water on a grid of cells (see the .cpp)
 class GroundNav
@@ -10,7 +11,7 @@ class GroundNav
 public:
 	static void reset();
 	// false when the goal is out of reach; out then leads towards the nearest point reached
-	static bool findPath( const Vec3& from, const Vec3& to, bool water, std::vector<Vec3>& out );
+	static bool findPath( const Vec3& from, const Vec3& to, bool water, std::vector<Vec3>& out, const PathDanger& danger = {} );
 	// a vehicle following a path could not get on from here in this direction: the way between the two cells is closed
 	// for every later search, whatever the trace between their middles said
 	static void blockAhead( const Vec3& here, const Vec3& towards );
@@ -26,6 +27,10 @@ private:
 	static Kind evaluate( int cell, float referenceHeight );
 	static bool passable( int from, int to, Kind wanted );
 	static bool lineOpen( const Vec3& a, const Vec3& b, Kind wanted );
+	static float flatDistance( int cell, const Vec3& point );
+	static bool search( int start, int goal, const Vec3& to, Kind wanted, const PathDanger& danger, int& end );
+	static void expandTowards( int cell, int dx, int dy, const Vec3& to, Kind wanted, const PathDanger& danger );
+	static void straighten( Vec3 anchor, const std::vector<Vec3>& raw, Kind wanted, std::vector<Vec3>& out );
 
 	static bool built_;
 	static Vec3 mins_;	// the map's corner the grid starts from

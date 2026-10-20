@@ -81,6 +81,14 @@ struct Bots::Mind
 	float							nearPadDist = 0;
 
 	bool landed() const { return (ps.ONOFF & OO_LANDED) != 0; }
+	// the team's threat map as a path search weighs it, by this bot's caution
+	PathDanger danger( bool air ) const { return PathDanger{ client->sess_.sessionTeam_, who().caution, air }; }
+	// a straight way on that crosses enough danger to be worth a path round it
+	bool riskyLeg( const Vec3& from, const Vec3& to, bool air ) const
+	{
+		constexpr float risky = 0.5f;
+		return danger( air ).along( from, to ) > risky;
+	}
 	const Character& who() const { return Bots::character( bot ); }
 	// name the place to get to
 	void travelTo( const Vec3& point )
@@ -110,7 +118,7 @@ struct Bots::Mind
 		}
 		if( theLevel.time_ >= bot.path.searchTime )
 		{
-			GroundNav::findPath( here, steer.dest, water, bot.path.points );
+			GroundNav::findPath( here, steer.dest, water, bot.path.points, danger( false ) );
 			bot.path.index = 0;
 			bot.path.searchTime = theLevel.time_ + 2000 + ThinkRate::stagger( ent->s.number, 300 );
 		}

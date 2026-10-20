@@ -18,7 +18,7 @@ list(APPEND GAME_SOURCES
     bots/goals/goals.cpp bots/goals/capabilities.cpp
     bots/senses/senses.cpp
     bots/world/world.cpp bots/world/threat.cpp bots/world/query.cpp bots/world/hints.cpp
-    bots/navigation/airnav.cpp bots/navigation/groundnav.cpp bots/navigation/intercept.cpp
+    bots/navigation/airnav.cpp bots/navigation/groundnav.cpp bots/navigation/intercept.cpp bots/navigation/danger.cpp
     bots/control/helo.cpp
     bots/crew/gunner.cpp bots/crew/engine.cpp bots/crew/countermeasures.cpp bots/crew/weaponbay.cpp
     bots/weapons/weapons.cpp bots/weapons/envelope.cpp

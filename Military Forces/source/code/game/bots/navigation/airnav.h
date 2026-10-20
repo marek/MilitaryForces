@@ -3,6 +3,7 @@
 
 #include "../../q_shared.h"
 #include <vector>
+#include "danger.h"
 
 // paths through the air in an octree of free space (see the .cpp)
 class AirNav
@@ -10,8 +11,8 @@ class AirNav
 public:
 	static void reset();
 	// false when the goal is out of reach; out then leads towards the nearest point reached. With a turn radius,
-	// the path favours space the aircraft can turn in
-	static bool findPath( const Vec3& from, const Vec3& to, std::vector<Vec3>& out, const Vec3& heading = Vec3(), float turnRadius = 0.0f );
+	// the path favours space the aircraft can turn in; with a danger, it goes round the team's threat map
+	static bool findPath( const Vec3& from, const Vec3& to, std::vector<Vec3>& out, const Vec3& heading = Vec3(), float turnRadius = 0.0f, const PathDanger& danger = {} );
 	// nothing of the world on the straight line, for a body of that width
 	static bool clearLine( const Vec3& a, const Vec3& b, float halfWidth );
 	// both ends well inside one free cube: clear without tracing

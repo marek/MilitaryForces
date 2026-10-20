@@ -8,7 +8,7 @@ behavior::Status HeloTasks::navigate( Mind& c )
 	const Vec3 toDest = c.steer.dest - here;
 	const float range = toDest.length();
 	const Vec3 probeEnd = range > 1500.0f ? here + toDest * (1500.0f / range) : c.steer.dest;
-	if( !c.steer.hasDest || c.landed() || range <= 600.0f || AirNav::clearLine( here, probeEnd, 60.0f ) )
+	if( !c.steer.hasDest || c.landed() || range <= 600.0f || (AirNav::clearLine( here, probeEnd, 60.0f ) && !c.riskyLeg( here, c.steer.dest, true )) )
 	{
 		bot.path.points.clear();
 		bot.path.following = false;
@@ -16,13 +16,14 @@ behavior::Status HeloTasks::navigate( Mind& c )
 	}
 	if( theLevel.time_ >= bot.path.searchTime )
 	{
-		AirNav::findPath( here, c.steer.dest, bot.path.points );
+		AirNav::findPath( here, c.steer.dest, bot.path.points, Vec3(), 0.0f, c.danger( true ) );
 		bot.path.index = 0;
 		bot.path.searchTime = theLevel.time_ + 2000 + ThinkRate::stagger( c.ent->s.number, 300 );
 	}
 	// on to the next waypoint once this one is reached or the one after can be flown to directly
 	while( bot.path.index + 1 < bot.path.points.size() &&
-		((bot.path.points[bot.path.index] - here).length() < 250.0f || AirNav::clearLine( here, bot.path.points[bot.path.index + 1], 60.0f )) )
+		((bot.path.points[bot.path.index] - here).length() < 250.0f ||
+		(AirNav::clearLine( here, bot.path.points[bot.path.index + 1], 60.0f ) && !c.riskyLeg( here, bot.path.points[bot.path.index + 1], true ))) )
 		bot.path.index++;
 	bot.path.following = bot.path.index < bot.path.points.size();
 	if( !bot.path.following )

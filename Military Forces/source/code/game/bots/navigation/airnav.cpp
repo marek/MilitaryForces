@@ -298,7 +298,7 @@ namespace
 	bool later( const Entry& a, const Entry& b ) { return a.first > b.first; }
 
 	// every empty cube next to this one, queued when this way to it is cheaper than any found before
-	void expand( int cell, const Vec3& to, float turnRadius )
+	void expand( int cell, const Vec3& to, float turnRadius, const PathDanger& danger )
 	{
 		if( nodes[cell].linkStart < 0 )
 			findLinks( cell );
@@ -311,7 +311,7 @@ namespace
 			const Vec3 entry = entryInto( next, here );
 			const Vec3 move = entry - here;
 			const Vec3 leaving = move.normalized();
-			const float total = soFar + stepCost( nodes[cell], next, move, leaving, turnRadius );
+			const float total = soFar + stepCost( nodes[cell], next, move, leaving, turnRadius ) * danger.factor( entry );
 			if( next.stamp == generation && total >= next.cost )
 				continue;
 			next.stamp = generation;
@@ -347,7 +347,7 @@ namespace
 	}
 
 	// A* over the cubes; reached is the goal when found, otherwise the cube that came nearest to it
-	bool search( int start, int goal, const Vec3& from, const Vec3& to, const Vec3& heading, float turnRadius, int& reached )
+	bool search( int start, int goal, const Vec3& from, const Vec3& to, const Vec3& heading, float turnRadius, const PathDanger& danger, int& reached )
 	{
 		generation++;
 		openHeap.clear();
@@ -381,7 +381,7 @@ namespace
 				reached = cell;
 			}
 			expansions++;
-			expand( cell, to, turnRadius );
+			expand( cell, to, turnRadius, danger );
 		}
 		return false;
 	}
@@ -390,7 +390,7 @@ namespace
 // A* from one point to another. With a turn radius given, turns cost more, and far more in cubes too small to
 // turn in, so a fast aircraft is routed where it can fly. Returns false with a path towards the nearest point
 // reached when the goal is not
-bool AirNav::findPath( const Vec3& from, const Vec3& to, std::vector<Vec3>& out, const Vec3& heading, float turnRadius )
+bool AirNav::findPath( const Vec3& from, const Vec3& to, std::vector<Vec3>& out, const Vec3& heading, float turnRadius, const PathDanger& danger )
 {
 	out.clear();
 	if( nodes.empty() )
@@ -405,7 +405,7 @@ bool AirNav::findPath( const Vec3& from, const Vec3& to, std::vector<Vec3>& out,
 		return true;
 	}
 	int reached = start;
-	const bool found = search( start, goal, from, to, heading, turnRadius, reached );
+	const bool found = search( start, goal, from, to, heading, turnRadius, danger, reached );
 	if( !found && reached == start )
 		return false;
 	std::vector<Vec3>& raw = rawPath;

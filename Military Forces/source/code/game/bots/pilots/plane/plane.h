@@ -195,6 +195,7 @@ struct PlaneTasks
 
 	// fly over the target at height and let the bombing step choose the release
 	static Status levelBomb( Mind& c );
+	static bool flyToRunIn( Mind& c, const Vec3& target );
 
 	// towards the enemy at the present height
 	static Status stalk( Mind& c );

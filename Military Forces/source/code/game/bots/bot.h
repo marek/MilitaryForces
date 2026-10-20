@@ -143,6 +143,8 @@ public:
 		int		chaseTime = 0;	// a chosen turn is flown out until then
 		float	turn = 0;	// the turn chosen towards the enemy
 		float	pitch = 0;	// and its climb or dive
+		Vec3	runIn;	// where a bomb run starts from
+		int		runInTime = 0;	// chosen afresh after then
 
 		void reset() { *this = {}; }
 	};

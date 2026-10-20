@@ -221,12 +221,11 @@ bool GroundNav::lineOpen( const Vec3& a, const Vec3& b, Kind wanted )
 
 // A* from one point to another over land or over water. Returns false with a path towards the nearest point
 // reached when the goal itself is out of reach. Corners that a straight line can skip are left out
-bool GroundNav::findPath( const Vec3& from, const Vec3& to, bool water, std::vector<Vec3>& out )
+bool GroundNav::findPath( const Vec3& from, const Vec3& to, bool water, std::vector<Vec3>& out, const PathDanger& danger )
 {
 	out.clear();
 	if( !built_ )
 		build();
-
 	const Kind wanted = water ? Water : Land;
 	const int start = cellAt( from );
 	const int goal = cellAt( to );
@@ -245,88 +244,10 @@ bool GroundNav::findPath( const Vec3& from, const Vec3& to, bool water, std::vec
 		out.push_back( to );
 		return true;
 	}
-
-	generation_++;
-	using Entry = std::pair<float, int>;
-	const auto later = []( const Entry& a, const Entry& b ) { return a.first > b.first; };
-	const auto flatDistance = [&]( int cell, const Vec3& point )
-	{
-		const int x = cell % nx_;
-		const int y = cell / nx_;
-		const float dx = mins_.x() + (x + 0.5f) * cellSize_ - point.x();
-		const float dy = mins_.y() + (y + 0.5f) * cellSize_ - point.y();
-		return sqrtf( dx * dx + dy * dy );
-	};
-
-	std::vector<Entry>& open = openHeap;
-	open.clear();
-	stamp_[start] = generation_;
-	cost_[start] = 0;
-	parent_[start] = -1;
-	open.push_back( { flatDistance( start, to ), start } );
-
-	int closest = start;
-	float closestDistance = flatDistance( start, to );
-	bool found = false;
-	int expansions = 0;
-	while( !open.empty() && expansions < maxExpansions )
-	{
-		std::pop_heap( open.begin(), open.end(), later );
-		const int cell = open.back().second;
-		const float queued = open.back().first;
-		open.pop_back();
-		const float remaining = flatDistance( cell, to );
-		// an entry left over from before a shorter way to this cell was found
-		if( queued > cost_[cell] + remaining + 1.0f )
-			continue;
-		if( cell == goal )
-		{
-			found = true;
-			break;
-		}
-		if( remaining < closestDistance )
-		{
-			closestDistance = remaining;
-			closest = cell;
-		}
-		expansions++;
-
-		const int x = cell % nx_;
-		const int y = cell / nx_;
-		for( int dy = -1; dy <= 1; dy++ )
-		{
-			for( int dx = -1; dx <= 1; dx++ )
-			{
-				if( !dx && !dy )
-					continue;
-				const int ox = x + dx, oy = y + dy;
-				if( ox < 0 || oy < 0 || ox >= nx_ || oy >= ny_ )
-					continue;
-				const int other = oy * nx_ + ox;
-				if( !passable( cell, other, wanted ) )
-					continue;
-				// no cutting a corner past a blocked cell
-				if( dx && dy && (!passable( cell, y * nx_ + ox, wanted ) || !passable( cell, oy * nx_ + x, wanted )) )
-					continue;
-				float step = cellSize_ * ((dx && dy) ? 1.4142f : 1.0f);
-				// climbing and descending cost more than level ground
-				step *= 1.0f + 2.0f * fabs( height_[other] - height_[cell] ) / cellSize_;
-				const float total = cost_[cell] + step;
-				if( stamp_[other] == generation_ && total >= cost_[other] )
-					continue;
-				stamp_[other] = generation_;
-				cost_[other] = total;
-				parent_[other] = cell;
-				open.push_back( { total + flatDistance( other, to ), other } );
-				std::push_heap( open.begin(), open.end(), later );
-			}
-		}
-	}
-
-	const int end = found ? goal : closest;
+	int end = start;
+	const bool found = search( start, goal, to, wanted, danger, end );
 	if( end == start )
 		return false;
-
 	std::vector<Vec3>& raw = rawPath;
 	raw.clear();
 	if( found )
@@ -334,9 +255,92 @@ bool GroundNav::findPath( const Vec3& from, const Vec3& to, bool water, std::vec
 	for( int cell = found ? parent_[goal] : end; cell >= 0 && cell != start; cell = parent_[cell] )
 		raw.push_back( centre( cell ) );
 	std::reverse( raw.begin(), raw.end() );
+	straighten( Vec3( from.x(), from.y(), height_[start] ), raw, wanted, out );
+	return found;
+}
 
-	// straighten: from each point keep the furthest of the next few that can be driven to directly
-	Vec3 anchor( from.x(), from.y(), height_[start] );
+// flat distance from a cell's middle to a point
+float GroundNav::flatDistance( int cell, const Vec3& point )
+{
+	const int x = cell % nx_;
+	const int y = cell / nx_;
+	const float dx = mins_.x() + (x + 0.5f) * cellSize_ - point.x();
+	const float dy = mins_.y() + (y + 0.5f) * cellSize_ - point.y();
+	return sqrtf( dx * dx + dy * dy );
+}
+
+// A* over the cells; end is the goal when found, otherwise the cell that came nearest to it
+bool GroundNav::search( int start, int goal, const Vec3& to, Kind wanted, const PathDanger& danger, int& end )
+{
+	using Entry = std::pair<float, int>;
+	const auto later = []( const Entry& a, const Entry& b ) { return a.first > b.first; };
+	generation_++;
+	openHeap.clear();
+	stamp_[start] = generation_;
+	cost_[start] = 0;
+	parent_[start] = -1;
+	openHeap.push_back( { flatDistance( start, to ), start } );
+	end = start;
+	float closestDistance = flatDistance( start, to );
+	int expansions = 0;
+	while( !openHeap.empty() && expansions < maxExpansions )
+	{
+		std::pop_heap( openHeap.begin(), openHeap.end(), later );
+		const int cell = openHeap.back().second;
+		const float queued = openHeap.back().first;
+		openHeap.pop_back();
+		const float remaining = flatDistance( cell, to );
+		// an entry left over from before a shorter way to this cell was found
+		if( queued > cost_[cell] + remaining + 1.0f )
+			continue;
+		if( cell == goal )
+		{
+			end = goal;
+			return true;
+		}
+		if( remaining < closestDistance )
+		{
+			closestDistance = remaining;
+			end = cell;
+		}
+		expansions++;
+		for( int n = 0; n < 9; n++ )
+			expandTowards( cell, n % 3 - 1, n / 3 - 1, to, wanted, danger );
+	}
+	return false;
+}
+
+// the neighbour one step that way, queued when this way to it is cheaper than any found before. No cutting a corner
+// past a blocked cell; climbing and descending cost more than level ground, and so does danger
+void GroundNav::expandTowards( int cell, int dx, int dy, const Vec3& to, Kind wanted, const PathDanger& danger )
+{
+	using Entry = std::pair<float, int>;
+	const auto later = []( const Entry& a, const Entry& b ) { return a.first > b.first; };
+	const int x = cell % nx_, y = cell / nx_;
+	const int ox = x + dx, oy = y + dy;
+	if( (!dx && !dy) || ox < 0 || oy < 0 || ox >= nx_ || oy >= ny_ )
+		return;
+	const int other = oy * nx_ + ox;
+	if( !passable( cell, other, wanted ) )
+		return;
+	if( dx && dy && (!passable( cell, y * nx_ + ox, wanted ) || !passable( cell, oy * nx_ + x, wanted )) )
+		return;
+	float step = cellSize_ * ((dx && dy) ? 1.4142f : 1.0f);
+	step *= 1.0f + 2.0f * fabs( height_[other] - height_[cell] ) / cellSize_;
+	step *= danger.factor( centre( other ) );
+	const float total = cost_[cell] + step;
+	if( stamp_[other] == generation_ && total >= cost_[other] )
+		return;
+	stamp_[other] = generation_;
+	cost_[other] = total;
+	parent_[other] = cell;
+	openHeap.push_back( { total + flatDistance( other, to ), other } );
+	std::push_heap( openHeap.begin(), openHeap.end(), later );
+}
+
+// from each point keep the furthest of the next few that can be driven to directly
+void GroundNav::straighten( Vec3 anchor, const std::vector<Vec3>& raw, Kind wanted, std::vector<Vec3>& out )
+{
 	size_t i = 0;
 	while( i < raw.size() )
 	{
@@ -353,5 +357,4 @@ bool GroundNav::findPath( const Vec3& from, const Vec3& to, bool water, std::vec
 		anchor = raw[furthest];
 		i = furthest + 1;
 	}
-	return found;
 }
