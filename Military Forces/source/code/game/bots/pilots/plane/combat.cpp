@@ -75,6 +75,19 @@ behavior::Status PlaneTasks::breakAway( Mind& c )
 }
 
 // directly away from the enemy
+// out of the reach of an enemy whose weapons outrange this aircraft's: straight away from it, and from one on the
+// surface climbing as well, since every unit of height is range and elevation its guns must find
+behavior::Status PlaneTasks::leaveReach( Mind& c )
+{
+	constexpr float climbAway = -12.0f;
+	c.view[YAW] = c.sense.enemyAngles[YAW] + 180.0f;
+	if( !c.sense.enemyAir && c.ceiling > 600.0f )
+		c.view[PITCH] = climbAway;
+	else
+		c.holdAltitude();
+	return Status::Running;
+}
+
 behavior::Status PlaneTasks::flee( Mind& c )
 {
 	c.view[YAW] = c.sense.enemyAngles[YAW] + 180.0f;

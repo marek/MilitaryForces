@@ -757,7 +757,8 @@ bool BotSenses::outranged( GameEntity* ent, const Bots::Sense& out )
 	if( !out.enemy || !out.enemy->client_ || out.enemy->client_->vehicle_ < 0 )
 		return false;
 	const bool selfAir = (out.can.runway || out.can.hovers) && !(ent->client_->ps_.ONOFF & OO_LANDED);
-	const float theirs = Envelope::reachOf( out.enemy->client_->vehicle_, out.enemy->client_->ps_.ammo, selfAir );
-	const float ours = Envelope::reachOf( ent->client_->vehicle_, ent->client_->ps_.ammo, out.enemyAir );
+	const float up = Envelope::elevationOf( out.enemy->r.currentOrigin, ent->r.currentOrigin );
+	const float theirs = Envelope::reachOf( out.enemy->client_->vehicle_, out.enemy->client_->ps_.ammo, selfAir, up );
+	const float ours = Envelope::reachOf( ent->client_->vehicle_, ent->client_->ps_.ammo, out.enemyAir, -up );
 	return out.enemyDist <= theirs && out.enemyDist > ours;
 }

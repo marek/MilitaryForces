@@ -76,6 +76,7 @@ struct HeloTasks
 	static bool evading( Mind& c ) { return c.bot.desire == Goal::Evade && (c.sense.enemy || c.sense.blindsided); }
 
 	static bool capturing( Mind& c ) { return c.bot.desire == Goal::Capture; }
+	static bool outranged( Mind& c ) { return c.sense.outranged && !c.sense.blindsided; }
 	// near enough to fight from cover
 
 	static bool fighting( Mind& c ) { return c.sense.enemy && c.bot.desire == Goal::Attack && c.sense.enemyDist < 3000; }
@@ -121,6 +122,7 @@ struct HeloTasks
 
 	// away from the enemy, or to the side when hit by someone unseen
 	static Status evade( Mind& c );
+	static Status leaveReach( Mind& c );
 
 	// to the flag, and down onto it at the end: a flag is touched near the ground
 	static Status goToFlag( Mind& c );

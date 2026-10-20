@@ -33,7 +33,9 @@ behavior::Tree<Bots::Mind> HeloTasks::build()
 		t.when( "wants to rearm", rearming, rearm ),
 		t.when( "infantry wants a lift", passengersNear, t.action( "wait for passengers", waitForPassengers ) ),
 		t.when( "team mate on foot nearby", walkerWaiting, t.action( "pick up walker", pickUpWalker ) ),
-		t.when( "evading", evading, t.action( "evade", evade ) ),
+		t.when( "evading", evading, t.selector( "evade", {
+			t.when( "outranged", outranged, t.action( "leave their reach", leaveReach ) ),
+			t.action( "evade", evade ) } ) ),
 		t.when( "capturing", capturing, t.action( "go to flag", goToFlag ) ),
 		t.when( "carries supplies", carriesCrates, t.action( "resupply team mate", resupply ) ),
 		t.when( "stealth with missiles", stealthStriking, stealthStrike ),

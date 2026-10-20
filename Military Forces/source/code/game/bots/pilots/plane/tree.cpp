@@ -23,6 +23,7 @@ const PlaneTasks::Node* PlaneTasks::decide( Tree& t )
 		t.when( "just airborne", departing, t.action( "depart", depart ) ),
 		t.when( "evading", evading, t.selector( "evade", {
 			t.when( "blindsided", blindsided, t.action( "break away", breakAway ) ),
+			t.when( "outranged", outranged, t.action( "leave their reach", leaveReach ) ),
 			t.action( "flee", flee ) } ) ),
 		t.when( "through a pass", extending, t.action( "extend", extend ) ),
 		t.when( "engaging", engaging, attack( t ) ),

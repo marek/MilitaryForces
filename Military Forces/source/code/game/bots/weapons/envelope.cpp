@@ -13,7 +13,7 @@ namespace
 	constexpr float noEscapeShare = 0.5f;
 }
 
-Envelope Envelope::of( int weapon )
+Envelope Envelope::of( int weapon, int vehicle )
 {
 	Envelope e;
 	if( weapon <= 0 )
@@ -55,10 +55,37 @@ Envelope Envelope::of( int weapon )
 	default:
 		break;
 	}
+	limitElevation( e, data, vehicle );
 	return e;
 }
 
-float Envelope::reachOf( int vehicle, const int* ammo, bool targetAir )
+// A turret's pitch limits (pitch down is positive) are the heights it can reach. A ground vehicle's guns go no higher
+// or lower than its gun can be laid: up to 360 less its gear height, down to its tail angle, as its movement holds them
+void Envelope::limitElevation( Envelope& e, const completeWeaponData_t& data, int vehicle )
+{
+	if( data.turret && data.maxturns[PITCH] > data.minturns[PITCH] )
+	{
+		e.minElevation = -data.maxturns[PITCH];
+		e.maxElevation = -data.minturns[PITCH];
+	}
+	if( vehicle < 0 || e.guided || !(availableVehicles[vehicle].cat & CAT_GROUND) )
+		return;
+	const completeVehicleData_t& veh = availableVehicles[vehicle];
+	if( veh.gearheight > 180.0f && veh.gearheight < 360.0f )
+		e.maxElevation = std::min( e.maxElevation, 360.0f - veh.gearheight );
+	if( veh.tailangle > 0.0f && veh.tailangle < 90.0f )
+		e.minElevation = std::max( e.minElevation, -veh.tailangle );
+}
+
+float Envelope::elevationOf( const vec3_t from, const vec3_t to )
+{
+	vec3_t dir;
+	VectorSubtract( to, from, dir );
+	const float flat = sqrtf( dir[0] * dir[0] + dir[1] * dir[1] );
+	return atan2f( dir[2], std::max( flat, 1.0f ) ) * 180.0f / static_cast<float>( M_PI );
+}
+
+float Envelope::reachOf( int vehicle, const int* ammo, bool targetAir, float elevation )
 {
 	if( vehicle < 0 )
 		return 0.0f;
@@ -68,8 +95,8 @@ float Envelope::reachOf( int vehicle, const int* ammo, bool targetAir )
 	{
 		if( !veh.weapons[slot] || ammo[slot] <= 0 )
 			continue;
-		const Envelope e = of( veh.weapons[slot] );
-		if( targetAir ? e.air : e.surface )
+		const Envelope e = of( veh.weapons[slot], vehicle );
+		if( (targetAir ? e.air : e.surface) && elevation >= e.minElevation && elevation <= e.maxElevation )
 			reach = std::max( reach, e.maxRange );
 	}
 	return reach;

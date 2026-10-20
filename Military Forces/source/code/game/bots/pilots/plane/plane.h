@@ -50,6 +50,7 @@ struct PlaneTasks
 	static bool evading( Mind& c ) { return c.bot.desire == Goal::Evade && (c.sense.blindsided || c.sense.enemy); }
 
 	static bool blindsided( Mind& c ) { return c.sense.blindsided; }
+	static bool outranged( Mind& c ) { return c.sense.outranged; }
 	// attacking, and not just leaving after a pass
 
 	static bool enemyHasTurrets( Mind& c ) { return c.sense.enemy && (availableVehicles[c.sense.enemy->client_->vehicle_].flags & VF_GUNSTATIONS); }
@@ -189,6 +190,7 @@ struct PlaneTasks
 
 	// directly away from the enemy
 	static Status flee( Mind& c );
+	static Status leaveReach( Mind& c );
 
 	// nose on the target, release when lined up and close with no team mate in the blast, then pull out
 	static Status diveBomb( Mind& c );

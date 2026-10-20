@@ -21,6 +21,17 @@ behavior::Status HeloTasks::dodgeMissile( Mind& c )
 }
 
 // away from the enemy, or to the side when hit by someone unseen
+// out of the reach of an enemy whose weapons outrange this helicopter's: away from it flat out and low, where the
+// ground soon stands in the way
+behavior::Status HeloTasks::leaveReach( Mind& c )
+{
+	c.view[YAW] = c.sense.enemyAngles[YAW] + 180.0f;
+	c.steer.evading = true;
+	c.steer.mode = Run;
+	c.steer.wantHeight = heloLowHeight;
+	return Status::Running;
+}
+
 behavior::Status HeloTasks::evade( Mind& c )
 {
 	c.view[YAW] = c.sense.blindsided ? c.bot.breakYaw : c.sense.enemyAngles[YAW] + 180.0f;
