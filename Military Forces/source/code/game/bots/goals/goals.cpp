@@ -257,6 +257,29 @@ namespace
 		{ Bots::Goal::Capture, "capture", captureTerms }
 	} };
 
+	// Per role, a weight on each goal's score, in the goal table's order: attack, evade, climb, hide, rearm, capture.
+	// The terms already ask what a vehicle can do; this is where a role is made keener or less keen on a goal as a
+	// whole. g_botWeights can scale a cell for a sweep ("Bomber.attack=1.2")
+	constexpr std::array<const char*, 8> roleNames = { "Fighter", "Bomber", "AttackHelo", "TransportHelo", "Tank", "AirDefence", "Boat", "Infantry" };
+	constexpr float roleWeights[roleNames.size()][goalTable.size()] = {
+		/* Fighter */		{ 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f },
+		/* Bomber */		{ 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f },
+		/* AttackHelo */	{ 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f },
+		/* TransportHelo */	{ 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f },
+		/* Tank */			{ 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f },
+		/* AirDefence */	{ 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f },
+		/* Boat */			{ 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f },
+		/* Infantry */		{ 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f },
+	};
+
+	float roleWeight( Bots::Role role, size_t goal )
+	{
+		const size_t r = static_cast<size_t>( role );
+		char key[64];
+		Com_sprintf( key, sizeof( key ), "%s.%s", roleNames[r], goalTable[goal].name );
+		return roleWeights[r][goal] * BotTelemetry::weight( key );
+	}
+
 	// a goal's score: its terms in order
 	float scoreOf( const GoalEntry& entry, const Situation& situation )
 	{
@@ -284,7 +307,7 @@ Bots::Goal Bots::chooseGoal( GameEntity* ent, State& bot, const Sense& sense )
 	std::array<float, goalTable.size()> scores;
 	for( size_t i = 0; i < goalTable.size(); i++ )
 	{
-		float score = scoreOf( goalTable[i], situation );
+		float score = scoreOf( goalTable[i], situation ) * roleWeight( sense.role, i );
 		if( goalTable[i].goal == bot.desire && goalTable[i].goal != Goal::Rearm )
 			score *= keep;
 		scores[i] = score;
