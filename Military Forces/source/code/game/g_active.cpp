@@ -9,6 +9,7 @@
 #include "g_level.h"
 #include "g_plane.h"
 #include "g_helo.h"
+#include "bots/bot.h"
 
 /*
 ===============
@@ -525,10 +526,12 @@ static void ClientEvents( GameEntity *ent, int oldEventSequence )
 		{
 		case EV_FIRE_MG:
 			fire_autocannon( ent, false );
+			Bots::onShot( ent );
 			break;
 
 		case EV_FIRE_WEAPON:
 			FireWeapon( ent );
+			Bots::onShot( ent );
 			break;
 
 		case EV_FIRE_FLARE:

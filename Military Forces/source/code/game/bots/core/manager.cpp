@@ -73,6 +73,31 @@ bool Bots::unfitHere( int type )
 
 // tallies lives per kind of vehicle and, among them, crashes soon after spawning: a kind that keeps
 // crashing on this map is picked less
+// A shot is heard by the bots near it that are not on the shooter's side. It tells roughly where the shooter is: the
+// contact becomes suspicious, drawing the bot's look, not its guns
+void Bots::onShot( GameEntity* shooter )
+{
+	constexpr float hearing = 2000.0f, vagueness = 300.0f;
+	if( !shooter || !shooter->client_ || shooter->s.number < 1 || shooter->s.number > MAX_CLIENTS )
+		return;
+	for( int i = 1; i <= theLevel.maxclients_ && i <= MAX_CLIENTS; i++ )
+	{
+		GameEntity* listener = theLevel.getEntity( i );
+		if( listener == shooter || !states_[i].active || !alive( listener ) || OnSameTeam( listener, shooter ) )
+			continue;
+		if( Distance( listener->r.currentOrigin, shooter->r.currentOrigin ) > hearing )
+			continue;
+		Seen& seen = states_[i].seen[shooter->s.number];
+		if( seen.level == Awareness::Aware )
+			continue;
+		VectorCopy( shooter->r.currentOrigin, seen.position );
+		seen.position[0] += crandom() * vagueness;
+		seen.position[1] += crandom() * vagueness;
+		seen.time = theLevel.time_;
+		seen.level = Awareness::Suspicious;
+	}
+}
+
 void Bots::onDeath( GameEntity* self, GameEntity* attacker, int meansOfDeath )
 {
 	BotTeam::onDeath( self, attacker );

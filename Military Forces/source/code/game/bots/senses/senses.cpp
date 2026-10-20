@@ -331,6 +331,13 @@ bool BotSenses::locate( GameEntity* ent, Bots::State& bot, GameEntity* other, co
 	}
 	if( seen.level == Bots::Awareness::Aware && theLevel.time_ - seen.awareTime >= trackingTime )
 		seen.level = Bots::Awareness::Suspicious;
+	// a radar contact shows where it is, not what it is doing
+	if( onRadar( ent, other, contact.dist ) )
+	{
+		VectorCopy( other->r.currentOrigin, seen.position );
+		seen.time = theLevel.time_;
+		seen.level = std::max( seen.level, Bots::Awareness::Suspicious );
+	}
 	// what a team mate saw, once word of it has got round
 	vec3_t told;
 	int toldTime;
@@ -354,6 +361,21 @@ bool BotSenses::locate( GameEntity* ent, Bots::State& bot, GameEntity* other, co
 		return false;
 	}
 	return true;
+}
+
+// on this bot's radar as on a player's: the radar on in the mode for that kind of target, inside its range, and not
+// hidden by stealth
+bool BotSenses::onRadar( GameEntity* ent, GameEntity* other, float dist )
+{
+	const playerState_t& ps = ent->client_->ps_;
+	const completeVehicleData_t& veh = availableVehicles[ent->client_->vehicle_];
+	GameClient* oc = other->client_;
+	const bool air = (availableVehicles[oc->vehicle_].cat & (CAT_PLANE|CAT_HELO)) != 0 && !(oc->ps_.ONOFF & OO_LANDED);
+	const int mode = air ? OO_RADAR_AIR : OO_RADAR_GROUND;
+	const float range = static_cast<float>( air ? veh.radarRange : veh.radarRange2 );
+	if( (ps.ONOFF & OO_RADAR) != mode || range <= 0.0f || dist > range )
+		return false;
+	return !VehicleData::stealthHidden( oc->vehicle_, oc->ps_.timers[TIMER_REVEAL], theLevel.time_, dist, range );
 }
 
 // within range, not hidden by stealth, and nothing in the way

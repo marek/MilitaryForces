@@ -26,6 +26,8 @@ public:
 	static bool isBot( int clientNum );
 	static int count();
 	static void onDeath( GameEntity* self, GameEntity* attacker, int meansOfDeath );
+	// someone fired: the bots that hear it are suspicious of the shooter
+	static void onShot( GameEntity* shooter );
 
 	// console commands
 	static void addCommand();
@@ -468,6 +470,7 @@ private:
 	static Attention attentionOf( GameEntity* ent, const Bots::State& bot );
 	static bool locate( GameEntity* ent, Bots::State& bot, GameEntity* other, const Attention& attention, Contact& contact );
 	static bool inSight( GameEntity* ent, GameEntity* other, float dist, float sightShare );
+	static bool onRadar( GameEntity* ent, GameEntity* other, float dist );
 	static bool noticed( GameEntity* ent, const Bots::State& bot, const Bots::Seen& seen, const vec3_t where, float dist, const Attention& attention );
 	static bool ahead( GameEntity* ent, const vec3_t point );
 	static bool lookingRound( GameEntity* ent, const Bots::State& bot );
