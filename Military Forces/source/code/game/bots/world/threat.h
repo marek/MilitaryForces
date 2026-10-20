@@ -6,7 +6,7 @@
 #include <vector>
 
 // Each team's map of where it is dangerous to be: the enemy's SAM and flak sites by their reach, where team mates
-// died in the last minutes, and enemies the team has seen, by what they can shoot at. Kept as a short list of discs,
+// died in the last minutes, and enemies the team has seen, by what they can shoot at. Without teams, only the sites. Kept as a short list of discs,
 // remade every two seconds, so a question costs a pass over a few dozen of them.
 class ThreatMap
 {

@@ -83,11 +83,18 @@ struct Bots::Mind
 	bool landed() const { return (ps.ONOFF & OO_LANDED) != 0; }
 	// the team's threat map as a path search weighs it, by this bot's caution
 	PathDanger danger( bool air ) const { return PathDanger{ client->sess_.sessionTeam_, who().caution, air }; }
-	// a straight way on that crosses enough danger to be worth a path round it
+	// A straight way on that crosses enough danger to be worth a path round it. The last stretch before the place
+	// steered for does not count, since that is where it is going, and a bot pressing an attack goes straight in
 	bool riskyLeg( const Vec3& from, const Vec3& to, bool air ) const
 	{
-		constexpr float risky = 0.5f;
-		return danger( air ).along( from, to ) > risky;
+		constexpr float risky = 0.5f, nearEnd = 2500.0f;
+		if( weapons.attacking )
+			return false;
+		const Vec3 way = to - from;
+		const float length = way.length();
+		if( length <= nearEnd )
+			return false;
+		return danger( air ).along( from, from + way * ((length - nearEnd) / length) ) > risky;
 	}
 	const Character& who() const { return Bots::character( bot ); }
 	// name the place to get to

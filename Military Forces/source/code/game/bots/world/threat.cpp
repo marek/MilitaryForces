@@ -67,6 +67,9 @@ void ThreatMap::refresh( int team )
 	std::vector<Disc>& out = discs_[slot];
 	out.clear();
 	addSites( team, out );
+	// without teams nobody shares what they saw, and a death is where the fighting is, not a warning to anyone
+	if( team == ClientBase::TEAM_FREE )
+		return;
 	addSightings( team, out );
 	addDeaths( team, out );
 }
