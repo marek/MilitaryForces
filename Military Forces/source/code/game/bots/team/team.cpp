@@ -584,7 +584,7 @@ namespace
 
 		void report()
 		{
-	#ifdef MF_BOT_DEBUG
+#ifdef MF_BOT_DEBUG
 			if( g_botDebug.integer >= 2 )
 			{
 				Common::printf( "BOTTEAM t %d %s level %d effort %.0f %.0f pushing %d carrier ours %d theirs %d jobs", theLevel.time_, teamName( team ), level,
@@ -594,7 +594,7 @@ namespace
 						Common::printf( " %d:%s:%s", m.num, kindName( static_cast<int>( m.kind ) ), jobName( assignments[m.num].job ) );
 				Common::printf( "\n" );
 			}
-	#endif
+#endif
 		}
 	};
 
