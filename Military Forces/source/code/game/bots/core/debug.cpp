@@ -57,7 +57,7 @@ void Bots::logState( GameEntity* ent, State& bot, const usercmd_t& cmd, const ve
 {
 	GameClient* client = ent->client_;
 	const playerState_t& ps = client->ps_;
-	bot.logTime = theLevel.time_ + (g_botDebug.integer >= 4 ? 100 : 500);
+	bot.logTime = theLevel.time_ + (g_botDebug.integer >= 5 ? 1 : g_botDebug.integer >= 4 ? 100 : 500);
 	vec3_t flat = { 0, ps.vehicleAngles[YAW], 0 }, forward, right, up = { 0, 0, 1 }, back, left, down = { 0, 0, -1 }, nose;
 	AngleVectors( flat, forward, right, nullptr );
 	AngleVectors( ps.vehicleAngles, nose, nullptr, nullptr );

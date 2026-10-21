@@ -450,6 +450,8 @@ void Bots::think( GameEntity* ent, State& bot, usercmd_t& cmd )
 	chaseFlagThief( ent, bot );
 	followPlan( ent, bot );
 	keepPlaneFuel( ent, bot );
+	if( giveUpStranded( ent, bot ) )
+		return;
 	pilot( ent, bot, cmd, view );
 
 	turnHand( bot, view );
@@ -468,16 +470,22 @@ void Bots::think( GameEntity* ent, State& bot, usercmd_t& cmd )
 #endif
 }
 
-// A hand on a mouse: the view turns fast but not in no time, so a change of mind never flicks it across in one frame.
-// The more skilled turn it faster
+// A hand on a mouse: the view eases round to where the pilot wants to look, never in no time and never past it. How
+// fast depends on what the pilot is doing: gently while roaming, travelling or going home, quicker when attacking,
+// quickest when getting out of the way of a missile, the ground or another aircraft. The more skilled are quicker
 void Bots::turnHand( State& bot, vec3_t view )
 {
-	constexpr float slowestTurn = 360.0f, skilledGain = 360.0f;
+	struct Hand { float slowest, skilled, ease; };	// degrees a second, more for skill; seconds to come most of the way round
+	constexpr Hand gentle = { 90.0f, 60.0f, 0.25f }, attacking = { 360.0f, 360.0f, 0.1f }, urgent = { 600.0f, 400.0f, 0.05f };
+	const bool avoiding = theLevel.time_ < bot.avoid.time;
+	const Hand& hand = bot.desire == Goal::Evade || avoiding ? urgent : bot.desire == Goal::Attack || bot.desire == Goal::Hide ? attacking : gentle;
 	if( bot.handTime && theLevel.time_ > bot.handTime )
 	{
-		const float most = (slowestTurn + skilledGain * skill( bot )) * (theLevel.time_ - bot.handTime) * 0.001f;
+		const float seconds = (theLevel.time_ - bot.handTime) * 0.001f;
+		const float most = (hand.slowest + hand.skilled * skill( bot )) * seconds;
+		const float share = 1.0f - expf( -seconds / hand.ease );
 		for( int i : { PITCH, YAW } )
-			view[i] = bot.handView[i] + std::clamp( AngleSubtract( view[i], bot.handView[i] ), -most, most );
+			view[i] = bot.handView[i] + std::clamp( AngleSubtract( view[i], bot.handView[i] ) * share, -most, most );
 	}
 	if( !bot.handTime || theLevel.time_ > bot.handTime )
 	{
@@ -548,6 +556,7 @@ void Bots::startLife( GameEntity* ent, State& bot )
 	// an offer of a lift belongs to the life that made it; whom it passed over is remembered
 	bot.lift.walker = -1;
 	bot.stillSince = 0;
+	bot.strandedSince = 0;
 	bot.lifeScore = ent->client_->ps_.persistant[PERS_SCORE];
 	bot.goalTime = 0;
 	bot.enemy = -1;
@@ -559,6 +568,7 @@ void Bots::startLife( GameEntity* ent, State& bot )
 	VectorCopy( ent->r.currentOrigin, bot.stuck.lastOrigin );
 	bot.path.reset();
 	bot.cover.reset();
+	bot.firing.reset();
 	bot.takeoff.reset();
 	bot.rearm.letGo();
 	bot.desire = Goal::Roam;
@@ -642,6 +652,27 @@ void Bots::followPlan( GameEntity* ent, State& bot )
 // Fuel (Marek, 2026-10-08): a plane with no pad it can land on on this map keeps a quarter tank, since it cannot
 // refuel there and no plane can pick up a supply drop. Nothing else gets free fuel: a plane that can land does,
 // ground vehicles and helicopters go back to a pad or are supplied by helicopter, boats are supplied.
+// Out of fuel and going nowhere, away from anything that would fill the tank: a person gives the vehicle up and takes
+// another, rather than sitting there for the rest of the game
+bool Bots::giveUpStranded( GameEntity* ent, State& bot )
+{
+	constexpr int waitFor = 10000;
+	constexpr float standing = 5.0f;
+	const playerState_t& ps = ent->client_->ps_;
+	if( ps.stats[STAT_FUEL] > 0 || VectorLength( ps.velocity ) > standing )
+	{
+		bot.strandedSince = 0;
+		return false;
+	}
+	if( !bot.strandedSince )
+		bot.strandedSince = theLevel.time_;
+	if( theLevel.time_ < bot.strandedSince + waitFor )
+		return false;
+	bot.strandedSince = 0;
+	Cmd_Kill_f( ent );
+	return true;
+}
+
 void Bots::keepPlaneFuel( GameEntity* ent, State& bot )
 {
 	constexpr int padCheckInterval = 2000;
@@ -652,7 +683,7 @@ void Bots::keepPlaneFuel( GameEntity* ent, State& bot )
 	{
 		bot.landing.padCheckTime = theLevel.time_ + padCheckInterval;
 		bot.landing.canLand = g_botLanding.integer && theLevel.time_ >= bot.landing.giveUp &&
-			BotWorld::findPad( ent, theLevel.time_ < bot.rearm.badPadTime ? bot.rearm.badPad : -1 ) >= 0;
+			BotWorld::findPad( ent, &bot.rearm ) >= 0;
 	}
 	if( !bot.landing.canLand && bot.rearm.pad < 0 && ps.stats[STAT_FUEL] < ps.stats[STAT_MAX_FUEL] / 4 )
 		ps.stats[STAT_FUEL] = ps.stats[STAT_MAX_FUEL] / 4;

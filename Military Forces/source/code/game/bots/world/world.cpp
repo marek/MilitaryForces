@@ -461,7 +461,7 @@ void BotWorld::buildPads()
 }
 
 // the nearest pad this vehicle may use: of its kind, of its team, and for a plane one with a runway
-int BotWorld::findPad( GameEntity* ent, int skip )
+int BotWorld::findPad( GameEntity* ent, const Bots::Rearm* rearm )
 {
 	if( !BotWorld::padsBuilt_ )
 		BotWorld::buildPads();
@@ -473,7 +473,7 @@ int BotWorld::findPad( GameEntity* ent, int skip )
 	for( size_t i = 0; i < BotWorld::pads_.size(); i++ )
 	{
 		const BotWorld::Pad& pad = BotWorld::pads_[i];
-		if( !(pad.category & cat) || ((cat & CAT_PLANE) && !pad.runway) || static_cast<int>( i ) == skip )
+		if( !(pad.category & cat) || ((cat & CAT_PLANE) && !pad.runway) || (rearm && rearm->avoided( static_cast<int>( i ), theLevel.time_ )) )
 			continue;
 		if( g_gametype.integer >= GT_TEAM && pad.team != ClientBase::TEAM_FREE && pad.team != client->sess_.sessionTeam_ )
 			continue;

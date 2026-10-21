@@ -28,7 +28,13 @@ struct SurfaceTasks
 
 	static bool evading( Mind& c ) { return c.bot.desire == Goal::Evade && c.sense.enemy; }
 
-	static bool engaging( Mind& c ) { return groundEnemy( c ) && c.bot.desire != Goal::Capture; }
+	// a boat fights only what it can get at: another boat, or one in reach of its guns from the water
+	static bool engaging( Mind& c )
+	{
+		if( !groundEnemy( c ) || c.bot.desire == Goal::Capture )
+			return false;
+		return !c.boat || (availableVehicles[c.sense.enemy->client_->vehicle_].cat & CAT_BOAT) || c.sense.enemyDist < weaponReach( c );
+	}
 
 	static bool reversing( Mind& c ) { return theLevel.time_ < c.bot.stuck.reverseTime; }
 
@@ -135,6 +141,9 @@ struct SurfaceTasks
 	static Status watchAhead( Mind& c );
 	static bool wallAhead( const Mind& c, const vec3_t dir, float reach );
 	static float cornerSpeed( const Mind& c, float turnLeft );
+	static float weaponReach( const Mind& c );
+	static bool keepFiringSpot( Mind& c );
+	static bool findFiringSpot( Mind& c );
 	static bool waterOrDropAhead( const Mind& c, const vec3_t forward );
 	static bool shoreAhead( const Mind& c, const vec3_t forward );
 	static bool noProgress( Mind& c );

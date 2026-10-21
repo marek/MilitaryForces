@@ -75,8 +75,7 @@ namespace
 	{
 		if( padPenalty )
 		{
-			c.bot.rearm.badPad = c.bot.rearm.pad;
-			c.bot.rearm.badPadTime = theLevel.time_ + padPenalty;
+			c.bot.rearm.avoid( c.bot.rearm.pad, theLevel.time_ + padPenalty );
 		}
 		c.bot.rearm.letGo();
 		c.bot.landing.giveUp = theLevel.time_ + retryDelay;

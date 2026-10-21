@@ -138,64 +138,60 @@ struct GoalScoring
 		return tank( s ) && !has( s, WT_ANTIAIRMISSILE ) ? s.who.caution * 1.6f * airThreatNear( s, 5000.0f ) : 0.0f;
 	}
 
-	// How empty a vehicle's weapons are, 0 full to 1 empty, across those its job is about: a bomber's payload, a supply
-	// helicopter's crates, and for everyone the whole of what it carries; the emptier of the two counts. Flares are a
-	// need of their own
-	static float ammunitionUsed( const Situation& s )
+	// What a vehicle carries, by kind, as the share left of what it can carry: guns, missiles and rockets, and what
+	// it drops (bombs, a supply helicopter's crates)
+	struct Stores
 	{
-		const bool supplier = BotWeapons::carriesSupplies( s.vehicle );
-		float used = 0, jobUsed = 0;
-		int slots = 0, jobSlots = 0;
+		float	guns = 1.0f, missiles = 1.0f, drops = 1.0f;
+	};
+	static Stores storesLeft( const Situation& s )
+	{
+		float have[3] = {}, most[3] = {};
 		for( int slot = WP_MACHINEGUN; slot < WP_FLARE; slot++ )
 		{
-			const int most = s.ps.ammo[slot + 8];
-			if( !availableVehicles[s.vehicle].weapons[slot] || most <= 0 )
+			const int weapon = availableVehicles[s.vehicle].weapons[slot];
+			if( !weapon || s.ps.ammo[slot + 8] <= 0 )
 				continue;
-			const float empty = 1.0f - std::clamp( static_cast<float>( s.ps.ammo[slot] ) / most, 0.0f, 1.0f );
-			used += empty;
-			slots++;
-			const int type = availableWeapons[availableVehicles[s.vehicle].weapons[slot]].type;
-			const bool payload = bomber( s ) && (type == WT_IRONBOMB || type == WT_GUIDEDBOMB || type == WT_ANTIGROUNDMISSILE || type == WT_ROCKET);
-			const bool crate = supplier && (type == WT_FUELCRATE || type == WT_AMMOCRATE || type == WT_HEALTHCRATE);
-			if( payload || crate )
-			{
-				jobUsed += empty;
-				jobSlots++;
-			}
+			const int type = availableWeapons[weapon].type;
+			const int kind = type == WT_MACHINEGUN || type == WT_BALLISTICGUN ? 0 :
+				type == WT_IRONBOMB || type == WT_GUIDEDBOMB || type == WT_FUELCRATE || type == WT_AMMOCRATE || type == WT_HEALTHCRATE ? 2 : 1;
+			have[kind] += static_cast<float>( s.ps.ammo[slot] ) / s.ps.ammo[slot + 8];
+			most[kind] += 1.0f;
 		}
-		return std::max( slots ? used / slots : 0.0f, jobSlots ? jobUsed / jobSlots : 0.0f );
+		Stores left;
+		left.guns = most[0] > 0 ? have[0] / most[0] : 1.0f;
+		left.missiles = most[1] > 0 ? have[1] / most[1] : 1.0f;
+		left.drops = most[2] > 0 ? have[2] / most[2] : 1.0f;
+		return left;
 	}
 
-	// The wish to go back to a pad is nothing while there is plenty left, and from the point where something is clearly
-	// running low it grows with the square of how far below that point it is: a wish growing from full sends an idle
-	// vehicle home at two thirds of a tank, and a vehicle that keeps going home is not where the fighting is.
-	// Fuel is the need that cannot wait: at under half a tank it is a full reason on its own, and below a quarter not
-	// even a duel outweighs it
-	static constexpr float fuelWanted = 0.45f, fuelUrgent = 0.25f;
+	// Going back to a pad is a trip out of the fight, and lives are short: it is wanted only once something has run
+	// low - fuel at three tenths of a tank, guns or missiles at a fifth, bombs or crates all gone - and then strongly.
+	// Below the trigger fuel weighs more the emptier the tank, and under a quarter not even a duel outweighs it
+	static constexpr float fuelTrigger = 0.3f, fuelUrgent = 0.25f;
 	static float fraction( int have, int most ) { return most > 0 ? std::clamp( static_cast<float>( have ) / most, 0.0f, 1.0f ) : 1.0f; }
-	// how far past the point where it starts to count, as a share of the way from there to the end
-	static float pastKnee( float used, float knee ) { return std::clamp( (used - knee) / (1.0f - knee), 0.0f, 1.0f ); }
 	static float fuelNeed( const Situation& s )
 	{
-		constexpr float fuelLow = 0.55f, urgentPull = 8.0f;
+		constexpr float urgentPull = 8.0f;
 		const float fuel = fraction( s.ps.stats[STAT_FUEL], s.ps.stats[STAT_MAX_FUEL] );
-		const float below = std::max( 0.0f, fuelLow - fuel ) / (fuelLow - fuelWanted);
-		return below * below + std::max( 0.0f, fuelWanted - fuel ) * urgentPull;
+		return fuel <= fuelTrigger ? 1.0f + (fuelTrigger - fuel) * urgentPull : 0.0f;
 	}
-	// repairs: from under three fifths, a full reason at under half health as the character's caution makes of it
+	// repairs: from under 45% health, as the character's caution makes of it, growing as it falls
 	static float damageNeed( const Situation& s )
 	{
-		constexpr float healthLow = 0.6f, repairWanted = 0.45f;
+		constexpr float healthLow = 0.45f, repairWanted = 0.3f;
 		const float below = std::max( 0.0f, healthLow - s.sense.health ) / (healthLow - repairWanted);
 		return std::min( below * below, 2.0f ) * (0.2f + 0.8f * s.who.caution);
 	}
-	// ammunition: from seven tenths used
+	// guns or missiles down to a fifth, or nothing left to drop
 	static float ammunitionNeed( const Situation& s )
 	{
-		constexpr float knee = 0.7f, emptyWeight = 1.1f;
-		const float past = pastKnee( ammunitionUsed( s ), knee );
-		return past * past * emptyWeight;
+		constexpr float armsTrigger = 0.2f, want = 0.9f;
+		const Stores left = storesLeft( s );
+		return left.guns <= armsTrigger || left.missiles <= armsTrigger || left.drops <= 0.0f ? want : 0.0f;
 	}
+	// how far past the point where it starts to count, as a share of the way from there to the end
+	static float pastKnee( float used, float knee ) { return std::clamp( (used - knee) / (1.0f - knee), 0.0f, 1.0f ); }
 	// flares: from half used, by caution
 	static float flareNeed( const Situation& s )
 	{
@@ -220,7 +216,7 @@ struct GoalScoring
 			return 0.0f;
 		if( plane( s ) && (!g_botLanding.integer || theLevel.time_ < s.bot.landing.giveUp) )
 			return 0.0f;
-		return BotWorld::findPad( s.ent, theLevel.time_ < s.bot.rearm.badPadTime ? s.bot.rearm.badPad : -1 ) >= 0 ? 1.0f : 0.0f;
+		return BotWorld::findPad( s.ent, &s.bot.rearm ) >= 0 ? 1.0f : 0.0f;
 	}
 
 	// the flag: surface vehicles and helicopters only, and nothing matters more than bringing it home
@@ -362,7 +358,7 @@ Bots::Goal Bots::chooseGoal( GameEntity* ent, State& bot, const Sense& sense )
 	{
 		if( bot.rearm.pad < 0 )
 		{
-			bot.rearm.pad = BotWorld::findPad( ent, theLevel.time_ < bot.rearm.badPadTime ? bot.rearm.badPad : -1 );
+			bot.rearm.pad = BotWorld::findPad( ent, &bot.rearm );
 			bot.rearm.phase = 0;
 		}
 	}

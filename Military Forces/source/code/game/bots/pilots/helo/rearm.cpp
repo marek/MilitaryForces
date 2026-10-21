@@ -60,8 +60,7 @@ bool HeloTasks::padTaken( Mind& c )
 behavior::Status HeloTasks::givePadUp( Mind& c )
 {
 	constexpr int avoidPad = 30000;
-	c.bot.rearm.badPad = c.bot.rearm.pad;
-	c.bot.rearm.badPadTime = theLevel.time_ + avoidPad;
+	c.bot.rearm.avoid( c.bot.rearm.pad, theLevel.time_ + avoidPad );
 	c.bot.rearm.letGo();
 	c.bot.goalEvalTime = 0;
 	c.steer.mode = Hover;

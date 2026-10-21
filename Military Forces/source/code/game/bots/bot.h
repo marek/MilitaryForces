@@ -75,8 +75,13 @@ public:
 	{
 		int		pad = -1;	// the pad it is going to for fuel and arms
 		int		phase = 0;	// survey, approach, final, on the ground
-		int		badPad = -1;	// a pad given up on
-		int		badPadTime = 0;	// and until when it is avoided
+		// pads given up on, each until a time: a pad found taken is passed over for a while and the next one tried,
+		// and with every pad taken the wish to rearm waits instead of hanging over one pad after another
+		static constexpr int mostPads = 32;
+		std::array<int, mostPads>	avoidUntil = {};
+
+		void avoid( int which, int until ) { if( which >= 0 && which < mostPads ) avoidUntil[which] = until; }
+		bool avoided( int which, int now ) const { return which >= 0 && which < mostPads && now < avoidUntil[which]; }
 
 		void reset() { *this = {}; }
 		// done with the pad it was going to, keeping in mind the one given up on
@@ -123,6 +128,21 @@ public:
 	};
 
 	// hiding: where, until when, and a helicopter coming up out of it to fire
+	// where a ground vehicle drives to fight from: in range, in sight of its enemy, round to its side or back. Kept
+	// until reached or stale, then the next one is chosen somewhere else
+	struct FiringSpot
+	{
+		vec3_t	point = { 0, 0, 0 };
+		bool	has = false;
+		int		enemy = -1;	// chosen against this enemy
+		int		until = 0;	// given up then if not reached
+		int		leaveAt = 0;	// reached: fires from it until then, then moves on
+		vec3_t	last = { 0, 0, 0 };	// the last one, which the next is not to be near
+		bool	hasLast = false;
+
+		void reset() { *this = {}; }
+	};
+
 	struct Cover
 	{
 		vec3_t	point = { 0, 0, 0 };	// where it hides
@@ -224,6 +244,7 @@ public:
 		int		leader = -1;	// client number of the leader it follows
 		int		leaderTime = 0;
 		bool	teamPlayer = false;	// this life is played alongside a leader
+		int		strandedSince = 0;	// out of fuel and standing still since then
 		int		stillSince = 0;	// riding as a passenger: since when the transport has stood still
 		// a lift offered to a team mate on foot: to whom and since when, waiting beside them since when, last held when;
 		// whom it last passed over, left alone until then (kept across lives)
@@ -250,6 +271,7 @@ public:
 		Landing	landing;
 		Takeoff	takeoff;
 		Cover	cover;
+		FiringSpot	firing;
 		Pursuit	pursuit;
 		Avoidance	avoid;
 		Path	path;
@@ -310,6 +332,7 @@ private:
 	static void chaseFlagThief( GameEntity* ent, State& bot );
 	static void followPlan( GameEntity* ent, State& bot );
 	static void keepPlaneFuel( GameEntity* ent, State& bot );
+	static bool giveUpStranded( GameEntity* ent, State& bot );
 	static void pilot( GameEntity* ent, State& bot, usercmd_t& cmd, vec3_t view );
 	static void thinkPlane( GameEntity* ent, State& bot, const Sense& sense, usercmd_t& cmd, vec3_t view );
 	static void thinkHelo( GameEntity* ent, State& bot, const Sense& sense, usercmd_t& cmd, vec3_t view );
@@ -409,7 +432,8 @@ public:
 	// the touchdown point sits this far inside the runway's end: close to it on a short strip, where every unit of roll counts
 	static float thresholdInset( const Pad& pad ) { return pad.halfLength < 600.0f ? 60.0f : 150.0f; }
 	static float approachSlope( const Pad& pad, float dir );
-	static int findPad( GameEntity* ent, int skip = -1 );
+	// the nearest pad this vehicle can use, passing over those the rearm state says to avoid
+	static int findPad( GameEntity* ent, const Bots::Rearm* rearm = nullptr );
 	static float heightAboveGround( const vec3_t origin, int passEntity );
 	// how far the nearest pad of any kind is: where a soldier on foot goes to take a vehicle
 	static float padDistance( const vec3_t point );
