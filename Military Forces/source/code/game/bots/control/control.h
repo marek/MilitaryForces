@@ -15,6 +15,12 @@ struct HeloControl
 
 	// tilt to move over the ground along a heading at a speed
 	static void tilt( Bots::Mind& c, float yaw, float speed );
+
+	// the most forward tilt from which it can still level and stop within that distance
+	static float tiltToStop( const Bots::Mind& c, float room );
+
+	// the gear key, pressed until the gear is down or up as wanted
+	static void gear( Bots::Mind& c, bool down );
 };
 
 #endif

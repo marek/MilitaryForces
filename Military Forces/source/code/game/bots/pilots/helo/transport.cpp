@@ -1,5 +1,12 @@
 #include "helo.h"
 
+bool HeloTasks::walkerWaiting( Mind& c )
+{
+	constexpr float pickupRange = 1800.0f, beside = 300.0f;
+	c.target = transport( c ) && !c.sense.enemyVisible ? BotSenses::walkerNear( c.ent, c.bot, pickupRange, beside ) : nullptr;
+	return c.target != nullptr;
+}
+
 // come down beside a team mate on foot and hold still so they can climb in
 behavior::Status HeloTasks::pickUpWalker( Mind& c )
 {
@@ -12,8 +19,6 @@ behavior::Status HeloTasks::pickUpWalker( Mind& c )
 		c.steer.mode = Hover;
 		c.steer.hold = true;
 		c.steer.wantHeight = -200.0f;
-		if( !(c.ps.ONOFF & OO_GEAR) )
-			c.cmd.buttons |= BUTTON_GEAR;
 		if( c.landed() )
 			c.steer.wait = true;
 	}
@@ -48,6 +53,8 @@ behavior::Status HeloTasks::resupply( Mind& c )
 	constexpr float humanPreference = 0.3f;
 	constexpr float dropHeight = 220.0f;
 	constexpr int repeatDelay = 12000;
+	// close enough to one of their own pads to rearm there
+	constexpr float selfService = 1500.0f;
 	if( g_gametype.integer < GT_TEAM || theLevel.time_ < c.bot.bombTime + 1500 )
 		return Status::Failure;
 	GameEntity* needy = nullptr;
@@ -62,20 +69,15 @@ behavior::Status HeloTasks::resupply( Mind& c )
 		const bool flying = (availableVehicles[other->client_->vehicle_].cat & (CAT_PLANE|CAT_HELO)) && !(other->client_->ps_.ONOFF & OO_LANDED);
 		if( flying || (c.bot.structure == i && theLevel.time_ < c.bot.structureTime) )
 			continue;
-		// what they are short of; failing that, someone in a fight will want ammunition soon
-		int need = BotWeapons::supplyNeed( other );
-		const bool fighting = Bots::isBot( i ) ? Bots::states_[i].enemy >= 0 : other->health_ < other->client_->pers_.maxHealth_;
-		float urgency = 1.0f;
-		if( !need && fighting )
-		{
-			need = WT_AMMOCRATE;
-			urgency = 2.5f;
-		}
+		const int need = BotWeapons::supplyNeed( other );
 		const int carried = need ? crateSlot( c, need ) : -1;
 		if( carried < 0 )
 			continue;
+		const int ownPad = BotWorld::findPad( other );
+		if( ownPad >= 0 && Distance( other->r.currentOrigin, BotWorld::pads_[ownPad].center ) < selfService )
+			continue;
 		const float dist = Distance( c.ent->r.currentOrigin, other->r.currentOrigin );
-		const float weighted = (Bots::isBot( i ) ? dist : dist * humanPreference) * urgency;
+		const float weighted = Bots::isBot( i ) ? dist : dist * humanPreference;
 		if( dist < range && (!needy || weighted < best) )
 		{
 			needy = other;

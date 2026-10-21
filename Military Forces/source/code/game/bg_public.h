@@ -1310,6 +1310,9 @@ public:
 	static bool selectable( int vehicle );
 	static bool stealthHidden( int vehicle, int revealTime, int time, float dist, float radarRange );
 	static bool vehicleHasTurret( int vehicle );
+	// a ground vehicle's limits: the highest edge it steps up, and the steepest slope, in degrees, it climbs
+	static float stepHeight( int vehicle );
+	static float climbAngle( int vehicle );
 	static void registerVehicles();
 	static int firstMainWeapon( int vehicle );
 	static std::span<const GunStation> gunStations( int vehicle );

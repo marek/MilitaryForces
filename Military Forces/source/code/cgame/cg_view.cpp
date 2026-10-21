@@ -89,6 +89,73 @@ struct ViewSetUpFor
 	}
 };
 
+// A spectator following a player looks along that player's vehicle, eased, never along the pilot's own aim: a bot
+// sets its aim afresh every frame, often far from where its vehicle points
+class FollowCamera
+{
+public:
+	// the eased heading of the followed vehicle for this frame: its yaw and part of its pitch, no roll
+	void aim( Vec3& angles )
+	{
+		Vec3 forward, heading;
+		AngleVectors( cg.predictedPlayerState.vehicleAngles, forward, nullptr, nullptr );
+		vectoangles( forward, heading );
+		const float targetYaw = heading[YAW];
+		const float targetPitch = AngleNormalize180( heading[PITCH] ) * pitchShare;
+
+		if( jumped() )
+		{
+			yaw = targetYaw;
+			pitch = targetPitch;
+		}
+		else
+		{
+			const float seconds = static_cast<float>( cg.time - lastTime ) / 1000.0f;
+			const float pull = 1.0f - expf( -seconds / easeSeconds );
+			yaw = AngleNormalize180( yaw + AngleSubtract( targetYaw, yaw ) * pull );
+			pitch += ( targetPitch - pitch ) * pull;
+		}
+		lastTime = cg.time;
+		VectorSet( angles, pitch, yaw, 0.0f );
+	}
+
+	// the next frame that follows someone starts afresh
+	void stop() { lastTime = -1; }
+
+private:
+	static constexpr float easeSeconds = 0.3f;
+	// the camera tips with a climb or dive by this share of the vehicle's pitch, so terrain bumps barely move it
+	static constexpr float pitchShare = 0.5f;
+
+	float yaw = 0.0f;
+	float pitch = 0.0f;
+	int lastTime = -1;
+	int client = -1;
+	int vehicle = -1;
+	int life = -1;
+	int level = -1;
+	int teleport = 0;
+
+	// another player, vehicle, life or map, or a teleport: easing from the old heading would swing the camera
+	// across the map
+	bool jumped()
+	{
+		const playerState_t& ps = cg.snap->ps;
+		const int nowVehicle = viewedVehicle();
+		const int nowTeleport = ps.eFlags & EF_TELEPORT_BIT;
+		const bool fresh = lastTime < 0 || cg.time < lastTime || ps.clientNum != client || nowVehicle != vehicle ||
+			ps.persistant[PERS_SPAWN_COUNT] != life || cgs.levelStartTime != level || nowTeleport != teleport;
+		client = ps.clientNum;
+		vehicle = nowVehicle;
+		life = ps.persistant[PERS_SPAWN_COUNT];
+		level = cgs.levelStartTime;
+		teleport = nowTeleport;
+		return fresh;
+	}
+};
+
+static FollowCamera followCamera;
+
 /*
 ===============
 CGame::offsetVehicleView
@@ -591,10 +658,16 @@ int CGame::calcViewValues( ) {
 	{
 		VectorCopy( cg.predictedPlayerEntity.currentState.angles, cg.refdefViewAngles );
 	}
+	else if( (cg.snap->ps.pm_flags & PMF_FOLLOW) && ps->pm_type != PM_SPECTATOR )
+	{
+		followCamera.aim( cg.refdefViewAngles );
+	}
 	else
 	{
 		VectorCopy( ps->viewangles, cg.refdefViewAngles );
 	}
+	if( !(cg.snap->ps.pm_flags & PMF_FOLLOW) )
+		followCamera.stop();
 
 	// add error decay
 	if ( cg_errorDecay.value > 0 ) {

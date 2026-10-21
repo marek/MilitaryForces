@@ -100,10 +100,10 @@ struct SurfaceTasks
 
 	static bool walkerWaiting( Mind& c )
 	{
-		constexpr float pickupRange = 1500.0f;
+		constexpr float pickupRange = 1500.0f, beside = 200.0f;
 		// boats and wheeled vehicles stop for a team mate on foot; tanks do not
 		const bool givesLifts = c.veh.seats > 1 && (c.boat || (c.veh.caps & HC_WHEELS));
-		c.target = givesLifts && !c.sense.enemyVisible ? BotSenses::walkerNear( c.ent, c.bot, pickupRange ) : nullptr;
+		c.target = givesLifts && !c.sense.enemyVisible ? BotSenses::walkerNear( c.ent, c.bot, pickupRange, beside ) : nullptr;
 		return c.target != nullptr;
 	}
 
@@ -133,7 +133,8 @@ struct SurfaceTasks
 
 	// a wall, water, a drop, shore for a boat, or no progress for a while: back out and try another way
 	static Status watchAhead( Mind& c );
-	static bool wallAhead( const Mind& c, const vec3_t forward );
+	static bool wallAhead( const Mind& c, const vec3_t dir, float reach );
+	static float cornerSpeed( const Mind& c, float turnLeft );
 	static bool waterOrDropAhead( const Mind& c, const vec3_t forward );
 	static bool shoreAhead( const Mind& c, const vec3_t forward );
 	static bool noProgress( Mind& c );

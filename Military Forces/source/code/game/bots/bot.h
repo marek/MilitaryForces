@@ -115,9 +115,8 @@ public:
 		int		planTime = 0;	// the take-off plan holds until then
 		int		taxiTime = 0;	// taxiing to a better spot until then
 		int		holdTime = 0;	// holding short until then
-		int		heldSince = 0;	// waiting on the ground for an aircraft standing ahead since then, 0 when not
-		int		sidestepTime = 0;	// taxiing round one that would not move, until then
-		int		holds = 0;	// holds in a row, so it does not wait for ever
+		int		heldSince = 0;	// waiting on the ground for traffic since then, 0 when not
+		int		holds = 0;	// holds in a row for a run that is short or blocked by the world, so it does not wait for ever
 		vec3_t	taxiSpot = { 0, 0, 0 };	// where it taxis to before rolling
 
 		void reset() { *this = {}; }
@@ -173,6 +172,7 @@ public:
 		std::vector<Vec3>	points;
 		size_t	index = 0;
 		int		searchTime = 0;	// when to search for a path again
+		int		skipTime = 0;	// when to look again whether the next waypoint can be gone to directly
 		bool	following = false;	// flying or driving that path now
 		bool	cornerAhead = false;	// the path turns sharply soon
 
@@ -203,6 +203,8 @@ public:
 		int		spawnTime = 0;	// when this life began
 		int		commandTime = 0;	// no further client command (enter, radar, respawn) before then
 		float	aimPhase = 0;	// where the aim wander is in its swing
+		Vec3	handView;	// the view the bot last sent, and when: its hand turns from there
+		int		handTime = 0;
 		bool	wasAlive = false;	// alive in the last frame: a change marks a life's start or end
 		int		character = 0;	// index of its character
 		Goal	desire = Goal::Roam;	// the goal it is pursuing
@@ -222,8 +224,18 @@ public:
 		int		leader = -1;	// client number of the leader it follows
 		int		leaderTime = 0;
 		bool	teamPlayer = false;	// this life is played alongside a leader
-		int		liftTime = 0;	// since when a lift has been offered, or a passenger has sat in a stopped transport
-		int		liftGiveUp = 0;	// no lifts offered before then
+		int		stillSince = 0;	// riding as a passenger: since when the transport has stood still
+		// a lift offered to a team mate on foot: to whom and since when, waiting beside them since when, last held when;
+		// whom it last passed over, left alone until then (kept across lives)
+		struct Lift
+		{
+			int		walker = -1;
+			int		since = 0;
+			int		besideSince = 0;
+			int		heldAt = 0;
+			int		passedOver = -1;
+			int		passedOverUntil = 0;
+		}		lift;
 		vec3_t	trail[6] = {};	// where it was in each of the last six seconds
 		int		trailTime = 0;
 		int		logTime = 0;
@@ -294,6 +306,7 @@ private:
 	static void think( GameEntity* ent, State& bot, usercmd_t& cmd );
 	static bool settleLife( GameEntity* ent, State& bot );
 	static void startLife( GameEntity* ent, State& bot );
+	static void turnHand( State& bot, vec3_t view );
 	static void chaseFlagThief( GameEntity* ent, State& bot );
 	static void followPlan( GameEntity* ent, State& bot );
 	static void keepPlaneFuel( GameEntity* ent, State& bot );
@@ -328,7 +341,7 @@ private:
 	static void pickGoal( GameEntity* ent, State& bot, float radius );
 	static GameEntity* nearestQuarry( GameEntity* ent, unsigned int cat );
 	static void goalNear( GameEntity* ent, State& bot, GameEntity* quarry, unsigned int cat );
-	static void goalAtRoamPoint( GameEntity* ent, State& bot );
+	static void goalAtRoamPoint( GameEntity* ent, State& bot, const std::vector<Vec3>& points, bool air );
 	static bool goalAtHint( GameEntity* ent, State& bot, unsigned int cat );
 	static void goalAroundHome( GameEntity* ent, State& bot, float radius, unsigned int cat );
 	static int pickVehicle( int teamFlag, bool allowInfantry = true, const Character* who = nullptr, const State* memory = nullptr, int teamKind = -1 );
@@ -389,6 +402,8 @@ public:
 	static void buildPads();
 	static bool flagPosition( int team, vec3_t out );
 	static void buildRoamPoints();
+	static void spreadRoamPoints( const Vec3& centre, const float reach[4], float sky );
+	static void dropRoamPoint( const Vec3& point, float sky );
 	static bool runwayAt( const vec3_t point, float* surface = nullptr );
 	static float runwayRun( const vec3_t origin, float yaw, float maxDist );
 	// the touchdown point sits this far inside the runway's end: close to it on a short strip, where every unit of roll counts
@@ -396,10 +411,14 @@ public:
 	static float approachSlope( const Pad& pad, float dir );
 	static int findPad( GameEntity* ent, int skip = -1 );
 	static float heightAboveGround( const vec3_t origin, int passEntity );
+	// how far the nearest pad of any kind is: where a soldier on foot goes to take a vehicle
+	static float padDistance( const vec3_t point );
 	static bool pathBlocked( const vec3_t origin, const vec3_t dir, float dist, int passEntity, trace_t& tr, float halfWidth = 0 );
 	static std::vector<Pad> pads_;
 	static bool padsBuilt_;
-	static std::vector<Vec3> roamPoints_;
+	static std::vector<Vec3> roamPoints_;	// places to fly to: the pads and points spread over the map
+	static std::vector<Vec3> landPoints_;	// the points spread over the map that are on land, at the surface
+	static std::vector<Vec3> waterPoints_;	// and those on water
 };
 
 // What a bot does with its weapons: which one for which target, when to fire it, flares, bombs, and what a vehicle
@@ -431,7 +450,12 @@ public:
 	static int targetOf( GameEntity* leader );
 	static Bots::Role roleOf( int vehicle );
 	static float turnOnAttacker( GameEntity* ent, const Bots::State& bot, int attacker );
-	static GameEntity* walkerNear( GameEntity* ent, Bots::State& bot, float range );
+	// A team mate on foot within range who wants a lift from this vehicle, a real player first, or null. The offer is to
+	// one walker at a time and one vehicle per walker; it is withdrawn when they have not come aboard in time (beside
+	// is how near counts as waiting beside them), and that walker is passed over for a while
+	static GameEntity* walkerNear( GameEntity* ent, Bots::State& bot, float range, float beside );
+	// someone on foot within range who wants a lift and has not turned this vehicle down lately, without making an offer
+	static GameEntity* liftSeeker( GameEntity* ent, const Bots::State& bot, float range );
 	static int ridersOf( GameEntity* ent );
 	static void sense( GameEntity* ent, Bots::State& bot, Bots::Sense& out );
 

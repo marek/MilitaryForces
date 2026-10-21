@@ -6,6 +6,7 @@ behavior::Tree<Bots::Mind> HeloTasks::build()
 
 	const auto* rearm = t.selector( "rearm", {
 		t.when( "parked on the pad", parked, t.action( "rearm on pad", rearmOnPad ) ),
+		t.when( "pad taken", padTaken, t.action( "give pad up", givePadUp ) ),
 		t.when( "above the pad", abovePad, t.action( "descend to pad", descendToPad ) ),
 		t.action( "fly to pad", flyToPad ) } );
 
@@ -48,6 +49,7 @@ behavior::Tree<Bots::Mind> HeloTasks::build()
 		t.action( "countermeasures", Crew::countermeasures ),
 		t.action( "navigate", navigate ),
 		t.when( "airborne", airborne, t.always( "fly", t.action( "steer", steer ), { t.action( "fire", fire ) } ) ),
+		t.action( "gear", gear ),
 		t.action( "collective", collective ),
 		t.action( "weapon bay", Crew::weaponBay ) } ) );
 	return t;

@@ -40,37 +40,38 @@ struct HeloTasks
 
 	static bool abovePad( Mind& c ) { return overPad( c ); }
 
+	// how far the vehicle reaches out from its middle, seen from above
+	static float radiusOf( int vehicle )
+	{
+		const completeVehicleData_t& veh = availableVehicles[vehicle];
+		return std::max( { -veh.mins[0], veh.maxs[0], -veh.mins[1], veh.maxs[1] } );
+	}
+
+	// close to the pad, and something else stands or hovers on it
+	static bool padTaken( Mind& c );
+
+	// no landing on top of it: that pad is given up for a while, and another chosen
+	static Status givePadUp( Mind& c );
+
 	static bool missileInbound( Mind& c ) { return c.sense.missile && c.sense.missileTime < 6.0f && !c.landed(); }
 	// only transport helicopters take passengers; attack helicopters leave soldiers to them
 
 	static bool transport( const Mind& c ) { return c.veh.seats > 1 && !(c.veh.cls & CLASS_HELO_ATTACK); }
 
-	static bool walkerWaiting( Mind& c )
-	{
-		constexpr float pickupRange = 1800.0f;
-		c.target = transport( c ) && !c.sense.enemyVisible ? BotSenses::walkerNear( c.ent, c.bot, pickupRange ) : nullptr;
-		return c.target != nullptr;
-	}
+	// a lift offered to someone on foot who wants one (BotSenses::walkerNear), so the helicopter is not held by
+	// someone who is not going anywhere
+	static bool walkerWaiting( Mind& c );
 
 	// come down beside a team mate on foot and hold still so they can climb in
 	static Status pickUpWalker( Mind& c );
 
-	// just spawned on the ground with team mates on foot close by: give them a moment to climb in
+	// just spawned on the ground with someone close by who wants a lift: give them a moment to climb in
 	static bool passengersNear( Mind& c )
 	{
-		if( g_gametype.integer < GT_TEAM || !c.landed() || theLevel.time_ >= c.bot.spawnTime + 12000 || !transport( c ) )
-			return false;
-		for( int i = 1; i <= theLevel.maxclients_; i++ )
-		{
-			GameEntity* other = theLevel.getEntity( i );
-			if( other == c.ent || !alive( other ) || !OnSameTeam( c.ent, other ) )
-				continue;
-			if( !(availableVehicles[other->client_->vehicle_].cat & CAT_LQM) || other->client_->sess_.ridingClient_ >= 0 )
-				continue;
-			if( Distance( c.ent->r.currentOrigin, other->r.currentOrigin ) < 1200 )
-				return true;
-		}
-		return false;
+		constexpr float boardingRange = 1200.0f;
+		constexpr int boardingTime = 12000;
+		return g_gametype.integer >= GT_TEAM && c.landed() && theLevel.time_ < c.bot.spawnTime + boardingTime && transport( c ) &&
+			BotSenses::liftSeeker( c.ent, c.bot, boardingRange ) != nullptr;
 	}
 
 	static bool evading( Mind& c ) { return c.bot.desire == Goal::Evade && (c.sense.enemy || c.sense.blindsided); }
@@ -202,7 +203,7 @@ struct HeloTasks
 	static int crateSlot( const Mind& c, int type );
 
 	// Carrying crates: find a team mate on the ground who is short of something we carry, a real player first,
-	// hover over them and drop it.
+	// hover over them and drop it. Someone close to one of their own pads rearms there by themselves.
 	static Status resupply( Mind& c );
 
 	// stay beside the leader, on the side given by the client number
@@ -216,6 +217,9 @@ struct HeloTasks
 
 	// climb or sink to the wanted height above the ground
 	static Status collective( Mind& c );
+
+	// gear down to set down, up once clear of the ground
+	static Status gear( Mind& c );
 
 	// free distance for the whole airframe along a direction, up to reach
 	static float clearAlong( const Mind& c, const vec3_t dir, float reach );
@@ -231,8 +235,12 @@ struct HeloTasks
 		float	speed = 0;
 	};
 	static Travel wantedTravel( const Mind& c );
+	static float pushFor( const Mind& c, bool& orbit );
+	// the slow tilt, low over the ground and when circling
+	static constexpr float lowTilt = 9.0f;
 	static void findOpenDirection( Mind& c, Travel& travel );
 	static void avoidThreats( const Mind& c, ContextMap& map, float reach );
+	static void avoidTraffic( const Mind& c, ContextMap& map, float speed );
 	static void stopBeforeDrift( const Mind& c, Travel& travel );
 	static void easeAwayFromWalls( const Mind& c, Travel& travel );
 

@@ -23,3 +23,22 @@ void HeloControl::tilt( Bots::Mind& c, float yaw, float speed )
 	else if( rollError < -levelling )
 		c.cmd.rightmove = -moveFull;
 }
+
+float HeloControl::tiltToStop( const Bots::Mind& c, float room )
+{
+	// it goes at the speed its tilt gives, so levelling at the pitch rate covers half that speed for tilt / rate
+	// seconds, after a moment to react
+	constexpr float reaction = 0.3f;
+	if( room <= 0.0f )
+		return 0.0f;
+	const float rate = std::max( 1.0f, c.veh.turnspeed[PITCH] );
+	const float perDegree = static_cast<float>( c.veh.maxspeed ) / maxPitch;
+	const float a = perDegree / (2.0f * rate), b = perDegree * reaction;
+	return (sqrtf( b * b + 4.0f * a * room ) - b) / (2.0f * a);
+}
+
+void HeloControl::gear( Bots::Mind& c, bool down )
+{
+	if( (c.veh.caps & HC_GEAR) && ((c.ps.ONOFF & OO_GEAR) != 0) != down )
+		c.cmd.buttons |= BUTTON_GEAR;
+}

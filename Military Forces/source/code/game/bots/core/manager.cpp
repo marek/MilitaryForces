@@ -21,6 +21,8 @@ std::array<int, 5> Bots::kindCrashes_ = {};
 std::array<int, MAX_VEHICLE_TYPES> Bots::typeLives_ = {};
 std::array<int, MAX_VEHICLE_TYPES> Bots::typeCrashes_ = {};
 std::vector<Vec3> BotWorld::roamPoints_;
+std::vector<Vec3> BotWorld::landPoints_;
+std::vector<Vec3> BotWorld::waterPoints_;
 std::vector<Bots::Character> Bots::characters_;
 
 void Bots::reset()
@@ -30,6 +32,8 @@ void Bots::reset()
 	BotWorld::pads_.clear();
 	BotWorld::padsBuilt_ = false;
 	BotWorld::roamPoints_.clear();
+	BotWorld::landPoints_.clear();
+	BotWorld::waterPoints_.clear();
 	ThreatMap::reset();
 	BotHints::reset();
 	BotOrders::reset();
@@ -448,6 +452,8 @@ void Bots::think( GameEntity* ent, State& bot, usercmd_t& cmd )
 	keepPlaneFuel( ent, bot );
 	pilot( ent, bot, cmd, view );
 
+	turnHand( bot, view );
+
 	// less skilled characters hold the aim less steadily; not while landing
 	const float wobble = bot.desire == Goal::Rearm ? 0.0f : handicap( bot ).aimWobble;
 	bot.aimPhase += 0.11f;
@@ -460,6 +466,24 @@ void Bots::think( GameEntity* ent, State& bot, usercmd_t& cmd )
 	if( g_botDebug.integer >= 3 && theLevel.time_ >= bot.logTime )
 		logState( ent, bot, cmd, view );
 #endif
+}
+
+// A hand on a mouse: the view turns fast but not in no time, so a change of mind never flicks it across in one frame.
+// The more skilled turn it faster
+void Bots::turnHand( State& bot, vec3_t view )
+{
+	constexpr float slowestTurn = 360.0f, skilledGain = 360.0f;
+	if( bot.handTime && theLevel.time_ > bot.handTime )
+	{
+		const float most = (slowestTurn + skilledGain * skill( bot )) * (theLevel.time_ - bot.handTime) * 0.001f;
+		for( int i : { PITCH, YAW } )
+			view[i] = bot.handView[i] + std::clamp( AngleSubtract( view[i], bot.handView[i] ), -most, most );
+	}
+	if( !bot.handTime || theLevel.time_ > bot.handTime )
+	{
+		VectorCopy( view, bot.handView );
+		bot.handTime = theLevel.time_;
+	}
 }
 
 // A life has ended: its record, and whether the next life is in another vehicle. True when the bot has just been
@@ -520,6 +544,10 @@ void Bots::startLife( GameEntity* ent, State& bot )
 {
 	bot.wasAlive = true;
 	bot.spawnTime = theLevel.time_;
+	bot.handTime = 0;
+	// an offer of a lift belongs to the life that made it; whom it passed over is remembered
+	bot.lift.walker = -1;
+	bot.stillSince = 0;
 	bot.lifeScore = ent->client_->ps_.persistant[PERS_SCORE];
 	bot.goalTime = 0;
 	bot.enemy = -1;

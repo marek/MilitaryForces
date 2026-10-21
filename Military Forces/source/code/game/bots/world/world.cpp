@@ -36,6 +36,20 @@ bool BotWorld::pathBlocked( const vec3_t origin, const vec3_t dir, float dist, i
 	return tr.fraction < 1.0f;
 }
 
+float BotWorld::padDistance( const vec3_t point )
+{
+	if( !BotWorld::padsBuilt_ )
+		BotWorld::buildPads();
+	float nearest = -1.0f;
+	for( const BotWorld::Pad& pad : BotWorld::pads_ )
+	{
+		const float dist = Distance( point, pad.spot );
+		if( nearest < 0.0f || dist < nearest )
+			nearest = dist;
+	}
+	return nearest;
+}
+
 // how much room there is straight up
 float BotWorld::ceilingAbove( const vec3_t origin, int passEntity )
 {
@@ -53,6 +67,43 @@ bool BotWorld::visible( GameEntity* ent, const vec3_t from, GameEntity* target )
 	trace_t tr;
 	GameHost::trace( &tr, from, nullptr, nullptr, target->r.currentOrigin, ent->s.number, MASK_SOLID, false );
 	return tr.fraction >= 1.0f || tr.entityNum == target->s.number;
+}
+
+// Points spread evenly over the whole map, so that roaming takes a bot across it and not round the bases and its own
+// spawn; each is also dropped onto the surface under it, from the height of the sky, to be driven or sailed to
+void BotWorld::spreadRoamPoints( const Vec3& centre, const float reach[4], float sky )
+{
+	constexpr int across = 6;
+	constexpr float spread = 0.85f;
+	BotWorld::landPoints_.clear();
+	BotWorld::waterPoints_.clear();
+	for( int k = 0; k < across * across; k++ )
+	{
+		const float fx = (k % across + 0.5f) / across * 2.0f - 1.0f, fy = (k / across + 0.5f) / across * 2.0f - 1.0f;
+		Vec3 point = centre;
+		point += Vec3( fx * spread * reach[fx > 0 ? 0 : 1], fy * spread * reach[fy > 0 ? 2 : 3], 0 );
+		BotWorld::roamPoints_.push_back( point );
+		dropRoamPoint( point, sky );
+	}
+}
+
+// a roam point on the surface under it: on water or on level enough land, never on the sky
+void BotWorld::dropRoamPoint( const Vec3& point, float sky )
+{
+	constexpr float level = 0.7f;
+	vec3_t top, bottom;
+	point.copyTo( top );
+	top[2] = sky;
+	VectorCopy( top, bottom );
+	bottom[2] = -65536.0f;
+	trace_t tr;
+	GameHost::trace( &tr, top, nullptr, nullptr, bottom, ENTITYNUM_NONE, MASK_SOLID|MASK_WATER, false );
+	if( tr.startsolid || tr.fraction >= 1.0f || (tr.surfaceFlags & SURF_SKY) )
+		return;
+	if( tr.contents & MASK_WATER )
+		BotWorld::waterPoints_.push_back( Vec3( tr.endpos ) );
+	else if( tr.plane.normal[2] >= level )
+		BotWorld::landPoints_.push_back( Vec3( tr.endpos ) );
 }
 
 // Places to head for when there is nothing else to do: the pads, the middle of the map as the spawn points and
@@ -118,6 +169,7 @@ void BotWorld::buildRoamPoints()
 			BotWorld::roamPoints_.push_back( point );
 		}
 	}
+	spreadRoamPoints( centre, reach, origin[2] );
 }
 
 // is there runway under this point, and at what height?
@@ -544,7 +596,11 @@ void Bots::pickGoal( GameEntity* ent, State& bot, float radius )
 	else if( !goalAtHint( ent, bot, cat ) )
 	{
 		if( (cat & (CAT_PLANE|CAT_HELO)) && !BotWorld::roamPoints_.empty() && radius > 3500 )
-			goalAtRoamPoint( ent, bot );
+			goalAtRoamPoint( ent, bot, BotWorld::roamPoints_, true );
+		else if( (cat & CAT_GROUND) && !BotWorld::landPoints_.empty() )
+			goalAtRoamPoint( ent, bot, BotWorld::landPoints_, false );
+		else if( (cat & CAT_BOAT) && !BotWorld::waterPoints_.empty() )
+			goalAtRoamPoint( ent, bot, BotWorld::waterPoints_, false );
 		else
 			goalAroundHome( ent, bot, radius, cat );
 	}
@@ -590,21 +646,22 @@ void Bots::goalNear( GameEntity* ent, State& bot, GameEntity* quarry, unsigned i
 }
 
 // one of a few roam points drawn at random, the least dangerous of them by the team's threat map: a cautious pilot
-// weighs the danger more, and none of them refuses to go where the fighting is
-void Bots::goalAtRoamPoint( GameEntity* ent, State& bot )
+// weighs the danger more, and none of them refuses to go where the fighting is. A point on the surface is gone to as
+// it is, a point in the air with some scatter
+void Bots::goalAtRoamPoint( GameEntity* ent, State& bot, const std::vector<Vec3>& points, bool air )
 {
 	constexpr int drawn = 4;
-	constexpr float scatter = 800.0f;
+	const float scatter = air ? 800.0f : 0.0f;
 	const int team = ent->client_->sess_.sessionTeam_;
 	const float caution = character( bot ).caution;
 	const Vec3* best = nullptr;
 	float bestScore = 0.0f;
 	for( int i = 0; i < drawn; i++ )
 	{
-		const Vec3& point = BotWorld::roamPoints_[rand() % BotWorld::roamPoints_.size()];
+		const Vec3& point = points[rand() % points.size()];
 		vec3_t at;
 		point.copyTo( at );
-		const float score = caution * ThreatMap::danger( team, at, true ) + random() * 0.3f;
+		const float score = caution * ThreatMap::danger( team, at, air ) + random() * 0.3f;
 		if( !best || score < bestScore )
 		{
 			best = &point;

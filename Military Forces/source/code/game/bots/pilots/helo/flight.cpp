@@ -1,14 +1,20 @@
 #include "helo.h"
 
-// when the straight line to the destination is blocked, follow the air path round the obstacle instead
+// when the straight line to the destination is blocked, follow the air path round the obstacle instead. A path once
+// taken is kept until it is next searched: at the edge of an obstacle the straight line is clear one frame and blocked
+// the next, and the nose would swing between the path and the destination with it
 behavior::Status HeloTasks::navigate( Mind& c )
 {
+	constexpr float probeReach = 1500.0f, nearEnough = 600.0f, clearance = 60.0f, waypointReached = 250.0f;
+	constexpr int searchEvery = 2000;
 	Bots::State& bot = c.bot;
 	const Vec3 here( c.ent->r.currentOrigin );
 	const Vec3 toDest = c.steer.dest - here;
 	const float range = toDest.length();
-	const Vec3 probeEnd = range > 1500.0f ? here + toDest * (1500.0f / range) : c.steer.dest;
-	if( !c.steer.hasDest || c.landed() || range <= 600.0f || (AirNav::clearLine( here, probeEnd, 60.0f ) && !c.riskyLeg( here, c.steer.dest, true )) )
+	const Vec3 probeEnd = range > probeReach ? here + toDest * (probeReach / range) : c.steer.dest;
+	const bool keepPath = bot.path.following && theLevel.time_ < bot.path.searchTime;
+	if( !c.steer.hasDest || c.landed() || range <= nearEnough ||
+		(!keepPath && AirNav::clearLine( here, probeEnd, clearance ) && !c.riskyLeg( here, c.steer.dest, true )) )
 	{
 		bot.path.points.clear();
 		bot.path.following = false;
@@ -18,12 +24,12 @@ behavior::Status HeloTasks::navigate( Mind& c )
 	{
 		AirNav::findPath( here, c.steer.dest, bot.path.points, Vec3(), 0.0f, c.danger( true ) );
 		bot.path.index = 0;
-		bot.path.searchTime = theLevel.time_ + 2000 + ThinkRate::stagger( c.ent->s.number, 300 );
+		bot.path.searchTime = theLevel.time_ + searchEvery + ThinkRate::stagger( c.ent->s.number, 300 );
 	}
 	// on to the next waypoint once this one is reached or the one after can be flown to directly
 	while( bot.path.index + 1 < bot.path.points.size() &&
-		((bot.path.points[bot.path.index] - here).length() < 250.0f ||
-		(AirNav::clearLine( here, bot.path.points[bot.path.index + 1], 60.0f ) && !c.riskyLeg( here, bot.path.points[bot.path.index + 1], true ))) )
+		((bot.path.points[bot.path.index] - here).length() < waypointReached ||
+		(AirNav::clearLine( here, bot.path.points[bot.path.index + 1], clearance ) && !c.riskyLeg( here, bot.path.points[bot.path.index + 1], true ))) )
 		bot.path.index++;
 	bot.path.following = bot.path.index < bot.path.points.size();
 	if( !bot.path.following )
@@ -63,6 +69,19 @@ behavior::Status HeloTasks::collective( Mind& c )
 	return Status::Success;
 }
 
+// gear down to set down, up once clear of the ground: down it costs a fifth of the speed
+behavior::Status HeloTasks::gear( Mind& c )
+{
+	constexpr float settingDown = 60.0f, clearOfGround = 150.0f;
+	if( c.landed() )
+		return Status::Success;
+	if( c.steer.hold || c.steer.wait || c.steer.wantHeight < settingDown )
+		HeloControl::gear( c, true );
+	else if( c.sense.height > clearOfGround )
+		HeloControl::gear( c, false );
+	return Status::Success;
+}
+
 // free distance for the whole airframe along a direction, up to reach
 float HeloTasks::clearAlong( const Mind& c, const vec3_t dir, float reach )
 {
@@ -97,40 +116,14 @@ behavior::Status HeloTasks::steer( Mind& c )
 }
 
 // how hard to push in the wanted direction, as forward tilt in degrees (negative backs away), by the manner of moving.
-// At fighting distance it keeps moving across the enemy's view instead of hanging still, changing direction now and
-// then, and opening the range when too close
+// In transit it goes near full tilt and eases off by its stopping distance; near the ground it goes slower. At fighting
+// distance it keeps moving across the enemy's view instead of hanging still, changing direction now and then, and
+// opening the range when too close
 HeloTasks::Travel HeloTasks::wantedTravel( const Mind& c )
 {
-	constexpr float fullTilt = 14.0f, lowTilt = 9.0f, coverTilt = 12.0f, backTilt = -5.0f;
 	constexpr int orbitPeriod = 6000;
-	float push = 0;
 	bool orbit = false;
-	if( c.sense.height > 60 )
-	{
-		switch( c.steer.mode )
-		{
-		case Run:
-			push = fullTilt;
-			break;
-		case ToPad:
-			push = std::clamp( c.steer.dist / 60.0f, 3.0f, fullTilt );
-			break;
-		case MoveToCover:
-			push = c.steer.dist > 150 ? coverTilt : 0.0f;
-			break;
-		case BackOff:
-			push = backTilt;
-			break;
-		case Hover:
-			break;
-		default:
-			if( c.steer.dist > c.steer.standoff + 300 )
-				push = c.sense.height > 300 ? fullTilt : lowTilt;
-			else
-				orbit = c.sense.enemy != nullptr;
-			break;
-		}
-	}
+	float push = c.sense.height > 60 ? pushFor( c, orbit ) : 0.0f;
 	Travel travel;
 	travel.yaw = c.view[YAW] + (push < 0 ? 180.0f : 0.0f);
 	if( orbit )
@@ -143,6 +136,33 @@ HeloTasks::Travel HeloTasks::wantedTravel( const Mind& c )
 	return travel;
 }
 
+// the forward tilt for the manner of moving; orbit is set when it is at fighting distance and should circle
+float HeloTasks::pushFor( const Mind& c, bool& orbit )
+{
+	constexpr float transitTilt = HeloControl::maxPitch * 0.88f, coverTilt = 12.0f, backTilt = -5.0f;
+	constexpr float padSlope = 60.0f, padTilt = 3.0f, nearGround = 75.0f, arriving = 300.0f;
+	switch( c.steer.mode )
+	{
+	case Run:
+		return HeloControl::maxPitch;
+	case ToPad:
+		return std::clamp( c.steer.dist / padSlope, padTilt, transitTilt );
+	case MoveToCover:
+		return c.steer.dist > 150 ? coverTilt : 0.0f;
+	case BackOff:
+		return backTilt;
+	case Hover:
+		return 0.0f;
+	default:
+		break;
+	}
+	// a negative standoff asks to go right to the place
+	if( c.steer.dist > c.steer.standoff + arriving )
+		return std::min( c.sense.height > nearGround ? transitTilt : lowTilt, HeloControl::tiltToStop( c, c.steer.dist - std::max( c.steer.standoff, 0.0f ) ) );
+	orbit = c.sense.enemy != nullptr;
+	return 0.0f;
+}
+
 // the wanted direction first, then either side of it, then back the way it came; hover and climb if nothing is open.
 // Rising ground is not an obstacle: where the level line is blocked but a climbing one is clear, go on and climb
 void HeloTasks::findOpenDirection( Mind& c, Travel& travel )
@@ -152,6 +172,7 @@ void HeloTasks::findOpenDirection( Mind& c, Travel& travel )
 	ContextMap map( travel.yaw, 8 );
 	map.want( travel.yaw, 1.0f );
 	avoidThreats( c, map, reach );
+	avoidTraffic( c, map, travel.speed );
 	std::array<bool, ContextMap::maxSlots> mustClimb = {};
 	const int slot = map.resolve( [&]( int s )
 	{
@@ -195,6 +216,39 @@ void HeloTasks::avoidThreats( const Mind& c, ContextMap& map, float reach )
 		AngleVectors( angles, dir, nullptr, nullptr );
 		VectorMA( c.ent->r.currentOrigin, reach * lookFurther, dir, at );
 		map.addDanger( s, caution * ThreatMap::danger( team, at, true ) );
+	}
+}
+
+// other aircraft in the air as danger along where they will be: a direction that would bring it within reach of one in
+// the next moments is closed, so two helicopters going for the same enemy do not fly into each other. A direction
+// that opens the distance stays open, however close they are already
+void HeloTasks::avoidTraffic( const Mind& c, ContextMap& map, float speed )
+{
+	constexpr float lookAhead = 2.0f, room = 60.0f, nearby = 1500.0f, blocked = 2.0f;
+	const Vec3 here( c.ent->r.currentOrigin );
+	const float own = radiusOf( c.client->vehicle_ );
+	for( int i = 1; i <= theLevel.maxclients_; i++ )
+	{
+		GameEntity* other = theLevel.getEntity( i );
+		if( other == c.ent || !alive( other ) || other->client_->sess_.ridingClient_ >= 0 )
+			continue;
+		const playerState_t& ps = other->client_->ps_;
+		if( !(availableVehicles[other->client_->vehicle_].cat & (CAT_PLANE|CAT_HELO)) || (ps.ONOFF & OO_LANDED) )
+			continue;
+		const Vec3 apart = here - Vec3( other->r.currentOrigin );
+		if( apart.length() > nearby )
+			continue;
+		const float clearance = own + radiusOf( other->client_->vehicle_ ) + room;
+		for( int s = 0; s < map.slots(); s++ )
+		{
+			Vec3 angles = { 0, map.yawOf( s ), 0 }, dir;
+			AngleVectors( angles, dir, nullptr, nullptr );
+			const Vec3 closing( dir[0] * speed - ps.velocity[0], dir[1] * speed - ps.velocity[1], c.ps.velocity[2] - ps.velocity[2] );
+			const float rate = DotProduct( closing, closing );
+			const float when = rate > 0.0f ? std::clamp( -DotProduct( apart, closing ) / rate, 0.0f, lookAhead ) : 0.0f;
+			if( when > 0.0f && (apart + closing * when).length() < clearance )
+				map.addDanger( s, blocked );
+		}
 	}
 }
 

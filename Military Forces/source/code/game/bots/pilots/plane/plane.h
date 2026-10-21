@@ -114,9 +114,11 @@ struct PlaneTasks
 	// the nose comes up at this multiple of the stall speed
 	static constexpr float rotateSpeed = 1.12f;
 
-	// holding short of the run for a moment, and taxiing to a spot with more runway
+	// holding short for a moment, taxiing to a spot with more runway, and a departure planned and not yet flown
 	static bool holdingShort( Mind& c ) { return theLevel.time_ < c.bot.takeoff.holdTime; }
 	static bool taxiing( Mind& c ) { return theLevel.time_ < c.bot.takeoff.taxiTime; }
+	static bool planned( const Mind& c ) { return theLevel.time_ < c.bot.takeoff.planTime; }
+	static bool linedUp( const Mind& c );
 
 	// the first seconds after the wheels leave the ground
 	static bool departing( Mind& c )
@@ -139,7 +141,18 @@ struct PlaneTasks
 	// keep flying the turn and the climb or dive that the arc choice settled on
 	static void flyChosenArc( Mind& c );
 
-	// parked where no heading has enough runway: find the nearest spot along the taxiway that has
+	// the ground roll to lift-off, and a comfortable length of runway for it
+	static float groundRun( const completeVehicleData_t& veh );
+	static float comfortableRun( const completeVehicleData_t& veh );
+
+	// whoever is low in the way of a run along a heading, now or within the seconds foreseen; nullptr when nobody
+	static const GameEntity* trafficOnWay( const Mind& c, const Vec3& from, float yaw, float length, float seconds );
+	static const GameEntity* turnInTheWay( const Mind& c, float yaw, float onward, float seconds );
+	static bool spotFree( const Mind& c, const Vec3& spot );
+	static bool inSomeonesRun( const Mind& c, const Vec3& spot );
+	static bool groundTaxiable( const Mind& c, const Vec3& from, const Vec3& to );
+
+	// the run from here will not do: find the nearest spot on the runway that has one
 	static bool findTaxiSpot( Mind& c, const vec3_t origin, float wanted );
 	static float longestRun( const Vec3& spot, float wanted );
 	static float yawOf( const Vec3& dir );
@@ -163,20 +176,22 @@ struct PlaneTasks
 		float	departTurn = 0;
 		float	score = 0;
 	};
+	// on the grass beside a runway: taxi back onto it
+	static void offRunway( Mind& c, const Vec3& origin );
 	static Roll rollFor( const Mind& c );
 	static Heading scoreHeading( const Mind& c, const Vec3& origin, float yaw, const Roll& roll );
 	static bool rollIsClear( const Mind& c, const Vec3& origin, const Vec3& dir, float length );
 	static void settleDeparture( Mind& c, const Vec3& origin, const Heading& best, const Roll& roll );
 
-	// On the ground: wait when told to hold, plan a departure, taxi to a spot with enough runway if needed, then roll
-	// and lift off. Slow, it stops for anyone ahead and keeps off the path of an aircraft on its roll
+	// On the ground: wait when told to hold, plan a departure, taxi to a spot with enough runway if needed, line up,
+	// wait for the run to be clear, then roll and lift off. Slow, it stops for anyone in its way and keeps off the
+	// path of an aircraft on its roll
 	static void prepareTakeOff( Mind& c );
 	static Status holdShort( Mind& c );
 	static Status taxiToSpot( Mind& c );
 	static Status lineUpAndRoll( Mind& c );
 	static Status giveWay( Mind& c );
 	static bool waitForTraffic( Mind& c );
-	static void sidestepIfStuck( Mind& c, const GameEntity* other, const vec3_t flat, const vec3_t forward );
 	static bool onTakeOffRollTowards( const GameEntity* other, const Vec3& rel, float dist );
 
 	// follow the departure that was planned on the ground; the manoeuvre check still vets it

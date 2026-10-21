@@ -138,62 +138,83 @@ struct GoalScoring
 		return tank( s ) && !has( s, WT_ANTIAIRMISSILE ) ? s.who.caution * 1.6f * airThreatNear( s, 5000.0f ) : 0.0f;
 	}
 
-	// a supply helicopter with no crates left has nothing to give until it restocks
-	static bool suppliesGone( const Situation& s )
+	// How empty a vehicle's weapons are, 0 full to 1 empty, across those its job is about: a bomber's payload, a supply
+	// helicopter's crates, and for everyone the whole of what it carries; the emptier of the two counts. Flares are a
+	// need of their own
+	static float ammunitionUsed( const Situation& s )
 	{
-		if( !BotWeapons::carriesSupplies( s.vehicle ) )
-			return false;
-		for( int slot : allWeaponSlots )
+		const bool supplier = BotWeapons::carriesSupplies( s.vehicle );
+		float used = 0, jobUsed = 0;
+		int slots = 0, jobSlots = 0;
+		for( int slot = WP_MACHINEGUN; slot < WP_FLARE; slot++ )
 		{
+			const int most = s.ps.ammo[slot + 8];
+			if( !availableVehicles[s.vehicle].weapons[slot] || most <= 0 )
+				continue;
+			const float empty = 1.0f - std::clamp( static_cast<float>( s.ps.ammo[slot] ) / most, 0.0f, 1.0f );
+			used += empty;
+			slots++;
 			const int type = availableWeapons[availableVehicles[s.vehicle].weapons[slot]].type;
-			if( (type == WT_FUELCRATE || type == WT_AMMOCRATE || type == WT_HEALTHCRATE) && s.ps.ammo[slot] > 0 )
-				return false;
+			const bool payload = bomber( s ) && (type == WT_IRONBOMB || type == WT_GUIDEDBOMB || type == WT_ANTIGROUNDMISSILE || type == WT_ROCKET);
+			const bool crate = supplier && (type == WT_FUELCRATE || type == WT_AMMOCRATE || type == WT_HEALTHCRATE);
+			if( payload || crate )
+			{
+				jobUsed += empty;
+				jobSlots++;
+			}
 		}
-		return true;
+		return std::max( slots ? used / slots : 0.0f, jobSlots ? jobUsed / jobSlots : 0.0f );
 	}
 
-	// a bomber that has dropped everything: its guns are for keeping fighters off, not a reason to stay out
-	static bool payloadGone( const Situation& s )
+	// The wish to go back to a pad grows with what is missing, from nothing when full: as the cube of it, so a little
+	// used hardly counts and running out counts fast; half the ammunition gone is not yet worth the trip when nothing
+	// else is going on. Fuel is the need that cannot wait: at under half a tank it is a full reason on its own, and
+	// below a quarter not even a duel outweighs it
+	static constexpr float fuelWanted = 0.45f, fuelUrgent = 0.25f;
+	static float fraction( int have, int most ) { return most > 0 ? std::clamp( static_cast<float>( have ) / most, 0.0f, 1.0f ) : 1.0f; }
+	static float fuelNeed( const Situation& s )
 	{
-		if( !bomber( s ) || hasGroundWeapons( s ) )
-			return false;
-		for( int slot : secondaryWeaponSlots )
-		{
-			const int type = availableWeapons[availableVehicles[s.vehicle].weapons[slot]].type;
-			if( type == WT_IRONBOMB || type == WT_GUIDEDBOMB || type == WT_ANTIGROUNDMISSILE || type == WT_ROCKET )
-				return true;
-		}
-		return false;
+		constexpr float urgentPull = 8.0f;
+		const float fuel = fraction( s.ps.stats[STAT_FUEL], s.ps.stats[STAT_MAX_FUEL] );
+		const float missing = (1.0f - fuel) / (1.0f - fuelWanted);
+		return missing * missing * missing + std::max( 0.0f, fuelWanted - fuel ) * urgentPull;
 	}
-
-	// go back to a pad for fuel, repairs, ammunition or flares
-	static float supplyNeeds( const Situation& s )
+	// repairs: as much at under half health as the character's caution makes of it
+	static float damageNeed( const Situation& s )
 	{
-		if( s.sense.can.onFoot )
+		constexpr float repairWanted = 0.45f;
+		const float missing = (1.0f - s.sense.health) / (1.0f - repairWanted);
+		return std::min( missing * missing * missing, 2.0f ) * (0.2f + 0.8f * s.who.caution);
+	}
+	static float ammunitionNeed( const Situation& s )
+	{
+		constexpr float emptyWeight = 1.1f;
+		const float used = ammunitionUsed( s );
+		return used * used * used * emptyWeight;
+	}
+	static float flareNeed( const Situation& s )
+	{
+		const int most = s.ps.ammo[WP_FLARE + 8];
+		if( availableVehicles[s.vehicle].ammo[WP_FLARE] <= 0 || most <= 0 || tank( s ) )
+			return 0.0f;
+		const float used = 1.0f - fraction( s.ps.ammo[WP_FLARE], most );
+		return used * used * used * 0.3f * s.who.caution;
+	}
+	// an honourable character in a duel does not leave to rearm, unless the tank is nearly dry
+	static float duelResolveRearm( const Situation& s )
+	{
+		return fraction( s.ps.stats[STAT_FUEL], s.ps.stats[STAT_MAX_FUEL] ) >= fuelUrgent ? duelResolve( s, 1.0f ) : 1.0f;
+	}
+	// once on the way to a pad with something still missing, see it through
+	static float underWay( const Situation& s ) { return s.bot.rearm.pad >= 0 && !Bots::replenished( s.ent ) ? 0.7f : 0.0f; }
+	// nothing to go back to: full of all a pad gives, on foot, a plane that does not land, or no pad this vehicle can use
+	static float padToGo( const Situation& s )
+	{
+		if( s.sense.can.onFoot || Bots::replenished( s.ent ) )
 			return 0.0f;
 		if( plane( s ) && (!g_botLanding.integer || theLevel.time_ < s.bot.landing.giveUp) )
 			return 0.0f;
-		// fuel is the need that cannot wait: it grows as the tank empties, and below a quarter not even a duel outweighs it
-		constexpr float fuelWanted = 0.45f, fuelUrgent = 0.25f, fuelPull = 8.0f;
-		const float fuel = static_cast<float>( s.ps.stats[STAT_FUEL] ) / std::max( 1, s.ps.stats[STAT_MAX_FUEL] );
-		float need = 0.0f;
-		if( fuel < fuelWanted )
-			need = 1.0f + ( fuelWanted - fuel ) * fuelPull;
-		else if( s.sense.health < 0.45f )
-			need = 0.2f + 0.8f * s.who.caution;
-		else if( BotWeapons::outOfAmmo( s.vehicle, s.ps ) || suppliesGone( s ) || payloadGone( s ) || strikeSpent( s ) )
-			need = 0.7f;
-		else if( availableVehicles[s.vehicle].ammo[WP_FLARE] > 0 && s.ps.ammo[WP_FLARE] <= 0 && !tank( s ) )
-			need = 0.3f * s.who.caution;
-		if( fuel >= fuelUrgent )
-			need *= duelResolve( s, 1.0f );
-		// once on the way to a pad, see it through
-		if( s.bot.rearm.pad >= 0 )
-			need = std::max( need, 0.9f );
-		// no pad this vehicle can use: nothing to go back to
-		if( need > 0 && BotWorld::findPad( s.ent, theLevel.time_ < s.bot.rearm.badPadTime ? s.bot.rearm.badPad : -1 ) < 0 )
-			return 0.0f;
-		return need;
+		return BotWorld::findPad( s.ent, theLevel.time_ < s.bot.rearm.badPadTime ? s.bot.rearm.badPad : -1 ) >= 0 ? 1.0f : 0.0f;
 	}
 
 	// the flag: surface vehicles and helicopters only, and nothing matters more than bringing it home
@@ -238,7 +259,9 @@ namespace
 	constexpr Term climbTerms[] = { { "bomb run height", Combine::Add, G::bombRunHeight }, { "height over enemy", Combine::Add, G::heightOverEnemy },
 		{ "stealth approach", Combine::Add, G::stealthApproach } };
 	constexpr Term hideTerms[] = { { "unseen fire", Combine::Add, G::unseenFire }, { "aircraft overhead", Combine::Add, G::aircraftOverhead } };
-	constexpr Term rearmTerms[] = { { "supply needs", Combine::Add, G::supplyNeeds } };
+	constexpr Term rearmTerms[] = { { "fuel", Combine::Add, G::fuelNeed }, { "damage", Combine::Add, G::damageNeed },
+		{ "ammunition", Combine::Add, G::ammunitionNeed }, { "flares", Combine::Add, G::flareNeed }, { "duel", Combine::Scale, G::duelResolveRearm },
+		{ "under way", Combine::Add, G::underWay }, { "pad to go to", Combine::Scale, G::padToGo } };
 	constexpr Term captureTerms[] = { { "flag", Combine::Add, G::flag } };
 
 	struct GoalEntry

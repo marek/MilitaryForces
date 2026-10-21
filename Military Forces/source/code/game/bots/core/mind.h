@@ -111,11 +111,13 @@ struct Bots::Mind
 		travelTo( Vec3( point ) );
 	}
 	// turn the course onto the ground path to the destination, searching again every two seconds; false when
-	// there is no path to follow or none is needed
+	// there is no path to follow or none is needed. A waypoint is let go when it is reached or when the one after it
+	// can be driven to straight from here: letting it go earlier cuts the corner it was there to go round
 	// (reach: how near a waypoint counts as reached; finish: how near the destination the path is let go and the rest
 	// driven straight, twice the reach unless given)
 	bool followGround( bool water, float reach, float finish = -1.0f )
 	{
+		constexpr int skipCheckEvery = 300;
 		const Vec3 here( ent->r.currentOrigin );
 		if( !steer.hasDest || steer.hold || (steer.dest - here).length() < (finish >= 0.0f ? finish : reach * 2.0f) )
 		{
@@ -133,7 +135,13 @@ struct Bots::Mind
 		{
 			const Vec3 leg = bot.path.points[bot.path.index] - here;
 			if( leg.x() * leg.x() + leg.y() * leg.y() > reach * reach )
-				break;
+			{
+				if( theLevel.time_ < bot.path.skipTime )
+					break;
+				bot.path.skipTime = theLevel.time_ + skipCheckEvery;
+				if( !GroundNav::lineOpen( here, bot.path.points[bot.path.index + 1], water ) )
+					break;
+			}
 			bot.path.index++;
 		}
 		bot.path.following = bot.path.index < bot.path.points.size();

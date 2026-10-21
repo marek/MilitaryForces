@@ -39,16 +39,45 @@ int BotSenses::ridersOf( GameEntity* ent )
 	return riders;
 }
 
-// A team mate on foot that this vehicle could take aboard, a real player first. The offer is held for a while and
-// then dropped for a time, so a vehicle does not sit waiting for someone who is not interested.
-GameEntity* BotSenses::walkerNear( GameEntity* ent, Bots::State& bot, float range )
+namespace
 {
-	constexpr int offerTime = 15000;
-	constexpr int restTime = 25000;
+	constexpr int passOverTime = 90000;
+
+	// A team mate on foot who wants a lift: a real player may anywhere; a bot is coming this way, or is far from any
+	// pad, where it would otherwise have to walk to take a vehicle. A bot near a pad takes a vehicle there by itself
+	bool wantsLift( GameEntity* ent, GameEntity* walker )
+	{
+		constexpr float padWalk = 1200.0f, walking = 20.0f, towards = 0.7f;
+		if( !Bots::isBot( walker->s.number ) )
+			return true;
+		vec3_t moving = { walker->client_->ps_.velocity[0], walker->client_->ps_.velocity[1], 0 };
+		vec3_t toUs = { ent->r.currentOrigin[0] - walker->r.currentOrigin[0], ent->r.currentOrigin[1] - walker->r.currentOrigin[1], 0 };
+		if( VectorNormalize( moving ) > walking && VectorNormalize( toUs ) > 0.0f && DotProduct( moving, toUs ) > towards )
+			return true;
+		return BotWorld::padDistance( walker->r.currentOrigin ) > padWalk;
+	}
+
+	// another vehicle is on its way to them now: one lift is enough
+	bool offeredElsewhere( GameEntity* ent, int walker )
+	{
+		constexpr int current = 500;
+		for( int i = 1; i <= theLevel.maxclients_; i++ )
+		{
+			if( i == ent->s.number || !Bots::isBot( i ) )
+				continue;
+			const Bots::State& other = BotTeam::stateOf( i );
+			if( other.lift.walker == walker && theLevel.time_ - other.lift.heldAt < current &&
+				alive( theLevel.getEntity( i ) ) )
+				return true;
+		}
+		return false;
+	}
+}
+
+GameEntity* BotSenses::liftSeeker( GameEntity* ent, const Bots::State& bot, float range )
+{
 	constexpr float humanPreference = 0.3f;
-	if( g_gametype.integer < GT_TEAM || theLevel.time_ < bot.liftGiveUp )
-		return nullptr;
-	if( BotSenses::ridersOf( ent ) >= availableVehicles[ent->client_->vehicle_].seats )
+	if( g_gametype.integer < GT_TEAM || BotSenses::ridersOf( ent ) + 1 >= availableVehicles[ent->client_->vehicle_].seats )
 		return nullptr;
 	GameEntity* walker = nullptr;
 	float best = 0;
@@ -57,29 +86,46 @@ GameEntity* BotSenses::walkerNear( GameEntity* ent, Bots::State& bot, float rang
 		GameEntity* other = theLevel.getEntity( i );
 		if( other == ent || !alive( other ) || !OnSameTeam( ent, other ) || other->client_->sess_.ridingClient_ >= 0 )
 			continue;
-		if( !(availableVehicles[other->client_->vehicle_].cat & CAT_LQM) )
+		if( !(availableVehicles[other->client_->vehicle_].cat & CAT_LQM) || (i == bot.lift.passedOver && theLevel.time_ < bot.lift.passedOverUntil) )
 			continue;
 		const float dist = Distance( ent->r.currentOrigin, other->r.currentOrigin );
 		const float weighted = Bots::isBot( i ) ? dist : dist * humanPreference;
-		if( dist < range && (!walker || weighted < best) )
+		if( dist < range && (!walker || weighted < best) && wantsLift( ent, other ) && (i == bot.lift.walker || !offeredElsewhere( ent, i )) )
 		{
 			walker = other;
 			best = weighted;
 		}
 	}
+	return walker;
+}
+
+GameEntity* BotSenses::walkerNear( GameEntity* ent, Bots::State& bot, float range, float beside )
+{
+	// time to get there and time to wait there
+	constexpr int offerTime = 30000, waitTime = 12000;
+	Bots::State::Lift& lift = bot.lift;
+	GameEntity* walker = liftSeeker( ent, bot, range );
 	if( !walker )
 	{
-		bot.liftTime = 0;
+		lift.walker = -1;
 		return nullptr;
 	}
-	if( !bot.liftTime )
-		bot.liftTime = theLevel.time_;
-	if( theLevel.time_ > bot.liftTime + offerTime )
+	if( walker->s.number != lift.walker )
 	{
-		bot.liftTime = 0;
-		bot.liftGiveUp = theLevel.time_ + restTime;
+		lift.walker = walker->s.number;
+		lift.since = theLevel.time_;
+		lift.besideSince = 0;
+	}
+	if( !lift.besideSince && Distance( ent->r.currentOrigin, walker->r.currentOrigin ) < beside )
+		lift.besideSince = theLevel.time_;
+	if( theLevel.time_ > lift.since + offerTime || (lift.besideSince && theLevel.time_ > lift.besideSince + waitTime) )
+	{
+		lift.passedOver = lift.walker;
+		lift.passedOverUntil = theLevel.time_ + passOverTime;
+		lift.walker = -1;
 		return nullptr;
 	}
+	lift.heldAt = theLevel.time_;
 	return walker;
 }
 

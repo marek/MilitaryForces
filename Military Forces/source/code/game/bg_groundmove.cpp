@@ -668,10 +668,15 @@ PlayerMove::groundVehicleMove
 */
 
 // how high a ground vehicle can step: a good part of its own height
-static float stepHeightOf( int vehicle )
+float VehicleData::stepHeight( int vehicle )
 {
 	constexpr float least = 6.0f, shareOfHeight = 0.6f;
 	return std::max( least, ( availableVehicles[vehicle].maxs[2] - availableVehicles[vehicle].mins[2] ) * shareOfHeight );
+}
+
+float VehicleData::climbAngle( int vehicle )
+{
+	return handlingOf( vehicle ).climb;
 }
 
 /*
@@ -696,7 +701,7 @@ void PlayerMove::stepSlideMove_GV()
 	VectorCopy( pm->ps->origin, slideOrigin );
 	VectorCopy( pm->ps->velocity, slideVelocity );
 
-	const float stepSize = stepHeightOf( pm->vehicle );
+	const float stepSize = VehicleData::stepHeight( pm->vehicle );
 	Vec3 maxs;
 	PM_GroundCoreBox( pm->vehicle, mins, maxs );
 
@@ -821,7 +826,7 @@ void PlayerMove::groundVehicleMove( )
 			// a face no higher than the vehicle can step is a kerb, not a wall: the same stretch one step up is clear,
 			// and the step move takes it from here
 			{
-				const float stepHeight = stepHeightOf( pm->vehicle );
+				const float stepHeight = VehicleData::stepHeight( pm->vehicle );
 				vec3_t fromUp, toUp;
 				VectorCopy( from, fromUp );
 				VectorCopy( to, toUp );
@@ -908,7 +913,7 @@ void PlayerMove::groundVehicleMove( )
 				continue;
 			// what that end has met is no higher than the vehicle steps: a kerb, which the step move takes
 			{
-				const float lift = stepHeightOf( pm->vehicle ) + veh.mins[2] + 1.0f - middle;
+				const float lift = VehicleData::stepHeight( pm->vehicle ) + veh.mins[2] + 1.0f - middle;
 				vec3_t fromUp, toUp;
 				VectorMA( from, lift, axis[2], fromUp );
 				VectorMA( to, lift, axis[2], toUp );

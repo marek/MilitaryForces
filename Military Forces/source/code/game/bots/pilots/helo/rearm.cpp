@@ -24,8 +24,6 @@ behavior::Status HeloTasks::descendToPad( Mind& c )
 	c.steer.hold = true;
 	c.steer.mode = Hover;
 	c.steer.wantHeight = -200.0f;
-	if( !(c.ps.ONOFF & OO_GEAR) )
-		c.cmd.buttons |= BUTTON_GEAR;
 	return Status::Running;
 }
 
@@ -36,5 +34,36 @@ behavior::Status HeloTasks::flyToPad( Mind& c )
 	c.weapons.cover = true;
 	c.steer.mode = ToPad;
 	c.steer.wantHeight = heloCruiseHeight * 0.6f;
+	return Status::Running;
+}
+
+bool HeloTasks::padTaken( Mind& c )
+{
+	constexpr float lookingAt = 600.0f, room = 40.0f, above = 300.0f, below = 50.0f;
+	const BotWorld::Pad& pad = BotWorld::pads_[c.bot.rearm.pad];
+	if( Distance( c.ent->r.currentOrigin, pad.center ) > lookingAt )
+		return false;
+	const float own = radiusOf( c.client->vehicle_ );
+	for( int i = 1; i <= theLevel.maxclients_; i++ )
+	{
+		GameEntity* other = theLevel.getEntity( i );
+		if( other == c.ent || !alive( other ) || other->client_->sess_.ridingClient_ >= 0 )
+			continue;
+		const Vec3 rel = Vec3( other->r.currentOrigin ) - pad.center;
+		const float aside = sqrtf( rel.x() * rel.x() + rel.y() * rel.y() );
+		if( aside < own + radiusOf( other->client_->vehicle_ ) + room && rel.z() < above && rel.z() > -below )
+			return true;
+	}
+	return false;
+}
+
+behavior::Status HeloTasks::givePadUp( Mind& c )
+{
+	constexpr int avoidPad = 30000;
+	c.bot.rearm.badPad = c.bot.rearm.pad;
+	c.bot.rearm.badPadTime = theLevel.time_ + avoidPad;
+	c.bot.rearm.letGo();
+	c.bot.goalEvalTime = 0;
+	c.steer.mode = Hover;
 	return Status::Running;
 }

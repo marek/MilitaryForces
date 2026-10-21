@@ -13,16 +13,24 @@ behavior::Status SurfaceTasks::navigate( Mind& c )
 {
 	// a flag has to be driven right up to, round whatever stands by it: the path is followed to the end. Anything
 	// else is near enough once the last stretch is a straight line
-	c.followGround( c.boat, 220.0f, c.bot.desire == Goal::Capture ? 60.0f : -1.0f );
+	c.followGround( c.boat, 48.0f, c.bot.desire == Goal::Capture ? 60.0f : 300.0f );
 	return Status::Success;
 }
 
-// a wall, water, a drop, shore for a boat, or no progress for a while: back out and try another way
+// A wall, water, a drop, shore for a boat, or no progress for a while: back out and try another way. A wall counts
+// only when both the hull and the way the driver wants to go run into it within the distance the vehicle needs to
+// stop: one coming round the end of a wall has it ahead of the hull and is already turning away from it
 behavior::Status SurfaceTasks::watchAhead( Mind& c )
 {
-	vec3_t forward, flat = { 0, c.ps.vehicleAngles[YAW], 0 };
+	vec3_t forward, flat = { 0, c.ps.vehicleAngles[YAW], 0 }, course;
 	AngleVectors( flat, forward, nullptr, nullptr );
-	c.steer.blocked = wallAhead( c, forward ) || (c.boat ? shoreAhead( c, forward ) : waterOrDropAhead( c, forward ));
+	VectorSet( course, c.steer.course[0], c.steer.course[1], 0 );
+	if( VectorNormalize( course ) < 0.01f )
+		VectorCopy( forward, course );
+	constexpr float leastReach = 40.0f, reachPerSpeed = 0.6f, mostReach = 260.0f;
+	const float reach = std::clamp( VectorLength( c.ps.velocity ) * reachPerSpeed, leastReach, mostReach );
+	c.steer.blocked = (wallAhead( c, forward, reach ) && wallAhead( c, course, reach )) ||
+		(c.boat ? shoreAhead( c, forward ) : waterOrDropAhead( c, forward ));
 	if( theLevel.time_ > c.bot.stuck.checkTime && noProgress( c ) )
 		c.steer.blocked = true;
 	if( c.steer.blocked && theLevel.time_ > c.bot.stuck.reverseTime )
@@ -30,15 +38,16 @@ behavior::Status SurfaceTasks::watchAhead( Mind& c )
 	return Status::Success;
 }
 
-// something solid ahead; a slope gentle enough to drive up is not an obstacle
-bool SurfaceTasks::wallAhead( const Mind& c, const vec3_t forward )
+// something solid ahead, from just above the highest edge the vehicle steps up; a slope gentle enough to drive up is
+// not an obstacle
+bool SurfaceTasks::wallAhead( const Mind& c, const vec3_t dir, float reach )
 {
-	constexpr float lookAhead = 260.0f, driveable = 0.6f;
+	constexpr float driveable = 0.6f;
 	vec3_t start;
 	trace_t tr;
 	VectorCopy( c.ent->r.currentOrigin, start );
-	start[2] += c.veh.maxs[2] * 0.5f + 8;
-	return BotWorld::pathBlocked( start, forward, lookAhead, c.ent->s.number, tr ) && tr.plane.normal[2] < driveable;
+	start[2] += c.veh.mins[2] + VehicleData::stepHeight( c.client->vehicle_ ) + 1.0f;
+	return BotWorld::pathBlocked( start, dir, reach, c.ent->s.number, tr ) && tr.plane.normal[2] < driveable;
 }
 
 // a land vehicle keeps out of water and off a drop, near and a little further on
@@ -106,7 +115,9 @@ behavior::Status SurfaceTasks::reverse( Mind& c )
 	return Status::Running;
 }
 
-// turn the hull onto the course; drive unless holding
+// Turn the hull onto the course; drive unless holding. A driver slows for a turn as a person does: at full speed a
+// vehicle turns in a wide circle, slowly in a tight one, so it slows by how far it still has to turn and before a
+// sharp bend in its path, and a gap in a wall is gone through instead of the wall beside it
 behavior::Status SurfaceTasks::steer( Mind& c )
 {
 	Vec3 angles;
@@ -117,7 +128,36 @@ behavior::Status SurfaceTasks::steer( Mind& c )
 		c.cmd.rightmove = moveFull;
 	else if( yawError > 6 )
 		c.cmd.rightmove = -moveFull;
-	if( !c.steer.hold )
+	if( c.steer.hold )
+		return Status::Running;
+	const float wanted = cornerSpeed( c, fabsf( yawError ) );
+	// the brake button is a parking brake that stays on; pulling back on the throttle while rolling brakes
+	if( c.speed > wanted * 1.15f )
+		c.cmd.forwardmove = -moveFull;
+	else if( c.speed < wanted )
 		c.cmd.forwardmove = moveFull;
 	return Status::Running;
+}
+
+// the speed for the turn ahead, as the instruments show it
+float SurfaceTasks::cornerSpeed( const Mind& c, float turnLeft )
+{
+	constexpr float easyTurn = 30.0f, hardTurn = 90.0f, slowest = 0.25f;
+	constexpr float bendAngle = 40.0f, bendNear = 160.0f, bendSpeed = 0.3f;
+	const float top = static_cast<float>( c.veh.maxspeed );
+	float share = 1.0f - std::clamp( (turnLeft - easyTurn) / (hardTurn - easyTurn), 0.0f, 1.0f ) * (1.0f - slowest);
+	const Bots::State& bot = c.bot;
+	if( bot.path.following && bot.path.index + 1 < bot.path.points.size() )
+	{
+		const Vec3 here( c.ent->r.currentOrigin );
+		const Vec3& at = bot.path.points[bot.path.index];
+		const Vec3& after = bot.path.points[bot.path.index + 1];
+		Vec3 in = at - here, out = after - at;
+		in[2] = out[2] = 0;
+		const float near = in.length();
+		if( near < bendNear && in.length() > 1.0f && out.length() > 1.0f &&
+			acosf( std::clamp( in.normalized().dot( out.normalized() ), -1.0f, 1.0f ) ) * 180.0f / std::numbers::pi_v<float> > bendAngle )
+			share = std::min( share, bendSpeed );
+	}
+	return top * share;
 }

@@ -12,7 +12,7 @@ void Bots::thinkRider( GameEntity* ent, State& bot, usercmd_t& cmd, vec3_t view 
 	view[ROLL] = 0;
 	const bool gunner = client->sess_.seat_ == 1 && VehicleData::vehicleHasTurret( pilot->client_->vehicle_ );
 	if( gunner )
-		bot.liftTime = 0;
+		bot.stillSince = 0;
 	else if( leaveStoppedRide( ent, bot, pilot ) )
 		return;
 	// passengers shoot only from open vehicles
@@ -43,17 +43,17 @@ bool Bots::leaveStoppedRide( GameEntity* ent, State& bot, GameEntity* pilot )
 	const completeVehicleData_t& ride = availableVehicles[pilot->client_->vehicle_];
 	if( !(ride.cat & CAT_GROUND) || !(ride.caps & HC_WHEELS) || VectorLength( pilot->client_->ps_.velocity ) >= 15 )
 	{
-		bot.liftTime = 0;
+		bot.stillSince = 0;
 		return false;
 	}
-	if( !bot.liftTime )
+	if( !bot.stillSince )
 	{
-		bot.liftTime = theLevel.time_;
+		bot.stillSince = theLevel.time_;
 		return false;
 	}
-	if( theLevel.time_ <= bot.liftTime + rideTime || theLevel.time_ <= bot.commandTime )
+	if( theLevel.time_ <= bot.stillSince + rideTime || theLevel.time_ <= bot.commandTime )
 		return false;
-	bot.liftTime = 0;
+	bot.stillSince = 0;
 	bot.commandTime = theLevel.time_ + 2000;
 	Cmd_Eject_f( ent );
 	return true;

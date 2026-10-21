@@ -21,7 +21,7 @@ behavior::Status InfantryTasks::wander( Mind& c )
 
 behavior::Status InfantryTasks::navigate( Mind& c )
 {
-	c.followGround( false, 120.0f );
+	c.followGround( false, 24.0f, 120.0f );
 	return Status::Success;
 }
 
