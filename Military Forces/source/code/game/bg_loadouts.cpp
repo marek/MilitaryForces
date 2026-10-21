@@ -76,7 +76,9 @@ bool VehicleData::distributeWeaponsOnPylons( int idx, completeLoadout_t* loadout
 //	Common::printf( "Calculating weapon stations for %s\n", availableVehicles[idx].tinyName );
 //#endif
 
-	loadout->mountsOnBay = false;
+	// from nothing: the tables are set up more than once in one process (game, client and menus share them), and
+	// stores left on the mounts from the last time would be counted again
+	memset( loadout, 0, sizeof( *loadout ) );
 	num = VehicleData::getTagsContaining(modelname, "tag_P", tags, MAX_MOUNTS_PER_VEHICLE );
 	if( !num && (availableVehicles[idx].cat & CAT_HELO) && (availableVehicles[idx].caps & HC_WEAPONBAY) ) {
 		modelname = VehicleData::createModelPathname( idx, "models/vehicles/%s/%s/%s_bay.md3" );
