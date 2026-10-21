@@ -6,8 +6,10 @@
 #include <vector>
 
 // Each team's map of where it is dangerous to be: the enemy's SAM and flak sites by their reach, where team mates
-// died in the last minutes, and enemies the team has seen, by what they can shoot at. Without teams, only the sites. Kept as a short list of discs,
-// remade every two seconds, so a question costs a pass over a few dozen of them.
+// died in the last minutes, and enemies the team has seen, by what they can shoot at. Without teams, only the sites.
+// Kept as a list of discs remade every two seconds and painted then onto a grid of points 256 units apart, one layer
+// for aircraft and one for the surface, so that a question - and a path search asks thousands - is a look at the four
+// points round it, whatever the number of discs.
 class ThreatMap
 {
 public:
@@ -33,6 +35,8 @@ private:
 		int		time = 0;
 	};
 	static void refresh( int team );
+	static void paint( int slot );
+	static float sample( const std::vector<float>& layer, const vec3_t point );
 	static void addSites( int team, std::vector<Disc>& out );
 	static void addSightings( int team, std::vector<Disc>& out );
 	static void addDeaths( int team, std::vector<Disc>& out );
@@ -40,6 +44,11 @@ private:
 	static std::array<std::vector<Disc>, 4>		discs_;
 	static std::array<int, 4>					refreshTime_;
 	static std::array<std::vector<Death>, 4>	deaths_;
+	static constexpr float						gridStep = 256.0f;
+	static std::array<std::vector<float>, 4>	airGrid_;
+	static std::array<std::vector<float>, 4>	surfaceGrid_;
+	static Vec3									gridMins_;
+	static int									gridX_, gridY_;
 };
 
 #endif
