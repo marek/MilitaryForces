@@ -1,4 +1,5 @@
 #include "surface.h"
+#include "../../weapons/envelope.h"
 
 // stop and lob shells at it from where we are, at the place it was last seen if it is out of sight
 behavior::Status SurfaceTasks::shellAirfield( Mind& c )
@@ -17,13 +18,20 @@ behavior::Status SurfaceTasks::withdraw( Mind& c )
 	return Status::Running;
 }
 
-// close to gun range and stop there to shoot
+// Close in, and stop to shoot only where a shot is possible: the enemy in sight and inside the reach of a weapon with
+// rounds left. One behind a rise or out of reach is driven towards, where it is or was last seen; two vehicles that
+// each stopped for the other out of sight would wait there for the rest of the game
 behavior::Status SurfaceTasks::engage( Mind& c )
 {
+	constexpr float closeEnough = 1500.0f;
 	c.bot.cover.has = false;
 	VectorCopy( c.sense.enemyDir, c.steer.course );
-	c.travelTo( c.enemyPosition() );
-	c.steer.hold = c.sense.enemyDist < 1500;
+	const Vec3 enemy = c.enemyPosition();
+	c.travelTo( enemy );
+	vec3_t at;
+	enemy.copyTo( at );
+	const float reach = Envelope::reachOf( c.client->vehicle_, c.ps.ammo, c.sense.enemyAir, Envelope::elevationOf( c.ent->r.currentOrigin, at ) );
+	c.steer.hold = c.sense.enemyVisible && c.sense.enemyDist < std::min( closeEnough, reach );
 	return Status::Running;
 }
 

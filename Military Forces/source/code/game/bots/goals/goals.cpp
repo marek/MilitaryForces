@@ -166,39 +166,45 @@ struct GoalScoring
 		return std::max( slots ? used / slots : 0.0f, jobSlots ? jobUsed / jobSlots : 0.0f );
 	}
 
-	// The wish to go back to a pad grows with what is missing, from nothing when full: as the cube of it, so a little
-	// used hardly counts and running out counts fast; half the ammunition gone is not yet worth the trip when nothing
-	// else is going on. Fuel is the need that cannot wait: at under half a tank it is a full reason on its own, and
-	// below a quarter not even a duel outweighs it
+	// The wish to go back to a pad is nothing while there is plenty left, and from the point where something is clearly
+	// running low it grows with the square of how far below that point it is: a wish growing from full sends an idle
+	// vehicle home at two thirds of a tank, and a vehicle that keeps going home is not where the fighting is.
+	// Fuel is the need that cannot wait: at under half a tank it is a full reason on its own, and below a quarter not
+	// even a duel outweighs it
 	static constexpr float fuelWanted = 0.45f, fuelUrgent = 0.25f;
 	static float fraction( int have, int most ) { return most > 0 ? std::clamp( static_cast<float>( have ) / most, 0.0f, 1.0f ) : 1.0f; }
+	// how far past the point where it starts to count, as a share of the way from there to the end
+	static float pastKnee( float used, float knee ) { return std::clamp( (used - knee) / (1.0f - knee), 0.0f, 1.0f ); }
 	static float fuelNeed( const Situation& s )
 	{
-		constexpr float urgentPull = 8.0f;
+		constexpr float fuelLow = 0.55f, urgentPull = 8.0f;
 		const float fuel = fraction( s.ps.stats[STAT_FUEL], s.ps.stats[STAT_MAX_FUEL] );
-		const float missing = (1.0f - fuel) / (1.0f - fuelWanted);
-		return missing * missing * missing + std::max( 0.0f, fuelWanted - fuel ) * urgentPull;
+		const float below = std::max( 0.0f, fuelLow - fuel ) / (fuelLow - fuelWanted);
+		return below * below + std::max( 0.0f, fuelWanted - fuel ) * urgentPull;
 	}
-	// repairs: as much at under half health as the character's caution makes of it
+	// repairs: from under three fifths, a full reason at under half health as the character's caution makes of it
 	static float damageNeed( const Situation& s )
 	{
-		constexpr float repairWanted = 0.45f;
-		const float missing = (1.0f - s.sense.health) / (1.0f - repairWanted);
-		return std::min( missing * missing * missing, 2.0f ) * (0.2f + 0.8f * s.who.caution);
+		constexpr float healthLow = 0.6f, repairWanted = 0.45f;
+		const float below = std::max( 0.0f, healthLow - s.sense.health ) / (healthLow - repairWanted);
+		return std::min( below * below, 2.0f ) * (0.2f + 0.8f * s.who.caution);
 	}
+	// ammunition: from seven tenths used
 	static float ammunitionNeed( const Situation& s )
 	{
-		constexpr float emptyWeight = 1.1f;
-		const float used = ammunitionUsed( s );
-		return used * used * used * emptyWeight;
+		constexpr float knee = 0.7f, emptyWeight = 1.1f;
+		const float past = pastKnee( ammunitionUsed( s ), knee );
+		return past * past * emptyWeight;
 	}
+	// flares: from half used, by caution
 	static float flareNeed( const Situation& s )
 	{
+		constexpr float knee = 0.5f, weight = 0.3f;
 		const int most = s.ps.ammo[WP_FLARE + 8];
 		if( availableVehicles[s.vehicle].ammo[WP_FLARE] <= 0 || most <= 0 || tank( s ) )
 			return 0.0f;
-		const float used = 1.0f - fraction( s.ps.ammo[WP_FLARE], most );
-		return used * used * used * 0.3f * s.who.caution;
+		const float past = pastKnee( 1.0f - fraction( s.ps.ammo[WP_FLARE], most ), knee );
+		return past * past * weight * s.who.caution;
 	}
 	// an honourable character in a duel does not leave to rearm, unless the tank is nearly dry
 	static float duelResolveRearm( const Situation& s )
