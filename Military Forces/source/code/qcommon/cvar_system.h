@@ -14,6 +14,8 @@ public:
 	static void setValue( const char *var_name, float value );
 	static void setValueSafe( const char *var_name, float value );
 	static float variableValue( const char *var_name );
+	// the value a latched change will give at the next restart, or the value when none waits
+	static float pendingVariableValue( const char *var_name );
 	static int variableIntegerValue( const char *var_name );
 	static char *variableString( const char *var_name );
 	static void variableStringBuffer( const char *var_name, char *buffer, int bufsize );

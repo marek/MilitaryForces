@@ -248,6 +248,7 @@ using searchpath_t = searchpath_s;
 
 char FileSystem::fs_gamedir[MAX_OSPATH];	// this will be a single file name with no separators
 static	cvar_t		*fs_debug;
+static	cvar_t		*fs_hqTextures;
 cvar_t *FileSystem::fs_homeconfigpath;
 cvar_t *FileSystem::fs_homedatapath;
 cvar_t *FileSystem::fs_homestatepath;
@@ -2771,6 +2772,32 @@ int QDECL FileSystem::paksort( const void *a, const void *b ) {
 	return FS_PathCmp( aa, bb );
 }
 
+// optional HQ model-texture overlays: they shadow the base paks' model textures, so only the selected one loads
+static constexpr const char *HQ_PAK_PREFIX = "mf_hq_";
+// the overlay each fs_hqTextures setting loads; 0 loads none
+static constexpr const char *hqPakForSetting[] = { nullptr, "mf_hq_2048.pk3", "mf_hq_4096.pk3" };
+
+/*
+================
+FS_IsHqPak
+================
+*/
+static bool FS_IsHqPak( const char *pak ) {
+	const char *name = strrchr( pak, '/' );
+	name = name ? name + 1 : pak;
+	return Q_stricmpn( name, HQ_PAK_PREFIX, strlen( HQ_PAK_PREFIX ) ) == 0;
+}
+
+/*
+================
+FS_IsSelectedHqPak
+================
+*/
+static bool FS_IsSelectedHqPak( const char *pakfile ) {
+	const char *selected = hqPakForSetting[fs_hqTextures->asInt()];
+	return selected && !FileSystem::filenameCompare( pakfile, selected );
+}
+
 /*
 ================
 FileSystem::addGameDirectory
@@ -2782,6 +2809,7 @@ then loads the zip headers
 void FileSystem::addGameDirectory( const char *path, const char *dir ) {
 	searchpath_t	*sp;
 	searchpath_t	*search;
+	searchpath_t	*hqSearch = nullptr;
 	pack_t			*pak;
 	char			curpath[MAX_OSPATH + 1], *pakfile;
 	int				numfiles;
@@ -2849,6 +2877,11 @@ void FileSystem::addGameDirectory( const char *path, const char *dir ) {
 
 		if (pakwhich) {
 			// The next .pk3 file is before the next .pk3dir
+			if (FS_IsHqPak(pakfiles[pakfilesi]) && !FS_IsSelectedHqPak(pakfiles[pakfilesi])) {
+				pakfilesi++;
+				continue;
+			}
+
 			pakfile = FileSystem::buildOSPath(path, dir, pakfiles[pakfilesi]);
 			if ((pak = FS_LoadZipFile(pakfile, pakfiles[pakfilesi])) == nullptr) {
 				// This isn't a .pk3! Next!
@@ -2864,8 +2897,12 @@ void FileSystem::addGameDirectory( const char *path, const char *dir ) {
 
 			search = Zone::make<searchpath_t>();
 			search->pack = pak;
-			search->next = fs_searchpaths;
-			fs_searchpaths = search;
+			if (FS_IsHqPak(pakfiles[pakfilesi])) {
+				hqSearch = search;
+			} else {
+				search->next = fs_searchpaths;
+				fs_searchpaths = search;
+			}
 
 			pakfilesi++;
 		}
@@ -2894,6 +2931,12 @@ void FileSystem::addGameDirectory( const char *path, const char *dir ) {
 
 			pakdirsi++;
 		}
+	}
+
+	// the selected HQ overlay is searched before every other pak of this directory
+	if (hqSearch) {
+		hqSearch->next = fs_searchpaths;
+		fs_searchpaths = hqSearch;
 	}
 
 	// done
@@ -2950,10 +2993,11 @@ bool FileSystem::idPak(char *pak, char *base, int numPaks)
 	if (i < numPaks) {
 		return true;
 	}
-	// paks named q3_* hold files from the player's own Quake III Arena copy: never sent, never asked for
+	// paks named q3_* hold files from the player's own Quake III Arena copy, and HQ overlays are the player's
+	// own choice: never sent, never asked for
 	const char *name = strrchr( pak, '/' );
 	name = name ? name + 1 : pak;
-	return Q_stricmpn( name, "q3_", 3 ) == 0;
+	return Q_stricmpn( name, "q3_", 3 ) == 0 || FS_IsHqPak( name );
 }
 
 /*
@@ -3280,6 +3324,8 @@ void FileSystem::startup( const char *gameName )
 	fs_packFiles = 0;
 
 	fs_debug = CvarSystem::get( "fs_debug", "0", 0 );
+	fs_hqTextures = CvarSystem::get( "fs_hqTextures", "0", CVAR_ARCHIVE|CVAR_LATCH );
+	CvarSystem::checkRange( fs_hqTextures, 0, std::size( hqPakForSetting ) - 1, true );
 	fs_basepath = CvarSystem::get ("fs_basepath", System::defaultInstallPath(), CVAR_INIT|CVAR_PROTECTED );
 	fs_basegame = CvarSystem::get ("fs_basegame", "", CVAR_INIT );
 	// a config file beside the game's own data keeps the settings in the game folder
@@ -3362,6 +3408,7 @@ void FileSystem::startup( const char *gameName )
 	FS_Path_f();
 
 	fs_gamedirvar->setModified( false ); // We just loaded, it's not modified
+	fs_hqTextures->setModified( false );
 
 	Common::printf( "----------------------\n" );
 
@@ -4027,6 +4074,7 @@ void FileSystem::initFilesystem( ) {
 	Common::startupVariable("fs_homedatapath");
 	Common::startupVariable("fs_homestatepath");
 	Common::startupVariable("fs_game");
+	Common::startupVariable("fs_hqTextures");
 
 	if(!FileSystem::filenameCompare(CvarSystem::variableString("fs_game"), com_basegame->asString()))
 		CvarSystem::set("fs_game", "");
@@ -4141,7 +4189,8 @@ bool FileSystem::conditionalRestart(int checksumFeed, bool disconnect)
 			fs_gamedirvar->setModified( false );
 	}
 
-	if(checksumFeed != fs_checksumFeed)
+	// a change of HQ overlay is latched until the pak list is read again
+	if(checksumFeed != fs_checksumFeed || fs_hqTextures->modified())
 		FileSystem::restart(checksumFeed);
 	else if(fs_numServerPaks && !fs_reordered)
 		FileSystem::reorderPurePaks();

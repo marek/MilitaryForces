@@ -112,6 +112,21 @@ float CvarSystem::variableValue( const char *var_name ) {
 
 /*
 ============
+CvarSystem::pendingVariableValue
+============
+*/
+float CvarSystem::pendingVariableValue( const char *var_name ) {
+	cvar_t	*var;
+
+	var = findVar (var_name);
+	if (!var)
+		return 0;
+	return var->latchedString_ ? atof( var->latchedString_ ) : var->value_;
+}
+
+
+/*
+============
 CvarSystem::variableIntegerValue
 ============
 */

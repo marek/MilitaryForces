@@ -105,7 +105,8 @@ UI_DisplayContextUI::runScript( char **p )
 float
 UI_DisplayContextUI::getCVarValue( const char *cvar )
 {
-	return CvarSystem::variableValue( cvar );
+	// a setting that takes effect on restart shows, and steps on from, the value chosen for it
+	return CvarSystem::pendingVariableValue( cvar );
 }
 
 void
